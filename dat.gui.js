@@ -3,6 +3,7 @@
  * http://code.google.com/p/dat-gui
  *
  * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2013 Mariusz Zieliński
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -3239,7 +3240,7 @@ dat.controllers.ColorController = (function (Controller, dom, Color, interpret, 
       if (a > 1) a = 1;
       else if (a < 0) a = 0;
 
-      _this.__color.a = a;
+      _this.__color.a = a.toFixed(2);
 
       _this.setValue(_this.__color.toOriginal());
 

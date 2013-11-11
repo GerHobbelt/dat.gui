@@ -279,3 +279,15 @@ $button-height: 20px;
 #dat-gui-save-locally {
   display: none;
 }
+
+.dg {
+  font-size: 20px !important;
+}
+
+.dg li:not(.folder) {
+  height:50px !important;
+}
+
+.dg .slider {
+  height: 50px !important;
+}

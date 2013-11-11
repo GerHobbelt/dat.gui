@@ -472,6 +472,7 @@ define([
   GUI.CLASS_DRAG = 'drag';
 
   GUI.DEFAULT_WIDTH = 245;
+  GUI.DEFAULT_HEIGHT = 27;
   GUI.TEXT_CLOSED = 'Close Controls';
   GUI.TEXT_OPEN = 'Open Controls';
 

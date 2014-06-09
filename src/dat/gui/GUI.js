@@ -625,7 +625,7 @@ common.extend(
 				throw new Error('You already have a folder in this GUI by the' +
 								' name "' + name + '"');
 			}
-
+    
 			var new_gui_params = { name: name, parent: this };
 
 			// We need to pass down the autoPlace trait so that we can

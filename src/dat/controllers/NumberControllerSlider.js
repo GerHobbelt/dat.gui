@@ -20,25 +20,25 @@ define([
 ], 
 function(NumberController, dom, css, common, styleSheet) {
 
-/**
- * @class Represents a given property of an object that is a number, contains
- * a minimum and maximum, and provides a slider element with which to
- * manipulate it. It should be noted that the slider element is made up of
- * <code>&lt;div&gt;</code> tags, <strong>not</strong> the html5
- * <code>&lt;slider&gt;</code> element.
- *
- * @extends dat.controllers.Controller
- * @extends dat.controllers.NumberController
- *
- * @param {Object} object The object to be manipulated
- * @param {string} property The name of the property to be manipulated
- * @param {Number} minValue Minimum allowed value
- * @param {Number} maxValue Maximum allowed value
- * @param {Number} stepValue Increment by which to change value
- *
- * @member dat.controllers
- */
-var NumberControllerSlider = function(object, property, min, max, step) {
+  /**
+   * @class Represents a given property of an object that is a number, contains
+   * a minimum and maximum, and provides a slider element with which to
+   * manipulate it. It should be noted that the slider element is made up of
+   * <code>&lt;div&gt;</code> tags, <strong>not</strong> the html5
+   * <code>&lt;slider&gt;</code> element.
+   *
+   * @extends dat.controllers.Controller
+   * @extends dat.controllers.NumberController
+   * 
+   * @param {Object} object The object to be manipulated
+   * @param {string} property The name of the property to be manipulated
+   * @param {Number} minValue Minimum allowed value
+   * @param {Number} maxValue Maximum allowed value
+   * @param {Number} stepValue Increment by which to change value
+   *
+   * @member dat.controllers
+   */
+  var NumberControllerSlider = function(object, property, min, max, step) {
 
     NumberControllerSlider.superclass.call(this, object, property, { min: min, max: max, step: step });
 
@@ -46,16 +46,15 @@ var NumberControllerSlider = function(object, property, min, max, step) {
 
     this.__background = document.createElement('div');
     this.__foreground = document.createElement('div');
-
+    
 
     dom.bind(this.__background, 'touchstart', onTouchDown);
     dom.bind(this.__background, 'mousedown', onMouseDown);
-
+    
     dom.addClass(this.__background, 'slider');
     dom.addClass(this.__foreground, 'slider-fg');
 
     function onTouchDown(e) {
-
       dom.bind(window, 'touchmove', onTouchDrag);
       dom.bind(window, 'touchend', onTouchUp);
 
@@ -63,7 +62,6 @@ var NumberControllerSlider = function(object, property, min, max, step) {
     }
 
     function onTouchDrag(e) {
-
       e.preventDefault();
 
       var offset = dom.getOffset(_this.__background);
@@ -74,7 +72,6 @@ var NumberControllerSlider = function(object, property, min, max, step) {
       );
 
       return false;
-
     }
     
     function onTouchUp() {
@@ -86,34 +83,31 @@ var NumberControllerSlider = function(object, property, min, max, step) {
     }    
 
     function onMouseDown(e) {
+      dom.bind(window, 'mousemove', onMouseDrag);
+      dom.bind(window, 'mouseup', onMouseUp);
 
-		dom.bind(window, 'mousemove', onMouseDrag);
-		dom.bind(window, 'mouseup', onMouseUp);
-
-		onMouseDrag(e);
+      onMouseDrag(e);
     }
 
     function onMouseDrag(e) {
+      e.preventDefault();
 
-		e.preventDefault();
+      var offset = dom.getOffset(_this.__background);
+      var width = dom.getWidth(_this.__background);
+      
+      _this.setValue(
+      	map(e.clientX, offset.left, offset.left + width, _this.__min, _this.__max)
+      );
 
-		var offset = dom.getOffset(_this.__background);
-		var width = dom.getWidth(_this.__background);
-
-		_this.setValue(
-			map(e.clientX, offset.left, offset.left + width, _this.__min, _this.__max)
-		);
-
-		return false;
-
+      return false;
     }
 
     function onMouseUp() {
-		dom.unbind(window, 'mousemove', onMouseDrag);
-		dom.unbind(window, 'mouseup', onMouseUp);
-		if (_this.__onFinishChange) {
-			_this.__onFinishChange.call(_this, _this.getValue());
-		}
+      dom.unbind(window, 'mousemove', onMouseDrag);
+      dom.unbind(window, 'mouseup', onMouseUp);
+      if (_this.__onFinishChange) {
+        _this.__onFinishChange.call(_this, _this.getValue());
+      }
     }
 
     this.updateDisplay();
@@ -121,39 +115,39 @@ var NumberControllerSlider = function(object, property, min, max, step) {
     this.__background.appendChild(this.__foreground);
     this.domElement.appendChild(this.__background);
 
-};
+  };
 
-NumberControllerSlider.superclass = NumberController;
+  NumberControllerSlider.superclass = NumberController;
 
-/**
- * Injects default stylesheet for slider elements.
- */
-NumberControllerSlider.useDefaultStyles = function() {
+  /**
+   * Injects default stylesheet for slider elements.
+   */
+  NumberControllerSlider.useDefaultStyles = function() {
     css.inject(styleSheet);
-};
+  };
 
-common.extend(
+  common.extend(
 
-    NumberControllerSlider.prototype,
-    NumberController.prototype,
+      NumberControllerSlider.prototype,
+      NumberController.prototype,
 
-    {
+      {
 
         updateDisplay: function() {
-			var pct = (this.getValue() - this.__min)/(this.__max - this.__min);
-			this.__foreground.style.width = pct*100+'%';
-			return NumberControllerSlider.superclass.prototype.updateDisplay.call(this);
+          var pct = (this.getValue() - this.__min)/(this.__max - this.__min);
+          this.__foreground.style.width = pct*100+'%';
+          return NumberControllerSlider.superclass.prototype.updateDisplay.call(this);
         }
 
-    }
+      }
 
 
 
-);
+  );
 
-function map(v, i1, i2, o1, o2) {
-	return o1 + (o2 - o1) * ((v - i1) / (i2 - i1));
-}
+	function map(v, i1, i2, o1, o2) {
+		return o1 + (o2 - o1) * ((v - i1) / (i2 - i1));
+	}
 
   return NumberControllerSlider;
   

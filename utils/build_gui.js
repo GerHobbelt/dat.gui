@@ -1,9 +1,9 @@
-var minify = process.argv[2] === 'min';
+var minify = (process.argv[2] === 'min');
 
-require(__dirname + '/builder.js').build({
-   "baseUrl": __dirname + "/../src/",
+require('./builder.js').build({
+   "baseUrl": "../src/",
    "main": "dat/gui/GUI",
-   "out": "dat.gui" + (minify ? ".min" : "") + ".js",
+   "out": "../build/dat.gui" + (minify ? ".min" : "") + ".js",
    "minify": minify,
    "shortcut": "dat.GUI",
    "paths": {},

@@ -1,17 +1,3 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-    "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-
-  <link rel="stylesheet" href="qunit.css" type="text/css" media="screen"/>
-  <script type="text/javascript" src="qunit.js"></script>
-  <script type="text/javascript" src="jquery.js"></script>
-
-  <script type="text/javascript" src="../build/dat.gui.js"></script>
-  <script type="text/javascript">
-
-  $.noConflict();
-  jQuery(document).ready(function($) {
 
     var math = dat.color.math;
     var interpret = dat.color.interpret;
@@ -26,7 +12,7 @@
     var NumberControllerSlider = dat.controllers.NumberControllerSlider;
     var FunctionController = dat.controllers.FunctionController;
     var ColorController = dat.controllers.ColorController;
-    var GUI = dat.gui;
+    var GUI = dat.gui.GUI;
 
 
     module("Color Math");
@@ -1041,7 +1027,7 @@ console.log(c2.__checkbox.getAttribute('checked'));
       var gui = new GUI();
 
       // Add a lot of controllers. This will fail if you have some freakishly tall monitor.
-      for (var i = 0; i < 100; i++) {
+      for (var i = 0; i < 50; i++) {
         gui.add({ x: 0 }, 'x');
       }
 
@@ -1404,17 +1390,3 @@ console.log(c2.__checkbox.getAttribute('checked'));
 
 
 });
-</script>
-
-</head>
-<body>
-<h1 id="qunit-header"></h1>
-
-<h2 id="qunit-banner"></h2>
-
-<div id="qunit-testrunner-toolbar"></div>
-<h2 id="qunit-userAgent"></h2>
-<ol id="qunit-tests"></ol>
-<div id="qunit-fixture">test markup, will be hidden</div>
-</body>
-</html>

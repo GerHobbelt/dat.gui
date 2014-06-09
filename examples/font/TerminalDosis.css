@@ -1,0 +1,55 @@
+@font-face {
+  font-family: 'Terminal Dosis';
+  font-style: normal;
+  font-weight: 700; /* 700 = Bold */
+  /* src: url('fontawesome-webfont.eot'); */
+  /*
+  src: url('fontawesome-webfont.eot?#iefix') format('embedded-opentype'),
+       url('fontawesome-webfont.woff') format('woff'),
+       url('fontawesome-webfont.ttf') format('truetype'),
+       url('fontawesome-webfont.svg#fontawesomeregular') format('svg');
+  */
+  src: local('Terminal Dosis Bold'), local('Terminal-Dosis-Bold'), url('TerminalDosis-Bold.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Terminal Dosis';
+  font-style: normal;
+  font-weight: 500; /* 500 = Medium */
+  /* src: url('fontawesome-webfont.eot'); */
+  /*
+  src: url('fontawesome-webfont.eot?#iefix') format('embedded-opentype'),
+       url('fontawesome-webfont.woff') format('woff'),
+       url('fontawesome-webfont.ttf') format('truetype'),
+       url('fontawesome-webfont.svg#fontawesomeregular') format('svg');
+  */
+  src: local('Terminal Dosis Medium'), local('Terminal-Dosis-Medium'), url('TerminalDosis-Medium.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Terminal Dosis';
+  font-style: normal;
+  font-weight: 400; /* 400 = Normal */
+  /* src: url('fontawesome-webfont.eot'); */
+  /*
+  src: url('fontawesome-webfont.eot?#iefix') format('embedded-opentype'),
+       url('fontawesome-webfont.woff') format('woff'),
+       url('fontawesome-webfont.ttf') format('truetype'),
+       url('fontawesome-webfont.svg#fontawesomeregular') format('svg');
+  */
+  src: local('Terminal Dosis Regular'), local('Terminal-Dosis-Regular'), url('TerminalDosis-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Terminal Dosis';
+  font-style: normal;
+  font-weight: 300; /* 300 = Light */
+  /* src: url('fontawesome-webfont.eot'); */
+  /*
+  src: url('fontawesome-webfont.eot?#iefix') format('embedded-opentype'),
+       url('fontawesome-webfont.woff') format('woff'),
+       url('fontawesome-webfont.ttf') format('truetype'),
+       url('fontawesome-webfont.svg#fontawesomeregular') format('svg');
+  */
+  src: local('Terminal Dosis Light'), local('Terminal-Dosis-Light'), url('TerminalDosis-Light.ttf') format('truetype');
+}

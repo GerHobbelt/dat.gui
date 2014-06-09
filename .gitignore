@@ -1,3 +1,10 @@
 .DS_Store
 .sass-cache
 .idea
+
+# editor bak files
+*~
+*.bak
+
+# Node/NPM
+node_modules/

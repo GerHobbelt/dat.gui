@@ -11,9 +11,11 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-var NumberController = require('./NumberController');
-var dom = require('../dom/dom');
-var common = require('../utils/common');
+define([
+  'dat/controllers/NumberController',
+  'dat/dom/dom',
+  'dat/utils/common'
+], function(NumberController, dom, common) {
 
 /**
  * @class Represents a given property of an object that is a number and
@@ -52,6 +54,7 @@ var NumberControllerBox = function(object, property, params) {
 
     dom.bind(this.__input, 'change', onChange);
     dom.bind(this.__input, 'blur', onBlur);
+    dom.bind(this.__input, 'mousedown', onTouchDown);
     dom.bind(this.__input, 'mousedown', onMouseDown);
     dom.bind(this.__input, 'keydown', function(e) {
 
@@ -74,6 +77,27 @@ var NumberControllerBox = function(object, property, params) {
 		if (_this.__onFinishChange) {
 			_this.__onFinishChange.call(_this, _this.getValue());
 		}
+    }
+    function onTouchDown(e) {
+      dom.bind(window, 'touchmove', onTouchDrag);
+      dom.bind(window, 'touchend', onTouchUp);
+      e.preventDefault();
+      prev_y = e.touches[0].clientY;
+    }
+
+    function onTouchDrag(e) {
+
+      var diff = prev_y - e.touches[0].clientY;
+      _this.setValue(_this.getValue() + diff * _this.__impliedStep);
+
+      prev_y = e.touches[0].clientY;
+      e.preventDefault();
+    }
+
+    function onTouchUp(e) {
+      dom.unbind(window, 'touchmove', onTouchDrag);
+      dom.unbind(window, 'touchend', onTouchUp);
+      e.preventDefault();    
     }
 
     function onMouseDown(e) {
@@ -126,6 +150,7 @@ function roundToDecimal(value, decimals) {
     return Math.round(value * tenTo) / tenTo;
 }
 
-module.exports = NumberControllerBox;
+  return NumberControllerBox;
 
+});
 

@@ -11,9 +11,12 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-var Controller = require('./Controller');
-var dom = require('../dom/dom');
-var common = require('../utils/common');
+define([
+    'dat/controllers/Controller',
+    'dat/dom/dom',
+    'dat/utils/common'
+],
+function(Controller, dom, common) {
 
 /**
  * @class Provides a select input to alter the property of an object, using a
@@ -95,5 +98,6 @@ common.extend(
 
 );
 
-module.exports =  OptionController;
+  return OptionController;
 
+});

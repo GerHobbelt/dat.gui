@@ -11,8 +11,10 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-var Controller = require('./Controller');
-var common = require('../utils/common');
+define([
+    'dat/controllers/Controller',
+    'dat/utils/common'
+], function(Controller, common) {
 
 /**
  * @class Represents a given property of an object that is a number.
@@ -48,7 +50,9 @@ var NumberController = function(object, property, params) {
 		}
 
     } else {
+
 		this.__impliedStep = this.__step;
+
     }
 
     this.__precision = numDecimals(this.__impliedStep);
@@ -136,4 +140,6 @@ function numDecimals(x) {
     }
 }
 
-module.exports = NumberController;
+  return NumberController;
+
+});

@@ -11,11 +11,14 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-var NumberController = require('./NumberController');
-var dom = require('../dom/dom');
-var css = require('../utils/css');
-var common = require('../utils/common');
-
+define([
+    'dat/controllers/NumberController',
+    'dat/dom/dom',
+    'dat/utils/css',
+    'dat/utils/common',
+    'text!dat/controllers/NumberControllerSlider.css'
+], 
+function(NumberController, dom, css, common, styleSheet) {
 
 /**
  * @class Represents a given property of an object that is a number, contains
@@ -45,11 +48,42 @@ var NumberControllerSlider = function(object, property, min, max, step) {
     this.__foreground = document.createElement('div');
 
 
-
+    dom.bind(this.__background, 'touchstart', onTouchDown);
     dom.bind(this.__background, 'mousedown', onMouseDown);
 
     dom.addClass(this.__background, 'slider');
     dom.addClass(this.__foreground, 'slider-fg');
+
+    function onTouchDown(e) {
+
+      dom.bind(window, 'touchmove', onTouchDrag);
+      dom.bind(window, 'touchend', onTouchUp);
+
+      onTouchDrag(e);
+    }
+
+    function onTouchDrag(e) {
+
+      e.preventDefault();
+
+      var offset = dom.getOffset(_this.__background);
+      var width = dom.getWidth(_this.__background);
+      
+      _this.setValue(
+        map(e.touches[0].clientX, offset.left, offset.left + width, _this.__min, _this.__max)
+      );
+
+      return false;
+
+    }
+    
+    function onTouchUp() {
+      dom.unbind(window, 'touchmove', onTouchDrag);
+      dom.unbind(window, 'touchend', onTouchUp);
+      if (_this.__onFinishChange) {
+        _this.__onFinishChange.call(_this, _this.getValue());
+      }
+    }    
 
     function onMouseDown(e) {
 
@@ -121,4 +155,6 @@ function map(v, i1, i2, o1, o2) {
 	return o1 + (o2 - o1) * ((v - i1) / (i2 - i1));
 }
 
-module.exports = NumberControllerSlider;
+  return NumberControllerSlider;
+  
+});

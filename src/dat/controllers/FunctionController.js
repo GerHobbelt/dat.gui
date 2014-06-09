@@ -11,9 +11,11 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-var Controller = require('./Controller');
-var dom = require('../dom/dom');
-var common = require('../utils/common');
+define([
+    'dat/controllers/Controller',
+    'dat/dom/dom',
+    'dat/utils/common'
+], function(Controller, dom, common) {
 
 /**
  * @class Provides a GUI interface to fire a specified method, a property of an object.
@@ -66,4 +68,6 @@ common.extend(
 
 );
 
-module.exports = FunctionController;
+  return FunctionController;
+
+});

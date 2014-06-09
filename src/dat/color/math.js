@@ -11,6 +11,10 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
+define([
+
+], function() {
+
 var tmpComponent;
 
 module.exports = {
@@ -90,4 +94,7 @@ module.exports = {
     hex_with_component: function(hex, componentIndex, value) {
 		return value << (tmpComponent = componentIndex * 8) | (hex & ~ (0xFF << tmpComponent));
     }
-};
+
+  }
+
+});

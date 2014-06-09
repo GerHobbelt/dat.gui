@@ -11,8 +11,11 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-var dom = require('../dom/dom');
-var common = require('../utils/common');
+define([
+  'dat/dom/dom',
+  'dat/utils/common'
+], function(dom, common) {
+
 
 var CenteredDiv = function() {
 
@@ -109,4 +112,6 @@ function lockScroll(e) {
     console.log(e);
 }
 
-module.exports = CenteredDiv;
+  return CenteredDiv;
+
+});

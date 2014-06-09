@@ -11,11 +11,13 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-var Controller = require('./Controller');
-var dom = require('../dom/dom');
-var Color = require('../color/Color');
-var interpret = require('../color/interpret');
-var common = require('../utils/common');
+define([
+  'dat/controllers/Controller',
+  'dat/dom/dom',
+  'dat/color/Color',
+  'dat/color/interpret',
+  'dat/utils/common'
+], function(Controller, dom, Color, interpret, common) {
 
 var ColorController = function(object, property) {
 
@@ -317,4 +319,6 @@ function hueGradient(elem) {
 }
 
 
-module.exports = ColorController;
+  return ColorController;
+
+});

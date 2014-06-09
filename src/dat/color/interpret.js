@@ -11,8 +11,10 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-var toString = require('./toString');
-var common = require('../utils/common');
+define([
+  'dat/color/toString',
+  'dat/utils/common'
+], function(toString, common) {
 
 var result, toReturn;
 
@@ -332,4 +334,7 @@ var INTERPRETATIONS = [
 
 ];
 
-module.exports = interpret;
+  return interpret;
+
+
+});

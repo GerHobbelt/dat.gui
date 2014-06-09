@@ -1,14 +1,19 @@
 /**
  * dat-gui JavaScript Controller Library
- * http://code.google.com/p/dat-gui
+ * https://github.com/lysannkessler/dat.gui
+ * Original Version: http://code.google.com/p/dat-gui
  *
  * Copyright 2011 Data Arts Team, Google Creative Lab
+ *           2012 Lysann Kessler
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * This file is based on the version by Data Arts Team and may have been
+ * modified by Lysann Kessler.
  */
 
 var fs = require('fs'),

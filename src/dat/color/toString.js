@@ -11,8 +11,11 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-var common = require('../utils/common');
-module.exports = function(color) {
+define([
+  'dat/utils/common'
+], function(common) {
+
+  return function(color) {
 
     if (color.a == 1 || common.isUndefined(color.a)) {
 
@@ -28,5 +31,7 @@ module.exports = function(color) {
 		return 'rgba(' + Math.round(color.r) + ',' + Math.round(color.g) + ',' + Math.round(color.b) + ',' + color.a + ')';
 
     }
-};
 
+  }
+
+});

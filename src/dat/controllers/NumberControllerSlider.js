@@ -48,14 +48,41 @@ function(NumberController, dom, css, common, styleSheet) {
     this.__foreground = document.createElement('div');
     
 
-
+    dom.bind(this.__background, 'touchstart', onTouchDown);
     dom.bind(this.__background, 'mousedown', onMouseDown);
     
     dom.addClass(this.__background, 'slider');
     dom.addClass(this.__foreground, 'slider-fg');
 
-    function onMouseDown(e) {
+    function onTouchDown(e) {
+      dom.bind(window, 'touchmove', onTouchDrag);
+      dom.bind(window, 'touchend', onTouchUp);
 
+      onTouchDrag(e);
+    }
+
+    function onTouchDrag(e) {
+      e.preventDefault();
+
+      var offset = dom.getOffset(_this.__background);
+      var width = dom.getWidth(_this.__background);
+      
+      _this.setValue(
+        map(e.touches[0].clientX, offset.left, offset.left + width, _this.__min, _this.__max)
+      );
+
+      return false;
+    }
+    
+    function onTouchUp() {
+      dom.unbind(window, 'touchmove', onTouchDrag);
+      dom.unbind(window, 'touchend', onTouchUp);
+      if (_this.__onFinishChange) {
+        _this.__onFinishChange.call(_this, _this.getValue());
+      }
+    }    
+
+    function onMouseDown(e) {
       dom.bind(window, 'mousemove', onMouseDrag);
       dom.bind(window, 'mouseup', onMouseUp);
 
@@ -63,7 +90,6 @@ function(NumberController, dom, css, common, styleSheet) {
     }
 
     function onMouseDrag(e) {
-
       e.preventDefault();
 
       var offset = dom.getOffset(_this.__background);
@@ -74,7 +100,6 @@ function(NumberController, dom, css, common, styleSheet) {
       );
 
       return false;
-
     }
 
     function onMouseUp() {

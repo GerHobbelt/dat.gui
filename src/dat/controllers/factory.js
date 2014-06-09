@@ -22,27 +22,27 @@ define([
 ],
     function(OptionController, NumberControllerBox, NumberControllerSlider, StringController, FunctionController, BooleanController, common) {
 
-      return function(object, property) {
+      return function(object, property, options_1, options_2) {
 
         var initialValue = object[property];
 
         // Providing options?
-        if (common.isArray(arguments[2]) || common.isObject(arguments[2])) {
-          return new OptionController(object, property, arguments[2]);
+        if (common.isArray(options_1) || common.isObject(options_1)) {
+          return new OptionController(object, property, options_1);
         }
 
         // Providing a map?
 
         if (common.isNumber(initialValue)) {
 
-          if (common.isNumber(arguments[2]) && common.isNumber(arguments[3])) {
+          if (common.isNumber(options_1) && common.isNumber(options_2)) {
 
             // Has min and max.
-            return new NumberControllerSlider(object, property, arguments[2], arguments[3]);
+            return new NumberControllerSlider(object, property, options_1, options_2);
 
           } else {
 
-            return new NumberControllerBox(object, property, { min: arguments[2], max: arguments[3] });
+            return new NumberControllerBox(object, property, { min: options_1, max: options_2 });
 
           }
 

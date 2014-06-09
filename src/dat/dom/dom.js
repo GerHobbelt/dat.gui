@@ -205,7 +205,7 @@ define([
     removeClass: function(elem, className) {
       if (className) {
         if (elem.className === undefined) {
-          // elem.className = className;
+          // elem.className = undefined;
         } else if (elem.className === className) {
           elem.removeAttribute('class');
         } else {

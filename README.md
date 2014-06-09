@@ -63,7 +63,12 @@ $ node build_gui.js
 
 This will create a namespaced, unminified build of dat.GUI at `build/dat.gui.js`
 
-_To export minified source using Closure Compiler, open `utils/build_gui.js` and set the `minify` parameter to `true`._
+To create a namespaced, _minified_ build of dat.GUI at `build/dat.gui.min.js`, using Closure Compiler, use the `min` parameter:
+
+```sh
+$ node ../utils/build_gui.js min
+```
+
 
 ----
 

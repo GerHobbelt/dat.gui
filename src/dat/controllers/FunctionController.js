@@ -45,7 +45,6 @@ define([
 
     this.domElement.appendChild(this.__button);
 
-
   };
 
   FunctionController.superclass = Controller;
@@ -60,10 +59,10 @@ define([
           if (this.__onChange) {
             this.__onChange.call(this);
           }
+          this.getValue().call(this.object);
           if (this.__onFinishChange) {
             this.__onFinishChange.call(this, this.getValue());
           }
-          this.getValue().call(this.object);
         }
       }
 

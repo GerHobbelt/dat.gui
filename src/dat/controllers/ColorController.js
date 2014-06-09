@@ -84,7 +84,7 @@ define([
       position: 'absolute',
       width: '12px',
       height: '12px',
-      border: this.__field_knob_border + (this.__color.v < .5 ? '#fff' : '#000'),
+      border: this.__field_knob_border + (this.__color.v < 0.5 ? '#fff' : '#000'),
       boxShadow: '0px 1px 3px rgba(0,0,0,0.5)',
       borderRadius: '12px',
       zIndex: 1
@@ -271,7 +271,7 @@ define([
 
           this.__temp.a = 1;
 
-          var flip = (this.__color.v < .5 || this.__color.s > .5) ? 255 : 0;
+          var flip = (this.__color.v < 0.5 || this.__color.s > 0.5) ? 255 : 0;
           var _flip = 255 - flip;
 
           common.extend(this.__field_knob.style, {

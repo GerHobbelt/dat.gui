@@ -74,7 +74,7 @@ define([
                   '0x' +
                       test[1].toString() + test[1].toString() +
                       test[2].toString() + test[2].toString() +
-                      test[3].toString() + test[3].toString())
+                      test[3].toString() + test[3].toString(), 16)
             };
 
           },
@@ -92,7 +92,7 @@ define([
 
             return {
               space: 'HEX',
-              hex: parseInt('0x' + test[1].toString())
+              hex: parseInt('0x' + test[1].toString(), 16)
             };
 
           },

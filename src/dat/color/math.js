@@ -51,7 +51,7 @@ define([
           delta = max - min,
           h, s;
 
-      if (max != 0) {
+      if (max !== 0) {
         s = delta / max;
       } else {
         return {

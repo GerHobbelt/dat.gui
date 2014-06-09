@@ -42,7 +42,7 @@ define([
 
     if (common.isUndefined(this.__step)) {
 
-      if (this.initialValue == 0) {
+      if (!this.initialValue) {
         this.__impliedStep = 1; // What are we, psychics?
       } else {
         // Hey Doug, check this out.
@@ -78,7 +78,7 @@ define([
             v = this.__max;
           }
 
-          if (this.__step !== undefined && v % this.__step != 0) {
+          if (this.__step !== undefined && v % this.__step !== 0) {
             v = Math.round(v / this.__step) * this.__step;
           }
 

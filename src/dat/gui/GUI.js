@@ -50,7 +50,7 @@ define([
 
   var SUPPORTS_LOCAL_STORAGE = (function() {
     try {
-      return 'localStorage' in window && window['localStorage'] !== null;
+      return 'localStorage' in window && window.localStorage !== null;
     } catch (e) {
       return false;
     }
@@ -673,7 +673,7 @@ define([
           var _this = this;
 
           common.each(Array.prototype.slice.call(arguments), function(object) {
-            if (_this.__rememberedObjects.length == 0) {
+            if (_this.__rememberedObjects.length === 0) {
               addSaveMenu(_this);
             }
             if (_this.__rememberedObjects.indexOf(object) == -1) {
@@ -786,7 +786,7 @@ define([
 
         listen: function(controller) {
 
-          var init = this.__listening.length == 0;
+          var init = this.__listening.length === 0;
           this.__listening.push(controller);
           if (init) updateDisplays(this.__listening);
 
@@ -1343,7 +1343,7 @@ define([
   function updateDisplays(controllerArray) {
 
 
-    if (controllerArray.length != 0) {
+    if (controllerArray.length !== 0) {
 
       requestAnimationFrame(function() {
         updateDisplays(controllerArray);

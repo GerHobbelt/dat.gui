@@ -238,7 +238,7 @@ define([
           cssValueToPixels(style['border-right-width']) +
           cssValueToPixels(style['padding-left']) +
           cssValueToPixels(style['padding-right']) +
-          cssValueToPixels(style['width']);
+          cssValueToPixels(style.width);
     },
 
     /**
@@ -253,7 +253,7 @@ define([
           cssValueToPixels(style['border-bottom-width']) +
           cssValueToPixels(style['padding-top']) +
           cssValueToPixels(style['padding-bottom']) +
-          cssValueToPixels(style['height']);
+          cssValueToPixels(style.height);
     },
 
     /**
@@ -266,7 +266,7 @@ define([
         do {
           offset.left += elem.offsetLeft;
           offset.top += elem.offsetTop;
-        } while (elem = elem.offsetParent);
+        } while ((elem = elem.offsetParent));
       }
       return offset;
     },

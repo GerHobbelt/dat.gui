@@ -1,17 +1,3 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-    "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-
-  <link rel="stylesheet" href="qunit.css" type="text/css" media="screen"/>
-  <script type="text/javascript" src="qunit.js"></script>
-  <script type="text/javascript" src="jquery.js"></script>
-
-  <script type="text/javascript" src="../build/dat.gui.js"></script>
-  <script type="text/javascript">
-
-  $.noConflict();
-  jQuery(document).ready(function($) {
 
     var math = dat.color.math;
     var interpret = dat.color.interpret;
@@ -26,7 +12,7 @@
     var NumberControllerSlider = dat.controllers.NumberControllerSlider;
     var FunctionController = dat.controllers.FunctionController;
     var ColorController = dat.controllers.ColorController;
-    var GUI = dat.gui;
+    var GUI = dat.gui.GUI;
 
 
     module("Color Math");
@@ -422,7 +408,7 @@
     });
 
 		function match(a, b, msg) {
-	
+
 			for (var i in b) {
 				if (b[i] !== b[i]) {
 					ok(a[i] !== a[i], msg)
@@ -430,15 +416,15 @@
 					equal(b[i], a[i], msg);
 				}
 			}
-	
+
 		}
-		
+
 		function equalish(a, b, tolerance, label) {
 			return ok(Math.abs(a - b) < tolerance, label);
 		}
 
 
-  
+
 
     function initObject() {
       return {
@@ -495,9 +481,9 @@
 
       equal(c1.__checkbox.checked,
           object.booleanProperty);
-          
+
 console.log(c2.__checkbox.getAttribute('checked'));
-          
+
       equal(c2.__checkbox.getAttribute('checked') === 'checked',
           object.anotherBooleanProperty);
 
@@ -519,7 +505,7 @@ console.log(c2.__checkbox.getAttribute('checked'));
       dom.fakeEvent(c1.__checkbox, 'click');
       equal(true, object.booleanProperty, 'changes back');
 
-      equal(true, c1.__checkbox.checked, 'checkbox valid');        
+      equal(true, c1.__checkbox.checked, 'checkbox valid');
 
 
 
@@ -757,7 +743,7 @@ console.log(c2.__checkbox.getAttribute('checked'));
     module("NumberControllerSlider");
 
     test("Acknowledges original value", function() {
-      
+
       var object = initObject();
 
       var min = 0, max = 50;
@@ -814,7 +800,7 @@ console.log(c2.__checkbox.getAttribute('checked'));
 
 
       dom.fakeEvent(window, 'mouseup');
-      
+
       dom.fakeEvent(window, 'mousemove', {
         x: o.left+w,
         y: o.top
@@ -903,7 +889,7 @@ console.log(c2.__checkbox.getAttribute('checked'));
       c4.onChange(function() {
         c4_changed = true;
       });
-      
+
       c5.onChange(function() {
         c5_changed = true;
       });
@@ -1007,7 +993,7 @@ console.log(c2.__checkbox.getAttribute('checked'));
 			return ok(Math.abs(a - b) < tolerance, label);
 		}
 
-  
+
 
     module('GUI Appearance');
 
@@ -1041,7 +1027,7 @@ console.log(c2.__checkbox.getAttribute('checked'));
       var gui = new GUI();
 
       // Add a lot of controllers. This will fail if you have some freakishly tall monitor.
-      for (var i = 0; i < 100; i++) {
+      for (var i = 0; i < 50; i++) {
         gui.add({ x: 0 }, 'x');
       }
 
@@ -1401,20 +1387,6 @@ console.log(c2.__checkbox.getAttribute('checked'));
       equal($(gui.__preset_select).children('option:selected')[0].value, gui.preset, "Dropdown display matches preset value");
 
     }
- 
-  
+
+
 });
-</script>
-  
-</head>
-<body>
-<h1 id="qunit-header"></h1>
-
-<h2 id="qunit-banner"></h2>
-
-<div id="qunit-testrunner-toolbar"></div>
-<h2 id="qunit-userAgent"></h2>
-<ol id="qunit-tests"></ol>
-<div id="qunit-fixture">test markup, will be hidden</div>
-</body>
-</html>

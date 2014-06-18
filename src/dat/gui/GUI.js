@@ -11,30 +11,25 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define([
+var css = require('../utils/css');
+var Controller = require('../controllers/Controller');
+var BooleanController = require('../controllers/BooleanController');
+var StringController = require('../controllers/StringController');
+var FunctionController = require('../controllers/FunctionController');
+var NumberControllerBox = require('../controllers/NumberControllerBox');
+var NumberControllerSlider = require('../controllers/NumberControllerSlider');
+var OptionController = require('../controllers/OptionController');
+var ColorController = require('../controllers/ColorController');
+var NullController = require('../controllers/NullController');
+var UndefinedController = require('../controllers/UndefinedController');
 
-  'dat/utils/css',
-
-  'text!dat/gui/saveDialogue.html',
-  'text!dat/gui/style.css',
-
-  'dat/controllers/factory',
-  'dat/controllers/Controller',
-  'dat/controllers/BooleanController',
-  'dat/controllers/FunctionController',
-  'dat/controllers/NumberControllerBox',
-  'dat/controllers/NumberControllerSlider',
-  'dat/controllers/OptionController',
-  'dat/controllers/ColorController',
-
-  'dat/utils/requestAnimationFrame',
-
-  'dat/dom/CenteredDiv',
-  'dat/dom/dom',
-
-  'dat/utils/common'
-
-], function(css, saveDialogueContents, styleSheet, controllerFactory, Controller, BooleanController, FunctionController, NumberControllerBox, NumberControllerSlider, OptionController, ColorController, requestAnimationFrame, CenteredDiv, dom, common) {
+var requestAnimationFrame = require('../utils/requestAnimationFrame');
+var CenteredDiv = require('../dom/CenteredDiv');
+var dom = require('../dom/dom');
+var common = require('../utils/common');
+var styleSheet = require('./style.css.js');
+var saveDialogueContents = require('./saveDialogue.html.js');
+var sniff = require('../controllers/sniff');
 
   css.inject(styleSheet);
 
@@ -88,6 +83,43 @@ define([
   var GUI = function(params) {
 
     var _this = this;
+
+	this._typeControllers = {
+		color: function(object, property) {
+			return new ColorController(object, property);
+		},
+		option: function(object, property, opts) {
+			return new OptionController(object, property, opts);
+		},
+		numberSlider: function(object, property, min, max, step) {
+			return new NumberControllerSlider(object,
+												property,
+											  min, max, step);
+		},
+		numberBox: function(object, property, min, max, step) {
+			return new NumberControllerBox(object,
+										   property, {
+											   min: min,
+											   max: max,
+											   step: step
+										   });
+		},
+		string: function(object, property) {
+			return new StringController(object, property);
+		},
+		'function': function(object, property) {
+			return new FunctionController(object, property, '');
+		},
+		'boolean': function(object, property) {
+			return new BooleanController(object, property);
+		},
+		'null': function(object, property) {
+			return new NullController(object, property);
+		},
+		'undefined': function(object, property) {
+			return new UndefinedController(object, property);
+		}
+	};
 
     /**
      * Outermost DOM Element
@@ -494,6 +526,23 @@ define([
 
       /** @lends dat.gui.GUI */
       {
+        /**
+         * @param controllerName
+         * @param factory
+         */
+		defineController: function(controllerName, controllerFactory) {
+			this._typeControllers[controllerName] = controllerFactory;
+		},
+
+		hasController: function(controllerName) {
+			return (this._typeControllers[controllerName] !== undefined);
+		},
+
+		createController: function(controllerName, args) {
+			return this.getRoot()
+				._typeControllers[controllerName]
+				.apply(this, args);
+		},
 
         /**
          * @param object
@@ -527,7 +576,7 @@ define([
               object,
               property,
               {
-                color: true
+					controller: 'color'
               }
           );
 
@@ -796,21 +845,20 @@ define([
   function add(gui, object, property, params) {
 
     if (object[property] === undefined) {
-      throw new Error("Object " + object + " has no property \"" + property + "\"");
+		//throw new Error("Object " + object + " has no property \"" + property + "\"");
+		object[property] = ''
     }
 
     var controller;
 
-    if (params.color) {
-
-      controller = new ColorController(object, property);
-
-    } else {
-
-      var factoryArgs = [object,property].concat(params.factoryArgs);
-      controller = controllerFactory.apply(gui, factoryArgs);
-
-    }
+	if(params.controller) {
+		controller = gui.createController(params.controller,
+													[object,property].concat(params.factoryArgs));
+	} else {
+		var controllerName = sniff(object, property, params.factoryArgs);
+		controller = gui.createController(controllerName,
+										  [object, property].concat(params.factoryArgs));
+	}
 
     if (params.before instanceof Controller) {
       params.before = params.before.__li;
@@ -904,7 +952,7 @@ define([
       },
 
       name: function(v) {
-        controller.__li.firstElementChild.firstElementChild.innerHTML = v;
+			controller.__li.firstChild.firstChild.innerHTML = v;
         return controller;
       },
 
@@ -937,7 +985,7 @@ define([
       });
 
       dom.addClass(li, 'has-slider');
-      controller.domElement.insertBefore(box.domElement, controller.domElement.firstElementChild);
+		controller.domElement.insertBefore(box.domElement, controller.domElement.firstChild);
 
     }
     else if (controller instanceof NumberControllerBox) {
@@ -1233,7 +1281,7 @@ define([
     dom.bind(gui.__resize_handle, 'mousedown', dragStart);
     dom.bind(gui.__closeButton, 'mousedown', dragStart);
 
-    gui.domElement.insertBefore(gui.__resize_handle, gui.domElement.firstElementChild);
+    gui.domElement.insertBefore(gui.__resize_handle, gui.domElement.firstChild);
 
     function dragStart(e) {
 

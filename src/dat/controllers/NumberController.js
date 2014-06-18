@@ -51,12 +51,11 @@ define([
 
     } else {
 
-    	this.__impliedStep = this.__step;
+      this.__impliedStep = this.__step;
 
     }
 
     this.__precision = numDecimals(this.__impliedStep);
-
 
   };
 

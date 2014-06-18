@@ -232,7 +232,7 @@ define([
               } else {
                 params.load.preset = v;
               }
-              setPresetSelectIndex(this);
+              setPresetSelectIndex(_this);
               _this.revert();
             }
 
@@ -288,7 +288,7 @@ define([
               // For browsers that aren't going to respect the CSS transition,
               // Lets just check our height against the window height right off
               // the bat.
-              this.onResize();
+              _this.onResize();
 
               if (_this.__closeButton) {
                 _this.__closeButton.innerHTML = v ? GUI.TEXT_OPEN : GUI.TEXT_CLOSED;
@@ -345,7 +345,7 @@ define([
 
         if (use_local_storage) {
 
-          _this.useLocalStorage = true;
+          this.useLocalStorage = true;
 
           var saved_gui = localStorage.getItem(getLocalStorageHash(this, 'gui'));
 
@@ -366,9 +366,7 @@ define([
 
         _this.closed = !_this.closed;
 
-
       });
-
 
       // Oh, you're a nested GUI!
     } else {
@@ -380,7 +378,7 @@ define([
       var title_row_name = document.createTextNode(params.name);
       dom.addClass(title_row_name, 'controller-name');
 
-      var title_row = addRow(_this, title_row_name);
+      var title_row = addRow(this, title_row_name);
 
       var on_click_title = function(e) {
         e.preventDefault();
@@ -419,16 +417,15 @@ define([
 
       }
 
-
       // Make it not elastic.
-      if (!this.parent) setWidth(_this, params.width);
+      if (!this.parent) setWidth(this, params.width);
 
     }
 
-    dom.bind(window, 'resize', function() { _this.onResize() });
+    dom.bind(window, 'resize', function() { _this.onResize(); });
     dom.bind(this.__ul, 'webkitTransitionEnd', function() { _this.onResize(); });
-    dom.bind(this.__ul, 'transitionend', function() { _this.onResize() });
-    dom.bind(this.__ul, 'oTransitionEnd', function() { _this.onResize() });
+    dom.bind(this.__ul, 'transitionend', function() { _this.onResize(); });
+    dom.bind(this.__ul, 'oTransitionEnd', function() { _this.onResize(); });
     this.onResize();
 
 
@@ -445,18 +442,18 @@ define([
     // expose this method publicly
     this.saveToLocalStorageIfPossible = saveToLocalStorage;
 
-    var root = _this.getRoot();
+    var root = this.getRoot();
     function resetWidth() {
-	      var root = _this.getRoot();
-	      root.width += 1;
-	      common.defer(function() {
-	        root.width -= 1;
-	      });
-	    }
+      var root = _this.getRoot();
+      root.width += 1;
+      common.defer(function() {
+        root.width -= 1;
+      });
+    }
 
-	    if (!params.parent) {
-	      resetWidth();
-	    }
+    if (!params.parent) {
+      resetWidth();
+    }
 
   };
 

@@ -57,13 +57,13 @@ define([
     
     compose: function() {
       var toCall = ARR_SLICE.call(arguments);
-            return function() {
-              var args = ARR_SLICE.call(arguments);
-              for (var i = toCall.length -1; i >= 0; i--) {
-                args = [toCall[i].apply(this, args)];
-              }
-              return args[0];
-            }
+      return function() {
+        var args = ARR_SLICE.call(arguments);
+        for (var i = toCall.length -1; i >= 0; i--) {
+          args = [toCall[i].apply(this, args)];
+        }
+        return args[0];
+      }
     },
     
     each: function(obj, itr, scope) {

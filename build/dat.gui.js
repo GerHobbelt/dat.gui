@@ -104,13 +104,13 @@
       
       compose: function() {
         var toCall = ARR_SLICE.call(arguments);
-              return function() {
-                var args = ARR_SLICE.call(arguments);
-                for (var i = toCall.length -1; i >= 0; i--) {
-                  args = [toCall[i].apply(this, args)];
-                }
-                return args[0];
-              }
+        return function() {
+          var args = ARR_SLICE.call(arguments);
+          for (var i = toCall.length -1; i >= 0; i--) {
+            args = [toCall[i].apply(this, args)];
+          }
+          return args[0];
+        }
       },
       
       each: function(obj, itr, scope) {
@@ -510,7 +510,7 @@
       removeClass: function(elem, className) {
         if (className) {
           if (elem.className === undefined) {
-            // elem.className = className;
+            // elem.className = undefined;
           } else if (elem.className === className) {
             elem.removeAttribute('class');
           } else {
@@ -543,7 +543,7 @@
             cssValueToPixels(style['border-right-width']) +
             cssValueToPixels(style['padding-left']) +
             cssValueToPixels(style['padding-right']) +
-            cssValueToPixels(style['width']);
+            cssValueToPixels(style.width);
       },
   
       /**
@@ -558,7 +558,7 @@
             cssValueToPixels(style['border-bottom-width']) +
             cssValueToPixels(style['padding-top']) +
             cssValueToPixels(style['padding-bottom']) +
-            cssValueToPixels(style['height']);
+            cssValueToPixels(style.height);
       },
   
       /**
@@ -571,7 +571,7 @@
           do {
             offset.left += elem.offsetLeft;
             offset.top += elem.offsetTop;
-          } while (elem = elem.offsetParent);
+          } while ((elem = elem.offsetParent));
         }
         return offset;
       },
@@ -709,7 +709,7 @@
   
       if (common.isUndefined(this.__step)) {
   
-        if (this.initialValue == 0) {
+        if (!this.initialValue) {
           this.__impliedStep = 1; // What are we, psychics?
         } else {
           // Hey Doug, check this out.
@@ -718,12 +718,11 @@
   
       } else {
   
-      	this.__impliedStep = this.__step;
+        this.__impliedStep = this.__step;
   
       }
   
       this.__precision = numDecimals(this.__impliedStep);
-  
   
     };
   
@@ -745,7 +744,7 @@
               v = this.__max;
             }
   
-            if (this.__step !== undefined && v % this.__step != 0) {
+            if (this.__step !== undefined && v % this.__step !== 0) {
               v = Math.round(v / this.__step) * this.__step;
             }
   
@@ -852,6 +851,7 @@
   
       dom.bind(this.__input, 'change', onChange);
       dom.bind(this.__input, 'blur', onBlur);
+      dom.bind(this.__input, 'touchdown', onTouchDown);
       dom.bind(this.__input, 'mousedown', onMouseDown);
       dom.bind(this.__input, 'keydown', function(e) {
   
@@ -876,6 +876,27 @@
         }
       }
   
+      function onTouchDown(e) {
+        dom.bind(window, 'touchmove', onTouchDrag);
+        dom.bind(window, 'touchend', onTouchUp);
+        e.preventDefault();
+        prev_y = e.touches[0].clientY;
+      }
+  
+      function onTouchDrag(e) {
+        var diff = prev_y - e.touches[0].clientY;
+        _this.setValue(_this.getValue() + diff * _this.__impliedStep);
+  
+        prev_y = e.touches[0].clientY;
+        e.preventDefault();
+      }
+  
+      function onTouchUp(e) {
+        dom.unbind(window, 'touchmove', onTouchDrag);
+        dom.unbind(window, 'touchend', onTouchUp);
+        e.preventDefault();    
+      }
+  
       function onMouseDown(e) {
         dom.bind(window, 'mousemove', onMouseDrag);
         dom.bind(window, 'mouseup', onMouseUp);
@@ -883,12 +904,10 @@
       }
   
       function onMouseDrag(e) {
-  
         var diff = prev_y - e.clientY;
         _this.setValue(_this.getValue() + diff * _this.__impliedStep);
   
         prev_y = e.clientY;
-  
       }
   
       function onMouseUp() {
@@ -963,14 +982,41 @@
       this.__foreground = document.createElement('div');
       
   
-  
+      dom.bind(this.__background, 'touchstart', onTouchDown);
       dom.bind(this.__background, 'mousedown', onMouseDown);
       
       dom.addClass(this.__background, 'slider');
       dom.addClass(this.__foreground, 'slider-fg');
   
-      function onMouseDown(e) {
+      function onTouchDown(e) {
+        dom.bind(window, 'touchmove', onTouchDrag);
+        dom.bind(window, 'touchend', onTouchUp);
   
+        onTouchDrag(e);
+      }
+  
+      function onTouchDrag(e) {
+        e.preventDefault();
+  
+        var offset = dom.getOffset(_this.__background);
+        var width = dom.getWidth(_this.__background);
+        
+        _this.setValue(
+          map(e.touches[0].clientX, offset.left, offset.left + width, _this.__min, _this.__max)
+        );
+  
+        return false;
+      }
+      
+      function onTouchUp() {
+        dom.unbind(window, 'touchmove', onTouchDrag);
+        dom.unbind(window, 'touchend', onTouchUp);
+        if (_this.__onFinishChange) {
+          _this.__onFinishChange.call(_this, _this.getValue());
+        }
+      }    
+  
+      function onMouseDown(e) {
         dom.bind(window, 'mousemove', onMouseDrag);
         dom.bind(window, 'mouseup', onMouseUp);
   
@@ -978,7 +1024,6 @@
       }
   
       function onMouseDrag(e) {
-  
         e.preventDefault();
   
         var offset = dom.getOffset(_this.__background);
@@ -989,7 +1034,6 @@
         );
   
         return false;
-  
       }
   
       function onMouseUp() {
@@ -1270,7 +1314,7 @@
                     '0x' +
                         test[1].toString() + test[1].toString() +
                         test[2].toString() + test[2].toString() +
-                        test[3].toString() + test[3].toString())
+                        test[3].toString() + test[3].toString(), 16)
               };
   
             },
@@ -1288,7 +1332,7 @@
   
               return {
                 space: 'HEX',
-                hex: parseInt('0x' + test[1].toString())
+                hex: parseInt('0x' + test[1].toString(), 16)
               };
   
             },
@@ -1553,7 +1597,7 @@
   
     var SUPPORTS_LOCAL_STORAGE = (function() {
       try {
-        return 'localStorage' in window && window['localStorage'] !== null;
+        return 'localStorage' in window && window.localStorage !== null;
       } catch (e) {
         return false;
       }
@@ -1735,7 +1779,7 @@
                 } else {
                   params.load.preset = v;
                 }
-                setPresetSelectIndex(this);
+                setPresetSelectIndex(_this);
                 _this.revert();
               }
   
@@ -1791,7 +1835,7 @@
                 // For browsers that aren't going to respect the CSS transition,
                 // Lets just check our height against the window height right off
                 // the bat.
-                this.onResize();
+                _this.onResize();
   
                 if (_this.__closeButton) {
                   _this.__closeButton.innerHTML = v ? GUI.TEXT_OPEN : GUI.TEXT_CLOSED;
@@ -1848,7 +1892,7 @@
   
           if (use_local_storage) {
   
-            _this.useLocalStorage = true;
+            this.useLocalStorage = true;
   
             var saved_gui = localStorage.getItem(getLocalStorageHash(this, 'gui'));
   
@@ -1869,9 +1913,7 @@
   
           _this.closed = !_this.closed;
   
-  
         });
-  
   
         // Oh, you're a nested GUI!
       } else {
@@ -1883,7 +1925,7 @@
         var title_row_name = document.createTextNode(params.name);
         dom.addClass(title_row_name, 'controller-name');
   
-        var title_row = addRow(_this, title_row_name);
+        var title_row = addRow(this, title_row_name);
   
         var on_click_title = function(e) {
           e.preventDefault();
@@ -1922,16 +1964,15 @@
   
         }
   
-  
         // Make it not elastic.
-        if (!this.parent) setWidth(_this, params.width);
+        if (!this.parent) setWidth(this, params.width);
   
       }
   
-      dom.bind(window, 'resize', function() { _this.onResize() });
+      dom.bind(window, 'resize', function() { _this.onResize(); });
       dom.bind(this.__ul, 'webkitTransitionEnd', function() { _this.onResize(); });
-      dom.bind(this.__ul, 'transitionend', function() { _this.onResize() });
-      dom.bind(this.__ul, 'oTransitionEnd', function() { _this.onResize() });
+      dom.bind(this.__ul, 'transitionend', function() { _this.onResize(); });
+      dom.bind(this.__ul, 'oTransitionEnd', function() { _this.onResize(); });
       this.onResize();
   
   
@@ -1948,18 +1989,18 @@
       // expose this method publicly
       this.saveToLocalStorageIfPossible = saveToLocalStorage;
   
-      var root = _this.getRoot();
+      var root = this.getRoot();
       function resetWidth() {
-  	      var root = _this.getRoot();
-  	      root.width += 1;
-  	      common.defer(function() {
-  	        root.width -= 1;
-  	      });
-  	    }
+        var root = _this.getRoot();
+        root.width += 1;
+        common.defer(function() {
+          root.width -= 1;
+        });
+      }
   
-  	    if (!params.parent) {
-  	      resetWidth();
-  	    }
+      if (!params.parent) {
+        resetWidth();
+      }
   
     };
   
@@ -2176,7 +2217,7 @@
             var _this = this;
   
             common.each(Array.prototype.slice.call(arguments), function(object) {
-              if (_this.__rememberedObjects.length == 0) {
+              if (_this.__rememberedObjects.length === 0) {
                 addSaveMenu(_this);
               }
               if (_this.__rememberedObjects.indexOf(object) == -1) {
@@ -2289,7 +2330,7 @@
   
           listen: function(controller) {
   
-            var init = this.__listening.length == 0;
+            var init = this.__listening.length === 0;
             this.__listening.push(controller);
             if (init) updateDisplays(this.__listening);
   
@@ -2846,7 +2887,7 @@
     function updateDisplays(controllerArray) {
   
   
-      if (controllerArray.length != 0) {
+      if (controllerArray.length !== 0) {
   
         requestAnimationFrame(function() {
           updateDisplays(controllerArray);
@@ -3060,7 +3101,7 @@
         position: 'absolute',
         width: '12px',
         height: '12px',
-        border: this.__field_knob_border + (this.__color.v < .5 ? '#fff' : '#000'),
+        border: this.__field_knob_border + (this.__color.v < 0.5 ? '#fff' : '#000'),
         boxShadow: '0px 1px 3px rgba(0,0,0,0.5)',
         borderRadius: '12px',
         zIndex: 1
@@ -3247,7 +3288,7 @@
   
             this.__temp.a = 1;
   
-            var flip = (this.__color.v < .5 || this.__color.s > .5) ? 255 : 0;
+            var flip = (this.__color.v < 0.5 || this.__color.s > 0.5) ? 255 : 0;
             var _flip = 255 - flip;
   
             common.extend(this.__field_knob.style, {
@@ -3352,7 +3393,7 @@
   
       get: function() {
   
-        if (!this.__state.space !== 'HEX') {
+        if (this.__state.space !== 'HEX') {
           this.__state.hex = math.rgb_to_hex(this.r, this.g, this.b);
         }
   
@@ -3508,7 +3549,7 @@
             delta = max - min,
             h, s;
   
-        if (max != 0) {
+        if (max !== 0) {
           s = delta / max;
         } else {
           return {

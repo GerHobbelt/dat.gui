@@ -70,6 +70,16 @@ define([
 
     });
 
+    dom.bind(this.__selector, 'touchstart', function(e) {
+
+      dom
+        .addClass(this, 'drag')
+        .bind(window, 'touchend', function(e) {
+          dom.removeClass(_this.__selector, 'drag');
+        });
+
+    });
+
     var value_field = document.createElement('div');
 
     common.extend(this.__selector.style, {
@@ -139,6 +149,8 @@ define([
 
     dom.bind(this.__saturation_field, 'mousedown', fieldDown);
     dom.bind(this.__field_knob, 'mousedown', fieldDown);
+    dom.bind(this.__saturation_field, 'touchstart', fieldDownOnTouch);
+    dom.bind(this.__field_knob, 'touchstart', fieldDownOnTouch);
 
     dom.bind(this.__hue_field, 'mousedown', function(e) {
       setH(e);
@@ -146,16 +158,32 @@ define([
       dom.bind(window, 'mouseup', unbindH);
     });
 
+    dom.bind(this.__hue_field, 'touchstart', function(e) {
+      setHonTouch(e);
+      dom.bind(window, 'touchmove', setHonTouch);
+      dom.bind(window, 'touchend', unbindH);
+    });
+
     function fieldDown(e) {
       setSV(e);
       // document.body.style.cursor = 'none';
       dom.bind(window, 'mousemove', setSV);
       dom.bind(window, 'mouseup', unbindSV);
+      dom.bind(window, 'touchmove', setSVonTouch);
+      dom.bind(window, 'touchend', unbindSV);
+    }
+
+    function fieldDownOnTouch(e) {
+      e.clientX = e.touches[0].clientX;
+      e.clientY = e.touches[0].clientY;
+      fieldDown(e);
     }
 
     function unbindSV() {
       dom.unbind(window, 'mousemove', setSV);
       dom.unbind(window, 'mouseup', unbindSV);
+      dom.unbind(window, 'touchmove', setSVonTouch);
+      dom.unbind(window, 'touchend', unbindSV);
       // document.body.style.cursor = 'default';
     }
 
@@ -172,6 +200,8 @@ define([
     function unbindH() {
       dom.unbind(window, 'mousemove', setH);
       dom.unbind(window, 'mouseup', unbindH);
+      dom.unbind(window, 'touchmove', setHonTouch);
+      dom.unbind(window, 'touchend', unbindH);
     }
 
     this.__saturation_field.appendChild(value_field);
@@ -191,8 +221,8 @@ define([
 
       var w = dom.getWidth(_this.__saturation_field);
       var o = dom.getOffset(_this.__saturation_field);
-      var s = (e.clientX - o.left + document.body.scrollLeft) / w;
-      var v = 1 - (e.clientY - o.top + document.body.scrollTop) / w;
+      var s = (e.clientX - o.left /* + document.body.scrollLeft */ ) / w;
+      var v = 1 - (e.clientY - o.top /* + document.body.scrollTop */ ) / w;
 
       if (v > 1) v = 1;
       else if (v < 0) v = 0;
@@ -205,7 +235,6 @@ define([
 
       _this.setValue(_this.__color.toOriginal());
 
-
       return false;
 
     }
@@ -216,7 +245,7 @@ define([
 
       var s = dom.getHeight(_this.__hue_field);
       var o = dom.getOffset(_this.__hue_field);
-      var h = 1 - (e.clientY - o.top + document.body.scrollTop) / s;
+      var h = 1 - (e.clientY - o.top /* + document.body.scrollTop */ ) / s;
 
       if (h > 1) h = 1;
       else if (h < 0) h = 0;
@@ -226,6 +255,21 @@ define([
       _this.setValue(_this.__color.toOriginal());
 
       return false;
+
+    }
+
+    function setSVonTouch(e) {
+
+      e.clientX = e.touches[0].clientX;
+      e.clientY = e.touches[0].clientY;
+      return setSV(e);
+
+    }
+
+    function setHonTouch(e) {
+
+      e.clientY = e.touches[0].clientY;
+      return setH(e);
 
     }
 

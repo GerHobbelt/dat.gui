@@ -1,0 +1,21 @@
+
+.GUI-preview-image{
+    float: left;
+    padding: 0.4em;
+    max-width: 2em;
+    max-height: 2em;
+
+}
+
+.GUI-label-image{
+    color:rgb(214, 214, 245);
+    text-decoration: underline;
+    display: block;
+    background-color: #3c3c3c;
+    width: 100%;
+    cursor: pointer;
+}
+
+.GUI-label-image:hover{
+    background: #3c3c3c;
+}

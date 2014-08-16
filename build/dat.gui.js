@@ -106,9 +106,8 @@ dat.utils.common = (function () {
     
     each: function(obj, itr, scope) {
 
-      if (!obj) return;
-
-      if (ARR_EACH && obj.forEach && obj.forEach === ARR_EACH) { 
+      
+      if (ARR_EACH && obj.forEach === ARR_EACH) { 
         
         obj.forEach(itr, scope);
         
@@ -171,7 +170,12 @@ dat.utils.common = (function () {
     
     isFunction: function(obj) {
       return Object.prototype.toString.call(obj) === '[object Function]';
+    },
+
+    isImagePath: function(obj){
+      return obj.search(/jpg|png/) > -1;
     }
+
   
   };
     
@@ -1674,8 +1678,6 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
         SUPPORTS_LOCAL_STORAGE &&
             localStorage.getItem(getLocalStorageHash(this, 'isLocal')) === 'true';
 
-    var saveToLocalStorage;
-
     Object.defineProperties(this,
 
         /** @lends dat.gui.GUI.prototype */
@@ -1931,14 +1933,9 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
       addResizeHandle(this);
     }
 
-    saveToLocalStorage = function () {
-      if (SUPPORTS_LOCAL_STORAGE && localStorage.getItem(getLocalStorageHash(_this, 'isLocal')) === 'true') {
-        localStorage.setItem(getLocalStorageHash(_this, 'gui'), JSON.stringify(_this.getSaveObject()));
-      }
+    function saveToLocalStorage() {
+      localStorage.setItem(getLocalStorageHash(_this, 'gui'), JSON.stringify(_this.getSaveObject()));
     }
-
-    // expose this method publicly
-    this.saveToLocalStorageIfPossible = saveToLocalStorage;
 
     var root = _this.getRoot();
     function resetWidth() {
@@ -2236,7 +2233,6 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
 
           this.load.remembered[this.preset] = getCurrentPreset(this);
           markPresetModified(this, false);
-          this.saveToLocalStorageIfPossible();
 
         },
 
@@ -2253,7 +2249,6 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
           this.load.remembered[presetName] = getCurrentPreset(this);
           this.preset = presetName;
           addPresetOption(this, presetName, true);
-          this.saveToLocalStorageIfPossible();
 
         },
 
@@ -2855,7 +2850,10 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
 })(dat.utils.css,
 "<div id=\"dg-save\" class=\"dg dialogue\">\n\n  Here's the new load parameter for your <code>GUI</code>'s constructor:\n\n  <textarea id=\"dg-new-constructor\"></textarea>\n\n  <div id=\"dg-save-locally\">\n\n    <input id=\"dg-local-storage\" type=\"checkbox\"/> Automatically save\n    values to <code>localStorage</code> on exit.\n\n    <div id=\"dg-local-explain\">The values saved to <code>localStorage</code> will\n      override those passed to <code>dat.GUI</code>'s constructor. This makes it\n      easier to work incrementally, but <code>localStorage</code> is fragile,\n      and your friends may not see the same values you do.\n      \n    </div>\n    \n  </div>\n\n</div>",
 ".dg {\n  /** Clear list styles */\n  /* Auto-place container */\n  /* Auto-placed GUI's */\n  /* Line items that don't contain folders. */\n  /** Folder names */\n  /** Hides closed items */\n  /** Controller row */\n  /** Name-half (left) */\n  /** Controller-half (right) */\n  /** Controller placement */\n  /** Shorter number boxes when slider is present. */\n  /** Ensure the entire boolean and function row shows a hand */ }\n  .dg ul {\n    list-style: none;\n    margin: 0;\n    padding: 0;\n    width: 100%;\n    clear: both; }\n  .dg.ac {\n    position: fixed;\n    top: 0;\n    left: 0;\n    right: 0;\n    height: 0;\n    z-index: 0; }\n  .dg:not(.ac) .main {\n    /** Exclude mains in ac so that we don't hide close button */\n    overflow: hidden; }\n  .dg.main {\n    -webkit-transition: opacity 0.1s linear;\n    -o-transition: opacity 0.1s linear;\n    -moz-transition: opacity 0.1s linear;\n    transition: opacity 0.1s linear; }\n    .dg.main.taller-than-window {\n      overflow-y: auto; }\n      .dg.main.taller-than-window .close-button {\n        opacity: 1;\n        /* TODO, these are style notes */\n        margin-top: -1px;\n        border-top: 1px solid #2c2c2c; }\n    .dg.main ul.closed .close-button {\n      opacity: 1 !important; }\n    .dg.main:hover .close-button,\n    .dg.main .close-button.drag {\n      opacity: 1; }\n    .dg.main .close-button {\n      /*opacity: 0;*/\n      -webkit-transition: opacity 0.1s linear;\n      -o-transition: opacity 0.1s linear;\n      -moz-transition: opacity 0.1s linear;\n      transition: opacity 0.1s linear;\n      border: 0;\n      position: absolute;\n      line-height: 19px;\n      height: 20px;\n      /* TODO, these are style notes */\n      cursor: pointer;\n      text-align: center;\n      background-color: #000; }\n      .dg.main .close-button:hover {\n        background-color: #111; }\n  .dg.a {\n    float: right;\n    margin-right: 15px;\n    overflow-x: hidden; }\n    .dg.a.has-save > ul {\n      margin-top: 27px; }\n      .dg.a.has-save > ul.closed {\n        margin-top: 0; }\n    .dg.a .save-row {\n      position: fixed;\n      top: 0;\n      z-index: 1002; }\n  .dg li {\n    -webkit-transition: height 0.1s ease-out;\n    -o-transition: height 0.1s ease-out;\n    -moz-transition: height 0.1s ease-out;\n    transition: height 0.1s ease-out; }\n  .dg li:not(.folder) {\n    cursor: auto;\n    height: 27px;\n    line-height: 27px;\n    overflow: hidden;\n    padding: 0 4px 0 5px; }\n  .dg li.folder {\n    padding: 0;\n    border-left: 4px solid rgba(0, 0, 0, 0); }\n  .dg li.title {\n    cursor: pointer;\n    margin-left: -4px; }\n  .dg .closed li:not(.title),\n  .dg .closed ul li,\n  .dg .closed ul li > * {\n    height: 0;\n    overflow: hidden;\n    border: 0; }\n  .dg .cr {\n    clear: both;\n    padding-left: 3px;\n    height: 27px; }\n  .dg .property-name {\n    cursor: default;\n    float: left;\n    clear: left;\n    width: 40%;\n    overflow: hidden;\n    text-overflow: ellipsis; }\n  .dg .c {\n    float: left;\n    width: 60%; }\n  .dg .c input[type=text] {\n    border: 0;\n    margin-top: 4px;\n    padding: 3px;\n    width: 100%;\n    float: right; }\n  .dg .has-slider input[type=text] {\n    width: 30%;\n    /*display: none;*/\n    margin-left: 0; }\n  .dg .slider {\n    float: left;\n    width: 66%;\n    margin-left: -5px;\n    margin-right: 0;\n    height: 19px;\n    margin-top: 4px; }\n  .dg .slider-fg {\n    height: 100%; }\n  .dg .c input[type=checkbox] {\n    margin-top: 9px; }\n  .dg .c select {\n    margin-top: 5px; }\n  .dg .cr.function,\n  .dg .cr.function .property-name,\n  .dg .cr.function *,\n  .dg .cr.boolean,\n  .dg .cr.boolean * {\n    cursor: pointer; }\n  .dg .selector {\n    display: none;\n    position: absolute;\n    margin-left: -9px;\n    margin-top: 23px;\n    z-index: 10; }\n  .dg .c:hover .selector,\n  .dg .selector.drag {\n    display: block; }\n  .dg li.save-row {\n    padding: 0; }\n    .dg li.save-row .button {\n      display: inline-block;\n      padding: 0px 6px; }\n  .dg.dialogue {\n    background-color: #222;\n    width: 460px;\n    padding: 15px;\n    font-size: 13px;\n    line-height: 15px; }\n\n/* TODO Separate style and structure */\n#dg-new-constructor {\n  padding: 10px;\n  color: #222;\n  font-family: Monaco, monospace;\n  font-size: 10px;\n  border: 0;\n  resize: none;\n  box-shadow: inset 1px 1px 1px #888;\n  word-wrap: break-word;\n  margin: 12px 0;\n  display: block;\n  width: 440px;\n  overflow-y: scroll;\n  height: 100px;\n  position: relative; }\n\n#dg-local-explain {\n  display: none;\n  font-size: 11px;\n  line-height: 17px;\n  border-radius: 3px;\n  background-color: #333;\n  padding: 8px;\n  margin-top: 10px; }\n  #dg-local-explain code {\n    font-size: 10px; }\n\n#dat-gui-save-locally {\n  display: none; }\n\n/** Main type */\n.dg {\n  color: #eee;\n  font: 11px 'Lucida Grande', sans-serif;\n  text-shadow: 0 -1px 0 #111;\n  /** Auto place */\n  /* Controller row, <li> */\n  /** Controllers */ }\n  .dg.main {\n    /** Scrollbar */ }\n    .dg.main::-webkit-scrollbar {\n      width: 5px;\n      background: #1a1a1a; }\n    .dg.main::-webkit-scrollbar-corner {\n      height: 0;\n      display: none; }\n    .dg.main::-webkit-scrollbar-thumb {\n      border-radius: 5px;\n      background: #676767; }\n  .dg li:not(.folder) {\n    background: #1a1a1a;\n    border-bottom: 1px solid #2c2c2c; }\n  .dg li.save-row {\n    line-height: 25px;\n    background: #dad5cb;\n    border: 0; }\n    .dg li.save-row select {\n      margin-left: 5px;\n      width: 108px; }\n    .dg li.save-row .button {\n      margin-left: 5px;\n      margin-top: 1px;\n      border-radius: 2px;\n      font-size: 9px;\n      line-height: 7px;\n      padding: 4px 4px 5px 4px;\n      background: #c5bdad;\n      color: #fff;\n      text-shadow: 0 1px 0 #b0a58f;\n      box-shadow: 0 -1px 0 #b0a58f;\n      cursor: pointer; }\n      .dg li.save-row .button.gears {\n        background: #c5bdad url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAANCAYAAAB/9ZQ7AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAQJJREFUeNpiYKAU/P//PwGIC/ApCABiBSAW+I8AClAcgKxQ4T9hoMAEUrxx2QSGN6+egDX+/vWT4e7N82AMYoPAx/evwWoYoSYbACX2s7KxCxzcsezDh3evFoDEBYTEEqycggWAzA9AuUSQQgeYPa9fPv6/YWm/Acx5IPb7ty/fw+QZblw67vDs8R0YHyQhgObx+yAJkBqmG5dPPDh1aPOGR/eugW0G4vlIoTIfyFcA+QekhhHJhPdQxbiAIguMBTQZrPD7108M6roWYDFQiIAAv6Aow/1bFwXgis+f2LUAynwoIaNcz8XNx3Dl7MEJUDGQpx9gtQ8YCueB+D26OECAAQDadt7e46D42QAAAABJRU5ErkJggg==) 2px 1px no-repeat;\n        height: 7px;\n        width: 8px; }\n      .dg li.save-row .button:hover {\n        background-color: #bab19e;\n        box-shadow: 0 -1px 0 #b0a58f; }\n  .dg li.folder {\n    border-bottom: 0; }\n  .dg li.title {\n    padding-left: 16px;\n    background: black url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlI+hKgFxoCgAOw==) 6px 10px no-repeat;\n    cursor: pointer;\n    border-bottom: 1px solid rgba(255, 255, 255, 0.2); }\n  .dg .closed li.title {\n    background-image: url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlGIWqMCbWAEAOw==); }\n  .dg .cr.boolean {\n    border-left: 3px solid #806787; }\n  .dg .cr.function {\n    border-left: 3px solid #e61d5f; }\n  .dg .cr.number {\n    border-left: 3px solid #2fa1d6; }\n    .dg .cr.number input[type=text] {\n      color: #2fa1d6; }\n  .dg .cr.string {\n    border-left: 3px solid #1ed36f; }\n    .dg .cr.string input[type=text] {\n      color: #1ed36f; }\n  .dg .cr.function:hover, .dg .cr.boolean:hover {\n    background: #111; }\n  .dg .c input[type=text] {\n    background: #303030;\n    outline: none; }\n    .dg .c input[type=text]:hover {\n      background: #3c3c3c; }\n    .dg .c input[type=text]:focus {\n      background: #494949;\n      color: #fff; }\n  .dg .c .slider {\n    background: #303030;\n    cursor: ew-resize; }\n  .dg .c .slider-fg {\n    background: #2fa1d6; }\n  .dg .c .slider:hover {\n    background: #3c3c3c; }\n    .dg .c .slider:hover .slider-fg {\n      background: #44abda; }\n",
-dat.controllers.factory = (function (OptionController, NumberControllerBox, NumberControllerSlider, StringController, FunctionController, BooleanController, common) {
+dat.controllers.factory = (function (OptionController, NumberControllerBox, NumberControllerSlider, StringController, FunctionController, BooleanController, ImageController,  common) {
+
+        var firstTimeImageController = true;
+
 
       return function(object, property) {
 
@@ -2883,6 +2881,14 @@ dat.controllers.factory = (function (OptionController, NumberControllerBox, Numb
 
         }
 
+        if(common.isImagePath(initialValue)){
+            if(firstTimeImageController){
+                ImageController.useDefaultStyles();
+                firstTimeImageController = false;
+            }
+          return new ImageController(object, property);
+        }
+
         if (common.isString(initialValue)) {
           return new StringController(object, property);
         }
@@ -2894,6 +2900,8 @@ dat.controllers.factory = (function (OptionController, NumberControllerBox, Numb
         if (common.isBoolean(initialValue)) {
           return new BooleanController(object, property);
         }
+
+
 
       }
 
@@ -2976,6 +2984,84 @@ dat.dom.dom,
 dat.utils.common),
 dat.controllers.FunctionController,
 dat.controllers.BooleanController,
+dat.controllers.ImageController = (function (Controller, dom, css, common, styleSheet) {
+
+    /**
+     * @class Provides a image/file input to alter the  url property on an object
+     *
+     * @extends dat.controllers.Controller
+     *
+     * @param {Object} object The object to be manipulated
+     * @param {string} property The name of the property to be manipulated
+     *
+     * @member dat.controllers
+     */
+    function ImageController(Object, property){
+
+        ImageController.superclass.call(this, Object, property);
+
+        var _this = this;
+
+        this.__input = document.createElement('input');
+        this.__input.setAttribute('type', 'file');
+        this.__input.style.display = 'none';
+
+        this.__label = document.createElement('label');
+        this.__label.innerText = this.getValue();
+        this.__label.appendChild(this.__input);
+
+        this.__previewImage = document.createElement('img');
+
+        dom.addClass(this.__previewImage, 'GUI-preview-image');
+        dom.addClass(this.__label, 'GUI-label-image');
+
+        dom.bind(this.__input, 'change', onChange);
+        //todo: bind onDragRelease
+
+        function onChange() {
+            var file = _this.__input.files[0];
+            var url = URL.createObjectURL(file);
+            _this.__previewImage.src = url;
+            _this.setValue( url );
+
+
+            if (_this.__onFinishChange) {
+                _this.__onFinishChange.call(_this, _this.getValue());
+            }
+        }
+        this.updateDisplay();
+        this.domElement.appendChild(this.__previewImage);
+        this.domElement.appendChild(this.__label);
+    }
+
+    ImageController.superclass = Controller;
+
+    /**
+     * Injects default stylesheet for slider elements.
+     */
+    ImageController.useDefaultStyles = function() {
+        css.inject(styleSheet);
+    };
+
+    common.extend(
+        ImageController.prototype,
+        Controller.prototype,
+
+        {
+            updateDisplay: function() {
+                this.__previewImage.src = this.getValue();
+                return ImageController.superclass.prototype.updateDisplay.call(this);
+            }
+        }
+    )
+
+
+    return ImageController;
+})(dat.controllers.Controller,
+dat.dom.dom,
+dat.utils.css,
+dat.utils.common,
+"\r\n.GUI-preview-image{\r\n    float: left;\r\n    padding: 0.4em;\r\n    max-width: 2em;\r\n    max-height: 2em;\r\n\r\n}\r\n\r\n.GUI-label-image{\r\n    color:rgb(214, 214, 245);\r\n    text-decoration: underline;\r\n    display: block;\r\n    background-color: #3c3c3c;\r\n    width: 100%;\r\n    cursor: pointer;\r\n}\r\n\r\n.GUI-label-image:hover{\r\n    background: #3c3c3c;\r\n}"),
 dat.utils.common),
 dat.controllers.Controller,
 dat.controllers.BooleanController,

@@ -18,9 +18,13 @@ define([
   'dat/controllers/StringController',
   'dat/controllers/FunctionController',
   'dat/controllers/BooleanController',
+  'dat/controllers/ImageController',
   'dat/utils/common'
 ],
-    function(OptionController, NumberControllerBox, NumberControllerSlider, StringController, FunctionController, BooleanController, common) {
+    function(OptionController, NumberControllerBox, NumberControllerSlider, StringController, FunctionController, BooleanController, ImageController,  common) {
+
+        var firstTimeImageController = true;
+
 
       return function(object, property) {
 
@@ -48,6 +52,14 @@ define([
 
         }
 
+        if(common.isImagePath(initialValue)){
+            if(firstTimeImageController){
+                ImageController.useDefaultStyles();
+                firstTimeImageController = false;
+            }
+          return new ImageController(object, property);
+        }
+
         if (common.isString(initialValue)) {
           return new StringController(object, property);
         }
@@ -59,6 +71,8 @@ define([
         if (common.isBoolean(initialValue)) {
           return new BooleanController(object, property);
         }
+
+
 
       }
 

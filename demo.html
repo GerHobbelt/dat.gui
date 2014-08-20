@@ -1,0 +1,107 @@
+<!doctype html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <title>dat-gui Demo</title>
+
+  <script src="../platform/platform.js"></script>
+  <link rel="import" href="dat-gui.html">
+
+</head>
+<body unresolved>
+
+  <p>An `dat-gui` looks like this:</p>
+
+  <my-example></my-example>
+
+  <polymer-element name="my-example">
+    <template>
+      <dat-gui>
+        <gui-number name="speed" value="{{speed}}"></gui-number>
+        <gui-string name="message" value="{{message}}"></gui-string>
+        <gui-boolean name="displayOutline" value="{{displayOutline}}"></gui-boolean>
+        <gui-function name="explode" value="{{explode}}" comment="hello there"></gui-function>
+        <gui-folder name="Flow Field">
+          <gui-number name="speed" value="{{speed}}"></gui-number>
+          <gui-string name="message" value="{{message}}"></gui-string>
+        </gui-folder>
+      </dat-gui>
+      <my-drawing></my-drawing>
+    </template>
+    <script>
+    Polymer({
+      speed: 0.5,
+      message: 'dat.gui'
+      displayOutline: false,
+      explode: function() {
+        console.log('explode');
+      }
+    })
+    </script>
+  </polymer-element>
+
+  <script>
+
+    var FizzyText = function() {
+      this.message = 'dat.gui';
+      this.speed = 0.8;
+      this.displayOutline = false;
+      this.explode = function() { console.log('explode'); };
+      // Define render logic ...
+    };
+
+    window.addEventListener('polymer-ready', function(e) {
+      var text = new FizzyText();
+      var gui = new dat.GUI();
+      gui.add(text, 'message');
+      gui.add(text, 'speed', -5, 5);
+      gui.add(text, 'displayOutline');
+      gui.add(text, 'explode');
+      gui.add(text, 'c', 'gui-color');
+      gui.add(text, 'speed').min(-5).max(5).step(1);
+    });
+
+    dat.register('gui-string', function(input) {
+      if (typeof input === 'string') {
+        return true;
+      }
+      return false;
+    });
+
+    function componentToHex(c) {
+        var hex = c.toString(16);
+        return hex.length == 1 ? "0" + hex : hex;
+    }
+
+    function rgbToHex(c) {
+        return "#" + componentToHex(c.r) + componentToHex(c.g) +
+            componentToHex(c.b);
+    }
+
+    function hexToRgb(hex) {
+        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        } : null;
+    }
+
+    dat.register('gui-color', function(input) {
+      if (typeof input === 'string') {
+        if (input.length === 7) && input[0] === '#') {
+          return true;
+        }
+      }
+      return false;
+    }, function(input) {
+      if (input.r && input.g && input.b) {
+        return [rgbToHex, hexToRgb];
+      }
+      return false;
+    });
+
+  </script>
+
+</body>
+</html>

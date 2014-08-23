@@ -1,3 +1,10 @@
+//
+// OBSOLETE STUFF?
+//
+// old v0.4 code which needs to be integrated or otherwise thrown away
+//
+
+
 GUI.millis = function() {
 	var d = new Date();
 	return d.getTime();

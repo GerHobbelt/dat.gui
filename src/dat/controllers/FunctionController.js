@@ -24,10 +24,16 @@ define([
    *
    * @param {Object} object The object to be manipulated
    * @param {string} property The name of the property to be manipulated
+   * @param {string} text The text displayed in the button which will invoke the specified method.
+   * @param {Array} user_data Optional set of user-specified datums to be passed to the specified method as its parameters (using JavaScript `.apply()`)
    *
    * @member dat.controllers
    */
-  var FunctionController = function(object, property, text) {
+  var FunctionController = function(object, property, text, user_data) {
+    
+    if (!common.isUndefined(user_data) && !common.isArray(user_data)) {
+      user_data = [user_data];
+    }
 
     FunctionController.superclass.call(this, object, property);
 
@@ -37,7 +43,7 @@ define([
     this.__button.innerHTML = text === undefined ? 'Fire' : text;
     dom.bind(this.__button, 'click', function(e) {
       e.preventDefault();
-      _this.fire();
+      _this.fire(user_data);
       return false;
     });
 
@@ -55,13 +61,13 @@ define([
       Controller.prototype,
       {
         
-        fire: function() {
+        fire: function(user_data) {
           if (this.__onChange) {
-            this.__onChange.call(this);
+            this.__onChange.call(this, this.getValue(), user_data);
           }
-          this.getValue().call(this.object);
+          this.getValue().apply(this.object, user_data);
           if (this.__onFinishChange) {
-            this.__onFinishChange.call(this, this.getValue());
+            this.__onFinishChange.call(this, this.getValue(), user_data);
           }
         }
       }

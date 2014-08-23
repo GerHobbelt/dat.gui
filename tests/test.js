@@ -1,3 +1,10 @@
+//
+// OBSOLETE STUFF?
+//
+// old v0.4 code which needs to be integrated or otherwise thrown away
+//
+
+
 
     var math = dat.color.math;
     var interpret = dat.color.interpret;

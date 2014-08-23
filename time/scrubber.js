@@ -1,3 +1,11 @@
+//
+// OBSOLETE STUFF?
+//
+// old v0.4 code which needs to be integrated or otherwise thrown away
+//
+
+
+
 GUI.Scrubber = function(controller, timer) {	
 
 	var _this = this;

@@ -29,7 +29,6 @@ exports.tab = tab;
 exports.license = read_file('license.txt');
 
 function build(_params) {
-
   params = _params;
 
   defined = {};
@@ -53,7 +52,6 @@ function build(_params) {
   var to_write = '';
   var ensured = {};
 
-
   for (var name in params.paths) {
     var path = params.baseUrl + params.paths[name] + '.js';
     var str = read_file(path);
@@ -69,7 +67,6 @@ function build(_params) {
 
   // Ensure namespaces
   for (i in namespaces) {
-
     var split = i.split('/');
 
     for (var j = 0; j < split.length; j++) {
@@ -90,7 +87,6 @@ function build(_params) {
         ensured[curn] = true;
       }
     }
-
   }
 
   var shared_count = 0;
@@ -106,20 +102,17 @@ function build(_params) {
       }
     }
   }
-  
 
   to_write += params.shortcut + ' = ' + params.main.replace(/\//g, '.') + ' = ' + defined[params.main].getClosure() + ';';
 
-  if ( params.umd ){
-    to_write = wrap_umd( params.shortcut.split('.')[0], to_write + '\nreturn '+params.umd.ret+';' );
+  if (params.umd) {
+    to_write = wrap_umd( params.shortcut.split('.')[0], to_write + '\nreturn ' + params.umd.ret + ';' );
   }
 
   if (params.verbose) console.log('Exported: ' + params.main + ' to window.' + params.shortcut);
 
   if (params.minify) {
-
     console.log('Compiling minified source ...');
-
 
     closure.compile(to_write, function(error, code) {
       if (error) {
@@ -131,19 +124,14 @@ function build(_params) {
         params.on_compile();
       }
     });
-
   } else {
-
     write(exports.license + "\n" + to_write);
-
   }
 
   return deps;
-
 }
 
 function define(deps, callback) {
-
   this.name = next_load;
   this.path = next_path;
   this.shared = false;
@@ -195,11 +183,9 @@ function define(deps, callback) {
   };
 
   this.recurseDeps = function() {
-
     if (!this.deps) return;
 
     for (var i in this.deps) {
-
       var dep = this.deps[i];
 
       if (dep in params.paths) continue;
@@ -221,13 +207,10 @@ function define(deps, callback) {
       } else {
         request_counts[dep] = 1;
       }
-
     }
-
   };
 
   this.recurseDeps();
-
 }
 
 /**
@@ -237,7 +220,6 @@ function define(deps, callback) {
  * @return {String}
  */
 function wrap_umd( name, src ){
-
   return [
     "(function (root, factory) {",
     "  if (typeof define === 'function' && define.amd) {",
@@ -245,10 +227,10 @@ function wrap_umd( name, src ){
     "    define(factory);",
     "  } else {",
     "    // Browser globals",
-    "    root."+ name +" = factory();",
+    "    root." + name + " = factory();",
     "  }",
     "}(this, function () {",
-      src.replace(/\n/g,'\n  '),
+      src.replace(/\n/g, '\n  '),
     "}));\n"
   ].join('\n');
 }
@@ -273,6 +255,7 @@ function read_file(path) {
 function load_module(path, name) {
   name = name || path;
   if (name in defined) return;
+  if (params.verbose) console.log("load module: ", name);
   next_load = name;
   next_path = path;
   eval('new ' + read_file(path));

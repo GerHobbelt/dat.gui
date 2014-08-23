@@ -105,7 +105,10 @@
     clear: left;
     width: 40%;
     overflow: hidden;
-    text-overflow: ellipsis; }
+    text-overflow: ellipsis; 
+    text-overflow: "…" "…";
+    white-space: nowrap;
+  }
   .dg .c {
     float: left;
     width: 60%; }

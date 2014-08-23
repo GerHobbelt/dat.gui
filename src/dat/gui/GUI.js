@@ -11,25 +11,70 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-var css = require('../utils/css');
-var Controller = require('../controllers/Controller');
-var BooleanController = require('../controllers/BooleanController');
-var StringController = require('../controllers/StringController');
-var FunctionController = require('../controllers/FunctionController');
-var NumberControllerBox = require('../controllers/NumberControllerBox');
-var NumberControllerSlider = require('../controllers/NumberControllerSlider');
-var OptionController = require('../controllers/OptionController');
-var ColorController = require('../controllers/ColorController');
-var NullController = require('../controllers/NullController');
-var UndefinedController = require('../controllers/UndefinedController');
 
-var requestAnimationFrame = require('../utils/requestAnimationFrame');
-var CenteredDiv = require('../dom/CenteredDiv');
-var dom = require('../dom/dom');
-var common = require('../utils/common');
-var styleSheet = require('./style.css.js');
-var saveDialogueContents = require('./saveDialogue.html.js');
-var sniff = require('../controllers/sniff');
+//
+// OBSOLETE STUFF?
+//
+// old v0.4 code which needs to be integrated or otherwise thrown away
+//
+
+
+// var css = require('../utils/css');
+// var Controller = require('../controllers/Controller');
+// var BooleanController = require('../controllers/BooleanController');
+// var StringController = require('../controllers/StringController');
+// var FunctionController = require('../controllers/FunctionController');
+// var NumberControllerBox = require('../controllers/NumberControllerBox');
+// var NumberControllerSlider = require('../controllers/NumberControllerSlider');
+// var OptionController = require('../controllers/OptionController');
+// var ColorController = require('../controllers/ColorController');
+// var NullController = require('../controllers/NullController');
+// var UndefinedController = require('../controllers/UndefinedController');
+
+// var requestAnimationFrame = require('../utils/requestAnimationFrame');
+// var CenteredDiv = require('../dom/CenteredDiv');
+// var dom = require('../dom/dom');
+// var common = require('../utils/common');
+// var styleSheet = require('./style.css.js');
+// var saveDialogueContents = require('./saveDialogue.html.js');
+// var sniff = require('../controllers/sniff');
+
+
+//
+// EOF
+//
+      
+      
+      
+define([
+
+  'dat/utils/css',
+
+  'text!dat/gui/saveDialogue.html',
+  'text!dat/gui/style.css',
+
+  'dat/controllers/factory',
+  'dat/controllers/Controller',
+  'dat/controllers/BooleanController',
+  'dat/controllers/FunctionController',
+  'dat/controllers/NumberController',
+  'dat/controllers/NumberControllerBox',
+  'dat/controllers/NumberControllerSlider',
+  'dat/controllers/OptionController',
+  'dat/controllers/StringController',
+  'dat/controllers/ColorController',
+
+  'dat/utils/requestAnimationFrame',
+
+  'dat/dom/CenteredDiv',
+  'dat/dom/dom',
+
+  'dat/utils/common'
+
+], function(css, saveDialogueContents, styleSheet, controllerFactory, Controller, BooleanController, FunctionController, NumberController, NumberControllerBox, NumberControllerSlider, OptionController, StringController, ColorController, requestAnimationFrame, CenteredDiv, dom, common) {
+
+  var ARR_EACH = Array.prototype.forEach;
+  var ARR_SLICE = Array.prototype.slice;
 
   css.inject(styleSheet);
 
@@ -84,42 +129,16 @@ var sniff = require('../controllers/sniff');
 
     var _this = this;
 
-	this._typeControllers = {
-		color: function(object, property) {
-			return new ColorController(object, property);
-		},
-		option: function(object, property, opts) {
-			return new OptionController(object, property, opts);
-		},
-		numberSlider: function(object, property, min, max, step) {
-			return new NumberControllerSlider(object,
-												property,
-											  min, max, step);
-		},
-		numberBox: function(object, property, min, max, step) {
-			return new NumberControllerBox(object,
-										   property, {
-											   min: min,
-											   max: max,
-											   step: step
-										   });
-		},
-		string: function(object, property) {
-			return new StringController(object, property);
-		},
-		'function': function(object, property) {
-			return new FunctionController(object, property, '');
-		},
-		'boolean': function(object, property) {
-			return new BooleanController(object, property);
-		},
-		'null': function(object, property) {
-			return new NullController(object, property);
-		},
-		'undefined': function(object, property) {
-			return new UndefinedController(object, property);
-		}
-	};
+    this.__typeControllers = {
+      color: ColorController,
+      option: OptionController,
+      numberSlider: NumberControllerSlider,
+      numberBox: NumberControllerBox,
+      number: NumberController,
+      string: StringController,
+      'function': FunctionController,
+      'boolean': BooleanController
+    };
 
     /**
      * Outermost DOM Element
@@ -215,154 +234,159 @@ var sniff = require('../controllers/sniff');
 
     Object.defineProperties(this,
 
-        /** @lends dat.gui.GUI.prototype */
-        {
+      /** @lends dat.gui.GUI.prototype */
+      {
 
-          /**
-           * The parent <code>GUI</code>
-           * @type dat.gui.GUI
-           */
-          parent: {
-            get: function() {
-              return params.parent;
+        /**
+         * The parent <code>GUI</code>
+         * @type dat.gui.GUI
+         */
+        parent: {
+          get: function() {
+            return params.parent;
+          }
+        },
+
+        scrollable: {
+          get: function() {
+            return params.scrollable;
+          }
+        },
+
+        /**
+         * Handles <code>GUI</code>'s element placement for you
+         * @type Boolean
+         */
+        autoPlace: {
+          get: function() {
+            return params.autoPlace;
+          }
+        },
+
+        /**
+         * The identifier for a set of saved values
+         * @type String
+         */
+        preset: {
+
+          get: function() {
+            if (_this.parent) {
+              return _this.getRoot().preset;
+            } else {
+              return params.load.preset;
             }
           },
 
-          scrollable: {
-            get: function() {
-              return params.scrollable;
+          set: function(v) {
+            if (_this.parent) {
+              _this.getRoot().preset = v;
+            } else {
+              params.load.preset = v;
             }
-          },
-
-          /**
-           * Handles <code>GUI</code>'s element placement for you
-           * @type Boolean
-           */
-          autoPlace: {
-            get: function() {
-              return params.autoPlace;
-            }
-          },
-
-          /**
-           * The identifier for a set of saved values
-           * @type String
-           */
-          preset: {
-
-            get: function() {
-              if (_this.parent) {
-                return _this.getRoot().preset;
-              } else {
-                return params.load.preset;
-              }
-            },
-
-            set: function(v) {
-              if (_this.parent) {
-                _this.getRoot().preset = v;
-              } else {
-                params.load.preset = v;
-              }
-              setPresetSelectIndex(_this);
-              _this.revert();
-            }
-
-          },
-
-          /**
-           * The width of <code>GUI</code> element
-           * @type Number
-           */
-          width: {
-            get: function() {
-              return params.width;
-            },
-            set: function(v) {
-              params.width = v;
-              setWidth(_this, v);
-            }
-          },
-
-          /**
-           * The name of <code>GUI</code>. Used for folders. i.e
-           * a folder's name
-           * @type String
-           */
-          name: {
-            get: function() {
-              return params.name;
-            },
-            set: function(v) {
-              // TODO Check for collisions among sibling folders
-              params.name = v;
-              if (title_row_name) {
-                title_row_name.innerHTML = params.name;
-              }
-            }
-          },
-
-          /**
-           * Whether the <code>GUI</code> is collapsed or not
-           * @type Boolean
-           */
-          closed: {
-            get: function() {
-              return params.closed;
-            },
-            set: function(v) {
-              params.closed = v;
-              if (params.closed) {
-                dom.addClass(_this.__ul, GUI.CLASS_CLOSED);
-              } else {
-                dom.removeClass(_this.__ul, GUI.CLASS_CLOSED);
-              }
-              // For browsers that aren't going to respect the CSS transition,
-              // Lets just check our height against the window height right off
-              // the bat.
-              _this.onResize();
-
-              if (_this.__closeButton) {
-                _this.__closeButton.innerHTML = v ? GUI.TEXT_OPEN : GUI.TEXT_CLOSED;
-              }
-            }
-          },
-
-          /**
-           * Contains all presets
-           * @type Object
-           */
-          load: {
-            get: function() {
-              return params.load;
-            }
-          },
-
-          /**
-           * Determines whether or not to use <a href="https://developer.mozilla.org/en/DOM/Storage#localStorage">localStorage</a> as the means for
-           * <code>remember</code>ing
-           * @type Boolean
-           */
-          useLocalStorage: {
-
-            get: function() {
-              return use_local_storage;
-            },
-            set: function(bool) {
-              if (SUPPORTS_LOCAL_STORAGE) {
-                use_local_storage = bool;
-                if (bool) {
-                  dom.bind(window, 'unload', saveToLocalStorage);
-                } else {
-                  dom.unbind(window, 'unload', saveToLocalStorage);
-                }
-                localStorage.setItem(getLocalStorageHash(_this, 'isLocal'), bool);
-              }
-            }
-
+            setPresetSelectIndex(_this);
+            _this.revert();
+            return _this;
           }
 
-        });
+        },
+
+        /**
+         * The width of <code>GUI</code> element
+         * @type Number
+         */
+        width: {
+          get: function() {
+            return params.width;
+          },
+          set: function(v) {
+            params.width = v;
+            setWidth(_this, v);
+            return _this;
+          }
+        },
+
+        /**
+         * The name of <code>GUI</code>. Used for folders. i.e
+         * a folder's name
+         * @type String
+         */
+        name: {
+          get: function() {
+            return params.name;
+          },
+          set: function(v) {
+            // TODO Check for collisions among sibling folders
+            params.name = v;
+            if (title_row_name) {
+              title_row_name.innerHTML = params.name;
+            }
+            return _this;
+          }
+        },
+
+        /**
+         * Whether the <code>GUI</code> is collapsed or not
+         * @type Boolean
+         */
+        closed: {
+          get: function() {
+            return params.closed;
+          },
+          set: function(v) {
+            params.closed = v;
+            if (params.closed) {
+              dom.addClass(_this.__ul, GUI.CLASS_CLOSED);
+            } else {
+              dom.removeClass(_this.__ul, GUI.CLASS_CLOSED);
+            }
+            // For browsers that aren't going to respect the CSS transition,
+            // Lets just check our height against the window height right off
+            // the bat.
+            _this.onResize();
+
+            if (_this.__closeButton) {
+              _this.__closeButton.innerHTML = v ? GUI.TEXT_OPEN : GUI.TEXT_CLOSED;
+            }
+            return _this;
+          }
+        },
+
+        /**
+         * Contains all presets
+         * @type Object
+         */
+        load: {
+          get: function() {
+            return params.load;
+          }
+        },
+
+        /**
+         * Determines whether or not to use <a href="https://developer.mozilla.org/en/DOM/Storage#localStorage">localStorage</a> as the means for
+         * <code>remember</code>ing
+         * @type Boolean
+         */
+        useLocalStorage: {
+
+          get: function() {
+            return use_local_storage;
+          },
+          set: function(bool) {
+            if (SUPPORTS_LOCAL_STORAGE) {
+              use_local_storage = bool;
+              if (bool) {
+                dom.bind(window, 'unload', saveToLocalStorage);
+              } else {
+                dom.unbind(window, 'unload', saveToLocalStorage);
+              }
+              localStorage.setItem(getLocalStorageHash(_this, 'isLocal'), bool);
+            }
+            return _this;
+          }
+
+        }
+
+      });
 
     // Are we a root level GUI?
     if (common.isUndefined(params.parent)) {
@@ -469,10 +493,13 @@ var sniff = require('../controllers/sniff');
       if (SUPPORTS_LOCAL_STORAGE && localStorage.getItem(getLocalStorageHash(_this, 'isLocal')) === 'true') {
         localStorage.setItem(getLocalStorageHash(_this, 'gui'), JSON.stringify(_this.getSaveObject()));
       }
-    }
+    };
 
     // expose this method publicly
-    this.saveToLocalStorageIfPossible = saveToLocalStorage;
+    this.saveToLocalStorageIfPossible = function () {
+      saveToLocalStorage();
+      return _this;
+    };
 
     var root = this.getRoot();
     function resetWidth() {
@@ -522,343 +549,365 @@ var sniff = require('../controllers/sniff');
 
   common.extend(
 
-      GUI.prototype,
+    GUI.prototype,
 
-      /** @lends dat.gui.GUI */
-      {
-        /**
-         * @param controllerName
-         * @param factory
-         */
-		defineController: function(controllerName, controllerFactory) {
-			this._typeControllers[controllerName] = controllerFactory;
-		},
+    /** @lends dat.gui.GUI */
+    {
+      /**
+       * @param controllerName
+       * @param controllerTemplate the template controller object which will be used for 
+       */
+      defineController: function(controllerName, controllerTemplate) {
+        this.__typeControllers[controllerName] = controllerTemplate;
+      },
 
-		hasController: function(controllerName) {
-			return (this._typeControllers[controllerName] !== undefined);
-		},
+      /**
+       * @param controllerName
+       * @returns {dat.controllers.Controller} The controller registered for the given `controllerName`. 
+       * Return boolean FALSE when no controller has been registered for the given name.
+       */
+      findController: function(controllerName) {
+        return this.__typeControllers[controllerName] || false;
+      },
 
-		createController: function(controllerName, args) {
-			return this.getRoot()
-				._typeControllers[controllerName]
-				.apply(this, args);
-		},
+      /**
+       * @param object
+       * @param property
+       * @returns {dat.controllers.Controller} The new controller that was added.
+       * @instance
+       */
+      add: function(object, property /* ...args */) {
 
-        /**
-         * @param object
-         * @param property
-         * @returns {dat.controllers.Controller} The new controller that was added.
-         * @instance
-         */
-        add: function(object, property) {
-
-          return add(
-              this,
-              object,
-              property,
-              {
-                factoryArgs: Array.prototype.slice.call(arguments, 2)
-              }
-          );
-
-        },
-
-        /**
-         * @param object
-         * @param property
-         * @returns {dat.controllers.ColorController} The new controller that was added.
-         * @instance
-         */
-        addColor: function(object, property) {
-
-          return add(
-              this,
-              object,
-              property,
-              {
-					controller: 'color'
-              }
-          );
-
-        },
-
-        /**
-         * @param controller
-         * @instance
-         */
-        remove: function(controller) {
-
-          // TODO listening?
-          this.__ul.removeChild(controller.__li);
-          this.__controllers.slice(this.__controllers.indexOf(controller), 1);
-          var _this = this;
-          common.defer(function() {
-            _this.onResize();
-          });
-
-        },
-
-        destroy: function() {
-
-          if (this.autoPlace) {
-            auto_place_container.removeChild(this.domElement);
-          }
-
-        },
-
-        /**
-         * @param name
-         * @returns {dat.gui.GUI} The new folder.
-         * @throws {Error} if this GUI already has a folder by the specified
-         * name
-         * @instance
-         */
-        addFolder: function(name) {
-
-          // We have to prevent collisions on names in order to have a key
-          // by which to remember saved values
-          if (this.__folders[name] !== undefined) {
-            throw new Error('You already have a folder in this GUI by the' +
-                ' name "' + name + '"');
-          }
-
-          var new_gui_params = { name: name, parent: this };
-
-          // We need to pass down the autoPlace trait so that we can
-          // attach event listeners to open/close folder actions to
-          // ensure that a scrollbar appears if the window is too short.
-          new_gui_params.autoPlace = this.autoPlace;
-
-          // Do we have saved appearance data for this folder?
-
-          if (this.load && // Anything loaded?
-              this.load.folders && // Was my parent a dead-end?
-              this.load.folders[name]) { // Did daddy remember me?
-
-            // Start me closed if I was closed
-            new_gui_params.closed = this.load.folders[name].closed;
-
-            // Pass down the loaded data
-            new_gui_params.load = this.load.folders[name];
-
-          }
-
-          var gui = new GUI(new_gui_params);
-          this.__folders[name] = gui;
-
-          var li = addRow(this, gui.domElement);
-          dom.addClass(li, 'folder');
-          return gui;
-
-        },
-
-        open: function() {
-          this.closed = false;
-        },
-
-        close: function() {
-          this.closed = true;
-        },
-
-        onResize: function() {
-
-          var root = this.getRoot();
-
-          if (root.scrollable) {
-
-            var top = dom.getOffset(root.__ul).top;
-            var h = 0;
-
-            common.each(root.__ul.childNodes, function(node) {
-              if (! (root.autoPlace && node === root.__save_row))
-                h += dom.getHeight(node);
-            });
-
-            if (window.innerHeight - top - CLOSE_BUTTON_HEIGHT < h) {
-              dom.addClass(root.domElement, GUI.CLASS_TOO_TALL);
-              root.__ul.style.height = window.innerHeight - top - CLOSE_BUTTON_HEIGHT + 'px';
-            } else {
-              dom.removeClass(root.domElement, GUI.CLASS_TOO_TALL);
-              root.__ul.style.height = 'auto';
+        return add(
+            this,
+            object,
+            property,
+            {
+              factoryArgs: ARR_SLICE.call(arguments, 2)
             }
+        );
 
-          }
+      },
 
-          if (root.__resize_handle) {
-            common.defer(function() {
-              root.__resize_handle.style.height = root.__ul.offsetHeight + 'px';
-            });
-          }
+      /**
+       * @param object
+       * @param property
+       * @returns {dat.controllers.ColorController} The new controller that was added.
+       * @instance
+       */
+      addColor: function(object, property) {
 
-          if (root.__closeButton) {
-            root.__closeButton.style.width = root.width + 'px';
-          }
-
-        },
-
-        /**
-         * Mark objects for saving. The order of these objects cannot change as
-         * the GUI grows. When remembering new objects, append them to the end
-         * of the list.
-         *
-         * @param {Object...} objects
-         * @throws {Error} if not called on a top level GUI.
-         * @instance
-         */
-        remember: function() {
-
-          if (common.isUndefined(SAVE_DIALOGUE)) {
-            SAVE_DIALOGUE = new CenteredDiv();
-            SAVE_DIALOGUE.domElement.innerHTML = saveDialogueContents;
-          }
-
-          if (this.parent) {
-            throw new Error("You can only call remember on a top level GUI.");
-          }
-
-          var _this = this;
-
-          common.each(Array.prototype.slice.call(arguments), function(object) {
-            if (_this.__rememberedObjects.length === 0) {
-              addSaveMenu(_this);
+        return add(
+            this,
+            object,
+            property,
+            {
+              controller: 'color'
             }
-            if (_this.__rememberedObjects.indexOf(object) == -1) {
-              _this.__rememberedObjects.push(object);
+        );
+
+      },
+
+      /**
+       * @param object
+       * @param property
+       * @returns {dat.controllers.Controller} The new controller that was added.
+       * @instance
+       */
+      addAs: function(object, property, controller /* ...args */) {
+
+        return add(
+            this,
+            object,
+            property,
+            {
+              controller: controller,
+              factoryArgs: ARR_SLICE.call(arguments, 3)
             }
-          });
+        );
 
-          if (this.autoPlace) {
-            // Set save row width
-            setWidth(this, this.width);
-          }
+      },
 
-        },
+      /**
+       * @param controller
+       * @instance
+       */
+      remove: function(controller) {
 
-        /**
-         * @returns {dat.gui.GUI} the topmost parent GUI of a nested GUI.
-         * @instance
-         */
-        getRoot: function() {
-          var gui = this;
-          while (gui.parent) {
-            gui = gui.parent;
-          }
-          return gui;
-        },
+        // TODO listening?
+        this.__ul.removeChild(controller.__li);
+        this.__controllers.slice(this.__controllers.indexOf(controller), 1);
+        var _this = this;
+        common.defer(function() {
+          _this.onResize();
+        });
+        return this;
 
-        /**
-         * @returns {Object} a JSON object representing the current state of
-         * this GUI as well as its remembered properties.
-         * @instance
-         */
-        getSaveObject: function() {
+      },
 
-          var toReturn = this.load;
+      destroy: function() {
 
-          toReturn.closed = this.closed;
+        if (this.autoPlace) {
+          auto_place_container.removeChild(this.domElement);
+        }
 
-          // Am I remembering any values?
-          if (this.__rememberedObjects.length > 0) {
+      },
 
-            toReturn.preset = this.preset;
+      /**
+       * @param name
+       * @returns {dat.gui.GUI} The new folder.
+       * @throws {Error} if this GUI already has a folder by the specified
+       * name
+       * @instance
+       */
+      addFolder: function(name) {
 
-            if (!toReturn.remembered) {
-              toReturn.remembered = {};
-            }
+        // We have to prevent collisions on names in order to have a key
+        // by which to remember saved values
+        if (this.__folders[name] !== undefined) {
+          throw new Error('You already have a folder in this GUI by the' +
+              ' name "' + name + '"');
+        }
 
-            toReturn.remembered[this.preset] = getCurrentPreset(this);
+        var new_gui_params = { name: name, parent: this };
 
-          }
+        // We need to pass down the autoPlace trait so that we can
+        // attach event listeners to open/close folder actions to
+        // ensure that a scrollbar appears if the window is too short.
+        new_gui_params.autoPlace = this.autoPlace;
 
-          toReturn.folders = {};
-          common.each(this.__folders, function(element, key) {
-            toReturn.folders[key] = element.getSaveObject();
-          });
+        // Do we have saved appearance data for this folder?
 
-          return toReturn;
+        if (this.load && // Anything loaded?
+            this.load.folders && // Was my parent a dead-end?
+            this.load.folders[name]) { // Did daddy remember me?
 
-        },
+          // Start me closed if I was closed
+          new_gui_params.closed = this.load.folders[name].closed;
 
-        save: function() {
-
-          if (!this.load.remembered) {
-            this.load.remembered = {};
-          }
-
-          this.load.remembered[this.preset] = getCurrentPreset(this);
-          markPresetModified(this, false);
-          this.saveToLocalStorageIfPossible();
-
-        },
-
-        saveAs: function(presetName) {
-
-          if (!this.load.remembered) {
-
-            // Retain default values upon first save
-            this.load.remembered = {};
-            this.load.remembered[DEFAULT_DEFAULT_PRESET_NAME] = getCurrentPreset(this, true);
-
-          }
-
-          this.load.remembered[presetName] = getCurrentPreset(this);
-          this.preset = presetName;
-          addPresetOption(this, presetName, true);
-          this.saveToLocalStorageIfPossible();
-
-        },
-
-        revert: function(gui) {
-
-          common.each(this.__controllers, function(controller) {
-            // Make revert work on Default.
-            if (!this.getRoot().load.remembered) {
-              controller.setValue(controller.initialValue);
-            } else {
-              recallSavedValue(gui || this.getRoot(), controller);
-            }
-          }, this);
-
-          common.each(this.__folders, function(folder) {
-            folder.revert(folder);
-          });
-
-          if (!gui) {
-            markPresetModified(this.getRoot(), false);
-          }
-
-
-        },
-
-        listen: function(controller) {
-
-          var init = this.__listening.length === 0;
-          this.__listening.push(controller);
-          if (init) updateDisplays(this.__listening);
+          // Pass down the loaded data
+          new_gui_params.load = this.load.folders[name];
 
         }
 
+        var gui = new GUI(new_gui_params);
+        this.__folders[name] = gui;
+
+        var li = addRow(this, gui.domElement);
+        dom.addClass(li, 'folder');
+        return this;
+        //return gui;
+
+      },
+
+      open: function() {
+        this.closed = false;
+        return this;
+      },
+
+      close: function() {
+        this.closed = true;
+        return this;
+      },
+
+      onResize: function() {
+
+        var root = this.getRoot();
+
+        if (root.scrollable) {
+
+          var top = dom.getOffset(root.__ul).top;
+          var h = 0;
+
+          common.each(root.__ul.childNodes, function(node) {
+            if (! (root.autoPlace && node === root.__save_row))
+              h += dom.getHeight(node);
+          });
+
+          if (window.innerHeight - top - CLOSE_BUTTON_HEIGHT < h) {
+            dom.addClass(root.domElement, GUI.CLASS_TOO_TALL);
+            root.__ul.style.height = window.innerHeight - top - CLOSE_BUTTON_HEIGHT + 'px';
+          } else {
+            dom.removeClass(root.domElement, GUI.CLASS_TOO_TALL);
+            root.__ul.style.height = 'auto';
+          }
+
+        }
+
+        if (root.__resize_handle) {
+          common.defer(function() {
+            root.__resize_handle.style.height = root.__ul.offsetHeight + 'px';
+          });
+        }
+
+        if (root.__closeButton) {
+          root.__closeButton.style.width = root.width + 'px';
+        }
+
+      },
+
+      /**
+       * Mark objects for saving. The order of these objects cannot change as
+       * the GUI grows. When remembering new objects, append them to the end
+       * of the list.
+       *
+       * @param {Object...} objects
+       * @throws {Error} if not called on a top level GUI.
+       * @instance
+       */
+      remember: function() {
+
+        if (common.isUndefined(SAVE_DIALOGUE)) {
+          SAVE_DIALOGUE = new CenteredDiv();
+          SAVE_DIALOGUE.domElement.innerHTML = saveDialogueContents;
+        }
+
+        if (this.parent) {
+          throw new Error("You can only call remember on a top level GUI.");
+        }
+
+        var _this = this;
+
+        common.each(ARR_SLICE.call(arguments), function(object) {
+          if (_this.__rememberedObjects.length === 0) {
+            addSaveMenu(_this);
+          }
+          if (_this.__rememberedObjects.indexOf(object) == -1) {
+            _this.__rememberedObjects.push(object);
+          }
+        });
+
+        if (this.autoPlace) {
+          // Set save row width
+          setWidth(this, this.width);
+        }
+        return this;
+
+      },
+
+      /**
+       * @returns {dat.gui.GUI} the topmost parent GUI of a nested GUI.
+       * @instance
+       */
+      getRoot: function() {
+        var gui = this;
+        while (gui.parent) {
+          gui = gui.parent;
+        }
+        return gui;
+      },
+
+      /**
+       * @returns {Object} a JSON object representing the current state of
+       * this GUI as well as its remembered properties.
+       * @instance
+       */
+      getSaveObject: function() {
+
+        var toReturn = this.load;
+
+        toReturn.closed = this.closed;
+
+        // Am I remembering any values?
+        if (this.__rememberedObjects.length > 0) {
+
+          toReturn.preset = this.preset;
+
+          if (!toReturn.remembered) {
+            toReturn.remembered = {};
+          }
+
+          toReturn.remembered[this.preset] = getCurrentPreset(this);
+
+        }
+
+        toReturn.folders = {};
+        common.each(this.__folders, function(element, key) {
+          toReturn.folders[key] = element.getSaveObject();
+        });
+
+        return toReturn;
+
+      },
+
+      save: function() {
+
+        if (!this.load.remembered) {
+          this.load.remembered = {};
+        }
+
+        this.load.remembered[this.preset] = getCurrentPreset(this);
+        markPresetModified(this, false);
+        this.saveToLocalStorageIfPossible();
+        return this;
+
+      },
+
+      saveAs: function(presetName) {
+
+        if (!this.load.remembered) {
+
+          // Retain default values upon first save
+          this.load.remembered = {};
+          this.load.remembered[DEFAULT_DEFAULT_PRESET_NAME] = getCurrentPreset(this, true);
+
+        }
+
+        this.load.remembered[presetName] = getCurrentPreset(this);
+        this.preset = presetName;
+        addPresetOption(this, presetName, true);
+        this.saveToLocalStorageIfPossible();
+        return this;
+
+      },
+
+      revert: function(gui) {
+
+        common.each(this.__controllers, function(controller) {
+          // Make revert work on Default.
+          if (!this.getRoot().load.remembered) {
+            controller.setValue(controller.initialValue);
+          } else {
+            recallSavedValue(gui || this.getRoot(), controller);
+          }
+        }, this);
+
+        common.each(this.__folders, function(folder) {
+          folder.revert(folder);
+        });
+
+        if (!gui) {
+          markPresetModified(this.getRoot(), false);
+        }
+        return this;
+
+      },
+
+      listen: function(controller) {
+
+        var init = this.__listening.length === 0;
+        this.__listening.push(controller);
+        if (init) updateDisplays(this.__listening);
+        return this;
+
       }
+
+    }
 
   );
 
   function add(gui, object, property, params) {
 
-    if (object[property] === undefined) {
-		//throw new Error("Object " + object + " has no property \"" + property + "\"");
-		object[property] = ''
+    var factoryArgs = [object, property, params.controller, gui.__typeControllers].concat(params.factoryArgs);
+    var controller = controllerFactory.apply(gui, factoryArgs);
+
+    if (!controller) {
+      if (object[property] === undefined) {
+        throw new Error("Object " + object + " has no property \"" + property + "\"");
+      } else {
+        throw new Error("Object " + object + " has a (probably null-ed) property \"" + property + "\" for which you did not explicitly specify a suitable controller");
+      }
     }
-
-    var controller;
-
-	if(params.controller) {
-		controller = gui.createController(params.controller,
-													[object,property].concat(params.factoryArgs));
-	} else {
-		var controllerName = sniff(object, property, params.factoryArgs);
-		controller = gui.createController(controllerName,
-										  [object, property].concat(params.factoryArgs));
-	}
 
     if (params.before instanceof Controller) {
       params.before = params.before.__li;
@@ -947,12 +996,12 @@ var sniff = require('../controllers/sniff');
               }
           );
 
-        }
+        }           
 
       },
 
       name: function(v) {
-			controller.__li.firstChild.firstChild.innerHTML = v;
+        controller.__li.firstElementChild.firstElementChild.innerHTML = v;
         return controller;
       },
 
@@ -978,14 +1027,14 @@ var sniff = require('../controllers/sniff');
         var pc = controller[method];
         var pb = box[method];
         controller[method] = box[method] = function() {
-          var args = Array.prototype.slice.call(arguments);
+          var args = ARR_SLICE.call(arguments);
           pc.apply(controller, args);
           return pb.apply(box, args);
         }
       });
 
       dom.addClass(li, 'has-slider');
-		controller.domElement.insertBefore(box.domElement, controller.domElement.firstChild);
+      controller.domElement.insertBefore(box.domElement, controller.domElement.firstElementChild);
 
     }
     else if (controller instanceof NumberControllerBox) {
@@ -1281,7 +1330,7 @@ var sniff = require('../controllers/sniff');
     dom.bind(gui.__resize_handle, 'mousedown', dragStart);
     dom.bind(gui.__closeButton, 'mousedown', dragStart);
 
-    gui.domElement.insertBefore(gui.__resize_handle, gui.domElement.firstChild);
+    gui.domElement.insertBefore(gui.__resize_handle, gui.domElement.firstElementChild);
 
     function dragStart(e) {
 
@@ -1405,3 +1454,4 @@ var sniff = require('../controllers/sniff');
   return GUI;
 
 });
+

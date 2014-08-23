@@ -17,6 +17,26 @@ define([
 ], function(Controller, common) {
 
   /**
+   * When the user didn't specify a sane step size, infer a suitable stepsize from the initialValue.
+   */
+  function guestimateImpliedStep(initialValue, userSpecifiedStep, minimumSaneStepSize, maximumSaneStepSize) {
+    if (common.isFiniteNumber(userSpecifiedStep)) {
+      return userSpecifiedStep;
+    }
+
+    var v;
+    if (!initialValue) {
+      v = 1; // What are we, psychics?
+    } else {
+      // make the step a rounded 10th of the initial value.
+      // (the floor(log) minus 1 ensures that the result still is as accurate as possible for very small numbers;
+      // while the old code performed pow(floor(log)) / 10 which would already cause trouble at values near 1E-6)
+      v = Math.pow(10, Math.floor(Math.log(Math.abs(initialValue)) / Math.LN10) - 1);
+    }
+    return Math.max(minimumSaneStepSize, Math.min(maximumSaneStepSize, v));
+  }
+
+  /**
    * @class Represents a given property of an object that is a number.
    *
    * @extends dat.controllers.Controller
@@ -36,24 +56,14 @@ define([
 
     params = params || {};
 
-    this.__min = params.min;
-    this.__max = params.max;
-    this.__step = params.step;
+    this.__min = (common.isFiniteNumber(params.min) ? params.min : undefined);
+    this.__max = (common.isFiniteNumber(params.max) ? params.max : undefined);
+    this.__step = (common.isFiniteNumber(params.step) ? params.step : undefined);
+    this.__minimumSaneStepSize = params.minimumSaneStepSize || 1E-9;
+    this.__maximumSaneStepSize = params.maximumSaneStepSize || 1E12;
+    this.__mode = params.mode || 'linear';
 
-    if (common.isUndefined(this.__step)) {
-
-      if (!this.initialValue) {
-        this.__impliedStep = 1; // What are we, psychics?
-      } else {
-        // Hey Doug, check this out.
-        this.__impliedStep = Math.pow(10, Math.floor(Math.log(this.initialValue)/Math.LN10))/10;
-      }
-
-    } else {
-
-      this.__impliedStep = this.__step;
-
-    }
+    this.__impliedStep = guestimateImpliedStep(this.initialValue, this.__step, this.__minimumSaneStepSize, this.__maximumSaneStepSize);
 
     this.__precision = numDecimals(this.__impliedStep);
 
@@ -81,6 +91,15 @@ define([
             v = Math.round(v / this.__step) * this.__step;
           }
 
+          if (this.__mode !== 'linear') {
+            var old_step = this.__impliedStep;
+            this.__impliedStep = guestimateImpliedStep(v, this.__step, this.__minimumSaneStepSize, this.__maximumSaneStepSize);
+            if (old_step != this.__impliedStep) {
+              this.__precision = numDecimals(this.__impliedStep);
+              console.log('number controller: new step = ', this.__impliedStep, ', precision: ', this.__precision);
+            }
+          }
+
           return NumberController.superclass.prototype.setValue.call(this, v);
 
         },
@@ -93,7 +112,7 @@ define([
          * @returns {dat.controllers.NumberController} this
          */
         min: function(v) {
-          this.__min = v;
+          this.__min = (common.isFiniteNumber(v) ? v : undefined);
           return this;
         },
 
@@ -105,7 +124,7 @@ define([
          * @returns {dat.controllers.NumberController} this
          */
         max: function(v) {
-          this.__max = v;
+          this.__max = (common.isFiniteNumber(v) ? v : undefined);
           return this;
         },
 
@@ -116,14 +135,33 @@ define([
          * @param {Number} stepValue The step value for
          * dat.controllers.NumberController
          * @default if minimum and maximum specified increment is 1% of the
-         * difference otherwise stepValue is 1
+         * difference otherwise stepValue is 1  (TODO: INCORRECT; stepsize is ~10% of the current value)
          * @returns {dat.controllers.NumberController} this
          */
         step: function(v) {
-          this.__step = v;
-          this.__impliedStep = v;
-          this.__precision = numDecimals(v);
+          this.__step = (common.isFiniteNumber(v) ? v : undefined);
+
+          this.__impliedStep = guestimateImpliedStep(this.getValue(), this.__step, this.__minimumSaneStepSize, this.__maximumSaneStepSize);
+
+          this.__precision = numDecimals(this.__impliedStep);
           return this;
+        },
+
+        mode: function(m) {
+          this.__mode = m || 'linear';
+
+          return this;
+        },
+
+        getMetaInfo: function() {
+          return {
+            min: this.__min, 
+            max: this.__max, 
+            step: this.__step, 
+            minimumSaneStepSize: this.__minimumSaneStepSize, 
+            maximumSaneStepSize: this.__maximumSaneStepSize,
+            mode: this.__mode
+          };
         }
 
       }
@@ -140,5 +178,4 @@ define([
   }
 
   return NumberController;
-
 });

@@ -5,9 +5,56 @@
 <body>
   <script type="text/javascript" src="build/dat.gui.js"></script>
   <script type="text/javascript">
-    var obj = { x: 5 };
+    var obj = { 
+      x: 5,
+
+      message: "message",
+      maxSize: 0,
+      growthSpeed: 0,
+      speed: 0,
+      font: "Times",
+      allFonts: ["Times", "Courier", "Verdana"],
+      noiseStrength: 0,
+      displayOutline: true,
+      explode: function (state) {
+      },
+      fgcolor: "#f00",
+      bgcolor: "#000", /* black */
+      regular_number: 5,
+      regular_number2: -155,
+      regular_number3: 0,
+    };
+
     var gui = new dat.GUI();
-	gui.add(obj, 'x').name('foo');
+
+    gui.add(obj, 'x').name('foo');
+
+    // Text field
+    gui.add(obj, 'message');
+	
+    // Sliders with min + max
+    gui.add(obj, 'maxSize').min(0.5).max(7);
+    gui.add(obj, 'growthSpeed').min(0.01).max(1).step(0.05);
+    gui.add(obj, 'speed', 0.1, 2, 0.05); // shorthand for min/max/step
+    gui.add(obj, 'font', obj.allFonts ); // Font toggle
+
+    // Sliders with min, max and increment.
+    gui.add(obj, 'noiseStrength', 10, 100, 5);
+
+    // Boolean checkbox
+    gui.add(obj, 'displayOutline');
+
+    // Fires a function called 'explode'
+    gui.add(obj, 'explode').name('Explode!'); // Specify a custom name.
+
+    // Colors
+    gui.addAs(obj, 'fgcolor', 'color');
+    gui.addAs(obj, 'bgcolor', gui.findController('color'));
+
+    // Numbers without range
+    gui.add(obj, 'regular_number').name('just a number...');
+    gui.add(obj, 'regular_number2').name('a negative number...');
+    gui.add(obj, 'regular_number3').name('exponential growth').mode('exp');
   </script>
 </body>
 </html>

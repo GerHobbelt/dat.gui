@@ -153,6 +153,8 @@ $button-height: 20px;
     width: 40%;
     overflow: hidden;
     text-overflow: ellipsis;
+    text-overflow: "…" "…";   // https://developer.mozilla.org/en-US/docs/Web/CSS/text-overflow
+    white-space: nowrap;      // otherwise the text will simply wrap and the text-overflow ellipsis will not be applied, but instead the text simply disappears (if only partially) 
   }
 
   /** Controller-half (right) */
@@ -279,7 +281,19 @@ $button-height: 20px;
 #dat-gui-save-locally {
   display: none;
 }
+                     
 
+
+
+
+//
+// OBSOLETE STUFF?
+//
+// old v0.4 code which needs to be integrated or otherwise thrown away
+//
+
+
+                     
 .dg {
   font-size: 20px !important;
 }

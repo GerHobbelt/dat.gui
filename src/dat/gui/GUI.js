@@ -1374,7 +1374,8 @@ define([
     // set the width manually if we want it to bleed to the edge
     if (gui.__save_row && gui.autoPlace) {
       gui.__save_row.style.width = w + 'px';
-    }if (gui.__closeButton) {
+    }
+    if (gui.__closeButton) {
       gui.__closeButton.style.width = w + 'px';
     }
   }
@@ -1435,23 +1436,17 @@ define([
   }
 
   function updateDisplays(controllerArray) {
-
-
     if (controllerArray.length !== 0) {
-
       requestAnimationFrame(function() {
         updateDisplays(controllerArray);
       });
-
     }
 
     common.each(controllerArray, function(c) {
       c.updateDisplay();
     });
-
   }
 
   return GUI;
-
 });
 

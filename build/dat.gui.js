@@ -1101,22 +1101,15 @@
     };
   
     common.extend(
-  
         NumberControllerSlider.prototype,
         NumberController.prototype,
-  
         {
-  
           updateDisplay: function() {
-            var pct = (this.getValue() - this.__min)/(this.__max - this.__min);
-            this.__foreground.style.width = pct*100+'%';
+            var pct = (this.getValue() - this.__min) / (this.__max - this.__min);
+            this.__foreground.style.width = (pct * 100) + '%';
             return NumberControllerSlider.superclass.prototype.updateDisplay.call(this);
           }
-  
         }
-  
-  
-  
     );
   
   	function map(v, i1, i2, o1, o2) {
@@ -1124,7 +1117,6 @@
   	}
   
     return NumberControllerSlider;
-    
   })(dat.controllers.NumberController,
   dat.dom.dom,
   dat.utils.css,

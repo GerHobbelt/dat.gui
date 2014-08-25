@@ -128,11 +128,15 @@ dat.utils.common = (function () {
     },
     
     isNumber: function(obj) {
-      return obj === obj+0;
+      return obj === +obj;
+    },
+    
+    isFiniteNumber: function(obj) {
+      return (obj === +obj) && isFinite(obj);
     },
     
     isString: function(obj) {
-      return obj === obj+'';
+      return typeof obj === 'string';
     },
     
     isBoolean: function(obj) {

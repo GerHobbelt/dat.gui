@@ -2,8 +2,8 @@ function FizzyText(message) {
 
 	var _this = this;
 
-	// These are the variables _this we manipulate with gui-dat.
-	// Notice they're all defined with "this". _this makes them public.
+	// These are the variables that we manipulate with gui-dat.
+	// Notice they're all defined with "this". that makes them public.
 	// Otherwise, gui-dat can't see them.
 
     this.growthSpeed = 0.5;		  // how fast do particles change size?
@@ -16,7 +16,7 @@ function FizzyText(message) {
     this.y = 0;
 	this.scale = 1;
 	
-    // __defineGetter__ and __defineSetter__ makes JavaScript believe _this
+    // __defineGetter__ and __defineSetter__ makes JavaScript believe that
     // we've defined a variable 'this.message'. This way, whenever we 
     // change the message variable, we can call some more functions.
     

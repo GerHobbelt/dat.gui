@@ -19,9 +19,12 @@ define([
   'dat/controllers/StringController',
   'dat/controllers/FunctionController',
   'dat/controllers/BooleanController',
+  'dat/controllers/ImageController',
   'dat/utils/common'
 ],
-    function(Controller, OptionController, NumberControllerBox, NumberControllerSlider, StringController, FunctionController, BooleanController, common) {
+    function(Controller, OptionController, NumberControllerBox, NumberControllerSlider, StringController, FunctionController, BooleanController, ImageController,  common) {
+
+      var firstTimeImageController = true;
 
       var ARR_SLICE = Array.prototype.slice;
 
@@ -75,6 +78,14 @@ define([
 
           }
 
+        }
+
+        if (common.isImagePath(initialValue)) {
+          if (firstTimeImageController) {
+            ImageController.useDefaultStyles();
+            firstTimeImageController = false;
+          }
+          return new ImageController(object, property);
         }
 
         if (common.isString(initialValue)) {

@@ -145,7 +145,12 @@ dat.utils.common = (function () {
     
     isFunction: function(obj) {
       return Object.prototype.toString.call(obj) === '[object Function]';
+    },
+
+    isImagePath: function(obj) {
+      return obj.search(/jpg|png/) > -1;
     }
+
   
   };
     

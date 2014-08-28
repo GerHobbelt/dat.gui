@@ -11,7 +11,7 @@ define([
 ], function(Controller, dom, css, common, styleSheet) {
 
     /**
-     * @class Provides a image/file input to alter the  url property on an object
+     * @class Provides a image/file input to alter the url property on an object
      *
      * @extends dat.controllers.Controller
      *
@@ -20,7 +20,7 @@ define([
      *
      * @member dat.controllers
      */
-    function ImageController(Object, property){
+    function ImageController(Object, property) {
 
         ImageController.superclass.call(this, Object, property);
 
@@ -70,7 +70,6 @@ define([
     common.extend(
         ImageController.prototype,
         Controller.prototype,
-
         {
             updateDisplay: function() {
                 this.__previewImage.src = this.getValue();
@@ -78,7 +77,6 @@ define([
             }
         }
     )
-
 
     return ImageController;
 });

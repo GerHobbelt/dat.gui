@@ -67,8 +67,8 @@ module.exports = function(grunt) {
                 return;
             }
 
-			this.files.forEach(function(file) {
-			  var contents = file.src.filter(function(filepath) {
+			files.forEach(function(file) {
+			  var srcfileset = file.src.filter(function(filepath) {
 			    // Remove nonexistent files (it's up to you to filter or warn here).
 			    if (!grunt.file.exists(filepath)) {
 			      grunt.log.warn('Source file "' + filepath + '" not found.');
@@ -76,32 +76,17 @@ module.exports = function(grunt) {
 			    } else {
 			      return true;
 			    }
-			  }).map(function(filepath) {
-			    // Read and return the file's source.
-			    return grunt.file.read(filepath);
-			  }).join('\n');
-			  // Write joined contents to destination filepath.
-			  grunt.file.write(file.dest, contents);
-			  // Print a success message.
-			  grunt.log.writeln('File "' + file.dest + '" created.');
+			  });
+
+			  var options = this.options;
+			  dat_builder.build(options, file.dest, srcfileset);
 			});
 
-            var file = files.pop();
-
-            grunt.log.writeln("Building " + file.src[0] + "...");
-			dat_builder.build(this);
-
-            var content = grunt.file.read(file.src[0], { encoding: null });
-
-            zlib.gzip(content, function(err, compressed) {
-                grunt.file.write(file.dest, compressed);
-                grunt.log.ok("Compressed file written to " + file.dest);
-                process();
-            });
+			done();
         }
 
         process();
     });
 
-	grunt.registerTask('default',  ['jshint', 'browserify']);
+	grunt.registerTask('default',  ['jshint', 'builder']);
 };

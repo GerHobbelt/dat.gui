@@ -127,20 +127,14 @@ define([
   NumberControllerBox.superclass = NumberController;
 
   common.extend(
-
       NumberControllerBox.prototype,
       NumberController.prototype,
-
       {
-
         updateDisplay: function() {
-
           this.__input.value = this.__truncationSuspended ? this.getValue() : roundToDecimal(this.getValue(), this.__precision);
           return NumberControllerBox.superclass.prototype.updateDisplay.call(this);
         }
-
       }
-
   );
 
   function roundToDecimal(value, decimals) {

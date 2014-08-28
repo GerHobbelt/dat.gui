@@ -62,6 +62,7 @@ define([
   'dat/controllers/NumberControllerSlider',
   'dat/controllers/OptionController',
   'dat/controllers/StringController',
+  'dat/controllers/ImageController',
   'dat/controllers/ColorController',
 
   'dat/utils/requestAnimationFrame',
@@ -71,7 +72,7 @@ define([
 
   'dat/utils/common'
 
-], function(css, saveDialogueContents, styleSheet, controllerFactory, Controller, BooleanController, FunctionController, NumberController, NumberControllerBox, NumberControllerSlider, OptionController, StringController, ColorController, requestAnimationFrame, CenteredDiv, dom, common) {
+], function(css, saveDialogueContents, styleSheet, controllerFactory, Controller, BooleanController, FunctionController, NumberController, NumberControllerBox, NumberControllerSlider, OptionController, StringController, ImageController, ColorController, requestAnimationFrame, CenteredDiv, dom, common) {
 
   var ARR_EACH = Array.prototype.forEach;
   var ARR_SLICE = Array.prototype.slice;
@@ -136,6 +137,7 @@ define([
       numberBox: NumberControllerBox,
       number: NumberController,
       string: StringController,
+      image: ImageController,
       'function': FunctionController,
       'boolean': BooleanController
     };
@@ -1040,10 +1042,8 @@ define([
     else if (controller instanceof NumberControllerBox) {
 
       var r = function(returned) {
-
         // Have we defined both boundaries?
         if (common.isNumber(controller.__min) && common.isNumber(controller.__max)) {
-
           // Well, then lets just replace this with a slider.
           controller.remove();
           return add(
@@ -1054,11 +1054,9 @@ define([
                 before: controller.__li.nextElementSibling,
                 factoryArgs: [controller.__min, controller.__max, controller.__step]
               });
-
         }
 
         return returned;
-
       };
 
       controller.min = common.compose(r, controller.min);

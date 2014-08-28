@@ -140,9 +140,8 @@ define([
     },
 
     isImagePath: function(obj) {
-      return obj.search(/jpg|png/) > -1;
+      return typeof obj === 'string' && obj.search(/\.(gif|jpg|jpeg|png)$/) > -1;
     }
-
   
   };
     

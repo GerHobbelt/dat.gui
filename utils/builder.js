@@ -28,7 +28,7 @@ exports.tab = tab;
 
 exports.license = read_file('license.txt');
 
-function build(_params) {
+function build(_params, destfile, sourcefiles) {
   params = _params;
 
   defined = {};

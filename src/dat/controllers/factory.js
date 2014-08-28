@@ -22,7 +22,7 @@ define([
   'dat/controllers/ImageController',
   'dat/utils/common'
 ],
-    function(Controller, OptionController, NumberControllerBox, NumberControllerSlider, StringController, FunctionController, BooleanController, ImageController,  common) {
+    function(Controller, OptionController, NumberControllerBox, NumberControllerSlider, StringController, FunctionController, BooleanController, ImageController, common) {
 
       var firstTimeImageController = true;
 

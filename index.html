@@ -1,9 +1,9 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
 <head>
   <title>dat.gui</title>
 
-  <link rel='icon' type='image/png' href='docs/assets/favicon.png'/>
+  <link rel='icon' type='image/png' href='examples/assets/favicon.png'/>
 
   <!--Minified build-->
   <!--<script type='text/javascript' src='build/dat.gui.min.js'></script>-->
@@ -13,11 +13,11 @@
 
   <!--Demo-->
   <!--
-  <link href='docs/docs.css' media='screen' rel='stylesheet' type='text/css'/>
-  <script type='text/javascript' src='docs/RequestAnimationFrame.js'></script>
-  <script type='text/javascript' src='docs/improvedNoise.js'></script>
-  <script type='text/javascript' src='docs/prettify.js'></script>
-  <script type='text/javascript' src='docs/demo.js'></script>
+  <link href='examples/demo.css' media='screen' rel='stylesheet' type='text/css'/>
+  <script type='text/javascript' src='examples/RequestAnimationFrame.js'></script>
+  <script type='text/javascript' src='examples/improvedNoise.js'></script>
+  <script type='text/javascript' src='examples/assets/prettify.js'></script>
+  <script type='text/javascript' src='examples/demo.js'></script>
   -->
 
   <script type='text/javascript'>
@@ -55,7 +55,7 @@
       gui.add(fizzyText, 'maxSize').min(0.5).max(7);
       gui.add(fizzyText, 'growthSpeed').min(0.01).max(1).step(0.05);
       gui.add(fizzyText, 'speed', 0.1, 2, 0.05); // shorthand for min/max/step
-      gui.add(fizzyText, 'font', fizzyText.allFonts ); // Font toggle
+      gui.add(fizzyText, 'font', fizzyText.allFonts); // Font toggle
 
       // Sliders with min, max and increment.
       gui.add(fizzyText, 'noiseStrength', 10, 100, 5);
@@ -142,7 +142,7 @@
 <!-- It gives you this! -->
 <div id='notifier'></div>
 
-<h1><a href='http://twitter.com/guidat'><img src='docs/assets/profile.png'
+<h1><a href='http://twitter.com/guidat'><img src='examples/assets/profile.png'
                                              border='0' alt='dat.gui flag'/></a>
 </h1>
 
@@ -185,7 +185,7 @@
 
 window.onload = function() {
 
-   var fizzyText = new <a href='docs/demo.js'>FizzyText</a>('dat.gui');
+   var fizzyText = new <a href='examples/demo.js'>FizzyText</a>('dat.gui');
 
    var gui = new DAT.GUI();
 

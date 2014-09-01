@@ -204,6 +204,13 @@ function FizzyText(message, font) {
     this.vx = 0;
     this.vy = 0;
 
+    function noise(x, y) {
+      var n1 = Math.random();
+      var angle = Math.atan2(x, y);
+      var rv = angle * (10 + n1) / 10.5;
+      return rv;
+    }
+
     // Called every frame
     this.render = function () {
 
@@ -217,7 +224,7 @@ function FizzyText(message, font) {
       var onScreen = this.x > 0 && this.x < width &&
           this.y > 0 && this.y < height;
 
-      var isBlack = c != "rgb(255,255,255)" && onScreen;
+      var isBlack = c !== "rgb(255,255,255)" && onScreen;
 
       // If we're on top of a black pixel, grow.
       // If not, shrink.
@@ -236,7 +243,7 @@ function FizzyText(message, font) {
       this.x += Math.cos(angle) * _this.speed + this.vx;
       this.y += -Math.sin(angle) * _this.speed + this.vy;
 
-      this.r = DAT.GUI.constrain(this.r, 0, _this.maxSize);
+      this.r = GUI.constrain(this.r, 0, _this.maxSize);
 
       // If we're tiny, keep moving around until we find a black
       // pixel.

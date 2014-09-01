@@ -3,9 +3,16 @@
 <head>
 </head>
 <body>
-  <script type="text/javascript" src="build/dat.gui.js"></script>
+  <div id="helvetica-demo">
+  </div>
+
+  <script type="text/javascript" src="../build/dat.gui.js"></script>
+  <script type="text/javascript" src="./gui.js"></script>
+  <script type="text/javascript" src="./demo.js"></script>
   <script type="text/javascript">
-    var obj = {
+    var obj = new FizzyText("message", "Arial");
+    
+    var obj2 = {
       x: 5,
 
       message: "message",
@@ -24,6 +31,11 @@
       regular_number2: -155,
       regular_number3: 0,
     };
+    for (var key in obj2) {
+      if (obj[key] === undefined) {
+        obj[key] = obj2[key];
+      }
+    }
 
     var gui = new dat.GUI();
 

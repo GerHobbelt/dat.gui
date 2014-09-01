@@ -18,6 +18,8 @@ define([
 ],
 function(Controller, dom, common) {
 
+  'use strict';
+
   /**
    * @class Provides a select input to alter the property of an object, using a
    * list of accepted values.

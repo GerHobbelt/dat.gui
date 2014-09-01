@@ -16,6 +16,8 @@ define([
     'dat/utils/common'
 ], function(Controller, common) {
 
+  'use strict';
+
   /**
    * When the user didn't specify a sane step size, infer a suitable stepsize from the initialValue.
    */
@@ -94,7 +96,7 @@ define([
           if (this.__mode !== 'linear') {
             var old_step = this.__impliedStep;
             this.__impliedStep = guestimateImpliedStep(v, this.__step, this.__minimumSaneStepSize, this.__maximumSaneStepSize);
-            if (old_step != this.__impliedStep) {
+            if (old_step !== this.__impliedStep) {
               this.__precision = numDecimals(this.__impliedStep);
               console.log('number controller: new step = ', this.__impliedStep, ', precision: ', this.__precision);
             }
@@ -178,4 +180,5 @@ define([
   }
 
   return NumberController;
+
 });

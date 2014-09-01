@@ -22,6 +22,8 @@ dat.utils = dat.utils || {};
 
 dat.utils.common = (function () {
   
+  'use strict';
+
   var ARR_EACH = Array.prototype.forEach;
   var ARR_SLICE = Array.prototype.slice;
 
@@ -39,9 +41,11 @@ dat.utils.common = (function () {
       
       this.each(ARR_SLICE.call(arguments, 1), function(obj) {
         
-        for (var key in obj)
-          if (!this.isUndefined(obj[key])) 
+        for (var key in obj) {
+          if (!this.isUndefined(obj[key])) {
             target[key] = obj[key];
+          }
+        }
         
       }, this);
       
@@ -53,9 +57,11 @@ dat.utils.common = (function () {
       
       this.each(ARR_SLICE.call(arguments, 1), function(obj) {
         
-        for (var key in obj)
-          if (this.isUndefined(target[key])) 
+        for (var key in obj) {
+          if (this.isUndefined(target[key])) {
             target[key] = obj[key];
+          }
+        }
         
       }, this);
       
@@ -76,7 +82,9 @@ dat.utils.common = (function () {
     
     each: function(obj, itr, scope) {
 
-      if (!obj) return;
+      if (!obj) {
+        return;
+      }
 
       if (ARR_EACH && obj.forEach && obj.forEach === ARR_EACH) { 
         
@@ -84,15 +92,19 @@ dat.utils.common = (function () {
         
       } else if (obj.length === obj.length + 0) { // Is number but not NaN
         
-        for (var key = 0, l = obj.length; key < l; key++)
-          if (key in obj && itr.call(scope, obj[key], key) === this.BREAK) 
+        for (var key = 0, l = obj.length; key < l; key++) {
+          if (key in obj && itr.call(scope, obj[key], key) === this.BREAK) {
             return;
+          }
+        }
             
       } else {
 
-        for (var key in obj) 
-          if (itr.call(scope, obj[key], key) === this.BREAK)
+        for (var objkey in obj) {
+          if (itr.call(scope, obj[objkey], objkey) === this.BREAK) {
             return;
+          }
+        }
             
       }
             
@@ -103,7 +115,9 @@ dat.utils.common = (function () {
     },
     
     toArray: function(obj) {
-      if (obj.toArray) return obj.toArray();
+      if (obj.toArray) {
+        return obj.toArray();
+      }
       return ARR_SLICE.call(obj);
     },
 
@@ -148,9 +162,8 @@ dat.utils.common = (function () {
     },
 
     isImagePath: function(obj) {
-      return obj.search(/jpg|png/) > -1;
+      return typeof obj === 'string' && obj.search(/\.(gif|jpg|jpeg|png)$/) > -1;
     }
-
   
   };
     
@@ -159,9 +172,11 @@ dat.utils.common = (function () {
 
 dat.color.toString = (function (common) {
 
+  'use strict';
+
   return function(color) {
 
-    if (color.a == 1 || common.isUndefined(color.a)) {
+    if (color.a === 1 || common.isUndefined(color.a)) {
 
       var s = color.hex.toString(16);
       while (s.length < 6) {
@@ -182,6 +197,8 @@ dat.color.toString = (function (common) {
 
 
 dat.Color = dat.color.Color = (function (interpret, math, toString, common) {
+
+  'use strict';
 
   var Color = function() {
 
@@ -206,47 +223,6 @@ dat.Color = dat.color.Color = (function (interpret, math, toString, common) {
 
     toOriginal: function() {
       return this.__state.conversion.write(this);
-    }
-
-  });
-
-  defineRGBComponent(Color.prototype, 'r', 2);
-  defineRGBComponent(Color.prototype, 'g', 1);
-  defineRGBComponent(Color.prototype, 'b', 0);
-
-  defineHSVComponent(Color.prototype, 'h');
-  defineHSVComponent(Color.prototype, 's');
-  defineHSVComponent(Color.prototype, 'v');
-
-  Object.defineProperty(Color.prototype, 'a', {
-
-    get: function() {
-      return this.__state.a;
-    },
-
-    set: function(v) {
-      this.__state.a = v;
-    }
-
-  });
-
-  Object.defineProperty(Color.prototype, 'hex', {
-
-    get: function() {
-
-      if (this.__state.space !== 'HEX') {
-        this.__state.hex = math.rgb_to_hex(this.r, this.g, this.b);
-      }
-
-      return this.__state.hex;
-
-    },
-
-    set: function(v) {
-
-      this.__state.space = 'HEX';
-      this.__state.hex = v;
-
     }
 
   });
@@ -288,8 +264,9 @@ dat.Color = dat.color.Color = (function (interpret, math, toString, common) {
 
       get: function() {
 
-        if (this.__state.space === 'HSV')
+        if (this.__state.space === 'HSV') {
           return this.__state[component];
+        }
 
         recalculateHSV(this);
 
@@ -349,9 +326,52 @@ dat.Color = dat.color.Color = (function (interpret, math, toString, common) {
 
   }
 
+  defineRGBComponent(Color.prototype, 'r', 2);
+  defineRGBComponent(Color.prototype, 'g', 1);
+  defineRGBComponent(Color.prototype, 'b', 0);
+
+  defineHSVComponent(Color.prototype, 'h');
+  defineHSVComponent(Color.prototype, 's');
+  defineHSVComponent(Color.prototype, 'v');
+
+  Object.defineProperty(Color.prototype, 'a', {
+
+    get: function() {
+      return this.__state.a;
+    },
+
+    set: function(v) {
+      this.__state.a = v;
+    }
+
+  });
+
+  Object.defineProperty(Color.prototype, 'hex', {
+
+    get: function() {
+
+      if (this.__state.space !== 'HEX') {
+        this.__state.hex = math.rgb_to_hex(this.r, this.g, this.b);
+      }
+
+      return this.__state.hex;
+
+    },
+
+    set: function(v) {
+
+      this.__state.space = 'HEX';
+      this.__state.hex = v;
+
+    }
+
+  });
+
   return Color;
 
 })(dat.color.interpret = (function (toString, common) {
+
+  'use strict';
 
   var result, toReturn;
 
@@ -403,7 +423,9 @@ dat.Color = dat.color.Color = (function (interpret, math, toString, common) {
           read: function(original) {
 
             var test = original.match(/^#([A-F0-9])([A-F0-9])([A-F0-9])$/i);
-            if (test === null) return false;
+            if (test === null) {
+              return false;
+            }
 
             return {
               space: 'HEX',
@@ -425,7 +447,9 @@ dat.Color = dat.color.Color = (function (interpret, math, toString, common) {
           read: function(original) {
 
             var test = original.match(/^#([A-F0-9]{6})$/i);
-            if (test === null) return false;
+            if (test === null) {
+              return false;
+            }
 
             return {
               space: 'HEX',
@@ -443,7 +467,9 @@ dat.Color = dat.color.Color = (function (interpret, math, toString, common) {
           read: function(original) {
 
             var test = original.match(/^rgb\(\s*(.+)\s*,\s*(.+)\s*,\s*(.+)\s*\)/);
-            if (test === null) return false;
+            if (test === null) { 
+              return false; 
+            }
 
             return {
               space: 'RGB',
@@ -463,7 +489,9 @@ dat.Color = dat.color.Color = (function (interpret, math, toString, common) {
           read: function(original) {
 
             var test = original.match(/^rgba\(\s*(.+)\s*,\s*(.+)\s*,\s*(.+)\s*\,\s*(.+)\s*\)/);
-            if (test === null) return false;
+            if (test === null) {
+              return false;
+            }
 
             return {
               space: 'RGB',
@@ -517,7 +545,10 @@ dat.Color = dat.color.Color = (function (interpret, math, toString, common) {
 
         RGB_ARRAY: {
           read: function(original) {
-            if (original.length != 3) return false;
+            if (original.length !== 3) {
+              return false;
+            }
+
             return {
               space: 'RGB',
               r: original[0],
@@ -534,7 +565,10 @@ dat.Color = dat.color.Color = (function (interpret, math, toString, common) {
 
         RGBA_ARRAY: {
           read: function(original) {
-            if (original.length != 4) return false;
+            if (original.length !== 4) {
+              return false;
+            }
+
             return {
               space: 'RGB',
               r: original[0],
@@ -668,15 +702,15 @@ dat.Color = dat.color.Color = (function (interpret, math, toString, common) {
 
     }
 
-
   ];
 
   return interpret;
 
-
 })(dat.color.toString,
 dat.utils.common),
 dat.color.math = (function () {
+
+  'use strict';
 
   var tmpComponent;
 
@@ -724,9 +758,9 @@ dat.color.math = (function () {
         };
       }
 
-      if (r == max) {
+      if (r === max) {
         h = (g - b) / delta;
-      } else if (g == max) {
+      } else if (g === max) {
         h = 2 + (b - r) / delta;
       } else {
         h = 4 + (r - g) / delta;

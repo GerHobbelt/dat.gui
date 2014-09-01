@@ -5,7 +5,7 @@
 <body>
   <script type="text/javascript" src="build/dat.gui.js"></script>
   <script type="text/javascript">
-    var obj = { 
+    var obj = {
       x: 5,
 
       message: "message",
@@ -31,7 +31,7 @@
 
     // Text field
     gui.add(obj, 'message');
-	
+
     // Sliders with min + max
     gui.add(obj, 'maxSize').min(0.5).max(7);
     gui.add(obj, 'growthSpeed').min(0.01).max(1).step(0.05);

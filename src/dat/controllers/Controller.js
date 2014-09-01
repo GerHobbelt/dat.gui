@@ -103,6 +103,8 @@ define([
    'dat/utils/common'
 ], function(common) {
 
+  'use strict';
+
   /**
    * @class An "abstract" class that represents a given property of an object.
    *

@@ -19,6 +19,8 @@ define([
   'dat/utils/common'
 ], function(Controller, dom, Color, interpret, common) {
 
+  'use strict';
+
   var ColorController = function(object, property) {
 
     ColorController.superclass.call(this, object, property);
@@ -27,6 +29,48 @@ define([
     this.__temp = new Color(0);
 
     var _this = this;
+
+    function fieldDown(e) {
+      setSV(e);
+      // document.body.style.cursor = 'none';
+      dom.bind(window, 'mousemove', setSV);
+      dom.bind(window, 'mouseup', unbindSV);
+      dom.bind(window, 'touchmove', setSVonTouch);
+      dom.bind(window, 'touchend', unbindSV);
+    }
+
+    function fieldDownOnTouch(e) {
+      e.clientX = e.touches[0].clientX;
+      e.clientY = e.touches[0].clientY;
+      fieldDown(e);
+    }
+
+    function unbindSV() {
+      dom.unbind(window, 'mousemove', setSV);
+      dom.unbind(window, 'mouseup', unbindSV);
+      dom.unbind(window, 'touchmove', setSVonTouch);
+      dom.unbind(window, 'touchend', unbindSV);
+      // document.body.style.cursor = 'default';
+    }
+
+    function onBlur() {
+      /* jshint validthis: true */
+      var i = interpret(this.value);
+      if (i !== false) {
+        _this.__color.__state = i;
+        _this.setValue(_this.__color.toOriginal());
+      } else {
+        this.value = _this.__color.toString();
+      }
+      /* jshint validthis: false */
+    }
+
+    function unbindH() {
+      dom.unbind(window, 'mousemove', setH);
+      dom.unbind(window, 'mouseup', unbindH);
+      dom.unbind(window, 'touchmove', setHonTouch);
+      dom.unbind(window, 'touchend', unbindH);
+    }
 
     this.domElement = document.createElement('div');
 
@@ -51,6 +95,8 @@ define([
     this.__input = document.createElement('input');
     this.__input.type = 'text';
     this.__input_textShadow = '0 1px 1px ';
+
+    /* jshint unused: false */
 
     dom.bind(this.__input, 'keydown', function(e) {
       if (e.keyCode === 13) { // on enter
@@ -79,6 +125,9 @@ define([
         });
 
     });
+
+    /* jshint unused: true */
+
 
     var value_field = document.createElement('div');
 
@@ -164,46 +213,6 @@ define([
       dom.bind(window, 'touchend', unbindH);
     });
 
-    function fieldDown(e) {
-      setSV(e);
-      // document.body.style.cursor = 'none';
-      dom.bind(window, 'mousemove', setSV);
-      dom.bind(window, 'mouseup', unbindSV);
-      dom.bind(window, 'touchmove', setSVonTouch);
-      dom.bind(window, 'touchend', unbindSV);
-    }
-
-    function fieldDownOnTouch(e) {
-      e.clientX = e.touches[0].clientX;
-      e.clientY = e.touches[0].clientY;
-      fieldDown(e);
-    }
-
-    function unbindSV() {
-      dom.unbind(window, 'mousemove', setSV);
-      dom.unbind(window, 'mouseup', unbindSV);
-      dom.unbind(window, 'touchmove', setSVonTouch);
-      dom.unbind(window, 'touchend', unbindSV);
-      // document.body.style.cursor = 'default';
-    }
-
-    function onBlur() {
-      var i = interpret(this.value);
-      if (i !== false) {
-        _this.__color.__state = i;
-        _this.setValue(_this.__color.toOriginal());
-      } else {
-        this.value = _this.__color.toString();
-      }
-    }
-
-    function unbindH() {
-      dom.unbind(window, 'mousemove', setH);
-      dom.unbind(window, 'mouseup', unbindH);
-      dom.unbind(window, 'touchmove', setHonTouch);
-      dom.unbind(window, 'touchend', unbindH);
-    }
-
     this.__saturation_field.appendChild(value_field);
     this.__selector.appendChild(this.__field_knob);
     this.__selector.appendChild(this.__saturation_field);
@@ -224,11 +233,19 @@ define([
       var s = (e.clientX - o.left /* + document.body.scrollLeft */ ) / w;
       var v = 1 - (e.clientY - o.top /* + document.body.scrollTop */ ) / w;
 
-      if (v > 1) v = 1;
-      else if (v < 0) v = 0;
+      if (v > 1) {
+        v = 1;
+      }
+      else if (v < 0) {
+        v = 0;
+      }
 
-      if (s > 1) s = 1;
-      else if (s < 0) s = 0;
+      if (s > 1) {
+        s = 1;
+      }
+      else if (s < 0) {
+        s = 0;
+      }
 
       _this.__color.v = v;
       _this.__color.s = s;
@@ -247,8 +264,12 @@ define([
       var o = dom.getOffset(_this.__hue_field);
       var h = 1 - (e.clientY - o.top /* + document.body.scrollTop */ ) / s;
 
-      if (h > 1) h = 1;
-      else if (h < 0) h = 0;
+      if (h > 1) {
+        h = 1;
+      }
+      else if (h < 0) {
+        h = 0;
+      }
 
       _this.__color.h = h * 360;
 

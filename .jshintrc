@@ -2,6 +2,7 @@
     "passfail"      : false,
     "maxerr"        : 1000000,
     "browser"       : true,
+    "predef"        : [ "define", "requirejs" ],
 
     "node"          : true,
     "rhino"         : false,
@@ -23,7 +24,7 @@
     "smarttabs"	    : true,
     "asi"           : true,
     "laxbreak"      : false,
-    "bitwise"       : true,
+    "bitwise"       : false,
     "boss"          : false,
     "curly"         : true,
     "eqeqeq"        : true,
@@ -52,10 +53,9 @@
     "trailing"      : true,
 
     "esnext"        : true,
-    "camelcase"     : true,
+    "camelcase"     : false,
     "curly"         : true,
     "indent"        : 2,
     "quotmark"      : "single",
     "unused"        : true
 }
-

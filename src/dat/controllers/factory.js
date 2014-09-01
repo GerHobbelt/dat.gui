@@ -24,6 +24,8 @@ define([
 ],
     function(Controller, OptionController, NumberControllerBox, NumberControllerSlider, StringController, FunctionController, BooleanController, ImageController, common) {
 
+      'use strict';
+      
       var firstTimeImageController = true;
 
       var ARR_SLICE = Array.prototype.slice;
@@ -41,12 +43,12 @@ define([
       return function(object, property, controllerName, controllers, options_1, options_2, options_3, options_4, options_5, options_6) {
 
         // when the user specified a specific controller, we'll be using that one, otherwise we 'sniff' the correct controller giving the input values & ditto types.
-        var controller = controllers[controllerName];
-        if (!controller && /* controllerName instanceof Controller */ isControllerTemplate(controllerName)) {
-          controller = controllerName;
+        var ControllerConstructor = controllers[controllerName];
+        if (!ControllerConstructor && /* controllerName instanceof Controller */ isControllerTemplate(controllerName)) {
+          ControllerConstructor = controllerName;
         }
-        if (controller) {
-          return new controller(object, property, options_1, options_2, options_3, options_4, options_5, options_6);
+        if (ControllerConstructor) {
+          return new ControllerConstructor(object, property, options_1, options_2, options_3, options_4, options_5, options_6);
         }
 
         var initialValue = object[property];
@@ -97,7 +99,7 @@ define([
           if (opts.length === 0) {
             opts = undefined;
           }
-          return new FunctionController(object, property, (common.isUndefined(options_1) ? '' : options_1), opts);
+          return new FunctionController(object, property, options_1, opts);
         }
 
         if (common.isBoolean(initialValue)) {

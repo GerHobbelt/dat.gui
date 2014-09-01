@@ -17,6 +17,8 @@ define([
   'dat/utils/common'
 ], function(NumberController, dom, common) {
 
+  'use strict';
+
   /**
    * @class Represents a given property of an object that is a number and
    * provides an input element with which to manipulate it.
@@ -47,29 +49,24 @@ define([
      */
     var prev_y;
 
-    this.__input = document.createElement('input');
-    this.__input.setAttribute('type', 'text');
-
     // Makes it so manually specified values are not truncated.
 
-    dom.bind(this.__input, 'change', onChange);
-    dom.bind(this.__input, 'blur', onBlur);
-    dom.bind(this.__input, 'touchdown', onTouchDown);
-    dom.bind(this.__input, 'mousedown', onMouseDown);
-    dom.bind(this.__input, 'keydown', function(e) {
-
+    function onKeyDown(e) {
       // When pressing ENTER key, you can be as precise as you want.
       if (e.keyCode === 13) {
         _this.__truncationSuspended = true;
-        this.blur();
+        /* jshint validthis: true */
+        this.blur();                              
+        /* jshint validthis: false */
         _this.__truncationSuspended = false;
       }
-
-    });
+    }
 
     function onChange() {
       var attempted = parseFloat(_this.__input.value);
-      if (!common.isNaN(attempted)) _this.setValue(attempted);
+      if (!common.isNaN(attempted)) {
+        _this.setValue(attempted);
+      }
     }
 
     function onBlur() {
@@ -117,6 +114,16 @@ define([
       dom.unbind(window, 'mousemove', onMouseDrag);
       dom.unbind(window, 'mouseup', onMouseUp);
     }
+
+
+    this.__input = document.createElement('input');
+    this.__input.setAttribute('type', 'text');
+
+    dom.bind(this.__input, 'change', onChange);
+    dom.bind(this.__input, 'blur', onBlur);
+    dom.bind(this.__input, 'touchdown', onTouchDown);
+    dom.bind(this.__input, 'mousedown', onMouseDown);
+    dom.bind(this.__input, 'keydown', onKeyDown);
 
     this.updateDisplay();
 

@@ -10,6 +10,8 @@ define([
     'text!dat/controllers/ImageController.css'
 ], function(Controller, dom, css, common, styleSheet) {
 
+  'use strict';
+
     /**
      * @class Provides a image/file input to alter the url property on an object
      *
@@ -39,9 +41,6 @@ define([
         dom.addClass(this.__previewImage, 'GUI-preview-image');
         dom.addClass(this.__label, 'GUI-label-image');
 
-        dom.bind(this.__input, 'change', onChange);
-        //todo: bind onDragRelease
-
         function onChange() {
             var file = _this.__input.files[0];
             var url = URL.createObjectURL(file);
@@ -53,6 +52,10 @@ define([
                 _this.__onFinishChange.call(_this, _this.getValue());
             }
         }
+
+        dom.bind(this.__input, 'change', onChange);
+        //todo: bind onDragRelease
+
         this.updateDisplay();
         this.domElement.appendChild(this.__previewImage);
         this.domElement.appendChild(this.__label);
@@ -79,4 +82,5 @@ define([
     )
 
     return ImageController;
+
 });

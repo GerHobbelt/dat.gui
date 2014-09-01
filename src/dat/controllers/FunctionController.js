@@ -17,6 +17,8 @@ define([
     'dat/utils/common'
 ], function(Controller, dom, common) {
 
+  'use strict';
+  
   /**
    * @class Provides a GUI interface to fire a specified method, a property of an object.
    *

@@ -1,6 +1,6 @@
 # dat.GUI
 
-A lightweight graphical user interface for changing variables in JavaScript. 
+A lightweight graphical user interface for changing variables in JavaScript.
 
 Get started with dat.GUI by reading the tutorial at http://workshop.chromeexperiments.com/examples/gui.
 
@@ -35,7 +35,7 @@ require([
   'path/to/gui/module/GUI'
 ], function(GUI) {
 
-  // No namespace necessary 
+  // No namespace necessary
   var gui = new GUI();
 
 });

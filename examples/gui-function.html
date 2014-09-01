@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>dat.gui</title>
+
+  <link rel='icon' type='image/png' href='assets/favicon.png'/>
+
+  <!-- data-main attribute tells require.js to load examples/init.js after require.js loads. -->
+  <script data-main='init' src='assets/require-plus-config.js'></script>
+
+</head>
+<body>
+  <script type="text/javascript">
+require(['domReady', 'dat.GUI'], function (domReady, datGUI) {
+  domReady(function () {
+    //This function is called once the DOM is ready.
+    //It will be safe to query the DOM and manipulate
+    //DOM nodes in this function.
+    var obj = { 
+		x: function execute() {
+			console.log('execute: ', arguments);
+			alert('execute!');
+		},
+		y: function execute() {
+			console.log('execute: ', arguments);
+			alert('execute!');
+		}
+	};
+    var gui = new datGUI();
+    gui.add(obj, 'x');
+    gui.add(obj, 'y').name('click me (or click the item above...)');
+  });
+});
+  </script>
+</body>
+</html>

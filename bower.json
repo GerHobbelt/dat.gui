@@ -6,7 +6,7 @@
     "Google Data Arts Team <dataarts@google.com>"
   ],
   "description": "dat.gui is a lightweight controller library for JavaScript.",
-  "main": "/build/dat.gui.js",
+  "main": "build/dat.gui.js",
   "keywords": [
     "controller",
     "javascript",
@@ -21,5 +21,10 @@
     "app/bower_components",
     "test",
     "tests"
-  ]
+  ],
+  "dependencies": {
+    "requirejs": "git://github.com/GerHobbelt/requirejs.git#master",
+    "requireJS-domReady": "git://github.com/GerHobbelt/requireJS-domReady.git#master",
+    "text": "git@github.com:GerHobbelt/text.git#~2.0.12"
+  }
 }

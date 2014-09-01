@@ -5,6 +5,10 @@
 //
 
 
+define([
+], function() {
+
+    'use strict';
 
     var math = dat.color.math;
     var interpret = dat.color.interpret;
@@ -414,21 +418,21 @@
 
     });
 
-		function match(a, b, msg) {
+        function match(a, b, msg) {
 
-			for (var i in b) {
-				if (b[i] !== b[i]) {
-					ok(a[i] !== a[i], msg)
-				} else {
-					equal(b[i], a[i], msg);
-				}
-			}
+            for (var i in b) {
+                if (b[i] !== b[i]) {
+                    ok(a[i] !== a[i], msg)
+                } else {
+                    equal(b[i], a[i], msg);
+                }
+            }
 
-		}
+        }
 
-		function equalish(a, b, tolerance, label) {
-			return ok(Math.abs(a - b) < tolerance, label);
-		}
+        function equalish(a, b, tolerance, label) {
+            return ok(Math.abs(a - b) < tolerance, label);
+        }
 
 
 
@@ -996,9 +1000,9 @@ console.log(c2.__checkbox.getAttribute('checked'));
 
     });
 
-		function equalish(a, b, tolerance, label) {
-			return ok(Math.abs(a - b) < tolerance, label);
-		}
+        function equalish(a, b, tolerance, label) {
+            return ok(Math.abs(a - b) < tolerance, label);
+        }
 
 
 
@@ -1394,6 +1398,5 @@ console.log(c2.__checkbox.getAttribute('checked'));
       equal($(gui.__preset_select).children('option:selected')[0].value, gui.preset, "Dropdown display matches preset value");
 
     }
-
 
 });

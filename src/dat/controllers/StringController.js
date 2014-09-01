@@ -17,6 +17,8 @@ define([
     'dat/utils/common'
 ], function(Controller, dom, common) {
 
+  'use strict';
+
   /**
    * @class Provides a text input to alter the string property of an object.
    *
@@ -33,19 +35,15 @@ define([
 
     var _this = this;
 
-    this.__input = document.createElement('input');
-    this.__input.setAttribute('type', 'text');
+    function onKeyDown(e) {
 
-    dom.bind(this.__input, 'keyup', onChange);
-    dom.bind(this.__input, 'change', onChange);
-    dom.bind(this.__input, 'blur', onBlur);
-    dom.bind(this.__input, 'keydown', function(e) {
       if (e.keyCode === 13) {
-        this.blur();
+        /* jshint validthis: true */
+        this.blur(); 
+        /* jshint validthis: false */
       }
-    });
+    }
     
-
     function onChange() {
       _this.setValue(_this.__input.value);
     }
@@ -55,6 +53,15 @@ define([
         _this.__onFinishChange.call(_this, _this.getValue());
       }
     }
+
+
+    this.__input = document.createElement('input');
+    this.__input.setAttribute('type', 'text');
+
+    dom.bind(this.__input, 'keyup', onChange);
+    dom.bind(this.__input, 'change', onChange);
+    dom.bind(this.__input, 'blur', onBlur);
+    dom.bind(this.__input, 'keydown', onKeyDown);
 
     this.updateDisplay();
 

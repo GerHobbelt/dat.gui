@@ -6,7 +6,7 @@
     "Google Data Arts Team <dataarts@google.com>"
   ],
   "description": "dat.gui is a lightweight controller library for JavaScript.",
-  "main": "/build/dat.gui.js",
+  "main": "build/dat.gui.js",
   "keywords": [
     "controller",
     "javascript",
@@ -22,13 +22,9 @@
     "test",
     "tests"
   ],
-  "_release": "0.5.0",
-  "_resolution": {
-    "type": "version",
-    "tag": "v0.5.0",
-    "commit": "fcfe534e5d62e96cdb4855b1e557e2c29d60b44b"
-  },
-  "_source": "git://github.com/perymimon/dat.gui.git",
-  "_target": "*",
-  "_originalSource": "perymimon/dat.gui"
+  "dependencies": {
+    "requirejs": "git://github.com/GerHobbelt/requirejs.git#master",
+    "requireJS-domReady": "git://github.com/GerHobbelt/requireJS-domReady.git#master"
+    "text": "git://github.com/GerHobbelt/text.git#master"
+  }
 }

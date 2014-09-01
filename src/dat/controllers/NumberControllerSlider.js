@@ -20,6 +20,8 @@ define([
 ], 
 function(NumberController, dom, css, common, styleSheet) {
 
+  'use strict';
+
   /**
    * @class Represents a given property of an object that is a number, contains
    * a minimum and maximum, and provides a slider element with which to
@@ -43,16 +45,6 @@ function(NumberController, dom, css, common, styleSheet) {
     NumberControllerSlider.superclass.call(this, object, property, { min: min, max: max, step: step });
 
     var _this = this;
-
-    this.__background = document.createElement('div');
-    this.__foreground = document.createElement('div');
-    
-
-    dom.bind(this.__background, 'touchstart', onTouchDown);
-    dom.bind(this.__background, 'mousedown', onMouseDown);
-    
-    dom.addClass(this.__background, 'slider');
-    dom.addClass(this.__foreground, 'slider-fg');
 
     function onTouchDown(e) {
       dom.bind(window, 'touchmove', onTouchDrag);
@@ -96,7 +88,7 @@ function(NumberController, dom, css, common, styleSheet) {
       var width = dom.getWidth(_this.__background);
       
       _this.setValue(
-      	map(e.clientX, offset.left, offset.left + width, _this.__min, _this.__max)
+        map(e.clientX, offset.left, offset.left + width, _this.__min, _this.__max)
       );
 
       return false;
@@ -109,6 +101,17 @@ function(NumberController, dom, css, common, styleSheet) {
         _this.__onFinishChange.call(_this, _this.getValue());
       }
     }
+
+
+    this.__background = document.createElement('div');
+    this.__foreground = document.createElement('div');
+    
+
+    dom.bind(this.__background, 'touchstart', onTouchDown);
+    dom.bind(this.__background, 'mousedown', onMouseDown);
+    
+    dom.addClass(this.__background, 'slider');
+    dom.addClass(this.__foreground, 'slider-fg');
 
     this.updateDisplay();
 

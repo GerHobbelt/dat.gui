@@ -1,0 +1,26 @@
+{
+  "name": "requirejs",
+  "homepage": "http://requirejs.org",
+  "authors": [
+    "jrburke.com"
+  ],
+  "description": "A file and module loader for JavaScript",
+  "main": "require.js",
+  "keywords": [
+    "AMD"
+  ],
+  "ignore": [
+    "**/*",
+    "!require.js"
+  ],
+  "license": "new BSD, and MIT",
+  "_release": "75609ac4dd",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "75609ac4dd9d2be51f1c838bcb07818fb1b9c199"
+  },
+  "_source": "git://github.com/GerHobbelt/requirejs.git",
+  "_target": "master",
+  "_originalSource": "git://github.com/GerHobbelt/requirejs.git"
+}

@@ -16,6 +16,8 @@ define([
   'dat/utils/common'
 ], function(toString, common) {
 
+  'use strict';
+
   var result, toReturn;
 
   var interpret = function() {
@@ -66,7 +68,9 @@ define([
           read: function(original) {
 
             var test = original.match(/^#([A-F0-9])([A-F0-9])([A-F0-9])$/i);
-            if (test === null) return false;
+            if (test === null) {
+              return false;
+            }
 
             return {
               space: 'HEX',
@@ -88,7 +92,9 @@ define([
           read: function(original) {
 
             var test = original.match(/^#([A-F0-9]{6})$/i);
-            if (test === null) return false;
+            if (test === null) {
+              return false;
+            }
 
             return {
               space: 'HEX',
@@ -106,7 +112,9 @@ define([
           read: function(original) {
 
             var test = original.match(/^rgb\(\s*(.+)\s*,\s*(.+)\s*,\s*(.+)\s*\)/);
-            if (test === null) return false;
+            if (test === null) { 
+              return false; 
+            }
 
             return {
               space: 'RGB',
@@ -126,7 +134,9 @@ define([
           read: function(original) {
 
             var test = original.match(/^rgba\(\s*(.+)\s*,\s*(.+)\s*,\s*(.+)\s*\,\s*(.+)\s*\)/);
-            if (test === null) return false;
+            if (test === null) {
+              return false;
+            }
 
             return {
               space: 'RGB',
@@ -180,7 +190,10 @@ define([
 
         RGB_ARRAY: {
           read: function(original) {
-            if (original.length != 3) return false;
+            if (original.length !== 3) {
+              return false;
+            }
+
             return {
               space: 'RGB',
               r: original[0],
@@ -197,7 +210,10 @@ define([
 
         RGBA_ARRAY: {
           read: function(original) {
-            if (original.length != 4) return false;
+            if (original.length !== 4) {
+              return false;
+            }
+
             return {
               space: 'RGB',
               r: original[0],
@@ -331,10 +347,8 @@ define([
 
     }
 
-
   ];
 
   return interpret;
-
 
 });

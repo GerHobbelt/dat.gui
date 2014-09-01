@@ -15,7 +15,7 @@ function FizzyText(message, font) {
   this.framesRendered = 0;
   this.font = 0;
   this.allFonts = ['arial', 'times', 'courier'];
-	
+
   // __defineGetter__ and __defineSetter__ makes JavaScript believe that
   // we've defined a variable 'this.message'. This way, whenever we
   // change the message variable, we can call some more functions.
@@ -78,17 +78,17 @@ function FizzyText(message, font) {
   c.setAttribute('height', height);
 
 /*
-	var onResize = function() {
-		r.width = c.width = width = window.innerWidth;
-		r.height = c.height = height = window.innerHeight;
-		console.log(width, height);
-	}
-	
-	window.addEventListener('resize', function() {
-		onResize();
-		createBitmap(this.message);
-	}, false);
-	onResize();
+    var onResize = function() {
+        r.width = c.width = width = window.innerWidth;
+        r.height = c.height = height = window.innerHeight;
+        console.log(width, height);
+    }
+
+    window.addEventListener('resize', function() {
+        onResize();
+        createBitmap(this.message);
+    }, false);
+    onResize();
 */
 
   // Add our demo to the HTML
@@ -103,7 +103,7 @@ function FizzyText(message, font) {
   // Set g.font to the same font as the bitmap canvas, incase we
   // want to draw some outlines.
   s.font = g.font = "800 82px " + this.allFonts[ this.font ];
-  
+
   // Instantiate some particles
   for (var i = 0; i < 1000; i++) {
     particles.push(new Particle(Math.random() * width, Math.random() * height));

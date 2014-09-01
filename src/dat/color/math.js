@@ -15,6 +15,8 @@ define([
 
 ], function() {
 
+  'use strict';
+
   var tmpComponent;
 
   return {
@@ -61,9 +63,9 @@ define([
         };
       }
 
-      if (r == max) {
+      if (r === max) {
         h = (g - b) / delta;
-      } else if (g == max) {
+      } else if (g === max) {
         h = 2 + (b - r) / delta;
       } else {
         h = 4 + (r - g) / delta;

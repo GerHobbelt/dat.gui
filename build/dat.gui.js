@@ -42,16 +42,6 @@
   
     'use strict';
   
-    // r.js fix: make the r.js run to completion in the Node environment
-    if (typeof document === 'undefined') {
-      return {
-        load: function (url, doc) {
-        },
-        inject: function(css, doc) {
-        }
-      };
-    }
-  
     return {
       load: function (url, doc) {
         doc = doc || document;
@@ -1865,13 +1855,6 @@
   dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, controllerFactory, Controller, BooleanController, FunctionController, NumberController, NumberControllerBox, NumberControllerSlider, OptionController, StringController, ImageController, ColorController, requestAnimationFrame, CenteredDiv, dom, common) {
   
     'use strict';
-  
-    // r.js fix: make the r.js run to completion in the Node environment
-    if (typeof window === 'undefined' || typeof document === 'undefined') {
-      return function() {
-        throw new Error('We expect to only execute in the browser environment');
-      };
-    }
   
     //var ARR_EACH = Array.prototype.forEach;
     var ARR_SLICE = Array.prototype.slice;
@@ -4007,13 +3990,6 @@
      * requirejs version of Paul Irish's RequestAnimationFrame
      * http://paulirish.com/2011/requestanimationframe-for-smart-animating/
      */
-  
-    // r.js fix: make the r.js run to completion in the Node environment
-    if (typeof window === 'undefined') {
-      return function() {
-        throw new Error('We expect to only execute in the browser environment');
-      };
-    }
   
     return window.requestAnimationFrame ||
         window.webkitRequestAnimationFrame ||

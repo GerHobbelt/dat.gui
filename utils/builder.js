@@ -52,7 +52,7 @@ function build(_params, destfile) {
   load_module(params.baseUrl + params.main + '.js', params.main);
 
   for (var i in defined) {
-    if (params.verbose) console.log('Loaded: ' + defined[i].path);
+    if (params.verbose) { console.log('Loaded: ' + defined[i].path); }
     deps.push(defined[i].path);
     if (defined[i].module) {
       var namespace = i.substr(0, i.lastIndexOf('/'));
@@ -71,7 +71,7 @@ function build(_params, destfile) {
       fail();
     }
     third_party[name] = str;
-    to_write += third_party[name] + "\n\n";
+    to_write += third_party[name] + '\n\n';
     if (params.verbose) { console.log('Loaded: ' + path); }
     //deps.push(path);
   }
@@ -117,7 +117,7 @@ function build(_params, destfile) {
   to_write += params.shortcut + ' = ' + params.main.replace(/\//g, '.') + ' = ' + defined[params.main].getClosure() + ';';
 
   if (params.umd) {
-    to_write = wrap_umd( params.shortcut.split('.')[0], to_write + '\nreturn ' + params.umd.ret + ';' );
+    to_write = wrap_umd(params.shortcut.split('.')[0], to_write + '\nreturn ' + params.umd.ret + ';');
   }
 
   if (params.verbose) { console.log('Exported: ' + params.main + ' to window.' + params.shortcut); }
@@ -143,6 +143,7 @@ function build(_params, destfile) {
 }
 
 function define(deps, callback) {
+  /*jshint validthis: true */
   this.name = next_load;
   this.path = next_path;
   this.shared = false;
@@ -222,6 +223,7 @@ function define(deps, callback) {
   };
 
   this.recurseDeps();
+  /*jshint validthis: false */
 }
 
 /**
@@ -230,19 +232,19 @@ function define(deps, callback) {
  * @param  {String} src Source code text
  * @return {String}
  */
-function wrap_umd( name, src ){
+function wrap_umd(name, src) {
   return [
-    "(function (root, factory) {",
-    "  if (typeof define === 'function' && define.amd) {",
-    "    // AMD. Register as an anonymous module.",
-    "    define(factory);",
-    "  } else {",
-    "    // Browser globals",
-    "    root." + name + " = factory();",
-    "  }",
-    "}(this, function () {",
+    '(function (root, factory) {',
+    '  if (typeof define === \'function\' && define.amd) {',
+    '    // AMD. Register as an anonymous module.',
+    '    define(factory);',
+    '  } else {',
+    '    // Browser globals',
+    '    root.' + name + ' = factory();',
+    '  }',
+    '}(this, function () {',
       src.replace(/\n/g, '\n  '),
-    "}));\n"
+    '}));\n'
   ].join('\n');
 }
 
@@ -266,7 +268,7 @@ function read_file(path) {
 function load_module(path, name) {
   name = name || path;
   if (name in defined) { return; }
-  if (params.verbose) { console.log("load module: ", name); }
+  if (params.verbose) { console.log('load module: ', name); }
   next_load = name;
   next_path = path;
   eval('new ' + read_file(path));
@@ -276,9 +278,9 @@ function load_text(path, name) {
   name = name || path;
   if (name in defined) { return; }
   var text = read_file(path);
-  text = text.replace(/\r/g, "\\r");
-  text = text.replace(/\n/g, "\\n");
-  text = text.replace(/"/g, "\\\"");
+  text = text.replace(/\r/g, '\\r');
+  text = text.replace(/\n/g, '\\n');
+  text = text.replace(/"/g, '\\\"');
   next_load = name;
   next_path = path;
   var d = new define([], '"' + text + '"');
@@ -287,11 +289,11 @@ function load_text(path, name) {
 }
 
 function tab(str, tabs) {
-  var lines = str.split("\n");
+  var lines = str.split('\n');
   for (var i in lines) {
     lines[i] = tabs + lines[i];
   }
-  return lines.join("\n");
+  return lines.join('\n');
 }
 
 function write(str) {

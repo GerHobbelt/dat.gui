@@ -61,15 +61,15 @@ module.exports = function(grunt) {
             //},
         },
 
-		requirejs: {
-		    compile: {
-		      	options: {
-		      		name: "build-main",
-			        mainConfigFile: "utils/build.js",
-			        out: "./optimized.js"
-		      	}
-		    },
-		},
+		// requirejs: {
+		//     compile: {
+		//       	options: {
+		//       		name: 'build-main',
+		// 	        mainConfigFile: 'utils/build.js',
+		// 	        out: './optimized.js'
+		//       	}
+		//     },
+		// },
 
         builder: {
             gui: {
@@ -103,7 +103,6 @@ module.exports = function(grunt) {
         var done = this.async();
 
         var files = this.files.slice();
-        var self = this;
 
 	    var options = this.options({
             verbose: false,
@@ -144,5 +143,5 @@ module.exports = function(grunt) {
 
     grunt.registerTask('patch_requireJS', ['concat:patch_requireJS']);
 
-    grunt.registerTask('default',  ['jshint', 'builder']);
+    grunt.registerTask('default',  ['jshint', 'patch_requireJS', 'builder']);
 };

@@ -74,7 +74,9 @@ define([
 
 ], function(css, saveDialogueContents, styleSheet, controllerFactory, Controller, BooleanController, FunctionController, NumberController, NumberControllerBox, NumberControllerSlider, OptionController, StringController, ImageController, ColorController, requestAnimationFrame, CenteredDiv, dom, common) {
 
-  var ARR_EACH = Array.prototype.forEach;
+  'use strict';
+
+  //var ARR_EACH = Array.prototype.forEach;
   var ARR_SLICE = Array.prototype.slice;
 
   css.inject(styleSheet);
@@ -205,7 +207,9 @@ define([
     if (!common.isUndefined(params.load)) {
 
       // Explicit preset
-      if (params.preset) params.load.preset = params.preset;
+      if (params.preset) {
+        params.load.preset = params.preset;
+      }
 
     } else {
 
@@ -476,7 +480,9 @@ define([
       }
 
       // Make it not elastic.
-      if (!this.parent) setWidth(this, params.width);
+      if (!this.parent) {
+        setWidth(this, params.width);
+      }
 
     }
 
@@ -503,7 +509,6 @@ define([
       return _this;
     };
 
-    var root = this.getRoot();
     function resetWidth() {
       var root = _this.getRoot();
       root.width += 1;
@@ -543,7 +548,7 @@ define([
   dom.bind(window, 'keydown', function(e) {
 
     if (document.activeElement.type !== 'text' &&
-        (e.which === HIDE_KEY_CODE || e.keyCode == HIDE_KEY_CODE)) {
+        (e.which === HIDE_KEY_CODE || e.keyCode === HIDE_KEY_CODE)) {
       GUI.toggleHide();
     }
 
@@ -697,8 +702,7 @@ define([
 
         var li = addRow(this, gui.domElement);
         dom.addClass(li, 'folder');
-        return this;
-        //return gui;
+        return gui;
 
       },
 
@@ -722,8 +726,9 @@ define([
           var h = 0;
 
           common.each(root.__ul.childNodes, function(node) {
-            if (! (root.autoPlace && node === root.__save_row))
+            if (! (root.autoPlace && node === root.__save_row)) {
               h += dom.getHeight(node);
+            }
           });
 
           if (window.innerHeight - top - CLOSE_BUTTON_HEIGHT < h) {
@@ -757,7 +762,7 @@ define([
        * @throws {Error} if not called on a top level GUI.
        * @instance
        */
-      remember: function() {
+      remember: function(/*...args*/) {
 
         if (common.isUndefined(SAVE_DIALOGUE)) {
           SAVE_DIALOGUE = new CenteredDiv();
@@ -765,7 +770,7 @@ define([
         }
 
         if (this.parent) {
-          throw new Error("You can only call remember on a top level GUI.");
+          throw new Error('You can only call remember on a top level GUI.');
         }
 
         var _this = this;
@@ -774,7 +779,7 @@ define([
           if (_this.__rememberedObjects.length === 0) {
             addSaveMenu(_this);
           }
-          if (_this.__rememberedObjects.indexOf(object) == -1) {
+          if (_this.__rememberedObjects.indexOf(object) === -1) {
             _this.__rememberedObjects.push(object);
           }
         });
@@ -889,7 +894,9 @@ define([
 
         var init = this.__listening.length === 0;
         this.__listening.push(controller);
-        if (init) updateDisplays(this.__listening);
+        if (init) {
+          updateDisplays(this.__listening);
+        }
         return this;
 
       }
@@ -905,9 +912,9 @@ define([
 
     if (!controller) {
       if (object[property] === undefined) {
-        throw new Error("Object " + object + " has no property \"" + property + "\"");
+        throw new Error('Object ' + object + ' has no property "' + property + '"');
       } else {
-        throw new Error("Object " + object + " has a (probably null-ed) property \"" + property + "\" for which you did not explicitly specify a suitable controller");
+        throw new Error('Object ' + object + ' has a (probably null-ed) property "' + property + '" for which you did not explicitly specify a suitable controller');
       }
     }
 
@@ -949,7 +956,9 @@ define([
    */
   function addRow(gui, dom, liBefore) {
     var li = document.createElement('li');
-    if (dom) li.appendChild(dom);
+    if (dom) {
+      li.appendChild(dom);
+    }
     if (liBefore) {
       gui.__ul.insertBefore(li, liBefore);
     } else {
@@ -968,8 +977,10 @@ define([
 
       options: function(options) {
 
+        var next_sibling;
+
         if (arguments.length > 1) {
-          var next_sibling = controller.__li.nextElementSibling;
+          next_sibling = controller.__li.nextElementSibling;
           controller.remove();
 
           return add(
@@ -985,7 +996,7 @@ define([
         }
 
         if (common.isArray(options) || common.isObject(options)) {
-          var next_sibling = controller.__li.nextElementSibling;
+          next_sibling = controller.__li.nextElementSibling;
           controller.remove();
 
           return add(
@@ -1120,7 +1131,7 @@ define([
     var matched_index = root.__rememberedObjects.indexOf(controller.object);
 
     // Why yes, it does!
-    if (matched_index != -1) {
+    if (matched_index !== -1) {
 
       // Let me fetch a map of controllers for thcommon.isObject.
       var controller_map =
@@ -1130,8 +1141,7 @@ define([
       // object. Lets make the map fresh.
       if (controller_map === undefined) {
         controller_map = {};
-        root.__rememberedObjectIndecesToControllers[matched_index] =
-            controller_map;
+        root.__rememberedObjectIndecesToControllers[matched_index] = controller_map;
       }
 
       // Keep track of this controller
@@ -1225,7 +1235,7 @@ define([
     if (gui.load && gui.load.remembered) {
 
       common.each(gui.load.remembered, function(value, key) {
-        addPresetOption(gui, key, key == gui.preset);
+        addPresetOption(gui, key, key === gui.preset);
       });
 
     } else {
@@ -1249,6 +1259,10 @@ define([
     div.appendChild(button2);
     div.appendChild(button3);
 
+    function showHideExplain() {
+      explain.style.display = gui.useLocalStorage ? 'block' : 'none';
+    }
+
     if (SUPPORTS_LOCAL_STORAGE) {
 
       var saveLocally = document.getElementById('dg-save-locally');
@@ -1260,10 +1274,6 @@ define([
 
       if (localStorage.getItem(getLocalStorageHash(gui, 'isLocal')) === 'true') {
         localStorageCheckBox.setAttribute('checked', 'checked');
-      }
-
-      function showHideExplain() {
-        explain.style.display = gui.useLocalStorage ? 'block' : 'none';
       }
 
       showHideExplain();
@@ -1279,7 +1289,7 @@ define([
     var newConstructorTextArea = document.getElementById('dg-new-constructor');
 
     dom.bind(newConstructorTextArea, 'keydown', function(e) {
-      if (e.metaKey && (e.which === 67 || e.keyCode == 67)) {
+      if (e.metaKey && (e.which === 67 || e.keyCode === 67)) {
         SAVE_DIALOGUE.hide();
       }
     });
@@ -1297,14 +1307,14 @@ define([
 
     dom.bind(button2, 'click', function() {
       var presetName = prompt('Enter a new preset name.');
-      if (presetName) gui.saveAs(presetName);
+      if (presetName) {
+        gui.saveAs(presetName);
+      }
     });
 
     dom.bind(button3, 'click', function() {
       gui.revert();
     });
-
-//    div.appendChild(button2);
 
   }
 
@@ -1324,11 +1334,6 @@ define([
     });
 
     var pmouseX;
-
-    dom.bind(gui.__resize_handle, 'mousedown', dragStart);
-    dom.bind(gui.__closeButton, 'mousedown', dragStart);
-
-    gui.domElement.insertBefore(gui.__resize_handle, gui.domElement.firstElementChild);
 
     function dragStart(e) {
 
@@ -1363,6 +1368,11 @@ define([
       dom.unbind(window, 'mouseup', dragStop);
 
     }
+
+    dom.bind(gui.__resize_handle, 'mousedown', dragStart);
+    dom.bind(gui.__closeButton, 'mousedown', dragStart);
+
+    gui.domElement.insertBefore(gui.__resize_handle, gui.domElement.firstElementChild);
 
   }
 
@@ -1417,7 +1427,7 @@ define([
 
   function setPresetSelectIndex(gui) {
     for (var index = 0; index < gui.__preset_select.length; index++) {
-      if (gui.__preset_select[index].value == gui.preset) {
+      if (gui.__preset_select[index].value === gui.preset) {
         gui.__preset_select.selectedIndex = index;
       }
     }
@@ -1427,7 +1437,7 @@ define([
     var opt = gui.__preset_select[gui.__preset_select.selectedIndex];
 //    console.log('mark', modified, opt);
     if (modified) {
-      opt.innerHTML = opt.value + "*";
+      opt.innerHTML = opt.value + '*';
     } else {
       opt.innerHTML = opt.value;
     }

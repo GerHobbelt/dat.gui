@@ -689,7 +689,7 @@ GUI.ScrubberPoint = function(scrubber, time, value) {
 	
 }
 
-GUI.Easing = {}
+GUI.Easing = {};
 
 GUI.Easing.Linear = function ( k ) {
 	return k;

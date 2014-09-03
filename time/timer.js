@@ -19,14 +19,14 @@ GUI.Controller.prototype.at = function(when, what, tween) {
 	this.scrubber.add(new GUI.ScrubberPoint(this.scrubber, when, what));
 	this.scrubber.render();
 	return this;
-}
+};
 
 GUI.loadJSON = function(json) {
-	if (typeof json == 'string') {
-		json = eval('('+json+')');
+	if (typeof json === 'string') {
+		json = eval('(' + json + ')');
 	}
 	GUI.loadedJSON = json;
-}
+};
 
 GUI.loadedJSON = null;
 
@@ -37,11 +37,11 @@ GUI.getJSON = function() {
 	}
 	var obj = {guis:guis};
 	return {guis:guis};
-}
+};
 
 GUI.closeSave = function() {
 	//
-}
+};
 
 GUI.save = function() {
 	
@@ -71,15 +71,12 @@ GUI.save = function() {
 	dialogue.appendChild(a);
 	dialogue.appendChild(span2);
 	dialogue.appendChild(textarea);
-		document.body.appendChild(dialogue);
-		
-		textarea.addEventListener('click', function() {
-			this.select();
-		}, false);
-		
+	document.body.appendChild(dialogue);
 	
-	
-}
+	textarea.addEventListener('click', function() {
+		this.select();
+	}, false);
+};
 
 	
 GUI.Timer = function(gui) {
@@ -186,19 +183,19 @@ GUI.Timer = function(gui) {
 	window.addEventListener('keyup', function(e) {
 		if (GUI.disableKeyListeners) return;
 		switch (e.keyCode) {
-			case 32:
-				_this.playPause();
-				break;
-			case 13: 
-				_this.stop();
-				break;
-			case 8: 
-				if (_this.activePoint != null) {
-					_this.activePoint.remove();
-					_this.activePoint = null;
-				}
-				_this.hideTweenSelector();
-				break;
+		case 32:
+			_this.playPause();
+			break;
+		case 13: 
+			_this.stop();
+			break;
+		case 8: 
+			if (_this.activePoint != null) {
+				_this.activePoint.remove();
+				_this.activePoint = null;
+			}
+			_this.hideTweenSelector();
+			break;
 		}
 	}, false);
 	
@@ -314,5 +311,5 @@ GUI.Timer = function(gui) {
 		this.windowMin = gui.json.timer.windowMin;
 		this.windowWidth = gui.json.timer.windowWidth;
 	}
-}
+};
 

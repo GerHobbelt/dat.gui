@@ -204,13 +204,6 @@ function FizzyText(message, font) {
     this.vx = 0;
     this.vy = 0;
 
-    function noise(x, y) {
-      var n1 = Math.random();
-      var angle = Math.atan2(x, y);
-      var rv = angle * (10 + n1) / 10.5;
-      return rv;
-    }
-
     // Called every frame
     this.render = function () {
 

@@ -22,7 +22,16 @@ requirejs.config({
     
         domReady: '../examples/assets/requireJS-domReady/domReady',
         text: '../examples/assets/text/text',
-        'dat.GUI': './index'
+        'dat.GUI': './index',
+
+        'gui': '../examples/gui',
+        'gui.timer': '../time/timer',
+        'gui.easing': '../time/easing',
+        'gui.scrubber': '../time/scrubber',
+        'gui.scrubberpoint': '../time/scrubberpoint',
+        'gui.utils': '../time/utils',
+
+        'demo': '../examples/demo',
     }
 });
 

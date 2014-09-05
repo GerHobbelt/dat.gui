@@ -1,3 +1,14 @@
+define([], function() {
+
+
+// previously: GUI.constrain
+function constrain(v, o1, o2) {
+    if (v < o1) v = o1;
+    else if (v > o2) v = o2;
+    return v;
+}
+
+
 function FizzyText(message, font) {
 
   var that = this;
@@ -236,7 +247,7 @@ function FizzyText(message, font) {
       this.x += Math.cos(angle) * _this.speed + this.vx;
       this.y += -Math.sin(angle) * _this.speed + this.vy;
 
-      this.r = GUI.constrain(this.r, 0, _this.maxSize);
+      this.r = constrain(this.r, 0, _this.maxSize);
 
       // If we're tiny, keep moving around until we find a black
       // pixel.
@@ -256,3 +267,10 @@ function FizzyText(message, font) {
   }
 
 }
+
+
+  return FizzyText;
+
+});
+
+

@@ -1,3 +1,7 @@
+
+define([], function() {
+
+
 var GUI = function() {
 
     GUI.allGuis.push(this);
@@ -567,7 +571,7 @@ GUI.constrain = function (v, o1, o2) {
 };
 
 GUI.error = function(str) {
-    if (typeof console.error == 'function') {
+    if (typeof console.error === 'function') {
         console.error("[GUI ERROR] " + str);
     }
 };
@@ -603,3 +607,7 @@ GUI.extendController = function(clazz) {
     clazz.prototype = new GUI.Controller();
     clazz.prototype.constructor = clazz;
 };
+
+
+    return GUI;
+});

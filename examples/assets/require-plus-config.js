@@ -1,4 +1,4 @@
-/*! dat.gui - v0.5.0 - 2014-09-01 */
+/*! dat.gui - v0.5.0 - 2014-09-05 */
 
 /** vim: et:ts=4:sw=4:sts=4
  * @license RequireJS 2.1.14 Copyright (c) 2010-2014, The Dojo Foundation All Rights Reserved.
@@ -2134,7 +2134,16 @@ requirejs.config({
     
         domReady: '../examples/assets/requireJS-domReady/domReady',
         text: '../examples/assets/text/text',
-        'dat.GUI': './index'
+        'dat.GUI': './index',
+
+        'gui': '../examples/gui',
+        'gui.timer': '../time/timer',
+        'gui.easing': '../time/easing',
+        'gui.scrubber': '../time/scrubber',
+        'gui.scrubberpoint': '../time/scrubberpoint',
+        'gui.utils': '../time/utils',
+
+        'demo': '../examples/demo',
     }
 });
 

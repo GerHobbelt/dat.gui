@@ -5,18 +5,7 @@
   <link rel="icon" type="image/png" href="assets/favicon.png" />
   <link href="demo.css" media="screen" rel="stylesheet" type="text/css" />
   <link href="gui.css" media="screen" rel="stylesheet" type="text/css" />
-  <script type="text/javascript" src="gui.js"></script>
-  <script type="text/javascript" src="controllers/slider.js"></script>
-  <script type="text/javascript" src="controllers/controller.js"></script>
-  <script type="text/javascript" src="controllers/controller.boolean.js"></script>
-  <script type="text/javascript" src="controllers/controller.function.js"></script>
-  <script type="text/javascript" src="controllers/controller.number.js"></script>
-  <script type="text/javascript" src="controllers/controller.string.js"></script>
-  <script type="text/javascript" src="time/scrubber.js"></script>
-  <script type="text/javascript" src="time/timer.js"></script>
   <script type="text/javascript" src="improvedNoise.js"></script>
-  <script type="text/javascript" src="prettify.js"></script>
-  <script type="text/javascript" src="demo.js"></script>
 
   <!-- data-main attribute tells require.js to load examples/init.js after require.js loads. -->
   <script data-main='init' src='assets/require-plus-config.js'></script>
@@ -24,7 +13,7 @@
   <script type='text/javascript'>
     //<![CDATA[
 
-  require(['domReady', 'dat.GUI'], function (domReady, GUI) {
+  require(['domReady', 'dat.GUI', 'gui', 'gui.utils', 'gui.timer', 'demo'], function (domReady, datGUI, GUI, GUI_utils, GUI_timer, FizzyText) {
     var timer;
 
     domReady(function () {

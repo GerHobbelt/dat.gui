@@ -11,7 +11,9 @@
 </head>
 <body>
   <script type="text/javascript">
-require(['domReady', 'dat.GUI'], function (domReady, datGUI) {
+require(['domReady', 'dat.gui'], function (domReady, dat) {
+  'use strict';
+
   domReady(function () {
     //This function is called once the DOM is ready.
     //It will be safe to query the DOM and manipulate
@@ -20,7 +22,7 @@ require(['domReady', 'dat.GUI'], function (domReady, datGUI) {
 		x: 5,
 		y: 'H',
 	};
-    var gui = new datGUI();
+    var gui = new dat.gui.GUI();
     gui.add(obj, 'x', [1, 5, 7, 42]);
     gui.add(obj, 'y', ['A', 'B', 'C', '---']);
   });

@@ -97,12 +97,57 @@ module.exports = function(grunt) {
                                ' * http://www.apache.org/licenses/LICENSE-2.0\n' +
                                ' */\n' +
                                '\n' +
-                               'var datGUI = (function () {\n\n\n'
+                               '(function (root, factory) {\n' +
+                               '  if (typeof define === \'function\' && define.amd) {\n' +
+                               '    // AMD. Register as an anonymous module.\n' +
+                               '    define(factory);\n' +
+                               '  } else {\n' +
+                               '    // Browser globals\n' +
+                               '    root.dat = factory();\n' +
+                               '  }\n' +
+                               '}(this, function () {\n' +
+                               '\n' +
+                               '  \'use strict\';\n' +
+                               '\n\n\n'
                         ,
                         // This string is appended to the file
-                        end: '\n\n\n' +
-                             '    return datGUI;\n' +
-                             '})();\n\n'
+                        end:   '\n\n\n' +
+                               '    var dat = {\n' +
+                               '        utils: {\n' +
+                               '            css: dat_utils_css,\n' +
+                               '            common: dat_utils_common,\n' +
+                               '            requestAnimationFrame: dat_utils_requestAnimationFrame,\n' +
+                               '        },\n' +
+                               '        controller: {\n' +
+                               '            Controller: dat_controllers_Controller,\n' +
+                               '            OptionController: dat_controllers_OptionController,\n' +
+                               '            NumberController: dat_controllers_NumberController,\n' +
+                               '            NumberControllerBox: dat_controllers_NumberControllerBox,\n' +
+                               '            NumberControllerSlider: dat_controllers_NumberControllerSlider,\n' +
+                               '            StringController: dat_controllers_StringController,\n' +
+                               '            FunctionController: dat_controllers_FunctionController,\n' +
+                               '            BooleanController: dat_controllers_BooleanController,\n' +
+                               '            ImageController: dat_controllers_ImageController,\n' +
+                               '            ColorController: dat_controllers_ColorController,\n' +
+                               '            factory: dat_controllers_factory,\n' +
+                               '        },\n' +
+                               '        dom: {\n' +
+                               '            dom: dat_dom_dom,\n' +
+                               '            CenteredDiv: dat_dom_CenteredDiv,\n' +
+                               '        },\n' +
+                               '        color: {\n' +
+                               '            toString: dat_color_toString,\n' +
+                               '            interpret: dat_color_interpret,\n' +
+                               '            math: dat_color_math,\n' +
+                               '            Color: dat_color_Color,\n' +
+                               '        },\n' +
+                               '        gui: {\n' +
+                               '            GUI: dat_gui_GUI\n' +
+                               '        }\n' +
+                               '    };\n' +
+                               '\n' +
+                               '    return dat;\n' +
+                               '}));\n\n'
                     }
                 },
                 files: {
@@ -116,6 +161,7 @@ module.exports = function(grunt) {
         builder: {
             gui: {
                 options: {
+                    main: 'dat/gui/GUI',
                     shortcut: 'dat.GUI',
                     umd: {
                         ret: 'dat'
@@ -129,6 +175,9 @@ module.exports = function(grunt) {
                 options: {
                     main: 'dat/color/Color',
                     shortcut: 'dat.Color',
+                    umd: {
+                        ret: 'dat.Color'
+                    }
                 },
                 files: {
                     'build/dat.color.js': [ 'src/**/*.js' ]
@@ -148,7 +197,7 @@ module.exports = function(grunt) {
 	    var options = this.options({
             verbose: false,
             baseUrl: './src/',
-            main: 'main',
+            main: null,
             out: './build/bundled.js',
             minify: false,
             shortcut: 'bundled',
@@ -173,7 +222,11 @@ module.exports = function(grunt) {
                 }
               });
 
+              try {
               dat_builder.build(options, file.dest, srcfileset);
+              } catch (ex) {
+                console.log('exception: ', ex, ex.stack);
+              } 
             });
 
             done();
@@ -236,5 +289,11 @@ module.exports = function(grunt) {
 
     grunt.registerTask('patch_requireJS', ['concat:patch_requireJS']);
 
-    grunt.registerTask('default',  ['jshint', 'patch_requireJS', 'builder']);
+    // build the library using r.js + amdclean + UMD wrapper
+    grunt.registerTask('build_B',  ['requirejs', 'amdclean']);
+
+    // build the library using builder.js
+    grunt.registerTask('build_A',  ['builder']);
+
+    grunt.registerTask('default',  ['jshint', 'patch_requireJS', 'build_A']);
 };

@@ -11,7 +11,7 @@
 </head>
 <body>
   <script type="text/javascript">
-require(['domReady', 'dat.GUI'], function (domReady, DatGUI) {
+require(['domReady', 'dat.gui'], function (domReady, dat) {
   'use strict';
 
   domReady(function () {
@@ -21,7 +21,7 @@ require(['domReady', 'dat.GUI'], function (domReady, DatGUI) {
     var obj = { 
         x: null
     };
-    var gui = new DatGUI();
+    var gui = new dat.gui.GUI();
     gui.add(obj, 'x');
   });
 });

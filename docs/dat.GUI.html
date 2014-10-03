@@ -1,12 +1,6 @@
 <!DOCTYPE html>
-<!-- saved from url=(0066)http://workshop.chromeexperiments.com/examples/gui/#1==Basic-Usage -->
-<html class=
-"wf-terminaldosis-n7-active wf-terminaldosis-n3-active wf-terminaldosis-n5-active wf-active">
+<html>
 <head>
-    <meta name="generator" content=
-    "HTML Tidy for HTML5 (experimental) for Windows https://github.com/w3c/tidy-html5/tree/c63cc39">
-    <meta http-equiv="Content-Type" content=
-    "text/html; charset=utf-8">
     <title>
       dat.GUI
     </title>
@@ -458,7 +452,7 @@
 <!-- It gives you this! -->
 <div id='notifier'></div>
 
-<h1><a href='http://twitter.com/guidat'><img src='docs/assets/profile.png'
+<h1><a href='http://twitter.com/guidat'><img src='../examples/assets/profile.png'
                                              border='0' alt='dat.gui flag'/></a>
 </h1>
 
@@ -466,15 +460,14 @@
   It allows you to easily manipulate variables and fire functions on the fly.
 </p>
 
-
 <ul>
   <li>
-    <a href='https://github.com/dataarts/dat.gui/raw/build/DAT.GUI.min.js'><strong>Download the minified source</strong></a>
+    <a href='../build/dat.gui.min.js'><strong>Download the minified source</strong></a>
     <small id='buildsizemin'>[19.6kb]
     </small>
   </li>
   <li>
-    <a href='https://github.com/dataarts/dat.gui/raw/build/DAT.GUI.js'><strong>Download the uncompressed source</strong></a>
+    <a href='../build/dat.gui.js'><strong>Download the uncompressed source</strong></a>
     <small id='buildsize'>[33.9kb]
     </small>
   </li>
@@ -510,7 +503,7 @@ var FizzyText = function() {
 
 window.onload = function() {
   var text = new FizzyText();
-  var gui = new dat.GUI();
+  var gui = new dat.gui.GUI();
   gui.add(text, 'message');
   gui.add(text, 'speed', -5, 5);
   gui.add(text, 'displayOutline');
@@ -564,7 +557,7 @@ gui.add(text, 'speed', { Stopped: 0, Slow: 0.1, Fast: 5 } );
         collapsible folders.
       </p>
       <pre class="prettyprint rag-top rag-bottom lang-js">
-var gui = new dat.GUI();
+var gui = new dat.gui.GUI();
 
 var f1 = gui.addFolder('Flow Field');
 f1.add(text, 'speed');
@@ -603,7 +596,7 @@ var FizzyText = function() {
 window.onload = function() {
 
   var text = new FizzyText();
-  var gui = new dat.GUI();
+  var gui = new dat.gui.GUI();
 
   gui.addColor(text, 'color0');
   gui.addColor(text, 'color1');
@@ -628,7 +621,7 @@ window.onload = function() {
       </p>
       <pre class="prettyprint rag-bottom lang-js">
 var fizzyText = new FizzyText();
-var gui = new dat.GUI();
+var gui = new dat.gui.GUI();
 
 gui.remember(fizzyText);
 
@@ -642,7 +635,7 @@ gui.remember(fizzyText);
       </p>
       <pre class="prettyprint rag-bottom lang-js">
 var fizzyText = new FizzyText();
-var gui = new dat.GUI({ load: JSON });
+var gui = new dat.gui.GUI({ load: JSON });
 
 gui.remember(fizzyText);
 
@@ -665,7 +658,7 @@ gui.remember(fizzyText);
         You can specify the default preset as follows:
       </p>
       <pre class="prettyprint rag-top rag-bottom lang-js">
-var gui = new dat.GUI({
+var gui = new dat.gui.GUI({
   load: JSON,
   preset: 'Flow'
 });
@@ -721,7 +714,7 @@ controller.onFinishChange(function(value) {
         <code>autoPlace</code> parameter to <code>false</code>.
       </p>
       <pre class="prettyprint rag-bottom lang-js">
-var gui = new dat.GUI({ autoPlace: false });
+var gui = new dat.gui.GUI({ autoPlace: false });
 
 var customContainer = document.getElementById('my-gui-container');
 customContainer.appendChild(gui.domElement);
@@ -737,7 +730,7 @@ customContainer.appendChild(gui.domElement);
       </p>
       <pre class="prettyprint rag-top rag-bottom lang-js">
 var fizzyText = new FizzyText();
-var gui = new dat.GUI();
+var gui = new dat.gui.GUI();
 
 gui.add(fizzyText, 'noiseStrength', 0, 100).listen();
 
@@ -789,51 +782,51 @@ update();
       <div id="dat-slides-toc" style="height: 0px; z-index: 1001;">
         <ul>
           <li>
-            <a href="./dat.GUI_files/dat.GUI.htm">1. Basic Usage</a>
+            <a href="#1--Basic-Usage">1. Basic Usage</a>
           </li>
           <li>
             <a href=
-            "http://workshop.chromeexperiments.com/examples/gui/#2--Constraining-Input">
+            "#2--Constraining-Input">
             2. Constraining Input</a>
           </li>
           <li>
             <a href=
-            "http://workshop.chromeexperiments.com/examples/gui/#3--Folders">
+            "#3--Folders">
             3. Folders</a>
           </li>
           <li>
             <a href=
-            "http://workshop.chromeexperiments.com/examples/gui/#4--Color-Controllers">
+            "#4--Color-Controllers">
             4. Color Controllers</a>
           </li>
           <li>
             <a href=
-            "http://workshop.chromeexperiments.com/examples/gui/#5--Saving-Values">
+            "#5--Saving-Values">
             5. Saving Values</a>
           </li>
           <li>
             <a href=
-            "http://workshop.chromeexperiments.com/examples/gui/#6--Presets">
+            "#6--Presets">
             6. Presets</a>
           </li>
           <li>
             <a href=
-            "http://workshop.chromeexperiments.com/examples/gui/#7--Events">
+            "#7--Events">
             7. Events</a>
           </li>
           <li>
             <a href=
-            "http://workshop.chromeexperiments.com/examples/gui/#8--Custom-Placement">
+            "#8--Custom-Placement">
             8. Custom Placement</a>
           </li>
           <li>
             <a href=
-            "http://workshop.chromeexperiments.com/examples/gui/#9--Updating-the-Display-Automatically">
+            "#9--Updating-the-Display-Automatically">
             9. Updating the Display Automatically</a>
           </li>
           <li>
             <a href=
-            "http://workshop.chromeexperiments.com/examples/gui/#10--Updating-the-Display-Manually">
+            "#10--Updating-the-Display-Manually">
             10. Updating the Display Manually</a>
           </li>
         </ul>

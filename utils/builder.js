@@ -271,7 +271,11 @@ function load_module(path, name) {
   if (params.verbose) { console.log('load module: ', name); }
   next_load = name;
   next_path = path;
-  eval('new ' + read_file(path));
+  try {
+    eval('new ' + read_file(path));
+  } catch (ex) {
+    console.log('eval exception: ', ex, '\n  , stack: ', ex.stack, '\n  , path: ', path, '\n  , content: ', read_file(path));
+  }
 }
 
 function load_text(path, name) {

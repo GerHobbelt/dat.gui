@@ -1,7 +1,8 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
 <head>
-  <title>gui-dat</title>
+  <title>dat.gui</title>
+
   <link rel="icon" type="image/png" href="assets/favicon.png" />
   <link href="demo.css" media="screen" rel="stylesheet" type="text/css" />
   <link href="gui.css" media="screen" rel="stylesheet" type="text/css" />
@@ -13,7 +14,7 @@
   <script type='text/javascript'>
     //<![CDATA[
 
-  require(['domReady', 'dat.GUI', 'gui', 'gui.utils', 'gui.timer', 'demo'], function (domReady, datGUI, GUI, GUI_utils, GUI_timer, FizzyText) {
+  require(['domReady', 'dat.GUI', 'gui', 'gui.utils', 'gui.timer', 'demo'], function (domReady, dat, GUI, GUI_utils, GUI_timer, FizzyText) {
     var timer;
 
     domReady(function () {
@@ -250,7 +251,7 @@
 
       var fizzyText = new FizzyText('gui-dat');
 
-      var gui = new GUI();
+      var gui = new dat.gui.GUI();
 
       var timerControls = new GUI();
 

@@ -11,7 +11,7 @@
   <script type='text/javascript'>
     //<![CDATA[
 
-  require(['domReady', 'dat.GUI'], function (domReady, DatGUI) {
+  require(['domReady', 'dat.gui', 'demo'], function (domReady, dat, FizzyText) {
     domReady(function () {
       //This function is called once the DOM is ready.
       //It will be safe to query the DOM and manipulate
@@ -38,7 +38,7 @@
         regular_number3: 0
       };
 
-      var gui = new DatGUI();
+      var gui = new dat.gui.GUI();
 
       // Text field
       gui.add(fizzyText, 'message');
@@ -166,7 +166,49 @@
 
   <li><a href='../license.txt'>The License</a></li>
 
-  <li><a href='example-development.html'>See a basic example</a></li>
+  <li>
+  See some examples:
+
+  <ul>
+    <li><a href='./development.html'>See some examples: development</a></li>
+
+    <li><a href='./example.html'>See an example: example</a></li>
+
+    <li>
+    The individual GUI types:
+
+    <ul>
+      <li><a href='./gui-boolean.html'>See an example: gui-boolean</a></li>
+
+      <li><a href='./gui-color.html'>See an example: gui-color</a></li>
+
+      <li><a href='./gui-folder.html'>See an example: gui-folder</a></li>
+
+      <li><a href='./gui-function.html'>See an example: gui-function</a></li>
+
+      <li><a href='./gui-image.html'>See an example: gui-image</a></li>
+
+      <li><a href='./gui-load-save.html'>See an example: gui-load-save</a></li>
+
+      <li><a href='./gui-null.html'>See an example: gui-null</a></li>
+
+      <li><a href='./gui-number-min-max-step.html'>See an example: gui-number-min-max-step</a></li>
+
+      <li><a href='./gui-number-slider.html'>See an example: gui-number-slider</a></li>
+
+      <li><a href='./gui-number.html'>See an example: gui-number</a></li>
+
+      <li><a href='./gui-option.html'>See an example: gui-option</a></li>
+
+      <li><a href='./gui-string.html'>See an example: gui-string</a></li>
+
+      <li><a href='./gui-undefined.html'>See an example: gui-undefined</a></li>
+    </ul>
+    </li>
+
+    <li><a href='./index.2.html'>See an example: index.2</a></li>
+  </ul>
+  </li>
 
   <li><a href='../tests/index.html'>qUnit tests</a></li>
 </ul>
@@ -180,7 +222,7 @@ window.onload = function() {
 
    var fizzyText = new <a href='demo.js'>FizzyText</a>('dat.gui');
 
-   var gui = new DAT.GUI();
+   var gui = new dat.GUI();
 
    // Text field
    gui.add(fizzyText, 'message');

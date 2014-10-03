@@ -5,41 +5,99 @@
 //
 
 
-// exports.controllers = {
-//  Controller: require('./dat/controllers/Controller'),
-//  StringController: require('./dat/controllers/StringController'),
-//  BooleanController: require('./dat/controllers/BooleanController'),
-//  FunctionController: require('./dat/controllers/FunctionController'),
-//  NumberControllerBox: require('./dat/controllers/NumberControllerBox'),
-//  NumberController: require('./dat/controllers/NumberController'),
-//  NumberControllerSlider: require('./dat/controllers/NumberControllerSlider'),
-//  OptionController: require('./dat/controllers/OptionController'),
-//  ColorController: require('./dat/controllers/ColorController')
-// };
-
-// exports.dom = {
-//  CenteredDiv:require('./dat/dom/CenteredDiv'),
-//  dom: require('./dat/dom/dom')
-// };
-
-// exports.color = {
-//     math: require('./dat/color/math'),
-//     interpret: require('./dat/color/interpret'),
-//     Color: require('./dat/color/Color')
-// };
-
-// exports.gui = require('./dat/gui/GUI');
-
-
 define([
 
-  'dat/gui/GUI'
+  'dat/gui/GUI',
 
-], function(gui) {
+  'dat/controllers/Controller',
+  'dat/controllers/StringController',
+  'dat/controllers/BooleanController',
+  'dat/controllers/FunctionController',
+  'dat/controllers/NumberControllerBox',
+  'dat/controllers/NumberController',
+  'dat/controllers/NumberControllerSlider',
+  'dat/controllers/OptionController',
+  'dat/controllers/ColorController',
+  'dat/controllers/ImageController',
+  'dat/controllers/factory',
+
+  'dat/dom/CenteredDiv',
+  'dat/dom/dom',
+
+  'dat/color/math',
+  'dat/color/interpret',
+  'dat/color/Color',
+  'dat/color/toString',
+
+  'dat/utils/css',
+  'dat/utils/common',
+  'dat/utils/requestAnimationFrame',
+
+], function(
+  dat_gui_GUI,
+
+  dat_controllers_Controller,
+  dat_controllers_StringController,
+  dat_controllers_BooleanController,
+  dat_controllers_FunctionController,
+  dat_controllers_NumberControllerBox,
+  dat_controllers_NumberController,
+  dat_controllers_NumberControllerSlider,
+  dat_controllers_OptionController,
+  dat_controllers_ColorController,
+  dat_controllers_ImageController,
+  dat_controllers_factory,
+
+  dat_dom_CenteredDiv,
+  dat_dom_dom,
+
+  dat_color_math,
+  dat_color_interpret,
+  dat_color_Color,
+  dat_color_toString,
+
+  dat_utils_css,
+  dat_utils_common,
+  dat_utils_requestAnimationFrame
+) {
 
   'use strict';
 
-  return gui;
+  var dat = {
+      utils: {
+          css: dat_utils_css,
+          common: dat_utils_common,
+          requestAnimationFrame: dat_utils_requestAnimationFrame,
+      },
+      controller: {
+          Controller: dat_controllers_Controller,
+          OptionController: dat_controllers_OptionController,
+          NumberController: dat_controllers_NumberController,
+          NumberControllerBox: dat_controllers_NumberControllerBox,
+          NumberControllerSlider: dat_controllers_NumberControllerSlider,
+          StringController: dat_controllers_StringController,
+          FunctionController: dat_controllers_FunctionController,
+          BooleanController: dat_controllers_BooleanController,
+          ImageController: dat_controllers_ImageController,
+          ColorController: dat_controllers_ColorController,
+          factory: dat_controllers_factory,
+      },
+      dom: {
+          dom: dat_dom_dom,
+          CenteredDiv: dat_dom_CenteredDiv,
+      },
+      color: {
+          toString: dat_color_toString,
+          interpret: dat_color_interpret,
+          math: dat_color_math,
+          Color: dat_color_Color,
+      },
+      gui: {
+          GUI: dat_gui_GUI
+      }
+  };
+
+  return dat;
 });
 
 

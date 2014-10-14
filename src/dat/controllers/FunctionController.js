@@ -45,6 +45,7 @@ define([
     this.__button.innerHTML = text === undefined ? 'Fire' : text;
     dom.bind(this.__button, 'click', function(e) {
       e.preventDefault();
+      e.stopPropagation();
       _this.fire(user_data);
       return false;
     });

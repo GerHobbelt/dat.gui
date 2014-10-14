@@ -108,8 +108,7 @@ module.exports = function(grunt) {
                                '}(this, function () {\n' +
                                '\n' +
                                '  \'use strict\';\n' +
-                               '\n\n\n'
-                        ,
+                               '\n\n\n',
                         // This string is appended to the file
                         end:   '\n\n\n' +
                                '    var dat = {\n' +

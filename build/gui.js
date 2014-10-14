@@ -158,6 +158,7 @@ var GUI = function() {
 
     toggleButton.addEventListener('click', function(e) {
         e.preventDefault();
+        e.stopPropagation();
         return false;
     }, false);
 

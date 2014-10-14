@@ -19,10 +19,12 @@ require(['domReady', 'dat.gui'], function (domReady, dat) {
     //It will be safe to query the DOM and manipulate
     //DOM nodes in this function.
     var obj = { 
-		x: '#fca' 
-	};
+    x: '#fca', 
+    y: 'rgba(255,0,0,0.2)'
+  };
     var gui = new dat.gui.GUI();
     gui.addColor(obj, 'x');
+    gui.addColor(obj, 'y');
   });
 });
   </script>

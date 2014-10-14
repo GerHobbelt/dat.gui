@@ -94,7 +94,7 @@ define([
 
     this.__input = document.createElement('input');
     this.__input.type = 'text';
-    this.__input_textShadow = '0 1px 1px ';
+    this.__input_textShadow = ['1px 0px 0px ', '-1px 0px 0px ', '0px 1px 0px ', '0px -1px 0px '];
 
     /* jshint unused: false */
 
@@ -193,7 +193,9 @@ define([
       color: '#fff',
       border: 0,
       fontWeight: 'bold',
-      textShadow: this.__input_textShadow + 'rgba(0,0,0,0.7)'
+      textShadow: this.__input_textShadow.map(function (d) {
+        return d + ' rgba(0,0,0,0.7)';
+      }).join(', ')
     });
 
     dom.bind(this.__saturation_field, 'mousedown', fieldDown);
@@ -356,7 +358,9 @@ define([
           common.extend(this.__input.style, {
             backgroundColor: this.__input.value = this.__color.toString(),
             color: 'rgb(' + flip + ',' + flip + ',' + flip +')',
-            textShadow: this.__input_textShadow + 'rgba(' + _flip + ',' + _flip + ',' + _flip +',.7)'
+            textShadow: this.__input_textShadow.map(function (d) {
+              return d + ' rgba(' + _flip + ',' + _flip + ',' + _flip +',0.7)';
+            }).join(', ')
           });
 
         }

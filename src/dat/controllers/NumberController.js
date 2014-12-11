@@ -34,6 +34,10 @@ define([
 
     NumberController.superclass.call(this, object, property);
 
+    if (typeof this.getValue() !== 'number') {
+      throw 'Provided value is not a number';
+    }
+
     params = params || {};
 
     this.__min = params.min;

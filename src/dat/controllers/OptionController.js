@@ -31,17 +31,23 @@ function(Controller, dom, common) {
    *
    * @member dat.controllers
    */
-  var OptionController = function(object, property, options) {
+  var OptionController = function(object, property, options, params) {
 
-    OptionController.superclass.call(this, object, property);
+    OptionController.superclass.call(this, object, property, 'option', params);
 
     var _this = this;
+    this.CUSTOM_FLAG = '';
+
+    params = params || {};
 
     /**
      * The drop down menu
      * @ignore
      */
     this.__select = document.createElement('select');
+
+    this.__input = document.createElement('input');
+    this.__input.setAttribute('type', 'text');
 
     if (common.isArray(options)) {
       var map = {};
@@ -60,15 +66,28 @@ function(Controller, dom, common) {
 
     });
 
+    if (params.custom) {
+      var opt = document.createElement('option');
+      opt.innerHTML = 'Custom';
+      opt.setAttribute('value', _this.CUSTOM_FLAG);
+      _this.__select.appendChild(opt);
+    }
+
     // Acknowledge original value
     this.updateDisplay();
 
     dom.bind(this.__select, 'change', function() {
-      var desiredValue = this.options[this.selectedIndex].value;
-      _this.setValue(desiredValue);
+      var value = this.options[this.selectedIndex].value;
+      _this.setValue(value);
+    });
+
+    dom.bind(this.__input, 'change', function() {
+      var value = this.value;
+      _this.setValue(value);
     });
 
     this.domElement.appendChild(this.__select);
+    this.domElement.appendChild(this.__input);
 
   };
 
@@ -90,7 +109,17 @@ function(Controller, dom, common) {
         },
 
         updateDisplay: function() {
-          this.__select.value = this.getValue();
+          var value = this.getValue();
+          var custom = true;
+          if (value != this.CUSTOM_FLAG) {
+            common.each(this.__select.options, function(option) {
+              if (value == option.value) custom = false;
+            });
+          }
+
+          this.__select.value = custom ? this.CUSTOM_FLAG : value;
+          this.__input.value = custom ? value : '';
+          this.__input.style.display = custom ? 'block' : 'none';
           return OptionController.superclass.prototype.updateDisplay.call(this);
         }
 

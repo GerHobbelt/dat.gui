@@ -27,9 +27,9 @@ define([
    *
    * @member dat.controllers
    */
-  var StringController = function(object, property) {
+  var StringController = function(object, property, options) {
 
-    StringController.superclass.call(this, object, property);
+    StringController.superclass.call(this, object, property, 'string', options);
 
     var _this = this;
 
@@ -77,6 +77,7 @@ define([
           if (!dom.isActive(this.__input)) {
             this.__input.value = this.getValue();
           }
+          this.__input.disabled = this.getReadonly();
           return StringController.superclass.prototype.updateDisplay.call(this);
         }
 

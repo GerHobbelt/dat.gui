@@ -19,9 +19,9 @@ define([
   'dat/utils/common'
 ], function(Controller, dom, Color, interpret, common) {
 
-  var ColorController = function(object, property) {
+  var ColorController = function(object, property, options) {
 
-    ColorController.superclass.call(this, object, property);
+    ColorController.superclass.call(this, object, property, 'color', options);
 
     this.__color = new Color(this.getValue());
     this.__temp = new Color(0);
@@ -51,6 +51,9 @@ define([
     this.__input = document.createElement('input');
     this.__input.type = 'text';
     this.__input_textShadow = '0 1px 1px ';
+
+    this.__input_container = document.createElement('div');
+    this.__input_container.style.marginLeft = '28px';
 
     dom.bind(this.__input, 'keydown', function(e) {
       if (e.keyCode === 13) { // on enter
@@ -305,6 +308,8 @@ define([
             color: 'rgb(' + flip + ',' + flip + ',' + flip +')',
             textShadow: this.__input_textShadow + 'rgba(' + _flip + ',' + _flip + ',' + _flip +',.7)'
           });
+
+          this.__input.disabled = this.getReadonly();
 
         }
 

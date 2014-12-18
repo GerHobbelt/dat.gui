@@ -30,9 +30,9 @@ define([
    *
    * @member dat.controllers
    */
-  var NumberController = function(object, property, params) {
+  var NumberController = function(object, property, params, options) {
 
-    NumberController.superclass.call(this, object, property);
+    NumberController.superclass.call(this, object, property, 'number', options);
 
     if (typeof this.getValue() !== 'number') {
       throw 'Provided value is not a number';

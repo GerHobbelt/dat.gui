@@ -48,7 +48,7 @@ define([
     /**
      * Keep track of the options
      */
-    this.__options = options;
+    this.__options = options || {};
 
     /**
      * The function to be called on change.
@@ -121,6 +121,23 @@ define([
          */
         getValue: function() {
           return this.object[this.property];
+        },
+
+        getOption: function(name) {
+          return this.__options[name];
+        },
+
+        setOption: function(name, value) {
+          this.__options[name] = value;
+        },
+
+        getReadonly: function() {
+          return this.getOption('readonly');
+        },
+
+        setReadonly: function(value) {
+          this.setOption('readonly', value);
+          this.updateDisplay();
         },
 
         /**

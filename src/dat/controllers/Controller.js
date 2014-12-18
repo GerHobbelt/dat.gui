@@ -23,7 +23,7 @@ define([
    *
    * @member dat.controllers
    */
-  var Controller = function(object, property) {
+  var Controller = function(object, property, type, options) {
 
     this.initialValue = object[property];
 
@@ -44,6 +44,11 @@ define([
      * @type {String}
      */
     this.property = property;
+
+    /**
+     * Keep track of the options
+     */
+    this.__options = options;
 
     /**
      * The function to be called on change.

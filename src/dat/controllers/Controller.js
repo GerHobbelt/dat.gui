@@ -104,10 +104,12 @@ define([
          * Change the value of <code>object[property]</code>
          *
          * @param {Object} newValue The new value of <code>object[property]</code>
+         *
+         * @param {Boolean} quiet If true, don't call the onChange handler
          */
-        setValue: function(newValue) {
+        setValue: function(newValue, quiet) {
           this.object[this.property] = newValue;
-          if (this.__onChange) {
+          if (this.__onChange && !quiet) {
             this.__onChange.call(this, newValue);
           }
           this.updateDisplay();

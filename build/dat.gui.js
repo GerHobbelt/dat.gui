@@ -222,7 +222,7 @@
       /**
        * Keep track of the options
        */
-      this.__options = options;
+      this.__options = options || {};
   
       /**
        * The function to be called on change.
@@ -278,10 +278,12 @@
            * Change the value of <code>object[property]</code>
            *
            * @param {Object} newValue The new value of <code>object[property]</code>
+           *
+           * @param {Boolean} silent If true, don't call the onChange handler
            */
-          setValue: function(newValue) {
+          setValue: function(newValue, silent) {
             this.object[this.property] = newValue;
-            if (this.__onChange) {
+            if (this.__onChange && !silent) {
               this.__onChange.call(this, newValue);
             }
             this.updateDisplay();
@@ -295,6 +297,23 @@
            */
           getValue: function() {
             return this.object[this.property];
+          },
+  
+          getOption: function(name) {
+            return this.__options[name];
+          },
+  
+          setOption: function(name, value) {
+            this.__options[name] = value;
+          },
+  
+          getReadonly: function() {
+            return this.getOption('readonly');
+          },
+  
+          setReadonly: function(value) {
+            this.setOption('readonly', value);
+            this.updateDisplay();
           },
   
           /**
@@ -612,9 +631,9 @@
      *
      * @member dat.controllers
      */
-    var OptionController = function(object, property, options, params) {
+    var OptionController = function(object, property, options, params, options) {
   
-      OptionController.superclass.call(this, object, property, 'option', params);
+      OptionController.superclass.call(this, object, property, 'option', options);
   
       var _this = this;
       this.CUSTOM_FLAG = '';
@@ -627,18 +646,18 @@
        */
       this.__select = document.createElement('select');
   
-      this.__input = document.createElement('input');
-      this.__input.setAttribute('type', 'text');
+      this.__arrow = document.createElement('label');
+      this.__arrow.className = 'caret-down';
   
-      if (common.isArray(options)) {
+      if (common.isArray(params)) {
         var map = {};
-        common.each(options, function(element) {
+        common.each(params, function(element) {
           map[element] = element;
         });
-        options = map;
+        params = map;
       }
   
-      common.each(options, function(value, key) {
+      common.each(params, function(value, key) {
   
         var opt = document.createElement('option');
         opt.innerHTML = key;
@@ -649,9 +668,11 @@
   
       if (params.custom) {
         var opt = document.createElement('option');
-        opt.innerHTML = 'Custom';
+        opt.innerHTML = params.custom.display || 'Custom';
         opt.setAttribute('value', _this.CUSTOM_FLAG);
         _this.__select.appendChild(opt);
+  
+        this.__custom_controller = params.custom.controller;
       }
   
       // Acknowledge original value
@@ -659,17 +680,23 @@
   
       dom.bind(this.__select, 'change', function() {
         var value = this.options[this.selectedIndex].value;
+        if (value == _this.CUSTOM_FLAG)
+          value = _this.__custom_controller.getValue();
         _this.setValue(value);
       });
   
-      dom.bind(this.__input, 'change', function() {
-        var value = this.value;
-        _this.setValue(value);
-      });
+      if (this.__custom_controller) {
+        this.__custom_controller.onChange(function() {
+          var value = this.getValue();
+          _this.setValue(value);
+        });
+      }
   
       this.domElement.appendChild(this.__select);
-      this.domElement.appendChild(this.__input);
-  
+      this.domElement.appendChild(this.__arrow);
+      if (this.__custom_controller) {
+        this.domElement.appendChild(this.__custom_controller.el);
+      }
     };
   
     OptionController.superclass = Controller;
@@ -699,8 +726,13 @@
             }
   
             this.__select.value = custom ? this.CUSTOM_FLAG : value;
-            this.__input.value = custom ? value : '';
-            this.__input.style.display = custom ? 'block' : 'none';
+            this.__select.disabled = this.getReadonly();
+  
+            if (this.__custom_controller) {
+              this.__custom_controller.el.style.display = custom ? 'block' : 'none';
+              this.__custom_controller.setReadonly(this.getReadonly());
+            }
+  
             return OptionController.superclass.prototype.updateDisplay.call(this);
           }
   
@@ -731,9 +763,9 @@
      *
      * @member dat.controllers
      */
-    var NumberController = function(object, property, params) {
+    var NumberController = function(object, property, params, options) {
   
-      NumberController.superclass.call(this, object, property);
+      NumberController.superclass.call(this, object, property, 'number', options);
   
       if (typeof this.getValue() !== 'number') {
         throw 'Provided value is not a number';
@@ -1157,9 +1189,9 @@
      *
      * @member dat.controllers
      */
-    var BooleanController = function(object, property) {
+    var BooleanController = function(object, property, options) {
   
-      BooleanController.superclass.call(this, object, property);
+      BooleanController.superclass.call(this, object, property, 'boolean', options);
   
       var _this = this;
       this.__prev = this.getValue();
@@ -1208,6 +1240,8 @@
             } else {
                 this.__checkbox.checked = false;
             }
+  
+            this.__checkbox.disabled = this.getReadonly();
   
             return BooleanController.superclass.prototype.updateDisplay.call(this);
   
@@ -2979,9 +3013,9 @@
      *
      * @member dat.controllers
      */
-    var StringController = function(object, property) {
+    var StringController = function(object, property, options) {
   
-      StringController.superclass.call(this, object, property);
+      StringController.superclass.call(this, object, property, 'string', options);
   
       var _this = this;
   
@@ -3029,6 +3063,7 @@
             if (!dom.isActive(this.__input)) {
               this.__input.value = this.getValue();
             }
+            this.__input.disabled = this.getReadonly();
             return StringController.superclass.prototype.updateDisplay.call(this);
           }
   
@@ -3052,9 +3087,9 @@
   dat.controllers.OptionController,
   dat.controllers.ColorController = (function (Controller, dom, Color, interpret, common) {
   
-    var ColorController = function(object, property) {
+    var ColorController = function(object, property, options) {
   
-      ColorController.superclass.call(this, object, property);
+      ColorController.superclass.call(this, object, property, 'color', options);
   
       this.__color = new Color(this.getValue());
       this.__temp = new Color(0);
@@ -3084,6 +3119,9 @@
       this.__input = document.createElement('input');
       this.__input.type = 'text';
       this.__input_textShadow = '0 1px 1px ';
+  
+      this.__input_container = document.createElement('div');
+      this.__input_container.style.marginLeft = '28px';
   
       dom.bind(this.__input, 'keydown', function(e) {
         if (e.keyCode === 13) { // on enter
@@ -3338,6 +3376,8 @@
               color: 'rgb(' + flip + ',' + flip + ',' + flip +')',
               textShadow: this.__input_textShadow + 'rgba(' + _flip + ',' + _flip + ',' + _flip +',.7)'
             });
+  
+            this.__input.disabled = this.getReadonly();
   
           }
   

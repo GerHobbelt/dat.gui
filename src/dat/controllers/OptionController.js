@@ -46,8 +46,8 @@ function(Controller, dom, common) {
      */
     this.__select = document.createElement('select');
 
-    this.__input = document.createElement('input');
-    this.__input.setAttribute('type', 'text');
+    this.__arrow = document.createElement('label');
+    this.__arrow.className = 'caret-down';
 
     if (common.isArray(params)) {
       var map = {};
@@ -68,9 +68,11 @@ function(Controller, dom, common) {
 
     if (params.custom) {
       var opt = document.createElement('option');
-      opt.innerHTML = 'Custom';
+      opt.innerHTML = params.custom.display || 'Custom';
       opt.setAttribute('value', _this.CUSTOM_FLAG);
       _this.__select.appendChild(opt);
+
+      this.__custom_controller = params.custom.controller;
     }
 
     // Acknowledge original value
@@ -78,17 +80,23 @@ function(Controller, dom, common) {
 
     dom.bind(this.__select, 'change', function() {
       var value = this.options[this.selectedIndex].value;
+      if (value == _this.CUSTOM_FLAG)
+        value = _this.__custom_controller.getValue();
       _this.setValue(value);
     });
 
-    dom.bind(this.__input, 'change', function() {
-      var value = this.value;
-      _this.setValue(value);
-    });
+    if (this.__custom_controller) {
+      this.__custom_controller.onChange(function() {
+        var value = this.getValue();
+        _this.setValue(value);
+      });
+    }
 
     this.domElement.appendChild(this.__select);
-    this.domElement.appendChild(this.__input);
-
+    this.domElement.appendChild(this.__arrow);
+    if (this.__custom_controller) {
+      this.domElement.appendChild(this.__custom_controller.el);
+    }
   };
 
   OptionController.superclass = Controller;
@@ -118,11 +126,12 @@ function(Controller, dom, common) {
           }
 
           this.__select.value = custom ? this.CUSTOM_FLAG : value;
-          this.__input.value = custom ? value : '';
-          this.__input.style.display = custom ? 'block' : 'none';
-
           this.__select.disabled = this.getReadonly();
-          this.__input.disabled = this.getReadonly();
+
+          if (this.__custom_controller) {
+            this.__custom_controller.el.style.display = custom ? 'block' : 'none';
+            this.__custom_controller.setReadonly(this.getReadonly());
+          }
 
           return OptionController.superclass.prototype.updateDisplay.call(this);
         }

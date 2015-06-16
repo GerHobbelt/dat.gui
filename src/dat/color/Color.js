@@ -30,7 +30,6 @@ define([
 
     this.__state.a = this.__state.a || 1;
 
-
   };
 
   Color.COMPONENTS = ['r','g','b','h','s','v','hex','a'];
@@ -43,6 +42,47 @@ define([
 
     toOriginal: function() {
       return this.__state.conversion.write(this);
+    }
+
+  });
+
+  defineRGBComponent(Color.prototype, 'r', 2);
+  defineRGBComponent(Color.prototype, 'g', 1);
+  defineRGBComponent(Color.prototype, 'b', 0);
+
+  defineHSVComponent(Color.prototype, 'h');
+  defineHSVComponent(Color.prototype, 's');
+  defineHSVComponent(Color.prototype, 'v');
+
+  Object.defineProperty(Color.prototype, 'a', {
+
+    get: function() {
+      return this.__state.a;
+    },
+
+    set: function(v) {
+      this.__state.a = v;
+    }
+
+  });
+
+  Object.defineProperty(Color.prototype, 'hex', {
+
+    get: function() {
+
+      if (this.__state.space !== 'HEX') {
+        this.__state.hex = math.rgb_to_hex(this.r, this.g, this.b);
+      }
+
+      return this.__state.hex;
+
+    },
+
+    set: function(v) {
+
+      this.__state.space = 'HEX';
+      this.__state.hex = v;
+
     }
 
   });
@@ -145,47 +185,6 @@ define([
     }
 
   }
-
-  defineRGBComponent(Color.prototype, 'r', 2);
-  defineRGBComponent(Color.prototype, 'g', 1);
-  defineRGBComponent(Color.prototype, 'b', 0);
-
-  defineHSVComponent(Color.prototype, 'h');
-  defineHSVComponent(Color.prototype, 's');
-  defineHSVComponent(Color.prototype, 'v');
-
-  Object.defineProperty(Color.prototype, 'a', {
-
-    get: function() {
-      return this.__state.a;
-    },
-
-    set: function(v) {
-      this.__state.a = v;
-    }
-
-  });
-
-  Object.defineProperty(Color.prototype, 'hex', {
-
-    get: function() {
-
-      if (this.__state.space !== 'HEX') {
-        this.__state.hex = math.rgb_to_hex(this.r, this.g, this.b);
-      }
-
-      return this.__state.hex;
-
-    },
-
-    set: function(v) {
-
-      this.__state.space = 'HEX';
-      this.__state.hex = v;
-
-    }
-
-  });
 
   return Color;
 

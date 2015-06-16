@@ -1,5 +1,6 @@
 
-.GUI-preview-image{
+.GUI-preview-image
+{
     float: left;
     padding: 0.4em;
     max-width: 2em;
@@ -7,7 +8,8 @@
 
 }
 
-.GUI-label-image{
+.GUI-label-image
+{
     color:rgb(214, 214, 245);
     text-decoration: underline;
     display: block;
@@ -16,6 +18,8 @@
     cursor: pointer;
 }
 
-.GUI-label-image:hover{
+.GUI-label-image:hover
+{
     background: #3c3c3c;
 }
+

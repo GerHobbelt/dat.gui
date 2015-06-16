@@ -169,7 +169,7 @@ define([
               space: 'HEX',
               hex: original,
               conversionName: 'HEX'
-            }
+            };
           },
 
           write: function(color) {
@@ -252,7 +252,7 @@ define([
                 g: original.g,
                 b: original.b,
                 a: original.a
-              }
+              };
             }
             return false;
           },
@@ -263,7 +263,7 @@ define([
               g: color.g,
               b: color.b,
               a: color.a
-            }
+            };
           }
         },
 
@@ -277,7 +277,7 @@ define([
                 r: original.r,
                 g: original.g,
                 b: original.b
-              }
+              };
             }
             return false;
           },
@@ -287,7 +287,7 @@ define([
               r: color.r,
               g: color.g,
               b: color.b
-            }
+            };
           }
         },
 
@@ -303,7 +303,7 @@ define([
                 s: original.s,
                 v: original.v,
                 a: original.a
-              }
+              };
             }
             return false;
           },
@@ -314,7 +314,7 @@ define([
               s: color.s,
               v: color.v,
               a: color.a
-            }
+            };
           }
         },
 
@@ -328,7 +328,7 @@ define([
                 h: original.h,
                 s: original.s,
                 v: original.v
-              }
+              };
             }
             return false;
           },
@@ -338,7 +338,7 @@ define([
               h: color.h,
               s: color.s,
               v: color.v
-            }
+            };
           }
 
         }

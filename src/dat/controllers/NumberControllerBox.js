@@ -49,7 +49,16 @@ define([
      */
     var prev_y;
 
+    this.__input = document.createElement('input');
+    this.__input.setAttribute('type', 'text');
+
     // Makes it so manually specified values are not truncated.
+
+    dom.bind(this.__input, 'change', onChange);
+    dom.bind(this.__input, 'blur', onBlur);
+    dom.bind(this.__input, 'touchdown', onTouchDown);
+    dom.bind(this.__input, 'mousedown', onMouseDown);
+    dom.bind(this.__input, 'keydown', onKeyDown);
 
     function onKeyDown(e) {
       // When pressing ENTER key, you can be as precise as you want.
@@ -114,16 +123,6 @@ define([
       dom.unbind(window, 'mousemove', onMouseDrag);
       dom.unbind(window, 'mouseup', onMouseUp);
     }
-
-
-    this.__input = document.createElement('input');
-    this.__input.setAttribute('type', 'text');
-
-    dom.bind(this.__input, 'change', onChange);
-    dom.bind(this.__input, 'blur', onBlur);
-    dom.bind(this.__input, 'touchdown', onTouchDown);
-    dom.bind(this.__input, 'mousedown', onMouseDown);
-    dom.bind(this.__input, 'keydown', onKeyDown);
 
     this.updateDisplay();
 

@@ -97,6 +97,6 @@ define([
       return value << (tmpComponent = componentIndex * 8) | (hex & ~ (0xFF << tmpComponent));
     }
 
-  }
+  };
 
 });

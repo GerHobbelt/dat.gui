@@ -102,11 +102,9 @@ function(NumberController, dom, css, common, styleSheet) {
       }
     }
 
-
     this.__background = document.createElement('div');
     this.__foreground = document.createElement('div');
     
-
     dom.bind(this.__background, 'touchstart', onTouchDown);
     dom.bind(this.__background, 'mousedown', onMouseDown);
     

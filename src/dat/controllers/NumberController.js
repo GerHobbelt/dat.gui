@@ -68,19 +68,16 @@ define([
     this.__impliedStep = guestimateImpliedStep(this.initialValue, this.__step, this.__minimumSaneStepSize, this.__maximumSaneStepSize);
 
     this.__precision = numDecimals(this.__impliedStep);
-
   };
 
   NumberController.superclass = Controller;
 
   common.extend(
-
       NumberController.prototype,
       Controller.prototype,
 
       /** @lends dat.controllers.NumberController.prototype */
       {
-
         setValue: function(v) {
 
           if (this.__min !== undefined && v < this.__min) {
@@ -165,9 +162,7 @@ define([
             mode: this.__mode
           };
         }
-
       }
-
   );
 
   function numDecimals(x) {
@@ -180,5 +175,4 @@ define([
   }
 
   return NumberController;
-
 });

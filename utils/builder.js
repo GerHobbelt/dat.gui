@@ -47,7 +47,7 @@ function build(_params, destfile) {
 
   var deps = [];
 
-  exports.license = read_file(params.licenseFile || 'license.txt');
+  exports.license = read_file(params.licenseFile || 'LICENSE');
 
   load_module(params.baseUrl + params.main + '.js', params.main);
 
@@ -274,7 +274,7 @@ function load_module(path, name) {
   try {
     eval('new ' + read_file(path));
   } catch (ex) {
-    console.log('eval exception: ', ex, '\n  , stack: ', ex.stack, '\n  , path: ', path, '\n  , content: ', read_file(path));
+    console.error('eval exception: ', ex, '\n  , stack: ', ex.stack, '\n  , path: ', path, '\n  , content: ', read_file(path));
   }
 }
 

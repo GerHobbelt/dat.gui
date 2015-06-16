@@ -1,7 +1,6 @@
 .DS_Store
 .sass-cache
 .idea
-.tmp
 
 # editor bak files
 *~
@@ -9,3 +8,8 @@
 
 # Node/NPM
 node_modules/
+
+# ignore github analysis scripts' temporaries
+__forks.info__/
+__forks__.bulk_dump
+

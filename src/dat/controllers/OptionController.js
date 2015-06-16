@@ -71,7 +71,6 @@ function(Controller, dom, common) {
     });
 
     this.domElement.appendChild(this.__select);
-
   };
 
   OptionController.superclass = Controller;

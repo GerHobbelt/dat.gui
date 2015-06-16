@@ -84,3 +84,4 @@ define([
     return ImageController;
 
 });
+

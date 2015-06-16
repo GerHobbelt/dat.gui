@@ -30,48 +30,6 @@ define([
 
     var _this = this;
 
-    function fieldDown(e) {
-      setSV(e);
-      // document.body.style.cursor = 'none';
-      dom.bind(window, 'mousemove', setSV);
-      dom.bind(window, 'mouseup', unbindSV);
-      dom.bind(window, 'touchmove', setSVonTouch);
-      dom.bind(window, 'touchend', unbindSV);
-    }
-
-    function fieldDownOnTouch(e) {
-      e.clientX = e.touches[0].clientX;
-      e.clientY = e.touches[0].clientY;
-      fieldDown(e);
-    }
-
-    function unbindSV() {
-      dom.unbind(window, 'mousemove', setSV);
-      dom.unbind(window, 'mouseup', unbindSV);
-      dom.unbind(window, 'touchmove', setSVonTouch);
-      dom.unbind(window, 'touchend', unbindSV);
-      // document.body.style.cursor = 'default';
-    }
-
-    function onBlur() {
-      /* jshint validthis: true */
-      var i = interpret(this.value);
-      if (i !== false) {
-        _this.__color.__state = i;
-        _this.setValue(_this.__color.toOriginal());
-      } else {
-        this.value = _this.__color.toString();
-      }
-      /* jshint validthis: false */
-    }
-
-    function unbindH() {
-      dom.unbind(window, 'mousemove', setH);
-      dom.unbind(window, 'mouseup', unbindH);
-      dom.unbind(window, 'touchmove', setHonTouch);
-      dom.unbind(window, 'touchend', unbindH);
-    }
-
     this.domElement = document.createElement('div');
 
     dom.makeSelectable(this.domElement, false);
@@ -214,6 +172,48 @@ define([
       dom.bind(window, 'touchmove', setHonTouch);
       dom.bind(window, 'touchend', unbindH);
     });
+
+    function fieldDown(e) {
+      setSV(e);
+      // document.body.style.cursor = 'none';
+      dom.bind(window, 'mousemove', setSV);
+      dom.bind(window, 'mouseup', unbindSV);
+      dom.bind(window, 'touchmove', setSVonTouch);
+      dom.bind(window, 'touchend', unbindSV);
+    }
+
+    function fieldDownOnTouch(e) {
+      e.clientX = e.touches[0].clientX;
+      e.clientY = e.touches[0].clientY;
+      fieldDown(e);
+    }
+
+    function unbindSV() {
+      dom.unbind(window, 'mousemove', setSV);
+      dom.unbind(window, 'mouseup', unbindSV);
+      dom.unbind(window, 'touchmove', setSVonTouch);
+      dom.unbind(window, 'touchend', unbindSV);
+      // document.body.style.cursor = 'default';
+    }
+
+    function onBlur() {
+      /* jshint validthis: true */
+      var i = interpret(this.value);
+      if (i !== false) {
+        _this.__color.__state = i;
+        _this.setValue(_this.__color.toOriginal());
+      } else {
+        this.value = _this.__color.toString();
+      }
+      /* jshint validthis: false */
+    }
+
+    function unbindH() {
+      dom.unbind(window, 'mousemove', setH);
+      dom.unbind(window, 'mouseup', unbindH);
+      dom.unbind(window, 'touchmove', setHonTouch);
+      dom.unbind(window, 'touchend', unbindH);
+    }
 
     this.__saturation_field.appendChild(value_field);
     this.__selector.appendChild(this.__field_knob);

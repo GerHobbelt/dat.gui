@@ -14,6 +14,8 @@
 define([
 ], function() {
   
+  'use strict';
+
   var ARR_EACH = Array.prototype.forEach;
   var ARR_SLICE = Array.prototype.slice;
 
@@ -31,9 +33,11 @@ define([
       
       this.each(ARR_SLICE.call(arguments, 1), function(obj) {
         
-        for (var key in obj)
-          if (!this.isUndefined(obj[key])) 
+        for (var key in obj) {
+          if (!this.isUndefined(obj[key])) {
             target[key] = obj[key];
+          }
+        }
         
       }, this);
       
@@ -45,9 +49,11 @@ define([
       
       this.each(ARR_SLICE.call(arguments, 1), function(obj) {
         
-        for (var key in obj)
-          if (this.isUndefined(target[key])) 
+        for (var key in obj) {
+          if (this.isUndefined(target[key])) {
             target[key] = obj[key];
+          }
+        }
         
       }, this);
       
@@ -57,18 +63,20 @@ define([
     
     compose: function() {
       var toCall = ARR_SLICE.call(arguments);
-            return function() {
-              var args = ARR_SLICE.call(arguments);
-              for (var i = toCall.length -1; i >= 0; i--) {
-                args = [toCall[i].apply(this, args)];
-              }
-              return args[0];
-            }
+      return function() {
+        var args = ARR_SLICE.call(arguments);
+        for (var i = toCall.length -1; i >= 0; i--) {
+          args = [toCall[i].apply(this, args)];
+        }
+        return args[0];
+      }
     },
     
     each: function(obj, itr, scope) {
 
-      if (!obj) return;
+      if (!obj) {
+        return;
+      }
 
       if (ARR_EACH && obj.forEach && obj.forEach === ARR_EACH) { 
         
@@ -76,15 +84,19 @@ define([
         
       } else if (obj.length === obj.length + 0) { // Is number but not NaN
         
-        for (var key = 0, l = obj.length; key < l; key++)
-          if (key in obj && itr.call(scope, obj[key], key) === this.BREAK) 
+        for (var key = 0, l = obj.length; key < l; key++) {
+          if (key in obj && itr.call(scope, obj[key], key) === this.BREAK) {
             return;
+          }
+        }
             
       } else {
 
-        for (var key in obj) 
-          if (itr.call(scope, obj[key], key) === this.BREAK)
+        for (var objkey in obj) {
+          if (itr.call(scope, obj[objkey], objkey) === this.BREAK) {
             return;
+          }
+        }
             
       }
             
@@ -95,7 +107,9 @@ define([
     },
     
     toArray: function(obj) {
-      if (obj.toArray) return obj.toArray();
+      if (obj.toArray) {
+        return obj.toArray();
+      }
       return ARR_SLICE.call(obj);
     },
 
@@ -120,11 +134,15 @@ define([
     },
     
     isNumber: function(obj) {
-      return obj === obj+0;
+      return obj === +obj;
+    },
+    
+    isFiniteNumber: function(obj) {
+      return (obj === +obj) && isFinite(obj);
     },
     
     isString: function(obj) {
-      return obj === obj+'';
+      return typeof obj === 'string';
     },
     
     isBoolean: function(obj) {

@@ -15,6 +15,8 @@ define([
   'dat/utils/common'
 ], function(common) {
 
+  'use strict';
+
   var EVENT_MAP = {
     'HTMLEvents': ['change'],
     'MouseEvents': ['click','mousemove','mousedown','mouseup', 'mouseover'],
@@ -32,7 +34,9 @@ define([
 
   function cssValueToPixels(val) {
 
-    if (val === '0' || common.isUndefined(val)) return 0;
+    if (val === '0' || common.isUndefined(val)) {
+      return 0;
+    }
 
     var match = val.match(CSS_VALUE_PIXELS);
 
@@ -59,7 +63,9 @@ define([
      */
     makeSelectable: function(elem, selectable) {
 
-      if (elem === undefined || elem.style === undefined) return;
+      if (elem === undefined || elem.style === undefined) {
+        return;
+      }
 
       elem.onselectstart = selectable ? function() {
         return false;
@@ -80,8 +86,12 @@ define([
      */
     makeFullscreen: function(elem, horizontal, vertical) {
 
-      if (common.isUndefined(horizontal)) horizontal = true;
-      if (common.isUndefined(vertical)) vertical = true;
+      if (common.isUndefined(horizontal)) {
+        horizontal = true;
+      }
+      if (common.isUndefined(vertical)) {
+        vertical = true;
+      }
 
       elem.style.position = 'absolute';
 
@@ -156,10 +166,12 @@ define([
      */
     bind: function(elem, event, func, bool) {
       bool = bool || false;
-      if (elem.addEventListener)
+      if (elem.addEventListener) {
         elem.addEventListener(event, func, bool);
-      else if (elem.attachEvent)
+      }
+      else if (elem.attachEvent) {
         elem.attachEvent('on' + event, func);
+      }
       return dom;
     },
 
@@ -172,10 +184,12 @@ define([
      */
     unbind: function(elem, event, func, bool) {
       bool = bool || false;
-      if (elem.removeEventListener)
+      if (elem.removeEventListener) {
         elem.removeEventListener(event, func, bool);
-      else if (elem.detachEvent)
+      }
+      else if (elem.detachEvent) {
         elem.detachEvent('on' + event, func);
+      }
       return dom;
     },
 
@@ -189,7 +203,7 @@ define([
         elem.className = className;
       } else if (elem.className !== className) {
         var classes = elem.className.split(/ +/);
-        if (classes.indexOf(className) == -1) {
+        if (classes.indexOf(className) === -1) {
           classes.push(className);
           elem.className = classes.join(' ').replace(/^\s+/, '').replace(/\s+$/, '');
         }
@@ -204,18 +218,20 @@ define([
      */
     removeClass: function(elem, className) {
       if (className) {
+        /* jshint -W035 */// jshint: ignore empty block
         if (elem.className === undefined) {
-          // elem.className = className;
+          // elem.className = undefined;
         } else if (elem.className === className) {
           elem.removeAttribute('class');
         } else {
           var classes = elem.className.split(/ +/);
           var index = classes.indexOf(className);
-          if (index != -1) {
+          if (index !== -1) {
             classes.splice(index, 1);
             elem.className = classes.join(' ');
           }
         }
+        /* jshint +W035 */
       } else {
         elem.className = undefined;
       }
@@ -238,7 +254,7 @@ define([
           cssValueToPixels(style['border-right-width']) +
           cssValueToPixels(style['padding-left']) +
           cssValueToPixels(style['padding-right']) +
-          cssValueToPixels(style['width']);
+          cssValueToPixels(style.width);
     },
 
     /**
@@ -253,7 +269,7 @@ define([
           cssValueToPixels(style['border-bottom-width']) +
           cssValueToPixels(style['padding-top']) +
           cssValueToPixels(style['padding-bottom']) +
-          cssValueToPixels(style['height']);
+          cssValueToPixels(style.height);
     },
 
     /**
@@ -266,7 +282,7 @@ define([
         do {
           offset.left += elem.offsetLeft;
           offset.top += elem.offsetTop;
-        } while (elem = elem.offsetParent);
+        } while ((elem = elem.offsetParent));
       }
       return offset;
     },

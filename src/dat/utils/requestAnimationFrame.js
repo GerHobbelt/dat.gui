@@ -14,6 +14,8 @@
 define([
 ], function() {
 
+  'use strict';
+
   /**
    * requirejs version of Paul Irish's RequestAnimationFrame
    * http://paulirish.com/2011/requestanimationframe-for-smart-animating/
@@ -24,9 +26,11 @@ define([
       window.mozRequestAnimationFrame ||
       window.oRequestAnimationFrame ||
       window.msRequestAnimationFrame ||
+      /* jshint unused: false */
       function(callback, element) {
 
         window.setTimeout(callback, 1000 / 60);
 
       };
+
 });

@@ -1,5 +1,3 @@
-/* global define */
-
 /**
  * dat-gui JavaScript Controller Library
  * http://code.google.com/p/dat-gui
@@ -19,7 +17,8 @@ define([
   'dat/color/toString',
   'dat/utils/common'
 ], function(interpret, math, toString, common) {
-  "use strict";
+
+  'use strict';
 
   var Color = function() {
 

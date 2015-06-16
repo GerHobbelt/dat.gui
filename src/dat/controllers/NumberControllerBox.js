@@ -17,6 +17,8 @@ define([
   'dat/utils/common'
 ], function(NumberController, dom, common) {
 
+  'use strict';
+
   /**
    * @class Represents a given property of an object that is a number and
    * provides an input element with which to manipulate it.
@@ -60,15 +62,18 @@ define([
       // When pressing ENTER key, you can be as precise as you want.
       if (e.keyCode === 13) {
         _this.__truncationSuspended = true;
-        this.blur();
+        /* jshint validthis: true */
+        this.blur();                              
+        /* jshint validthis: false */
         _this.__truncationSuspended = false;
       }
-
     });
 
     function onChange() {
       var attempted = parseFloat(_this.__input.value);
-      if (!common.isNaN(attempted)) _this.setValue(attempted);
+      if (!common.isNaN(attempted)) {
+        _this.setValue(attempted);
+      }
     }
 
     function onBlur() {
@@ -85,12 +90,10 @@ define([
     }
 
     function onMouseDrag(e) {
-
       var diff = prev_y - e.clientY;
       _this.setValue(_this.getValue() + diff * _this.__impliedStep);
 
       prev_y = e.clientY;
-
     }
 
     function onMouseUp() {
@@ -107,20 +110,14 @@ define([
   NumberControllerBox.superclass = NumberController;
 
   common.extend(
-
       NumberControllerBox.prototype,
       NumberController.prototype,
-
       {
-
         updateDisplay: function() {
-
           this.__input.value = this.__truncationSuspended ? this.getValue() : roundToDecimal(this.getValue(), this.__precision);
           return NumberControllerBox.superclass.prototype.updateDisplay.call(this);
         }
-
       }
-
   );
 
   function roundToDecimal(value, decimals) {

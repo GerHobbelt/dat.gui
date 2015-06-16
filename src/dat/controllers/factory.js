@@ -22,6 +22,8 @@ define([
 ],
     function(OptionController, NumberControllerBox, NumberControllerSlider, StringController, FunctionController, BooleanController, common) {
 
+      'use strict';
+      
       return function(object, property, options_1, options_2, options_3) {
 
         var initialValue = object[property];

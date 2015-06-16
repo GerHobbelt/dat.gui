@@ -1,6 +1,6 @@
 # dat.GUI
 
-A lightweight graphical user interface for changing variables in JavaScript. 
+A lightweight graphical user interface for changing variables in JavaScript.
 
 Get started with dat.GUI by reading the tutorial at http://workshop.chromeexperiments.com/examples/gui.
 
@@ -12,7 +12,7 @@ The easiest way to use dat.GUI in your code is by using the built source at `bui
 
 In your `head` tag, include the following code:
 
-```
+```html
 <script type="text/javascript" src="dat.gui.min.js"></script>
 ```
 
@@ -24,18 +24,18 @@ Internally, dat.GUI uses [require.js](http://requirejs.org/) to handle dependenc
 
 In your `head` tag, include the following code:
 
-```
+```html
 <script data-main="path/to/main" src="path/to/requirejs/require.js"></script>
 ```
 
 Then, in `path/to/main.js`:
 
-```
+```javascript
 require([
   'path/to/gui/module/GUI'
 ], function(GUI) {
 
-  // No namespace necessary 
+  // No namespace necessary
   var gui = new GUI();
   ...
 });
@@ -54,7 +54,7 @@ require([
 
 In the terminal, enter the following:
 
-```
+```sh
 $ cd utils
 $ node build_gui.js
 ```
@@ -81,7 +81,7 @@ _To export minified source using Closure Compiler, open `utils/build_gui.js` and
 * Made Controller code completely agnostic of GUI. Controllers can easily be created independent of a GUI panel.
 
 
-# 0.4
+### 0.4
 
 * Migrated from GitHub to Google Code.
 
@@ -94,3 +94,4 @@ The following libraries / open-source projects were used in the development of d
 * [Sass](http://sass-lang.com/)
 * [node.js](http://nodejs.org/)
 * [QUnit](https://github.com/jquery/qunit) / [jquery](http://jquery.com/)
+

@@ -1,5 +1,3 @@
-/* global define */
-
 /**
  * dat-gui JavaScript Controller Library
  * http://code.google.com/p/dat-gui
@@ -17,7 +15,8 @@ define([
   'dat/color/toString',
   'dat/utils/common'
 ], function(toString, common) {
-  "use strict";
+
+  'use strict';
 
   var result, toReturn;
 
@@ -79,7 +78,7 @@ define([
                   '0x' +
                       test[1].toString() + test[1].toString() +
                       test[2].toString() + test[2].toString() +
-                      test[3].toString() + test[3].toString())
+                      test[3].toString() + test[3].toString(), 16)
             };
 
           },
@@ -99,7 +98,7 @@ define([
 
             return {
               space: 'HEX',
-              hex: parseInt('0x' + test[1].toString())
+              hex: parseInt('0x' + test[1].toString(), 16)
             };
 
           },
@@ -113,8 +112,8 @@ define([
           read: function(original) {
 
             var test = original.match(/^rgb\(\s*(.+)\s*,\s*(.+)\s*,\s*(.+)\s*\)/);
-            if (test === null) {
-              return false;
+            if (test === null) { 
+              return false; 
             }
 
             return {
@@ -194,6 +193,7 @@ define([
             if (original.length !== 3) {
               return false;
             }
+
             return {
               space: 'RGB',
               r: original[0],
@@ -213,6 +213,7 @@ define([
             if (original.length !== 4) {
               return false;
             }
+
             return {
               space: 'RGB',
               r: original[0],
@@ -346,10 +347,8 @@ define([
 
     }
 
-
   ];
 
   return interpret;
-
 
 });

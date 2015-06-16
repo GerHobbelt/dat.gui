@@ -20,6 +20,8 @@ define([
 ], 
 function(NumberController, dom, css, common, styleSheet) {
 
+  'use strict';
+
   /**
    * @class Represents a given property of an object that is a number, contains
    * a minimum and maximum, and provides a slider element with which to
@@ -47,15 +49,12 @@ function(NumberController, dom, css, common, styleSheet) {
     this.__background = document.createElement('div');
     this.__foreground = document.createElement('div');
     
-
-
     dom.bind(this.__background, 'mousedown', onMouseDown);
     
     dom.addClass(this.__background, 'slider');
     dom.addClass(this.__foreground, 'slider-fg');
 
     function onMouseDown(e) {
-
       dom.bind(window, 'mousemove', onMouseDrag);
       dom.bind(window, 'mouseup', onMouseUp);
 
@@ -63,18 +62,16 @@ function(NumberController, dom, css, common, styleSheet) {
     }
 
     function onMouseDrag(e) {
-
       e.preventDefault();
 
       var offset = dom.getOffset(_this.__background);
       var width = dom.getWidth(_this.__background);
       
       _this.setValue(
-      	map(e.clientX, offset.left, offset.left + width, _this.__min, _this.__max)
+        map(e.clientX, offset.left, offset.left + width, _this.__min, _this.__max)
       );
 
       return false;
-
     }
 
     function onMouseUp() {
@@ -102,22 +99,15 @@ function(NumberController, dom, css, common, styleSheet) {
   };
 
   common.extend(
-
       NumberControllerSlider.prototype,
       NumberController.prototype,
-
       {
-
         updateDisplay: function() {
-          var pct = (this.getValue() - this.__min)/(this.__max - this.__min);
-          this.__foreground.style.width = pct*100+'%';
+          var pct = (this.getValue() - this.__min) / (this.__max - this.__min);
+          this.__foreground.style.width = (pct * 100) + '%';
           return NumberControllerSlider.superclass.prototype.updateDisplay.call(this);
         }
-
       }
-
-
-
   );
 
 	function map(v, i1, i2, o1, o2) {
@@ -125,5 +115,4 @@ function(NumberController, dom, css, common, styleSheet) {
 	}
 
   return NumberControllerSlider;
-  
 });

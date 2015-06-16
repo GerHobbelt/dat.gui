@@ -15,6 +15,8 @@ define([
 
 ], function() {
 
+  'use strict';
+
   var tmpComponent;
 
   return {

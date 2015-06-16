@@ -17,6 +17,8 @@ define([
     'dat/utils/common'
 ], function(Controller, dom, common) {
 
+  'use strict';
+
   /**
    * @class Provides a text input to alter the string property of an object.
    *
@@ -41,11 +43,12 @@ define([
     dom.bind(this.__input, 'blur', onBlur);
     dom.bind(this.__input, 'keydown', function(e) {
       if (e.keyCode === 13) {
-        this.blur();
+        /* jshint validthis: true */
+        this.blur(); 
+        /* jshint validthis: false */
       }
     });
     
-
     function onChange() {
       _this.setValue(_this.__input.value);
     }

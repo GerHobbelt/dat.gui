@@ -16,6 +16,7 @@ define([
   'dat/utils/common'
 ], function(dom, common) {
 
+  'use strict';
 
   var CenteredDiv = function() {
 
@@ -104,8 +105,8 @@ define([
   };
 
   CenteredDiv.prototype.layout = function() {
-    this.domElement.style.left = window.innerWidth/2 - dom.getWidth(this.domElement) / 2 + 'px';
-    this.domElement.style.top = window.innerHeight/2 - dom.getHeight(this.domElement) / 2 + 'px';
+    this.domElement.style.left = (window.innerWidth / 2 - dom.getWidth(this.domElement) / 2) + 'px';
+    this.domElement.style.top = (window.innerHeight / 2 - dom.getHeight(this.domElement) / 2) + 'px';
   };
   
   function lockScroll(e) {

@@ -153,6 +153,8 @@ $button-height: 20px;
     width: 40%;
     overflow: hidden;
     text-overflow: ellipsis;
+    text-overflow: "…" "…";   // https://developer.mozilla.org/en-US/docs/Web/CSS/text-overflow
+    white-space: nowrap;      // otherwise the text will simply wrap and the text-overflow ellipsis will not be applied, but instead the text simply disappears (if only partially) 
   }
 
   /** Controller-half (right) */

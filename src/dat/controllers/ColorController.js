@@ -19,6 +19,8 @@ define([
   'dat/utils/common'
 ], function(Controller, dom, Color, interpret, common) {
 
+  'use strict';
+
   var ColorController = function(object, property, options) {
 
     ColorController.superclass.call(this, object, property, 'color', options);
@@ -50,7 +52,7 @@ define([
 
     this.__input = document.createElement('input');
     this.__input.type = 'text';
-    this.__input_textShadow = '0 1px 1px ';
+    this.__input_textShadow = ['1px 0px 0px ', '-1px 0px 0px ', '0px 1px 0px ', '0px -1px 0px '];
 
     this.__input_container = document.createElement('div');
     this.__input_container.style.marginLeft = '28px';
@@ -87,7 +89,7 @@ define([
       position: 'absolute',
       width: '12px',
       height: '12px',
-      border: this.__field_knob_border + (this.__color.v < .5 ? '#fff' : '#000'),
+      border: this.__field_knob_border + (this.__color.v < 0.5 ? '#fff' : '#000'),
       boxShadow: '0px 1px 3px rgba(0,0,0,0.5)',
       borderRadius: '12px',
       zIndex: 1
@@ -137,7 +139,9 @@ define([
       color: '#fff',
       border: 0,
       fontWeight: 'bold',
-      textShadow: this.__input_textShadow + 'rgba(0,0,0,0.7)'
+      textShadow: this.__input_textShadow.map(function (d) {
+        return d + ' rgba(0,0,0,0.7)';
+      }).join(', ')
     });
 
     dom.bind(this.__saturation_field, 'mousedown', fieldDown);
@@ -163,6 +167,7 @@ define([
     }
 
     function onBlur() {
+      /* jshint validthis: true */
       var i = interpret(this.value);
       if (i !== false) {
         _this.__color.__state = i;
@@ -170,6 +175,7 @@ define([
       } else {
         this.value = _this.__color.toString();
       }
+      /* jshint validthis: false */
     }
 
     function unbindH() {
@@ -198,11 +204,19 @@ define([
       var s = (e.clientX - o.left + scroll.left) / w;
       var v = 1 - (e.clientY - o.top + scroll.top) / w;
 
-      if (v > 1) v = 1;
-      else if (v < 0) v = 0;
+      if (v > 1) {
+        v = 1;
+      }
+      else if (v < 0) {
+        v = 0;
+      }
 
-      if (s > 1) s = 1;
-      else if (s < 0) s = 0;
+      if (s > 1) {
+        s = 1;
+      }
+      else if (s < 0) {
+        s = 0;
+      }
 
       _this.__color.v = v;
       _this.__color.s = s;
@@ -222,8 +236,12 @@ define([
       var scroll = getScroll(_this.__hue_field);
       var h = 1 - (e.clientY - o.top + scroll.top) / s;
 
-      if (h > 1) h = 1;
-      else if (h < 0) h = 0;
+      if (h > 1) {
+        h = 1;
+      }
+      else if (h < 0) {
+        h = 0;
+      }
 
       _this.__color.h = h * 360;
 
@@ -286,7 +304,7 @@ define([
 
           this.__temp.a = 1;
 
-          var flip = (this.__color.v < .5 || this.__color.s > .5) ? 255 : 0;
+          var flip = (this.__color.v < 0.5 || this.__color.s > 0.5) ? 255 : 0;
           var _flip = 255 - flip;
 
           common.extend(this.__field_knob.style, {
@@ -306,7 +324,9 @@ define([
           common.extend(this.__input.style, {
             backgroundColor: this.__input.value = this.__color.toString(),
             color: 'rgb(' + flip + ',' + flip + ',' + flip +')',
-            textShadow: this.__input_textShadow + 'rgba(' + _flip + ',' + _flip + ',' + _flip +',.7)'
+            textShadow: this.__input_textShadow.map(function (d) {
+              return d + ' rgba(' + _flip + ',' + _flip + ',' + _flip +',0.7)';
+            }).join(', ')
           });
 
           this.__input.disabled = this.getReadonly();

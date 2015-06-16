@@ -18,6 +18,8 @@ define([
 ],
 function(Controller, dom, common) {
 
+  'use strict';
+
   /**
    * @class Provides a select input to alter the property of an object, using a
    * list of accepted values.
@@ -31,7 +33,7 @@ function(Controller, dom, common) {
    *
    * @member dat.controllers
    */
-  var OptionController = function(object, property, options, params, options) {
+  var OptionController = function(object, property, params, options) {
 
     OptionController.superclass.call(this, object, property, 'option', options);
 
@@ -143,3 +145,4 @@ function(Controller, dom, common) {
   return OptionController;
 
 });
+

@@ -1,16 +1,4 @@
-/**
- * dat-gui JavaScript Controller Library
- * http://code.google.com/p/dat-gui
- *
- * Copyright 2011 Data Arts Team, Google Creative Lab
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- */
-
+false
 (function (root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
@@ -39,6 +27,9 @@
   dat.color = dat.color || {};
   
   dat.utils.css = (function () {
+  
+    'use strict';
+  
     return {
       load: function (url, doc) {
         doc = doc || document;
@@ -55,12 +46,15 @@
         injected.innerHTML = css;
         doc.getElementsByTagName('head')[0].appendChild(injected);
       }
-    }
+    };
+  
   })();
   
   
   dat.utils.common = (function () {
     
+    'use strict';
+  
     var ARR_EACH = Array.prototype.forEach;
     var ARR_SLICE = Array.prototype.slice;
   
@@ -78,9 +72,11 @@
         
         this.each(ARR_SLICE.call(arguments, 1), function(obj) {
           
-          for (var key in obj)
-            if (!this.isUndefined(obj[key])) 
+          for (var key in obj) {
+            if (!this.isUndefined(obj[key])) {
               target[key] = obj[key];
+            }
+          }
           
         }, this);
         
@@ -92,9 +88,11 @@
         
         this.each(ARR_SLICE.call(arguments, 1), function(obj) {
           
-          for (var key in obj)
-            if (this.isUndefined(target[key])) 
+          for (var key in obj) {
+            if (this.isUndefined(target[key])) {
               target[key] = obj[key];
+            }
+          }
           
         }, this);
         
@@ -104,18 +102,20 @@
       
       compose: function() {
         var toCall = ARR_SLICE.call(arguments);
-              return function() {
-                var args = ARR_SLICE.call(arguments);
-                for (var i = toCall.length -1; i >= 0; i--) {
-                  args = [toCall[i].apply(this, args)];
-                }
-                return args[0];
-              }
+        return function() {
+          var args = ARR_SLICE.call(arguments);
+          for (var i = toCall.length -1; i >= 0; i--) {
+            args = [toCall[i].apply(this, args)];
+          }
+          return args[0];
+        }
       },
       
       each: function(obj, itr, scope) {
   
-        if (!obj) return;
+        if (!obj) {
+          return;
+        }
   
         if (ARR_EACH && obj.forEach && obj.forEach === ARR_EACH) { 
           
@@ -123,15 +123,19 @@
           
         } else if (obj.length === obj.length + 0) { // Is number but not NaN
           
-          for (var key = 0, l = obj.length; key < l; key++)
-            if (key in obj && itr.call(scope, obj[key], key) === this.BREAK) 
+          for (var key = 0, l = obj.length; key < l; key++) {
+            if (key in obj && itr.call(scope, obj[key], key) === this.BREAK) {
               return;
+            }
+          }
               
         } else {
   
-          for (var key in obj) 
-            if (itr.call(scope, obj[key], key) === this.BREAK)
+          for (var objkey in obj) {
+            if (itr.call(scope, obj[objkey], objkey) === this.BREAK) {
               return;
+            }
+          }
               
         }
               
@@ -142,7 +146,9 @@
       },
       
       toArray: function(obj) {
-        if (obj.toArray) return obj.toArray();
+        if (obj.toArray) {
+          return obj.toArray();
+        }
         return ARR_SLICE.call(obj);
       },
   
@@ -167,11 +173,15 @@
       },
       
       isNumber: function(obj) {
-        return obj === obj+0;
+        return obj === +obj;
+      },
+      
+      isFiniteNumber: function(obj) {
+        return (obj === +obj) && isFinite(obj);
       },
       
       isString: function(obj) {
-        return obj === obj+'';
+        return typeof obj === 'string';
       },
       
       isBoolean: function(obj) {
@@ -188,6 +198,8 @@
   
   
   dat.controllers.Controller = (function (common) {
+  
+    'use strict';
   
     /**
      * @class An "abstract" class that represents a given property of an object.
@@ -338,11 +350,12 @@
   
     return Controller;
   
-  
   })(dat.utils.common);
   
   
   dat.dom.dom = (function (common) {
+  
+    'use strict';
   
     var EVENT_MAP = {
       'HTMLEvents': ['change'],
@@ -361,7 +374,9 @@
   
     function cssValueToPixels(val) {
   
-      if (val === '0' || common.isUndefined(val)) return 0;
+      if (val === '0' || common.isUndefined(val)) {
+        return 0;
+      }
   
       var match = val.match(CSS_VALUE_PIXELS);
   
@@ -388,7 +403,9 @@
        */
       makeSelectable: function(elem, selectable) {
   
-        if (elem === undefined || elem.style === undefined) return;
+        if (elem === undefined || elem.style === undefined) {
+          return;
+        }
   
         elem.onselectstart = selectable ? function() {
           return false;
@@ -409,8 +426,12 @@
        */
       makeFullscreen: function(elem, horizontal, vertical) {
   
-        if (common.isUndefined(horizontal)) horizontal = true;
-        if (common.isUndefined(vertical)) vertical = true;
+        if (common.isUndefined(horizontal)) {
+          horizontal = true;
+        }
+        if (common.isUndefined(vertical)) {
+          vertical = true;
+        }
   
         elem.style.position = 'absolute';
   
@@ -485,10 +506,12 @@
        */
       bind: function(elem, event, func, bool) {
         bool = bool || false;
-        if (elem.addEventListener)
+        if (elem.addEventListener) {
           elem.addEventListener(event, func, bool);
-        else if (elem.attachEvent)
+        }
+        else if (elem.attachEvent) {
           elem.attachEvent('on' + event, func);
+        }
         return dom;
       },
   
@@ -501,10 +524,12 @@
        */
       unbind: function(elem, event, func, bool) {
         bool = bool || false;
-        if (elem.removeEventListener)
+        if (elem.removeEventListener) {
           elem.removeEventListener(event, func, bool);
-        else if (elem.detachEvent)
+        }
+        else if (elem.detachEvent) {
           elem.detachEvent('on' + event, func);
+        }
         return dom;
       },
   
@@ -518,7 +543,7 @@
           elem.className = className;
         } else if (elem.className !== className) {
           var classes = elem.className.split(/ +/);
-          if (classes.indexOf(className) == -1) {
+          if (classes.indexOf(className) === -1) {
             classes.push(className);
             elem.className = classes.join(' ').replace(/^\s+/, '').replace(/\s+$/, '');
           }
@@ -533,18 +558,20 @@
        */
       removeClass: function(elem, className) {
         if (className) {
+          /* jshint -W035 */// jshint: ignore empty block
           if (elem.className === undefined) {
-            // elem.className = className;
+            // elem.className = undefined;
           } else if (elem.className === className) {
             elem.removeAttribute('class');
           } else {
             var classes = elem.className.split(/ +/);
             var index = classes.indexOf(className);
-            if (index != -1) {
+            if (index !== -1) {
               classes.splice(index, 1);
               elem.className = classes.join(' ');
             }
           }
+          /* jshint +W035 */
         } else {
           elem.className = undefined;
         }
@@ -567,7 +594,7 @@
             cssValueToPixels(style['border-right-width']) +
             cssValueToPixels(style['padding-left']) +
             cssValueToPixels(style['padding-right']) +
-            cssValueToPixels(style['width']);
+            cssValueToPixels(style.width);
       },
   
       /**
@@ -582,7 +609,7 @@
             cssValueToPixels(style['border-bottom-width']) +
             cssValueToPixels(style['padding-top']) +
             cssValueToPixels(style['padding-bottom']) +
-            cssValueToPixels(style['height']);
+            cssValueToPixels(style.height);
       },
   
       /**
@@ -595,7 +622,7 @@
           do {
             offset.left += elem.offsetLeft;
             offset.top += elem.offsetTop;
-          } while (elem = elem.offsetParent);
+          } while ((elem = elem.offsetParent));
         }
         return offset;
       },
@@ -618,6 +645,8 @@
   
   dat.controllers.OptionController = (function (Controller, dom, common) {
   
+    'use strict';
+  
     /**
      * @class Provides a select input to alter the property of an object, using a
      * list of accepted values.
@@ -631,7 +660,7 @@
      *
      * @member dat.controllers
      */
-    var OptionController = function(object, property, options, params, options) {
+    var OptionController = function(object, property, params, options) {
   
       OptionController.superclass.call(this, object, property, 'option', options);
   
@@ -749,6 +778,8 @@
   
   dat.controllers.NumberController = (function (Controller, common) {
   
+    'use strict';
+  
     /**
      * @class Represents a given property of an object that is a number.
      *
@@ -785,28 +816,21 @@
           // Hey Doug, check this out.
           this.__impliedStep = Math.pow(10, Math.floor(Math.log(Math.abs(this.initialValue))/Math.LN10))/10;
         }
-  
       } else {
-  
       	this.__impliedStep = this.__step;
-  
       }
   
       this.__precision = numDecimals(this.__impliedStep);
-  
-  
     };
   
     NumberController.superclass = Controller;
   
     common.extend(
-  
         NumberController.prototype,
         Controller.prototype,
   
         /** @lends dat.controllers.NumberController.prototype */
         {
-  
           setValue: function(v) {
   
             if (this.__min !== undefined && v < this.__min) {
@@ -815,7 +839,7 @@
               v = this.__max;
             }
   
-            if (this.__step !== undefined && v % this.__step != 0) {
+            if (this.__step !== undefined && v % this.__step !== 0) {
               v = Math.round(v / this.__step) * this.__step;
             }
   
@@ -863,9 +887,7 @@
             this.__precision = numDecimals(v);
             return this;
           }
-  
         }
-  
     );
   
     function numDecimals(x) {
@@ -878,12 +900,13 @@
     }
   
     return NumberController;
-  
   })(dat.controllers.Controller,
   dat.utils.common);
   
   
   dat.controllers.NumberControllerBox = (function (NumberController, dom, common) {
+  
+    'use strict';
   
     /**
      * @class Represents a given property of an object that is a number and
@@ -928,15 +951,18 @@
         // When pressing ENTER key, you can be as precise as you want.
         if (e.keyCode === 13) {
           _this.__truncationSuspended = true;
-          this.blur();
+          /* jshint validthis: true */
+          this.blur();                              
+          /* jshint validthis: false */
           _this.__truncationSuspended = false;
         }
-  
       });
   
       function onChange() {
         var attempted = parseFloat(_this.__input.value);
-        if (!common.isNaN(attempted)) _this.setValue(attempted);
+        if (!common.isNaN(attempted)) {
+          _this.setValue(attempted);
+        }
       }
   
       function onBlur() {
@@ -953,12 +979,10 @@
       }
   
       function onMouseDrag(e) {
-  
         var diff = prev_y - e.clientY;
         _this.setValue(_this.getValue() + diff * _this.__impliedStep);
   
         prev_y = e.clientY;
-  
       }
   
       function onMouseUp() {
@@ -975,20 +999,14 @@
     NumberControllerBox.superclass = NumberController;
   
     common.extend(
-  
         NumberControllerBox.prototype,
         NumberController.prototype,
-  
         {
-  
           updateDisplay: function() {
-  
             this.__input.value = this.__truncationSuspended ? this.getValue() : roundToDecimal(this.getValue(), this.__precision);
             return NumberControllerBox.superclass.prototype.updateDisplay.call(this);
           }
-  
         }
-  
     );
   
     function roundToDecimal(value, decimals) {
@@ -1004,6 +1022,8 @@
   
   
   dat.controllers.NumberControllerSlider = (function (NumberController, dom, css, common, styleSheet) {
+  
+    'use strict';
   
     /**
      * @class Represents a given property of an object that is a number, contains
@@ -1032,15 +1052,12 @@
       this.__background = document.createElement('div');
       this.__foreground = document.createElement('div');
       
-  
-  
       dom.bind(this.__background, 'mousedown', onMouseDown);
       
       dom.addClass(this.__background, 'slider');
       dom.addClass(this.__foreground, 'slider-fg');
   
       function onMouseDown(e) {
-  
         dom.bind(window, 'mousemove', onMouseDrag);
         dom.bind(window, 'mouseup', onMouseUp);
   
@@ -1048,18 +1065,16 @@
       }
   
       function onMouseDrag(e) {
-  
         e.preventDefault();
   
         var offset = dom.getOffset(_this.__background);
         var width = dom.getWidth(_this.__background);
         
         _this.setValue(
-        	map(e.clientX, offset.left, offset.left + width, _this.__min, _this.__max)
+          map(e.clientX, offset.left, offset.left + width, _this.__min, _this.__max)
         );
   
         return false;
-  
       }
   
       function onMouseUp() {
@@ -1087,22 +1102,15 @@
     };
   
     common.extend(
-  
         NumberControllerSlider.prototype,
         NumberController.prototype,
-  
         {
-  
           updateDisplay: function() {
-            var pct = (this.getValue() - this.__min)/(this.__max - this.__min);
-            this.__foreground.style.width = pct*100+'%';
+            var pct = (this.getValue() - this.__min) / (this.__max - this.__min);
+            this.__foreground.style.width = (pct * 100) + '%';
             return NumberControllerSlider.superclass.prototype.updateDisplay.call(this);
           }
-  
         }
-  
-  
-  
     );
   
   	function map(v, i1, i2, o1, o2) {
@@ -1110,7 +1118,6 @@
   	}
   
     return NumberControllerSlider;
-    
   })(dat.controllers.NumberController,
   dat.dom.dom,
   dat.utils.css,
@@ -1118,8 +1125,90 @@
   "/**\n * dat-gui JavaScript Controller Library\n * http://code.google.com/p/dat-gui\n *\n * Copyright 2011 Data Arts Team, Google Creative Lab\n *\n * Licensed under the Apache License, Version 2.0 (the \"License\");\n * you may not use this file except in compliance with the License.\n * You may obtain a copy of the License at\n *\n * http://www.apache.org/licenses/LICENSE-2.0\n */\n\n.slider {\n  box-shadow: inset 0 2px 4px rgba(0,0,0,0.15);\n  height: 1em;\n  border-radius: 1em;\n  background-color: #eee;\n  padding: 0 0.5em;\n  overflow: hidden;\n}\n\n.slider-fg {\n  padding: 1px 0 2px 0;\n  background-color: #aaa;\n  height: 1em;\n  margin-left: -0.5em;\n  padding-right: 0.5em;\n  border-radius: 1em 0 0 1em;\n}\n\n.slider-fg:after {\n  display: inline-block;\n  border-radius: 1em;\n  background-color: #fff;\n  border:  1px solid #aaa;\n  content: '';\n  float: right;\n  margin-right: -1em;\n  margin-top: -1px;\n  height: 0.9em;\n  width: 0.9em;\n}");
   
   
+  dat.controllers.StringController = (function (Controller, dom, common) {
+  
+    'use strict';
+  
+    /**
+     * @class Provides a text input to alter the string property of an object.
+     *
+     * @extends dat.controllers.Controller
+     *
+     * @param {Object} object The object to be manipulated
+     * @param {string} property The name of the property to be manipulated
+     *
+     * @member dat.controllers
+     */
+    var StringController = function(object, property, options) {
+  
+      StringController.superclass.call(this, object, property, 'string', options);
+  
+      var _this = this;
+  
+      this.__input = document.createElement('input');
+      this.__input.setAttribute('type', 'text');
+  
+      dom.bind(this.__input, 'keyup', onChange);
+      dom.bind(this.__input, 'change', onChange);
+      dom.bind(this.__input, 'blur', onBlur);
+      dom.bind(this.__input, 'keydown', function(e) {
+        if (e.keyCode === 13) {
+          /* jshint validthis: true */
+          this.blur(); 
+          /* jshint validthis: false */
+        }
+      });
+      
+      function onChange() {
+        _this.setValue(_this.__input.value);
+      }
+  
+      function onBlur() {
+        if (_this.__onFinishChange) {
+          _this.__onFinishChange.call(_this, _this.getValue());
+        }
+      }
+  
+      this.updateDisplay();
+  
+      this.domElement.appendChild(this.__input);
+  
+    };
+  
+    StringController.superclass = Controller;
+  
+    common.extend(
+  
+        StringController.prototype,
+        Controller.prototype,
+  
+        {
+  
+          updateDisplay: function() {
+            // Stops the caret from moving on account of:
+            // keyup -> setValue -> updateDisplay
+            if (!dom.isActive(this.__input)) {
+              this.__input.value = this.getValue();
+            }
+            this.__input.disabled = this.getReadonly();
+            return StringController.superclass.prototype.updateDisplay.call(this);
+          }
+  
+        }
+  
+    );
+  
+    return StringController;
+  
+  })(dat.controllers.Controller,
+  dat.dom.dom,
+  dat.utils.common);
+  
+  
   dat.controllers.FunctionController = (function (Controller, dom, common) {
   
+    'use strict';
+    
     /**
      * @class Provides a GUI interface to fire a specified method, a property of an object.
      *
@@ -1127,6 +1216,7 @@
      *
      * @param {Object} object The object to be manipulated
      * @param {string} property The name of the property to be manipulated
+     * @param {string} text The text displayed in the button which will invoke the specified method.
      *
      * @member dat.controllers
      */
@@ -1140,6 +1230,7 @@
       this.__button.innerHTML = text === undefined ? 'Fire' : text;
       dom.bind(this.__button, 'click', function(e) {
         e.preventDefault();
+        e.stopPropagation();
         _this.fire();
         return false;
       });
@@ -1179,6 +1270,8 @@
   
   
   dat.controllers.BooleanController = (function (Controller, dom, common) {
+  
+    'use strict';
   
     /**
      * @class Provides a checkbox input to alter the boolean property of an object.
@@ -1247,7 +1340,6 @@
   
           }
   
-  
         }
   
     );
@@ -1260,7 +1352,8 @@
   
   
   dat.color.toString = (function (common) {
-    "use strict";
+  
+    'use strict';
   
     return function(color) {
   
@@ -1285,7 +1378,8 @@
   
   
   dat.color.interpret = (function (toString, common) {
-    "use strict";
+  
+    'use strict';
   
     var result, toReturn;
   
@@ -1347,7 +1441,7 @@
                     '0x' +
                         test[1].toString() + test[1].toString() +
                         test[2].toString() + test[2].toString() +
-                        test[3].toString() + test[3].toString())
+                        test[3].toString() + test[3].toString(), 16)
               };
   
             },
@@ -1367,7 +1461,7 @@
   
               return {
                 space: 'HEX',
-                hex: parseInt('0x' + test[1].toString())
+                hex: parseInt('0x' + test[1].toString(), 16)
               };
   
             },
@@ -1381,8 +1475,8 @@
             read: function(original) {
   
               var test = original.match(/^rgb\(\s*(.+)\s*,\s*(.+)\s*,\s*(.+)\s*\)/);
-              if (test === null) {
-                return false;
+              if (test === null) { 
+                return false; 
               }
   
               return {
@@ -1462,6 +1556,7 @@
               if (original.length !== 3) {
                 return false;
               }
+  
               return {
                 space: 'RGB',
                 r: original[0],
@@ -1481,6 +1576,7 @@
               if (original.length !== 4) {
                 return false;
               }
+  
               return {
                 space: 'RGB',
                 r: original[0],
@@ -1614,17 +1710,20 @@
   
       }
   
-  
     ];
   
     return interpret;
-  
   
   })(dat.color.toString,
   dat.utils.common);
   
   
-  dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, controllerFactory, Controller, BooleanController, FunctionController, NumberControllerBox, NumberControllerSlider, OptionController, ColorController, requestAnimationFrame, CenteredDiv, dom, common) {
+  dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, controllerFactory, Controller, BooleanController, FunctionController, NumberController, NumberControllerBox, NumberControllerSlider, OptionController, StringController, ImageController, ColorController, requestAnimationFrame, CenteredDiv, dom, common) {
+  
+    'use strict';
+  
+    //var ARR_EACH = Array.prototype.forEach;
+    var ARR_SLICE = Array.prototype.slice;
   
     css.inject(styleSheet);
   
@@ -1640,7 +1739,7 @@
   
     var SUPPORTS_LOCAL_STORAGE = (function() {
       try {
-        return 'localStorage' in window && window['localStorage'] !== null;
+        return 'localStorage' in window && window.localStorage !== null;
       } catch (e) {
         return false;
       }
@@ -1678,6 +1777,17 @@
     var GUI = function(params) {
   
       var _this = this;
+  
+      this.__typeControllers = {
+        color: ColorController,
+        option: OptionController,
+        numberSlider: NumberControllerSlider,
+        numberBox: NumberControllerBox,
+        number: NumberController,
+        string: StringController,
+        'function': FunctionController,
+        'boolean': BooleanController
+      };
   
       /**
        * Outermost DOM Element
@@ -1742,7 +1852,9 @@
       if (!common.isUndefined(params.load)) {
   
         // Explicit preset
-        if (params.preset) params.load.preset = params.preset;
+        if (params.preset) {
+          params.load.preset = params.preset;
+        }
   
       } else {
   
@@ -1773,154 +1885,159 @@
   
       Object.defineProperties(this,
   
-          /** @lends dat.gui.GUI.prototype */
-          {
+        /** @lends dat.gui.GUI.prototype */
+        {
   
-            /**
-             * The parent <code>GUI</code>
-             * @type dat.gui.GUI
-             */
-            parent: {
-              get: function() {
-                return params.parent;
+          /**
+           * The parent <code>GUI</code>
+           * @type dat.gui.GUI
+           */
+          parent: {
+            get: function() {
+              return params.parent;
+            }
+          },
+  
+          scrollable: {
+            get: function() {
+              return params.scrollable;
+            }
+          },
+  
+          /**
+           * Handles <code>GUI</code>'s element placement for you
+           * @type Boolean
+           */
+          autoPlace: {
+            get: function() {
+              return params.autoPlace;
+            }
+          },
+  
+          /**
+           * The identifier for a set of saved values
+           * @type String
+           */
+          preset: {
+  
+            get: function() {
+              if (_this.parent) {
+                return _this.getRoot().preset;
+              } else {
+                return params.load.preset;
               }
             },
   
-            scrollable: {
-              get: function() {
-                return params.scrollable;
+            set: function(v) {
+              if (_this.parent) {
+                _this.getRoot().preset = v;
+              } else {
+                params.load.preset = v;
               }
-            },
-  
-            /**
-             * Handles <code>GUI</code>'s element placement for you
-             * @type Boolean
-             */
-            autoPlace: {
-              get: function() {
-                return params.autoPlace;
-              }
-            },
-  
-            /**
-             * The identifier for a set of saved values
-             * @type String
-             */
-            preset: {
-  
-              get: function() {
-                if (_this.parent) {
-                  return _this.getRoot().preset;
-                } else {
-                  return params.load.preset;
-                }
-              },
-  
-              set: function(v) {
-                if (_this.parent) {
-                  _this.getRoot().preset = v;
-                } else {
-                  params.load.preset = v;
-                }
-                setPresetSelectIndex(this);
-                _this.revert();
-              }
-  
-            },
-  
-            /**
-             * The width of <code>GUI</code> element
-             * @type Number
-             */
-            width: {
-              get: function() {
-                return params.width;
-              },
-              set: function(v) {
-                params.width = v;
-                setWidth(_this, v);
-              }
-            },
-  
-            /**
-             * The name of <code>GUI</code>. Used for folders. i.e
-             * a folder's name
-             * @type String
-             */
-            name: {
-              get: function() {
-                return params.name;
-              },
-              set: function(v) {
-                // TODO Check for collisions among sibling folders
-                params.name = v;
-                if (title_row_name) {
-                  title_row_name.innerHTML = params.name;
-                }
-              }
-            },
-  
-            /**
-             * Whether the <code>GUI</code> is collapsed or not
-             * @type Boolean
-             */
-            closed: {
-              get: function() {
-                return params.closed;
-              },
-              set: function(v) {
-                params.closed = v;
-                if (params.closed) {
-                  dom.addClass(_this.__ul, GUI.CLASS_CLOSED);
-                } else {
-                  dom.removeClass(_this.__ul, GUI.CLASS_CLOSED);
-                }
-                // For browsers that aren't going to respect the CSS transition,
-                // Lets just check our height against the window height right off
-                // the bat.
-                this.onResize();
-  
-                if (_this.__closeButton) {
-                  _this.__closeButton.innerHTML = v ? GUI.TEXT_OPEN : GUI.TEXT_CLOSED;
-                }
-              }
-            },
-  
-            /**
-             * Contains all presets
-             * @type Object
-             */
-            load: {
-              get: function() {
-                return params.load;
-              }
-            },
-  
-            /**
-             * Determines whether or not to use <a href="https://developer.mozilla.org/en/DOM/Storage#localStorage">localStorage</a> as the means for
-             * <code>remember</code>ing
-             * @type Boolean
-             */
-            useLocalStorage: {
-  
-              get: function() {
-                return use_local_storage;
-              },
-              set: function(bool) {
-                if (SUPPORTS_LOCAL_STORAGE) {
-                  use_local_storage = bool;
-                  if (bool) {
-                    dom.bind(window, 'unload', saveToLocalStorage);
-                  } else {
-                    dom.unbind(window, 'unload', saveToLocalStorage);
-                  }
-                  localStorage.setItem(getLocalStorageHash(_this, 'isLocal'), bool);
-                }
-              }
-  
+              setPresetSelectIndex(_this);
+              _this.revert();
+              return _this;
             }
   
-          });
+          },
+  
+          /**
+           * The width of <code>GUI</code> element
+           * @type Number
+           */
+          width: {
+            get: function() {
+              return params.width;
+            },
+            set: function(v) {
+              params.width = v;
+              setWidth(_this, v);
+              return _this;
+            }
+          },
+  
+          /**
+           * The name of <code>GUI</code>. Used for folders. i.e
+           * a folder's name
+           * @type String
+           */
+          name: {
+            get: function() {
+              return params.name;
+            },
+            set: function(v) {
+              // TODO Check for collisions among sibling folders
+              params.name = v;
+              if (title_row_name) {
+                title_row_name.innerHTML = params.name;
+              }
+              return _this;
+            }
+          },
+  
+          /**
+           * Whether the <code>GUI</code> is collapsed or not
+           * @type Boolean
+           */
+          closed: {
+            get: function() {
+              return params.closed;
+            },
+            set: function(v) {
+              params.closed = v;
+              if (params.closed) {
+                dom.addClass(_this.__ul, GUI.CLASS_CLOSED);
+              } else {
+                dom.removeClass(_this.__ul, GUI.CLASS_CLOSED);
+              }
+              // For browsers that aren't going to respect the CSS transition,
+              // Lets just check our height against the window height right off
+              // the bat.
+              _this.onResize();
+  
+              if (_this.__closeButton) {
+                _this.__closeButton.innerHTML = v ? GUI.TEXT_OPEN : GUI.TEXT_CLOSED;
+              }
+              return _this;
+            }
+          },
+  
+          /**
+           * Contains all presets
+           * @type Object
+           */
+          load: {
+            get: function() {
+              return params.load;
+            }
+          },
+  
+          /**
+           * Determines whether or not to use <a href="https://developer.mozilla.org/en/DOM/Storage#localStorage">localStorage</a> as the means for
+           * <code>remember</code>ing
+           * @type Boolean
+           */
+          useLocalStorage: {
+  
+            get: function() {
+              return use_local_storage;
+            },
+            set: function(bool) {
+              if (SUPPORTS_LOCAL_STORAGE) {
+                use_local_storage = bool;
+                if (bool) {
+                  dom.bind(window, 'unload', saveToLocalStorage);
+                } else {
+                  dom.unbind(window, 'unload', saveToLocalStorage);
+                }
+                localStorage.setItem(getLocalStorageHash(_this, 'isLocal'), bool);
+              }
+              return _this;
+            }
+  
+          }
+  
+        });
   
       // Are we a root level GUI?
       if (common.isUndefined(params.parent)) {
@@ -1935,7 +2052,7 @@
   
           if (use_local_storage) {
   
-            _this.useLocalStorage = true;
+            this.useLocalStorage = true;
   
             var saved_gui = localStorage.getItem(getLocalStorageHash(this, 'gui'));
   
@@ -1956,9 +2073,7 @@
   
           _this.closed = !_this.closed;
   
-  
         });
-  
   
         // Oh, you're a nested GUI!
       } else {
@@ -1970,7 +2085,7 @@
         var title_row_name = document.createTextNode(params.name);
         dom.addClass(title_row_name, 'controller-name');
   
-        var title_row = addRow(_this, title_row_name);
+        var title_row = addRow(this, title_row_name);
   
         var on_click_title = function(e) {
           e.preventDefault();
@@ -2009,16 +2124,17 @@
   
         }
   
-  
         // Make it not elastic.
-        if (!this.parent) setWidth(_this, params.width);
+        if (!this.parent) {
+          setWidth(this, params.width);
+        }
   
       }
   
-      dom.bind(window, 'resize', function() { _this.onResize() });
+      dom.bind(window, 'resize', function() { _this.onResize(); });
       dom.bind(this.__ul, 'webkitTransitionEnd', function() { _this.onResize(); });
-      dom.bind(this.__ul, 'transitionend', function() { _this.onResize() });
-      dom.bind(this.__ul, 'oTransitionEnd', function() { _this.onResize() });
+      dom.bind(this.__ul, 'transitionend', function() { _this.onResize(); });
+      dom.bind(this.__ul, 'oTransitionEnd', function() { _this.onResize(); });
       this.onResize();
   
   
@@ -2030,23 +2146,25 @@
         if (SUPPORTS_LOCAL_STORAGE && localStorage.getItem(getLocalStorageHash(_this, 'isLocal')) === 'true') {
           localStorage.setItem(getLocalStorageHash(_this, 'gui'), JSON.stringify(_this.getSaveObject()));
         }
-      }
+      };
   
       // expose this method publicly
-      this.saveToLocalStorageIfPossible = saveToLocalStorage;
+      this.saveToLocalStorageIfPossible = function () {
+        saveToLocalStorage();
+        return _this;
+      };
   
-      var root = _this.getRoot();
       function resetWidth() {
-  	      var root = _this.getRoot();
-  	      root.width += 1;
-  	      common.defer(function() {
-  	        root.width -= 1;
-  	      });
-  	    }
+        var root = _this.getRoot();
+        root.width += 1;
+        common.defer(function() {
+          root.width -= 1;
+        });
+      }
   
-  	    if (!params.parent) {
-  	      resetWidth();
-  	    }
+      if (!params.parent) {
+        resetWidth();
+      }
   
     };
   
@@ -2075,7 +2193,7 @@
     dom.bind(window, 'keydown', function(e) {
   
       if (document.activeElement.type !== 'text' &&
-          (e.which === HIDE_KEY_CODE || e.keyCode == HIDE_KEY_CODE)) {
+          (e.which === HIDE_KEY_CODE || e.keyCode === HIDE_KEY_CODE)) {
         GUI.toggleHide();
       }
   
@@ -2083,313 +2201,359 @@
   
     common.extend(
   
-        GUI.prototype,
+      GUI.prototype,
   
-        /** @lends dat.gui.GUI */
-        {
+      /** @lends dat.gui.GUI */
+      {
+        /**
+         * @param controllerName
+         * @param controllerTemplate the template controller object which will be used for 
+         */
+        defineController: function(controllerName, controllerTemplate) {
+          this.__typeControllers[controllerName] = controllerTemplate;
+        },
   
-          /**
-           * @param object
-           * @param property
-           * @returns {dat.controllers.Controller} The new controller that was added.
-           * @instance
-           */
-          add: function(object, property) {
+        /**
+         * @param controllerName
+         * @returns {dat.controllers.Controller} The controller registered for the given `controllerName`. 
+         * Return boolean FALSE when no controller has been registered for the given name.
+         */
+        findController: function(controllerName) {
+          return this.__typeControllers[controllerName] || false;
+        },
   
-            return add(
-                this,
-                object,
-                property,
-                {
-                  factoryArgs: Array.prototype.slice.call(arguments, 2)
-                }
-            );
+        /**
+         * @param object
+         * @param property
+         * @returns {dat.controllers.Controller} The new controller that was added.
+         * @instance
+         */
+        add: function(object, property /* ...args */) {
   
-          },
-  
-          /**
-           * @param object
-           * @param property
-           * @returns {dat.controllers.ColorController} The new controller that was added.
-           * @instance
-           */
-          addColor: function(object, property) {
-  
-            return add(
-                this,
-                object,
-                property,
-                {
-                  color: true
-                }
-            );
-  
-          },
-  
-          /**
-           * @param controller
-           * @instance
-           */
-          remove: function(controller) {
-  
-            // TODO listening?
-            this.__ul.removeChild(controller.__li);
-            this.__controllers.splice(this.__controllers.indexOf(controller), 1);
-            var _this = this;
-            common.defer(function() {
-              _this.onResize();
-            });
-  
-          },
-  
-          destroy: function() {
-  
-            if (this.autoPlace) {
-              auto_place_container.removeChild(this.domElement);
-            }
-  
-          },
-  
-          /**
-           * @param name
-           * @returns {dat.gui.GUI} The new folder.
-           * @throws {Error} if this GUI already has a folder by the specified
-           * name
-           * @instance
-           */
-          addFolder: function(name) {
-  
-            // We have to prevent collisions on names in order to have a key
-            // by which to remember saved values
-            if (this.__folders[name] !== undefined) {
-              throw new Error('You already have a folder in this GUI by the' +
-                  ' name "' + name + '"');
-            }
-  
-            var new_gui_params = { name: name, parent: this };
-  
-            // We need to pass down the autoPlace trait so that we can
-            // attach event listeners to open/close folder actions to
-            // ensure that a scrollbar appears if the window is too short.
-            new_gui_params.autoPlace = this.autoPlace;
-  
-            // Do we have saved appearance data for this folder?
-  
-            if (this.load && // Anything loaded?
-                this.load.folders && // Was my parent a dead-end?
-                this.load.folders[name]) { // Did daddy remember me?
-  
-              // Start me closed if I was closed
-              new_gui_params.closed = this.load.folders[name].closed;
-  
-              // Pass down the loaded data
-              new_gui_params.load = this.load.folders[name];
-  
-            }
-  
-            var gui = new GUI(new_gui_params);
-            this.__folders[name] = gui;
-  
-            var li = addRow(this, gui.domElement);
-            dom.addClass(li, 'folder');
-            return gui;
-  
-          },
-  
-          open: function() {
-            this.closed = false;
-          },
-  
-          close: function() {
-            this.closed = true;
-          },
-  
-          onResize: function() {
-  
-            var root = this.getRoot();
-  
-            if (root.scrollable) {
-  
-              var top = dom.getOffset(root.__ul).top;
-              var h = 0;
-  
-              common.each(root.__ul.childNodes, function(node) {
-                if (! (root.autoPlace && node === root.__save_row))
-                  h += dom.getHeight(node);
-              });
-  
-              if (window.innerHeight - top - CLOSE_BUTTON_HEIGHT < h) {
-                dom.addClass(root.domElement, GUI.CLASS_TOO_TALL);
-                root.__ul.style.height = window.innerHeight - top - CLOSE_BUTTON_HEIGHT + 'px';
-              } else {
-                dom.removeClass(root.domElement, GUI.CLASS_TOO_TALL);
-                root.__ul.style.height = 'auto';
+          return add(
+              this,
+              object,
+              property,
+              {
+                factoryArgs: ARR_SLICE.call(arguments, 2)
               }
+          );
   
-            }
+        },
   
-            if (root.__resize_handle) {
-              common.defer(function() {
-                root.__resize_handle.style.height = root.__ul.offsetHeight + 'px';
-              });
-            }
+        /**
+         * @param object
+         * @param property
+         * @returns {dat.controllers.ColorController} The new controller that was added.
+         * @instance
+         */
+        addColor: function(object, property) {
   
-            if (root.__closeButton) {
-              root.__closeButton.style.width = root.width + 'px';
-            }
-  
-          },
-  
-          /**
-           * Mark objects for saving. The order of these objects cannot change as
-           * the GUI grows. When remembering new objects, append them to the end
-           * of the list.
-           *
-           * @param {Object...} objects
-           * @throws {Error} if not called on a top level GUI.
-           * @instance
-           */
-          remember: function() {
-  
-            if (common.isUndefined(SAVE_DIALOGUE)) {
-              SAVE_DIALOGUE = new CenteredDiv();
-              SAVE_DIALOGUE.domElement.innerHTML = saveDialogueContents;
-            }
-  
-            if (this.parent) {
-              throw new Error("You can only call remember on a top level GUI.");
-            }
-  
-            var _this = this;
-  
-            common.each(Array.prototype.slice.call(arguments), function(object) {
-              if (_this.__rememberedObjects.length == 0) {
-                addSaveMenu(_this);
+          return add(
+              this,
+              object,
+              property,
+              {
+                controller: 'color'
               }
-              if (_this.__rememberedObjects.indexOf(object) == -1) {
-                _this.__rememberedObjects.push(object);
+          );
+  
+        },
+  
+        /**
+         * @param object
+         * @param property
+         * @returns {dat.controllers.Controller} The new controller that was added.
+         * @instance
+         */
+        addAs: function(object, property, controller /* ...args */) {
+  
+          return add(
+              this,
+              object,
+              property,
+              {
+                controller: controller,
+                factoryArgs: ARR_SLICE.call(arguments, 3)
               }
-            });
+          );
   
-            if (this.autoPlace) {
-              // Set save row width
-              setWidth(this, this.width);
-            }
+        },
   
-          },
+        /**
+         * @param controller
+         * @instance
+         */
+        remove: function(controller) {
   
-          /**
-           * @returns {dat.gui.GUI} the topmost parent GUI of a nested GUI.
-           * @instance
-           */
-          getRoot: function() {
-            var gui = this;
-            while (gui.parent) {
-              gui = gui.parent;
-            }
-            return gui;
-          },
+          // TODO listening?
+          this.__ul.removeChild(controller.__li);
+          this.__controllers.splice(this.__controllers.indexOf(controller), 1);
+          var _this = this;
+          common.defer(function() {
+            _this.onResize();
+          });
+          return this;
   
-          /**
-           * @returns {Object} a JSON object representing the current state of
-           * this GUI as well as its remembered properties.
-           * @instance
-           */
-          getSaveObject: function() {
+        },
   
-            var toReturn = this.load;
+        destroy: function() {
   
-            toReturn.closed = this.closed;
+          if (this.autoPlace) {
+            auto_place_container.removeChild(this.domElement);
+          }
   
-            // Am I remembering any values?
-            if (this.__rememberedObjects.length > 0) {
+        },
   
-              toReturn.preset = this.preset;
+        /**
+         * @param name
+         * @returns {dat.gui.GUI} The new folder.
+         * @throws {Error} if this GUI already has a folder by the specified
+         * name
+         * @instance
+         */
+        addFolder: function(name) {
   
-              if (!toReturn.remembered) {
-                toReturn.remembered = {};
-              }
+          // We have to prevent collisions on names in order to have a key
+          // by which to remember saved values
+          if (this.__folders[name] !== undefined) {
+            throw new Error('You already have a folder in this GUI by the' +
+                ' name "' + name + '"');
+          }
   
-              toReturn.remembered[this.preset] = getCurrentPreset(this);
+          var new_gui_params = { name: name, parent: this };
   
-            }
+          // We need to pass down the autoPlace trait so that we can
+          // attach event listeners to open/close folder actions to
+          // ensure that a scrollbar appears if the window is too short.
+          new_gui_params.autoPlace = this.autoPlace;
   
-            toReturn.folders = {};
-            common.each(this.__folders, function(element, key) {
-              toReturn.folders[key] = element.getSaveObject();
-            });
+          // Do we have saved appearance data for this folder?
   
-            return toReturn;
+          if (this.load && // Anything loaded?
+              this.load.folders && // Was my parent a dead-end?
+              this.load.folders[name]) { // Did daddy remember me?
   
-          },
+            // Start me closed if I was closed
+            new_gui_params.closed = this.load.folders[name].closed;
   
-          save: function() {
-  
-            if (!this.load.remembered) {
-              this.load.remembered = {};
-            }
-  
-            this.load.remembered[this.preset] = getCurrentPreset(this);
-            markPresetModified(this, false);
-            this.saveToLocalStorageIfPossible();
-  
-          },
-  
-          saveAs: function(presetName) {
-  
-            if (!this.load.remembered) {
-  
-              // Retain default values upon first save
-              this.load.remembered = {};
-              this.load.remembered[DEFAULT_DEFAULT_PRESET_NAME] = getCurrentPreset(this, true);
-  
-            }
-  
-            this.load.remembered[presetName] = getCurrentPreset(this);
-            this.preset = presetName;
-            addPresetOption(this, presetName, true);
-            this.saveToLocalStorageIfPossible();
-  
-          },
-  
-          revert: function(gui) {
-  
-            common.each(this.__controllers, function(controller) {
-              // Make revert work on Default.
-              if (!this.getRoot().load.remembered) {
-                controller.setValue(controller.initialValue);
-              } else {
-                recallSavedValue(gui || this.getRoot(), controller);
-              }
-            }, this);
-  
-            common.each(this.__folders, function(folder) {
-              folder.revert(folder);
-            });
-  
-            if (!gui) {
-              markPresetModified(this.getRoot(), false);
-            }
-  
-  
-          },
-  
-          listen: function(controller) {
-  
-            var init = this.__listening.length == 0;
-            this.__listening.push(controller);
-            if (init) updateDisplays(this.__listening);
+            // Pass down the loaded data
+            new_gui_params.load = this.load.folders[name];
   
           }
   
+          var gui = new GUI(new_gui_params);
+          this.__folders[name] = gui;
+  
+          var li = addRow(this, gui.domElement);
+          dom.addClass(li, 'folder');
+          return gui;
+  
+        },
+  
+        open: function() {
+          this.closed = false;
+          return this;
+        },
+  
+        close: function() {
+          this.closed = true;
+          return this;
+        },
+  
+        onResize: function() {
+  
+          var root = this.getRoot();
+  
+          if (root.scrollable) {
+  
+            var top = dom.getOffset(root.__ul).top;
+            var h = 0;
+  
+            common.each(root.__ul.childNodes, function(node) {
+              if (! (root.autoPlace && node === root.__save_row)) {
+                h += dom.getHeight(node);
+              }
+            });
+  
+            if (window.innerHeight - top - CLOSE_BUTTON_HEIGHT < h) {
+              dom.addClass(root.domElement, GUI.CLASS_TOO_TALL);
+              root.__ul.style.height = window.innerHeight - top - CLOSE_BUTTON_HEIGHT + 'px';
+            } else {
+              dom.removeClass(root.domElement, GUI.CLASS_TOO_TALL);
+              root.__ul.style.height = 'auto';
+            }
+  
+          }
+  
+          if (root.__resize_handle) {
+            common.defer(function() {
+              root.__resize_handle.style.height = root.__ul.offsetHeight + 'px';
+            });
+          }
+  
+          if (root.__closeButton) {
+            root.__closeButton.style.width = root.width + 'px';
+          }
+  
+        },
+  
+        /**
+         * Mark objects for saving. The order of these objects cannot change as
+         * the GUI grows. When remembering new objects, append them to the end
+         * of the list.
+         *
+         * @param {Object...} objects
+         * @throws {Error} if not called on a top level GUI.
+         * @instance
+         */
+        remember: function(/*...args*/) {
+  
+          if (common.isUndefined(SAVE_DIALOGUE)) {
+            SAVE_DIALOGUE = new CenteredDiv();
+            SAVE_DIALOGUE.domElement.innerHTML = saveDialogueContents;
+          }
+  
+          if (this.parent) {
+            throw new Error('You can only call remember on a top level GUI.');
+          }
+  
+          var _this = this;
+  
+          common.each(ARR_SLICE.call(arguments), function(object) {
+            if (_this.__rememberedObjects.length === 0) {
+              addSaveMenu(_this);
+            }
+            if (_this.__rememberedObjects.indexOf(object) === -1) {
+              _this.__rememberedObjects.push(object);
+            }
+          });
+  
+          if (this.autoPlace) {
+            // Set save row width
+            setWidth(this, this.width);
+          }
+          return this;
+  
+        },
+  
+        /**
+         * @returns {dat.gui.GUI} the topmost parent GUI of a nested GUI.
+         * @instance
+         */
+        getRoot: function() {
+          var gui = this;
+          while (gui.parent) {
+            gui = gui.parent;
+          }
+          return gui;
+        },
+  
+        /**
+         * @returns {Object} a JSON object representing the current state of
+         * this GUI as well as its remembered properties.
+         * @instance
+         */
+        getSaveObject: function() {
+  
+          var toReturn = this.load;
+  
+          toReturn.closed = this.closed;
+  
+          // Am I remembering any values?
+          if (this.__rememberedObjects.length > 0) {
+  
+            toReturn.preset = this.preset;
+  
+            if (!toReturn.remembered) {
+              toReturn.remembered = {};
+            }
+  
+            toReturn.remembered[this.preset] = getCurrentPreset(this);
+  
+          }
+  
+          toReturn.folders = {};
+          common.each(this.__folders, function(element, key) {
+            toReturn.folders[key] = element.getSaveObject();
+          });
+  
+          return toReturn;
+  
+        },
+  
+        save: function() {
+  
+          if (!this.load.remembered) {
+            this.load.remembered = {};
+          }
+  
+          this.load.remembered[this.preset] = getCurrentPreset(this);
+          markPresetModified(this, false);
+          this.saveToLocalStorageIfPossible();
+          return this;
+  
+        },
+  
+        saveAs: function(presetName) {
+  
+          if (!this.load.remembered) {
+  
+            // Retain default values upon first save
+            this.load.remembered = {};
+            this.load.remembered[DEFAULT_DEFAULT_PRESET_NAME] = getCurrentPreset(this, true);
+  
+          }
+  
+          this.load.remembered[presetName] = getCurrentPreset(this);
+          this.preset = presetName;
+          addPresetOption(this, presetName, true);
+          this.saveToLocalStorageIfPossible();
+          return this;
+  
+        },
+  
+        revert: function(gui) {
+  
+          common.each(this.__controllers, function(controller) {
+            // Make revert work on Default.
+            if (!this.getRoot().load.remembered) {
+              controller.setValue(controller.initialValue);
+            } else {
+              recallSavedValue(gui || this.getRoot(), controller);
+            }
+          }, this);
+  
+          common.each(this.__folders, function(folder) {
+            folder.revert(folder);
+          });
+  
+          if (!gui) {
+            markPresetModified(this.getRoot(), false);
+          }
+          return this;
+  
+        },
+  
+        listen: function(controller) {
+  
+          var init = this.__listening.length === 0;
+          this.__listening.push(controller);
+          if (init) {
+            updateDisplays(this.__listening);
+          }
+          return this;
+  
         }
+  
+      }
   
     );
   
     function add(gui, object, property, params) {
   
       if (object[property] === undefined) {
-        throw new Error("Object " + object + " has no property \"" + property + "\"");
+        throw new Error('Object ' + object + ' has no property "' + property + '"');
       }
   
       var controller;
@@ -2447,7 +2611,9 @@
      */
     function addRow(gui, dom, liBefore) {
       var li = document.createElement('li');
-      if (dom) li.appendChild(dom);
+      if (dom) {
+        li.appendChild(dom);
+      }
       if (liBefore) {
         gui.__ul.insertBefore(li, liBefore);
       } else {
@@ -2466,8 +2632,10 @@
   
         options: function(options) {
   
+          var next_sibling;
+  
           if (arguments.length > 1) {
-            var next_sibling = controller.__li.nextElementSibling;
+            next_sibling = controller.__li.nextElementSibling;
             controller.remove();
   
             return add(
@@ -2483,7 +2651,7 @@
           }
   
           if (common.isArray(options) || common.isObject(options)) {
-            var next_sibling = controller.__li.nextElementSibling;
+            next_sibling = controller.__li.nextElementSibling;
             controller.remove();
   
             return add(
@@ -2496,7 +2664,7 @@
                 }
             );
   
-          }
+          }           
   
         },
   
@@ -2527,7 +2695,7 @@
           var pc = controller[method];
           var pb = box[method];
           controller[method] = box[method] = function() {
-            var args = Array.prototype.slice.call(arguments);
+            var args = ARR_SLICE.call(arguments);
             pc.apply(controller, args);
             return pb.apply(box, args);
           }
@@ -2540,10 +2708,8 @@
       else if (controller instanceof NumberControllerBox) {
   
         var r = function(returned) {
-  
           // Have we defined both boundaries?
           if (common.isNumber(controller.__min) && common.isNumber(controller.__max)) {
-  
             // Well, then lets just replace this with a slider.
             controller.remove();
             return add(
@@ -2554,11 +2720,9 @@
                   before: controller.__li.nextElementSibling,
                   factoryArgs: [controller.__min, controller.__max, controller.__step]
                 });
-  
           }
   
           return returned;
-  
         };
   
         controller.min = common.compose(r, controller.min);
@@ -2622,7 +2786,7 @@
       var matched_index = root.__rememberedObjects.indexOf(controller.object);
   
       // Why yes, it does!
-      if (matched_index != -1) {
+      if (matched_index !== -1) {
   
         // Let me fetch a map of controllers for thcommon.isObject.
         var controller_map =
@@ -2632,8 +2796,7 @@
         // object. Lets make the map fresh.
         if (controller_map === undefined) {
           controller_map = {};
-          root.__rememberedObjectIndecesToControllers[matched_index] =
-              controller_map;
+          root.__rememberedObjectIndecesToControllers[matched_index] = controller_map;
         }
   
         // Keep track of this controller
@@ -2727,7 +2890,7 @@
       if (gui.load && gui.load.remembered) {
   
         common.each(gui.load.remembered, function(value, key) {
-          addPresetOption(gui, key, key == gui.preset);
+          addPresetOption(gui, key, key === gui.preset);
         });
   
       } else {
@@ -2751,6 +2914,10 @@
       div.appendChild(button2);
       div.appendChild(button3);
   
+      function showHideExplain() {
+        explain.style.display = gui.useLocalStorage ? 'block' : 'none';
+      }
+  
       if (SUPPORTS_LOCAL_STORAGE) {
   
         var saveLocally = document.getElementById('dg-save-locally');
@@ -2762,10 +2929,6 @@
   
         if (localStorage.getItem(getLocalStorageHash(gui, 'isLocal')) === 'true') {
           localStorageCheckBox.setAttribute('checked', 'checked');
-        }
-  
-        function showHideExplain() {
-          explain.style.display = gui.useLocalStorage ? 'block' : 'none';
         }
   
         showHideExplain();
@@ -2781,7 +2944,7 @@
       var newConstructorTextArea = document.getElementById('dg-new-constructor');
   
       dom.bind(newConstructorTextArea, 'keydown', function(e) {
-        if (e.metaKey && (e.which === 67 || e.keyCode == 67)) {
+        if (e.metaKey && (e.which === 67 || e.keyCode === 67)) {
           SAVE_DIALOGUE.hide();
         }
       });
@@ -2799,7 +2962,9 @@
   
       dom.bind(button2, 'click', function() {
         var presetName = prompt('Enter a new preset name.');
-        if (presetName) gui.saveAs(presetName);
+        if (presetName) {
+          gui.saveAs(presetName);
+        }
       });
   
       dom.bind(button3, 'click', function() {
@@ -2874,7 +3039,8 @@
       // set the width manually if we want it to bleed to the edge
       if (gui.__save_row && gui.autoPlace) {
         gui.__save_row.style.width = w + 'px';
-      }if (gui.__closeButton) {
+      }
+      if (gui.__closeButton) {
         gui.__closeButton.style.width = w + 'px';
       }
     }
@@ -2918,7 +3084,7 @@
   
     function setPresetSelectIndex(gui) {
       for (var index = 0; index < gui.__preset_select.length; index++) {
-        if (gui.__preset_select[index].value == gui.preset) {
+        if (gui.__preset_select[index].value === gui.preset) {
           gui.__preset_select.selectedIndex = index;
         }
       }
@@ -2928,36 +3094,32 @@
       var opt = gui.__preset_select[gui.__preset_select.selectedIndex];
   //    console.log('mark', modified, opt);
       if (modified) {
-        opt.innerHTML = opt.value + "*";
+        opt.innerHTML = opt.value + '*';
       } else {
         opt.innerHTML = opt.value;
       }
     }
   
     function updateDisplays(controllerArray) {
-  
-  
-      if (controllerArray.length != 0) {
-  
+      if (controllerArray.length !== 0) {
         requestAnimationFrame(function() {
           updateDisplays(controllerArray);
         });
-  
       }
   
       common.each(controllerArray, function(c) {
         c.updateDisplay();
       });
-  
     }
   
     return GUI;
-  
   })(dat.utils.css,
   "<div id=\"dg-save\" class=\"dg dialogue\">\n\n  Here's the new load parameter for your <code>GUI</code>'s constructor:\n\n  <textarea id=\"dg-new-constructor\"></textarea>\n\n  <div id=\"dg-save-locally\">\n\n    <input id=\"dg-local-storage\" type=\"checkbox\"/> Automatically save\n    values to <code>localStorage</code> on exit.\n\n    <div id=\"dg-local-explain\">The values saved to <code>localStorage</code> will\n      override those passed to <code>dat.GUI</code>'s constructor. This makes it\n      easier to work incrementally, but <code>localStorage</code> is fragile,\n      and your friends may not see the same values you do.\n      \n    </div>\n    \n  </div>\n\n</div>",
-  ".dg {\n  /** Clear list styles */\n  /* Auto-place container */\n  /* Auto-placed GUI's */\n  /* Line items that don't contain folders. */\n  /** Folder names */\n  /** Hides closed items */\n  /** Controller row */\n  /** Name-half (left) */\n  /** Controller-half (right) */\n  /** Controller placement */\n  /** Shorter number boxes when slider is present. */\n  /** Ensure the entire boolean and function row shows a hand */ }\n  .dg ul {\n    list-style: none;\n    margin: 0;\n    padding: 0;\n    width: 100%;\n    clear: both; }\n  .dg.ac {\n    position: fixed;\n    top: 0;\n    left: 0;\n    right: 0;\n    height: 0;\n    z-index: 0; }\n  .dg:not(.ac) .main {\n    /** Exclude mains in ac so that we don't hide close button */\n    overflow: hidden; }\n  .dg.main {\n    -webkit-transition: opacity 0.1s linear;\n    -o-transition: opacity 0.1s linear;\n    -moz-transition: opacity 0.1s linear;\n    transition: opacity 0.1s linear; }\n    .dg.main.taller-than-window {\n      overflow-y: auto; }\n      .dg.main.taller-than-window .close-button {\n        opacity: 1;\n        /* TODO, these are style notes */\n        margin-top: -1px;\n        border-top: 1px solid #2c2c2c; }\n    .dg.main ul.closed .close-button {\n      opacity: 1 !important; }\n    .dg.main:hover .close-button,\n    .dg.main .close-button.drag {\n      opacity: 1; }\n    .dg.main .close-button {\n      /*opacity: 0;*/\n      -webkit-transition: opacity 0.1s linear;\n      -o-transition: opacity 0.1s linear;\n      -moz-transition: opacity 0.1s linear;\n      transition: opacity 0.1s linear;\n      border: 0;\n      position: absolute;\n      line-height: 19px;\n      height: 20px;\n      /* TODO, these are style notes */\n      cursor: pointer;\n      text-align: center;\n      background-color: #000; }\n      .dg.main .close-button:hover {\n        background-color: #111; }\n  .dg.a {\n    float: right;\n    margin-right: 15px;\n    overflow-x: hidden; }\n    .dg.a.has-save > ul {\n      margin-top: 27px; }\n      .dg.a.has-save > ul.closed {\n        margin-top: 0; }\n    .dg.a .save-row {\n      position: fixed;\n      top: 0;\n      z-index: 1002; }\n  .dg li {\n    -webkit-transition: height 0.1s ease-out;\n    -o-transition: height 0.1s ease-out;\n    -moz-transition: height 0.1s ease-out;\n    transition: height 0.1s ease-out; }\n  .dg li:not(.folder) {\n    cursor: auto;\n    height: 27px;\n    line-height: 27px;\n    overflow: hidden;\n    padding: 0 4px 0 5px; }\n  .dg li.folder {\n    padding: 0;\n    border-left: 4px solid rgba(0, 0, 0, 0); }\n  .dg li.title {\n    cursor: pointer;\n    margin-left: -4px; }\n  .dg .closed li:not(.title),\n  .dg .closed ul li,\n  .dg .closed ul li > * {\n    height: 0;\n    overflow: hidden;\n    border: 0; }\n  .dg .cr {\n    clear: both;\n    padding-left: 3px;\n    height: 27px; }\n  .dg .property-name {\n    cursor: default;\n    float: left;\n    clear: left;\n    width: 40%;\n    overflow: hidden;\n    text-overflow: ellipsis; }\n  .dg .c {\n    float: left;\n    width: 60%; }\n  .dg .c input[type=text] {\n    border: 0;\n    margin-top: 4px;\n    padding: 3px;\n    width: 100%;\n    float: right; }\n  .dg .has-slider input[type=text] {\n    width: 30%;\n    /*display: none;*/\n    margin-left: 0; }\n  .dg .slider {\n    float: left;\n    width: 66%;\n    margin-left: -5px;\n    margin-right: 0;\n    height: 19px;\n    margin-top: 4px; }\n  .dg .slider-fg {\n    height: 100%; }\n  .dg .c input[type=checkbox] {\n    margin-top: 9px; }\n  .dg .c select {\n    margin-top: 5px; }\n  .dg .cr.function,\n  .dg .cr.function .property-name,\n  .dg .cr.function *,\n  .dg .cr.boolean,\n  .dg .cr.boolean * {\n    cursor: pointer; }\n  .dg .selector {\n    display: none;\n    position: absolute;\n    margin-left: -9px;\n    margin-top: 23px;\n    z-index: 10; }\n  .dg .c:hover .selector,\n  .dg .selector.drag {\n    display: block; }\n  .dg li.save-row {\n    padding: 0; }\n    .dg li.save-row .button {\n      display: inline-block;\n      padding: 0px 6px; }\n  .dg.dialogue {\n    background-color: #222;\n    width: 460px;\n    padding: 15px;\n    font-size: 13px;\n    line-height: 15px; }\n\n/* TODO Separate style and structure */\n#dg-new-constructor {\n  padding: 10px;\n  color: #222;\n  font-family: Monaco, monospace;\n  font-size: 10px;\n  border: 0;\n  resize: none;\n  box-shadow: inset 1px 1px 1px #888;\n  word-wrap: break-word;\n  margin: 12px 0;\n  display: block;\n  width: 440px;\n  overflow-y: scroll;\n  height: 100px;\n  position: relative; }\n\n#dg-local-explain {\n  display: none;\n  font-size: 11px;\n  line-height: 17px;\n  border-radius: 3px;\n  background-color: #333;\n  padding: 8px;\n  margin-top: 10px; }\n  #dg-local-explain code {\n    font-size: 10px; }\n\n#dat-gui-save-locally {\n  display: none; }\n\n/** Main type */\n.dg {\n  color: #eee;\n  font: 11px 'Lucida Grande', sans-serif;\n  text-shadow: 0 -1px 0 #111;\n  /** Auto place */\n  /* Controller row, <li> */\n  /** Controllers */ }\n  .dg.main {\n    /** Scrollbar */ }\n    .dg.main::-webkit-scrollbar {\n      width: 5px;\n      background: #1a1a1a; }\n    .dg.main::-webkit-scrollbar-corner {\n      height: 0;\n      display: none; }\n    .dg.main::-webkit-scrollbar-thumb {\n      border-radius: 5px;\n      background: #676767; }\n  .dg li:not(.folder) {\n    background: #1a1a1a;\n    border-bottom: 1px solid #2c2c2c; }\n  .dg li.save-row {\n    line-height: 25px;\n    background: #dad5cb;\n    border: 0; }\n    .dg li.save-row select {\n      margin-left: 5px;\n      width: 108px; }\n    .dg li.save-row .button {\n      margin-left: 5px;\n      margin-top: 1px;\n      border-radius: 2px;\n      font-size: 9px;\n      line-height: 7px;\n      padding: 4px 4px 5px 4px;\n      background: #c5bdad;\n      color: #fff;\n      text-shadow: 0 1px 0 #b0a58f;\n      box-shadow: 0 -1px 0 #b0a58f;\n      cursor: pointer; }\n      .dg li.save-row .button.gears {\n        background: #c5bdad url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAANCAYAAAB/9ZQ7AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAQJJREFUeNpiYKAU/P//PwGIC/ApCABiBSAW+I8AClAcgKxQ4T9hoMAEUrxx2QSGN6+egDX+/vWT4e7N82AMYoPAx/evwWoYoSYbACX2s7KxCxzcsezDh3evFoDEBYTEEqycggWAzA9AuUSQQgeYPa9fPv6/YWm/Acx5IPb7ty/fw+QZblw67vDs8R0YHyQhgObx+yAJkBqmG5dPPDh1aPOGR/eugW0G4vlIoTIfyFcA+QekhhHJhPdQxbiAIguMBTQZrPD7108M6roWYDFQiIAAv6Aow/1bFwXgis+f2LUAynwoIaNcz8XNx3Dl7MEJUDGQpx9gtQ8YCueB+D26OECAAQDadt7e46D42QAAAABJRU5ErkJggg==) 2px 1px no-repeat;\n        height: 7px;\n        width: 8px; }\n      .dg li.save-row .button:hover {\n        background-color: #bab19e;\n        box-shadow: 0 -1px 0 #b0a58f; }\n  .dg li.folder {\n    border-bottom: 0; }\n  .dg li.title {\n    padding-left: 16px;\n    background: black url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlI+hKgFxoCgAOw==) 6px 10px no-repeat;\n    cursor: pointer;\n    border-bottom: 1px solid rgba(255, 255, 255, 0.2); }\n  .dg .closed li.title {\n    background-image: url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlGIWqMCbWAEAOw==); }\n  .dg .cr.boolean {\n    border-left: 3px solid #806787; }\n  .dg .cr.color {\n    border-left: 3px solid; }\n  .dg .cr.function {\n    border-left: 3px solid #e61d5f; }\n  .dg .cr.number {\n    border-left: 3px solid #2fa1d6; }\n    .dg .cr.number input[type=text] {\n      color: #2fa1d6; }\n  .dg .cr.string {\n    border-left: 3px solid #1ed36f; }\n    .dg .cr.string input[type=text] {\n      color: #1ed36f; }\n  .dg .cr.function:hover, .dg .cr.boolean:hover {\n    background: #111; }\n  .dg .c input[type=text] {\n    background: #303030;\n    outline: none; }\n    .dg .c input[type=text]:hover {\n      background: #3c3c3c; }\n    .dg .c input[type=text]:focus {\n      background: #494949;\n      color: #fff; }\n  .dg .c .slider {\n    background: #303030;\n    cursor: ew-resize; }\n  .dg .c .slider-fg {\n    background: #2fa1d6; }\n  .dg .c .slider:hover {\n    background: #3c3c3c; }\n    .dg .c .slider:hover .slider-fg {\n      background: #44abda; }\n",
+  ".dg {\n  /** Clear list styles */\n  /* Auto-place container */\n  /* Auto-placed GUI's */\n  /* Line items that don't contain folders. */\n  /** Folder names */\n  /** Hides closed items */\n  /** Controller row */\n  /** Name-half (left) */\n  /** Controller-half (right) */\n  /** Controller placement */\n  /** Shorter number boxes when slider is present. */\n  /** Ensure the entire boolean and function row shows a hand */ }\n  .dg ul {\n    list-style: none;\n    margin: 0;\n    padding: 0;\n    width: 100%;\n    clear: both; }\n  .dg.ac {\n    position: fixed;\n    top: 0;\n    left: 0;\n    right: 0;\n    height: 0;\n    z-index: 0; }\n  .dg:not(.ac) .main {\n    /** Exclude mains in ac so that we don't hide close button */\n    overflow: hidden; }\n  .dg.main {\n    -webkit-transition: opacity 0.1s linear;\n    -o-transition: opacity 0.1s linear;\n    -moz-transition: opacity 0.1s linear;\n    transition: opacity 0.1s linear; }\n    .dg.main.taller-than-window {\n      overflow-y: auto; }\n      .dg.main.taller-than-window .close-button {\n        opacity: 1;\n        /* TODO, these are style notes */\n        margin-top: -1px;\n        border-top: 1px solid #2c2c2c; }\n    .dg.main ul.closed .close-button {\n      opacity: 1 !important; }\n    .dg.main:hover .close-button,\n    .dg.main .close-button.drag {\n      opacity: 1; }\n    .dg.main .close-button {\n      /*opacity: 0;*/\n      -webkit-transition: opacity 0.1s linear;\n      -o-transition: opacity 0.1s linear;\n      -moz-transition: opacity 0.1s linear;\n      transition: opacity 0.1s linear;\n      border: 0;\n      position: absolute;\n      line-height: 19px;\n      height: 20px;\n      /* TODO, these are style notes */\n      cursor: pointer;\n      text-align: center;\n      background-color: #000; }\n      .dg.main .close-button:hover {\n        background-color: #111; }\n  .dg.a {\n    float: right;\n    margin-right: 15px;\n    overflow-x: hidden; }\n    .dg.a.has-save > ul {\n      margin-top: 27px; }\n      .dg.a.has-save > ul.closed {\n        margin-top: 0; }\n    .dg.a .save-row {\n      position: fixed;\n      top: 0;\n      z-index: 1002; }\n  .dg li {\n    -webkit-transition: height 0.1s ease-out;\n    -o-transition: height 0.1s ease-out;\n    -moz-transition: height 0.1s ease-out;\n    transition: height 0.1s ease-out; }\n  .dg li:not(.folder) {\n    cursor: auto;\n    height: 27px;\n    line-height: 27px;\n    overflow: hidden;\n    padding: 0 4px 0 5px; }\n  .dg li.folder {\n    padding: 0;\n    border-left: 4px solid rgba(0, 0, 0, 0); }\n  .dg li.title {\n    cursor: pointer;\n    margin-left: -4px; }\n  .dg .closed li:not(.title),\n  .dg .closed ul li,\n  .dg .closed ul li > * {\n    height: 0;\n    overflow: hidden;\n    border: 0; }\n  .dg .cr {\n    clear: both;\n    padding-left: 3px;\n    height: 27px; }\n  .dg .property-name {\n    cursor: default;\n    float: left;\n    clear: left;\n    width: 40%;\n    overflow: hidden;\n    text-overflow: ellipsis; \n    text-overflow: \"�\" \"�\";\n    white-space: nowrap;\n  }\n  .dg .c {\n    float: left;\n    width: 60%; }\n  .dg .c input[type=text] {\n    border: 0;\n    margin-top: 4px;\n    padding: 3px;\n    width: 100%;\n    float: right; }\n  .dg .has-slider input[type=text] {\n    width: 30%;\n    /*display: none;*/\n    margin-left: 0; }\n  .dg .slider {\n    float: left;\n    width: 66%;\n    margin-left: -5px;\n    margin-right: 0;\n    height: 19px;\n    margin-top: 4px; }\n  .dg .slider-fg {\n    height: 100%; }\n  .dg .c input[type=checkbox] {\n    margin-top: 9px; }\n  .dg .c select {\n    margin-top: 5px; }\n  .dg .cr.function,\n  .dg .cr.function .property-name,\n  .dg .cr.function *,\n  .dg .cr.boolean,\n  .dg .cr.boolean * {\n    cursor: pointer; }\n  .dg .cr.function .button {\n    margin: 3px 0px;\n    padding: 2px 3px;\n    /* border: 2px solid #666; */\n    line-height: 18px;\n    background: #333;\n    border-radius: 2px;\n  }\n  .dg .selector {\n    display: none;\n    position: absolute;\n    margin-left: -9px;\n    margin-top: 23px;\n    z-index: 10; }\n  .dg .c:hover .selector,\n  .dg .selector.drag {\n    display: block; }\n  .dg li.save-row {\n    padding: 0; }\n    .dg li.save-row .button {\n      display: inline-block;\n      padding: 0px 6px; }\n  .dg.dialogue {\n    background-color: #222;\n    width: 460px;\n    padding: 15px;\n    font-size: 13px;\n    line-height: 15px; }\n\n/* TODO Separate style and structure */\n#dg-new-constructor {\n  padding: 10px;\n  color: #222;\n  font-family: Monaco, monospace;\n  font-size: 10px;\n  border: 0;\n  resize: none;\n  box-shadow: inset 1px 1px 1px #888;\n  word-wrap: break-word;\n  margin: 12px 0;\n  display: block;\n  width: 440px;\n  overflow-y: scroll;\n  height: 100px;\n  position: relative; }\n\n#dg-local-explain {\n  display: none;\n  font-size: 11px;\n  line-height: 17px;\n  border-radius: 3px;\n  background-color: #333;\n  padding: 8px;\n  margin-top: 10px; }\n  #dg-local-explain code {\n    font-size: 10px; }\n\n#dat-gui-save-locally {\n  display: none; }\n\n/** Main type */\n.dg {\n  color: #eee;\n  font: 11px 'Lucida Grande', sans-serif;\n  text-shadow: 0 -1px 0 #111;\n  /** Auto place */\n  /* Controller row, <li> */\n  /** Controllers */ }\n  .dg.main {\n    /** Scrollbar */ }\n    .dg.main::-webkit-scrollbar {\n      width: 5px;\n      background: #1a1a1a; }\n    .dg.main::-webkit-scrollbar-corner {\n      height: 0;\n      display: none; }\n    .dg.main::-webkit-scrollbar-thumb {\n      border-radius: 5px;\n      background: #676767; }\n  .dg li:not(.folder) {\n    background: #1a1a1a;\n    border-bottom: 1px solid #2c2c2c; }\n  .dg li.save-row {\n    line-height: 25px;\n    background: #dad5cb;\n    border: 0; }\n    .dg li.save-row select {\n      margin-left: 5px;\n      width: 108px; }\n    .dg li.save-row .button {\n      margin-left: 5px;\n      margin-top: 1px;\n      border-radius: 2px;\n      font-size: 9px;\n      line-height: 7px;\n      padding: 4px 4px 5px 4px;\n      background: #c5bdad;\n      color: #fff;\n      text-shadow: 0 1px 0 #b0a58f;\n      box-shadow: 0 -1px 0 #b0a58f;\n      cursor: pointer; }\n      .dg li.save-row .button.gears {\n        background: #c5bdad url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAANCAYAAAB/9ZQ7AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAQJJREFUeNpiYKAU/P//PwGIC/ApCABiBSAW+I8AClAcgKxQ4T9hoMAEUrxx2QSGN6+egDX+/vWT4e7N82AMYoPAx/evwWoYoSYbACX2s7KxCxzcsezDh3evFoDEBYTEEqycggWAzA9AuUSQQgeYPa9fPv6/YWm/Acx5IPb7ty/fw+QZblw67vDs8R0YHyQhgObx+yAJkBqmG5dPPDh1aPOGR/eugW0G4vlIoTIfyFcA+QekhhHJhPdQxbiAIguMBTQZrPD7108M6roWYDFQiIAAv6Aow/1bFwXgis+f2LUAynwoIaNcz8XNx3Dl7MEJUDGQpx9gtQ8YCueB+D26OECAAQDadt7e46D42QAAAABJRU5ErkJggg==) 2px 1px no-repeat;\n        height: 7px;\n        width: 8px; }\n      .dg li.save-row .button:hover {\n        background-color: #bab19e;\n        box-shadow: 0 -1px 0 #b0a58f; }\n  .dg li.folder {\n    border-bottom: 0; }\n  .dg li.title {\n    padding-left: 16px;\n    background: black url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlI+hKgFxoCgAOw==) 6px 10px no-repeat;\n    cursor: pointer;\n    border-bottom: 1px solid rgba(255, 255, 255, 0.2); }\n  .dg .closed li.title {\n    background-image: url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlGIWqMCbWAEAOw==); }\n  .dg .cr.boolean {\n    border-left: 3px solid #806787; }\n  .dg .cr.color {\n    border-left: 3px solid; }\n  .dg .cr.function {\n    border-left: 3px solid #e61d5f; }\n  .dg .cr.number {\n    border-left: 3px solid #2fa1d6; }\n    .dg .cr.number input[type=text] {\n      color: #2fa1d6; }\n  .dg .cr.string {\n    border-left: 3px solid #1ed36f; }\n    .dg .cr.string input[type=text] {\n      color: #1ed36f; }\n  .dg .cr.function:hover, .dg .cr.boolean:hover {\n    background: #111; }\n  .dg .c input[type=text] {\n    background: #303030;\n    outline: none; }\n    .dg .c input[type=text]:hover {\n      background: #3c3c3c; }\n    .dg .c input[type=text]:focus {\n      background: #494949;\n      color: #fff; }\n  .dg .c .slider {\n    background: #303030;\n    cursor: ew-resize; }\n  .dg .c .slider-fg {\n    background: #2fa1d6; }\n  .dg .c .slider:hover {\n    background: #3c3c3c; }\n    .dg .c .slider:hover .slider-fg {\n      background: #44abda; }\n",
   dat.controllers.factory = (function (OptionController, NumberControllerBox, NumberControllerSlider, StringController, FunctionController, BooleanController, common) {
   
+        'use strict';
+        
         return function(object, property, options_1, options_2, options_3) {
   
           var initialValue = object[property];
@@ -3004,91 +3166,21 @@
       })(dat.controllers.OptionController,
   dat.controllers.NumberControllerBox,
   dat.controllers.NumberControllerSlider,
-  dat.controllers.StringController = (function (Controller, dom, common) {
-  
-    /**
-     * @class Provides a text input to alter the string property of an object.
-     *
-     * @extends dat.controllers.Controller
-     *
-     * @param {Object} object The object to be manipulated
-     * @param {string} property The name of the property to be manipulated
-     *
-     * @member dat.controllers
-     */
-    var StringController = function(object, property, options) {
-  
-      StringController.superclass.call(this, object, property, 'string', options);
-  
-      var _this = this;
-  
-      this.__input = document.createElement('input');
-      this.__input.setAttribute('type', 'text');
-  
-      dom.bind(this.__input, 'keyup', onChange);
-      dom.bind(this.__input, 'change', onChange);
-      dom.bind(this.__input, 'blur', onBlur);
-      dom.bind(this.__input, 'keydown', function(e) {
-        if (e.keyCode === 13) {
-          this.blur();
-        }
-      });
-      
-  
-      function onChange() {
-        _this.setValue(_this.__input.value);
-      }
-  
-      function onBlur() {
-        if (_this.__onFinishChange) {
-          _this.__onFinishChange.call(_this, _this.getValue());
-        }
-      }
-  
-      this.updateDisplay();
-  
-      this.domElement.appendChild(this.__input);
-  
-    };
-  
-    StringController.superclass = Controller;
-  
-    common.extend(
-  
-        StringController.prototype,
-        Controller.prototype,
-  
-        {
-  
-          updateDisplay: function() {
-            // Stops the caret from moving on account of:
-            // keyup -> setValue -> updateDisplay
-            if (!dom.isActive(this.__input)) {
-              this.__input.value = this.getValue();
-            }
-            this.__input.disabled = this.getReadonly();
-            return StringController.superclass.prototype.updateDisplay.call(this);
-          }
-  
-        }
-  
-    );
-  
-    return StringController;
-  
-  })(dat.controllers.Controller,
-  dat.dom.dom,
-  dat.utils.common),
+  dat.controllers.StringController,
   dat.controllers.FunctionController,
   dat.controllers.BooleanController,
   dat.utils.common),
   dat.controllers.Controller,
   dat.controllers.BooleanController,
   dat.controllers.FunctionController,
+  dat.controllers.NumberController,
   dat.controllers.NumberControllerBox,
   dat.controllers.NumberControllerSlider,
   dat.controllers.OptionController,
+  dat.controllers.StringController,
   dat.controllers.ColorController = (function (Controller, dom, Color, interpret, common) {
+  
+    'use strict';
   
     var ColorController = function(object, property, options) {
   
@@ -3121,7 +3213,7 @@
   
       this.__input = document.createElement('input');
       this.__input.type = 'text';
-      this.__input_textShadow = '0 1px 1px ';
+      this.__input_textShadow = ['1px 0px 0px ', '-1px 0px 0px ', '0px 1px 0px ', '0px -1px 0px '];
   
       this.__input_container = document.createElement('div');
       this.__input_container.style.marginLeft = '28px';
@@ -3158,7 +3250,7 @@
         position: 'absolute',
         width: '12px',
         height: '12px',
-        border: this.__field_knob_border + (this.__color.v < .5 ? '#fff' : '#000'),
+        border: this.__field_knob_border + (this.__color.v < 0.5 ? '#fff' : '#000'),
         boxShadow: '0px 1px 3px rgba(0,0,0,0.5)',
         borderRadius: '12px',
         zIndex: 1
@@ -3208,7 +3300,9 @@
         color: '#fff',
         border: 0,
         fontWeight: 'bold',
-        textShadow: this.__input_textShadow + 'rgba(0,0,0,0.7)'
+        textShadow: this.__input_textShadow.map(function (d) {
+          return d + ' rgba(0,0,0,0.7)';
+        }).join(', ')
       });
   
       dom.bind(this.__saturation_field, 'mousedown', fieldDown);
@@ -3234,6 +3328,7 @@
       }
   
       function onBlur() {
+        /* jshint validthis: true */
         var i = interpret(this.value);
         if (i !== false) {
           _this.__color.__state = i;
@@ -3241,6 +3336,7 @@
         } else {
           this.value = _this.__color.toString();
         }
+        /* jshint validthis: false */
       }
   
       function unbindH() {
@@ -3269,11 +3365,19 @@
         var s = (e.clientX - o.left + scroll.left) / w;
         var v = 1 - (e.clientY - o.top + scroll.top) / w;
   
-        if (v > 1) v = 1;
-        else if (v < 0) v = 0;
+        if (v > 1) {
+          v = 1;
+        }
+        else if (v < 0) {
+          v = 0;
+        }
   
-        if (s > 1) s = 1;
-        else if (s < 0) s = 0;
+        if (s > 1) {
+          s = 1;
+        }
+        else if (s < 0) {
+          s = 0;
+        }
   
         _this.__color.v = v;
         _this.__color.s = s;
@@ -3293,8 +3397,12 @@
         var scroll = getScroll(_this.__hue_field);
         var h = 1 - (e.clientY - o.top + scroll.top) / s;
   
-        if (h > 1) h = 1;
-        else if (h < 0) h = 0;
+        if (h > 1) {
+          h = 1;
+        }
+        else if (h < 0) {
+          h = 0;
+        }
   
         _this.__color.h = h * 360;
   
@@ -3357,7 +3465,7 @@
   
             this.__temp.a = 1;
   
-            var flip = (this.__color.v < .5 || this.__color.s > .5) ? 255 : 0;
+            var flip = (this.__color.v < 0.5 || this.__color.s > 0.5) ? 255 : 0;
             var _flip = 255 - flip;
   
             common.extend(this.__field_knob.style, {
@@ -3377,7 +3485,9 @@
             common.extend(this.__input.style, {
               backgroundColor: this.__input.value = this.__color.toString(),
               color: 'rgb(' + flip + ',' + flip + ',' + flip +')',
-              textShadow: this.__input_textShadow + 'rgba(' + _flip + ',' + _flip + ',' + _flip +',.7)'
+              textShadow: this.__input_textShadow.map(function (d) {
+                return d + ' rgba(' + _flip + ',' + _flip + ',' + _flip +',0.7)';
+              }).join(', ')
             });
   
             this.__input.disabled = this.getReadonly();
@@ -3412,7 +3522,8 @@
   })(dat.controllers.Controller,
   dat.dom.dom,
   dat.color.Color = (function (interpret, math, toString, common) {
-    "use strict";
+  
+    'use strict';
   
     var Color = function() {
   
@@ -3585,6 +3696,8 @@
   })(dat.color.interpret,
   dat.color.math = (function () {
   
+    'use strict';
+  
     var tmpComponent;
   
     return {
@@ -3674,6 +3787,8 @@
   dat.utils.common),
   dat.utils.requestAnimationFrame = (function () {
   
+    'use strict';
+  
     /**
      * requirejs version of Paul Irish's RequestAnimationFrame
      * http://paulirish.com/2011/requestanimationframe-for-smart-animating/
@@ -3684,14 +3799,17 @@
         window.mozRequestAnimationFrame ||
         window.oRequestAnimationFrame ||
         window.msRequestAnimationFrame ||
+        /* jshint unused: false */
         function(callback, element) {
   
           window.setTimeout(callback, 1000 / 60);
   
         };
+  
   })(),
   dat.dom.CenteredDiv = (function (dom, common) {
   
+    'use strict';
   
     var CenteredDiv = function() {
   
@@ -3780,8 +3898,8 @@
     };
   
     CenteredDiv.prototype.layout = function() {
-      this.domElement.style.left = window.innerWidth/2 - dom.getWidth(this.domElement) / 2 + 'px';
-      this.domElement.style.top = window.innerHeight/2 - dom.getHeight(this.domElement) / 2 + 'px';
+      this.domElement.style.left = (window.innerWidth / 2 - dom.getWidth(this.domElement) / 2) + 'px';
+      this.domElement.style.top = (window.innerHeight / 2 - dom.getHeight(this.domElement) / 2) + 'px';
     };
     
     function lockScroll(e) {

@@ -16,6 +16,8 @@ define([
     'dat/utils/common'
 ], function(Controller, common) {
 
+  'use strict';
+
   /**
    * @class Represents a given property of an object that is a number.
    *
@@ -52,28 +54,21 @@ define([
         // Hey Doug, check this out.
         this.__impliedStep = Math.pow(10, Math.floor(Math.log(Math.abs(this.initialValue))/Math.LN10))/10;
       }
-
     } else {
-
     	this.__impliedStep = this.__step;
-
     }
 
     this.__precision = numDecimals(this.__impliedStep);
-
-
   };
 
   NumberController.superclass = Controller;
 
   common.extend(
-
       NumberController.prototype,
       Controller.prototype,
 
       /** @lends dat.controllers.NumberController.prototype */
       {
-
         setValue: function(v) {
 
           if (this.__min !== undefined && v < this.__min) {
@@ -82,7 +77,7 @@ define([
             v = this.__max;
           }
 
-          if (this.__step !== undefined && v % this.__step != 0) {
+          if (this.__step !== undefined && v % this.__step !== 0) {
             v = Math.round(v / this.__step) * this.__step;
           }
 
@@ -130,9 +125,7 @@ define([
           this.__precision = numDecimals(v);
           return this;
         }
-
       }
-
   );
 
   function numDecimals(x) {
@@ -145,5 +138,4 @@ define([
   }
 
   return NumberController;
-
 });

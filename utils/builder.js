@@ -26,11 +26,19 @@ exports.file_exists = file_exists;
 exports.read_file = read_file;
 exports.tab = tab;
 
-exports.license = read_file('license.txt');
+exports.license = '';
 
-function build(_params) {
+function build(_params, destfile) {
+  // shallow copy of _params:
+  params = {};
+  for (var key in _params) {
+    params[key] = _params[key]; 
+  }
 
-  params = _params;
+  // overwrite the 'out' option when the destination file has been specified explicitly.
+  if (destfile) {
+    params.out = destfile;
+  }
 
   defined = {};
   third_party = {};
@@ -39,10 +47,12 @@ function build(_params) {
 
   var deps = [];
 
+  exports.license = read_file(params.licenseFile || 'LICENSE');
+
   load_module(params.baseUrl + params.main + '.js', params.main);
 
   for (var i in defined) {
-    if (params.verbose) console.log('Loaded: ' + defined[i].path);
+    if (params.verbose) { console.log('Loaded: ' + defined[i].path); }
     deps.push(defined[i].path);
     if (defined[i].module) {
       var namespace = i.substr(0, i.lastIndexOf('/'));
@@ -53,7 +63,6 @@ function build(_params) {
   var to_write = '';
   var ensured = {};
 
-
   for (var name in params.paths) {
     var path = params.baseUrl + params.paths[name] + '.js';
     var str = read_file(path);
@@ -62,19 +71,18 @@ function build(_params) {
       fail();
     }
     third_party[name] = str;
-    to_write += third_party[name] + "\n\n";
-    if (params.verbose) console.log('Loaded: ' + path);
+    to_write += third_party[name] + '\n\n';
+    if (params.verbose) { console.log('Loaded: ' + path); }
     //deps.push(path);
   }
 
   // Ensure namespaces
   for (i in namespaces) {
-
     var split = i.split('/');
 
     for (var j = 0; j < split.length; j++) {
       var cur = [];
-      if (j == 0 && !ensured[split[j]]) {
+      if (j === 0 && !ensured[split[j]]) {
         to_write += '/** @namespace */\n';
         to_write += 'var ' + split[j] + ' = ' + split[j] + ' || {};\n\n';
         ensured[split[j]] = true;
@@ -90,7 +98,6 @@ function build(_params) {
         ensured[curn] = true;
       }
     }
-
   }
 
   var shared_count = 0;
@@ -100,26 +107,23 @@ function build(_params) {
       if (i in defined) {
         var new_shared = i.replace(/\//g, '.');
         var v = new_shared + ' = ' + defined[i].getClosure() + ';\n';
-        to_write += v + "\n\n";
+        to_write += v + '\n\n';
         defined[i].shared = new_shared;
         shared_count++;
       }
     }
   }
-  
 
   to_write += params.shortcut + ' = ' + params.main.replace(/\//g, '.') + ' = ' + defined[params.main].getClosure() + ';';
 
-  if ( params.umd ){
-    to_write = wrap_umd( params.shortcut.split('.')[0], to_write + '\nreturn '+params.umd.ret+';' );
+  if (params.umd) {
+    to_write = wrap_umd(params.shortcut.split('.')[0], to_write + '\nreturn ' + params.umd.ret + ';');
   }
 
-  if (params.verbose) console.log('Exported: ' + params.main + ' to window.' + params.shortcut);
+  if (params.verbose) { console.log('Exported: ' + params.main + ' to window.' + params.shortcut); }
 
   if (params.minify) {
-
     console.log('Compiling minified source ...');
-
 
     closure.compile(to_write, function(error, code) {
       if (error) {
@@ -131,19 +135,15 @@ function build(_params) {
         params.on_compile();
       }
     });
-
   } else {
-
-    write(exports.license + "\n" + to_write);
-
+    write(exports.license + '\n' + to_write);
   }
 
   return deps;
-
 }
 
 function define(deps, callback) {
-
+  /*jshint validthis: true */
   this.name = next_load;
   this.path = next_path;
   this.shared = false;
@@ -174,8 +174,8 @@ function define(deps, callback) {
   }
 
   this.getClosure = function() {
-    if (this.shared) return this.shared;
-    if (!this.deps || this.text) return this.callback;
+    if (this.shared) { return this.shared; }
+    if (!this.deps || this.text) { return this.callback; }
     var arg_string = '(';
     var args = [];
     for (var i in this.deps) {
@@ -195,14 +195,12 @@ function define(deps, callback) {
   };
 
   this.recurseDeps = function() {
-
-    if (!this.deps) return;
+    if (!this.deps) { return; }
 
     for (var i in this.deps) {
-
       var dep = this.deps[i];
 
-      if (dep in params.paths) continue;
+      if (dep in params.paths) { continue; }
 
       var path = params.baseUrl + dep;
 
@@ -221,13 +219,11 @@ function define(deps, callback) {
       } else {
         request_counts[dep] = 1;
       }
-
     }
-
   };
 
   this.recurseDeps();
-
+  /*jshint validthis: false */
 }
 
 /**
@@ -236,20 +232,19 @@ function define(deps, callback) {
  * @param  {String} src Source code text
  * @return {String}
  */
-function wrap_umd( name, src ){
-
+function wrap_umd(name, src) {
   return [
-    "(function (root, factory) {",
-    "  if (typeof define === 'function' && define.amd) {",
-    "    // AMD. Register as an anonymous module.",
-    "    define(factory);",
-    "  } else {",
-    "    // Browser globals",
-    "    root."+ name +" = factory();",
-    "  }",
-    "}(this, function () {",
-      src.replace(/\n/g,'\n  '),
-    "}));\n"
+    '(function (root, factory) {',
+    '  if (typeof define === \'function\' && define.amd) {',
+    '    // AMD. Register as an anonymous module.',
+    '    define(factory);',
+    '  } else {',
+    '    // Browser globals',
+    '    root.' + name + ' = factory();',
+    '  }',
+    '}(this, function () {',
+      src.replace(/\n/g, '\n  '),
+    '}));\n'
   ].join('\n');
 }
 
@@ -272,19 +267,24 @@ function read_file(path) {
 
 function load_module(path, name) {
   name = name || path;
-  if (name in defined) return;
+  if (name in defined) { return; }
+  if (params.verbose) { console.log('load module: ', name); }
   next_load = name;
   next_path = path;
-  eval('new ' + read_file(path));
+  try {
+    eval('new ' + read_file(path));
+  } catch (ex) {
+    console.error('eval exception: ', ex, '\n  , stack: ', ex.stack, '\n  , path: ', path, '\n  , content: ', read_file(path));
+  }
 }
 
 function load_text(path, name) {
   name = name || path;
-  if (name in defined) return;
+  if (name in defined) { return; }
   var text = read_file(path);
-  text = text.replace(/\r/g, "\\r");
-  text = text.replace(/\n/g, "\\n");
-  text = text.replace(/"/g, "\\\"");
+  text = text.replace(/\r/g, '\\r');
+  text = text.replace(/\n/g, '\\n');
+  text = text.replace(/"/g, '\\\"');
   next_load = name;
   next_path = path;
   var d = new define([], '"' + text + '"');
@@ -293,11 +293,11 @@ function load_text(path, name) {
 }
 
 function tab(str, tabs) {
-  var lines = str.split("\n");
+  var lines = str.split('\n');
   for (var i in lines) {
     lines[i] = tabs + lines[i];
   }
-  return lines.join("\n");
+  return lines.join('\n');
 }
 
 function write(str) {

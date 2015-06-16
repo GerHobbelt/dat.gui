@@ -105,7 +105,10 @@
     clear: left;
     width: 40%;
     overflow: hidden;
-    text-overflow: ellipsis; }
+    text-overflow: ellipsis; 
+    text-overflow: "…" "…";
+    white-space: nowrap;
+  }
   .dg .c {
     float: left;
     width: 60%; }
@@ -138,6 +141,14 @@
   .dg .cr.boolean,
   .dg .cr.boolean * {
     cursor: pointer; }
+  .dg .cr.function .button {
+    margin: 3px 0px;
+    padding: 2px 3px;
+    /* border: 2px solid #666; */
+    line-height: 18px;
+    background: #333;
+    border-radius: 2px;
+  }
   .dg .selector {
     display: none;
     position: absolute;

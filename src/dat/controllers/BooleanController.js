@@ -17,6 +17,8 @@ define([
   'dat/utils/common'
 ], function(Controller, dom, common) {
 
+  'use strict';
+
   /**
    * @class Provides a checkbox input to alter the boolean property of an object.
    * @extends dat.controllers.Controller
@@ -83,7 +85,6 @@ define([
           return BooleanController.superclass.prototype.updateDisplay.call(this);
 
         }
-
 
       }
 

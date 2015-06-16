@@ -17,6 +17,8 @@ define([
     'dat/utils/common'
 ], function(Controller, dom, common) {
 
+  'use strict';
+  
   /**
    * @class Provides a GUI interface to fire a specified method, a property of an object.
    *
@@ -24,6 +26,7 @@ define([
    *
    * @param {Object} object The object to be manipulated
    * @param {string} property The name of the property to be manipulated
+   * @param {string} text The text displayed in the button which will invoke the specified method.
    *
    * @member dat.controllers
    */
@@ -37,6 +40,7 @@ define([
     this.__button.innerHTML = text === undefined ? 'Fire' : text;
     dom.bind(this.__button, 'click', function(e) {
       e.preventDefault();
+      e.stopPropagation();
       _this.fire();
       return false;
     });

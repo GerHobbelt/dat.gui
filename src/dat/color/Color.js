@@ -71,7 +71,7 @@ define([
 
     get: function() {
 
-      if (!this.__state.space !== 'HEX') {
+      if (this.__state.space !== 'HEX') {
         this.__state.hex = math.rgb_to_hex(this.r, this.g, this.b);
       }
 

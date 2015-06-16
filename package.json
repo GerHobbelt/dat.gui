@@ -1,6 +1,6 @@
 {
   "name": "dat.gui",
-  "version": "0.0.0",
+  "version": "0.5.0",
   "description": "a lightweight controller library for JavaScript from ChromeExperiments",
   "main": "index.js",
   "directories": {
@@ -30,9 +30,9 @@
   },
   "homepage": "https://github.com/dataarts/dat.gui",
   "devDependencies": {
-    "qunit": "^0.6.3",
+    "qunit": "^0.7.6",
     "sass": "^0.5.0",
-    "less": "^1.7.1",
-    "requirejs": "^2.1.14"
+    "less": "^2.5.1",
+    "requirejs": "^2.1.18"
   }
 }

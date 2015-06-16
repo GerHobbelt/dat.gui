@@ -51,7 +51,7 @@ define([
           delta = max - min,
           h, s;
 
-      if (max != 0) {
+      if (max !== 0) {
         s = delta / max;
       } else {
         return {
@@ -61,9 +61,9 @@ define([
         };
       }
 
-      if (r == max) {
+      if (r === max) {
         h = (g - b) / delta;
-      } else if (g == max) {
+      } else if (g === max) {
         h = 2 + (b - r) / delta;
       } else {
         h = 4 + (r - g) / delta;
@@ -95,6 +95,6 @@ define([
       return value << (tmpComponent = componentIndex * 8) | (hex & ~ (0xFF << tmpComponent));
     }
 
-  }
+  };
 
 });

@@ -1,3 +1,5 @@
+/* global define */
+
 /**
  * dat-gui JavaScript Controller Library
  * http://code.google.com/p/dat-gui
@@ -17,6 +19,7 @@ define([
   'dat/color/toString',
   'dat/utils/common'
 ], function(interpret, math, toString, common) {
+  "use strict";
 
   var Color = function() {
 
@@ -27,7 +30,6 @@ define([
     }
 
     this.__state.a = this.__state.a || 1;
-
 
   };
 
@@ -123,8 +125,9 @@ define([
 
       get: function() {
 
-        if (this.__state.space === 'HSV')
+        if (this.__state.space === 'HSV') {
           return this.__state[component];
+        }
 
         recalculateHSV(this);
 

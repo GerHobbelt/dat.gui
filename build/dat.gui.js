@@ -1187,10 +1187,11 @@
   
   
   dat.color.toString = (function (common) {
+    "use strict";
   
     return function(color) {
   
-      if (color.a == 1 || common.isUndefined(color.a)) {
+      if (color.a === 1 || common.isUndefined(color.a)) {
   
         var s = color.hex.toString(16);
         while (s.length < 6) {
@@ -1205,12 +1206,13 @@
   
       }
   
-    }
+    };
   
   })(dat.utils.common);
   
   
   dat.color.interpret = (function (toString, common) {
+    "use strict";
   
     var result, toReturn;
   
@@ -1262,7 +1264,9 @@
             read: function(original) {
   
               var test = original.match(/^#([A-F0-9])([A-F0-9])([A-F0-9])$/i);
-              if (test === null) return false;
+              if (test === null) {
+                return false;
+              }
   
               return {
                 space: 'HEX',
@@ -1284,7 +1288,9 @@
             read: function(original) {
   
               var test = original.match(/^#([A-F0-9]{6})$/i);
-              if (test === null) return false;
+              if (test === null) {
+                return false;
+              }
   
               return {
                 space: 'HEX',
@@ -1302,7 +1308,9 @@
             read: function(original) {
   
               var test = original.match(/^rgb\(\s*(.+)\s*,\s*(.+)\s*,\s*(.+)\s*\)/);
-              if (test === null) return false;
+              if (test === null) {
+                return false;
+              }
   
               return {
                 space: 'RGB',
@@ -1322,7 +1330,9 @@
             read: function(original) {
   
               var test = original.match(/^rgba\(\s*(.+)\s*,\s*(.+)\s*,\s*(.+)\s*\,\s*(.+)\s*\)/);
-              if (test === null) return false;
+              if (test === null) {
+                return false;
+              }
   
               return {
                 space: 'RGB',
@@ -1355,7 +1365,7 @@
                 space: 'HEX',
                 hex: original,
                 conversionName: 'HEX'
-              }
+              };
             },
   
             write: function(color) {
@@ -1376,7 +1386,9 @@
   
           RGB_ARRAY: {
             read: function(original) {
-              if (original.length != 3) return false;
+              if (original.length !== 3) {
+                return false;
+              }
               return {
                 space: 'RGB',
                 r: original[0],
@@ -1393,7 +1405,9 @@
   
           RGBA_ARRAY: {
             read: function(original) {
-              if (original.length != 4) return false;
+              if (original.length !== 4) {
+                return false;
+              }
               return {
                 space: 'RGB',
                 r: original[0],
@@ -1432,7 +1446,7 @@
                   g: original.g,
                   b: original.b,
                   a: original.a
-                }
+                };
               }
               return false;
             },
@@ -1443,7 +1457,7 @@
                 g: color.g,
                 b: color.b,
                 a: color.a
-              }
+              };
             }
           },
   
@@ -1457,7 +1471,7 @@
                   r: original.r,
                   g: original.g,
                   b: original.b
-                }
+                };
               }
               return false;
             },
@@ -1467,7 +1481,7 @@
                 r: color.r,
                 g: color.g,
                 b: color.b
-              }
+              };
             }
           },
   
@@ -1483,7 +1497,7 @@
                   s: original.s,
                   v: original.v,
                   a: original.a
-                }
+                };
               }
               return false;
             },
@@ -1494,7 +1508,7 @@
                 s: color.s,
                 v: color.v,
                 a: color.a
-              }
+              };
             }
           },
   
@@ -1508,7 +1522,7 @@
                   h: original.h,
                   s: original.s,
                   v: original.v
-                }
+                };
               }
               return false;
             },
@@ -1518,7 +1532,7 @@
                 h: color.h,
                 s: color.s,
                 v: color.v
-              }
+              };
             }
   
           }
@@ -3300,6 +3314,7 @@
   })(dat.controllers.Controller,
   dat.dom.dom,
   dat.color.Color = (function (interpret, math, toString, common) {
+    "use strict";
   
     var Color = function() {
   
@@ -3310,7 +3325,6 @@
       }
   
       this.__state.a = this.__state.a || 1;
-  
   
     };
   
@@ -3406,8 +3420,9 @@
   
         get: function() {
   
-          if (this.__state.space === 'HSV')
+          if (this.__state.space === 'HSV') {
             return this.__state[component];
+          }
   
           recalculateHSV(this);
   
@@ -3508,7 +3523,7 @@
             delta = max - min,
             h, s;
   
-        if (max != 0) {
+        if (max !== 0) {
           s = delta / max;
         } else {
           return {
@@ -3518,9 +3533,9 @@
           };
         }
   
-        if (r == max) {
+        if (r === max) {
           h = (g - b) / delta;
-        } else if (g == max) {
+        } else if (g === max) {
           h = 2 + (b - r) / delta;
         } else {
           h = 4 + (r - g) / delta;
@@ -3552,7 +3567,7 @@
         return value << (tmpComponent = componentIndex * 8) | (hex & ~ (0xFF << tmpComponent));
       }
   
-    }
+    };
   
   })(),
   dat.color.toString,

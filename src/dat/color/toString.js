@@ -1,3 +1,5 @@
+/* global define */
+
 /**
  * dat-gui JavaScript Controller Library
  * http://code.google.com/p/dat-gui
@@ -14,10 +16,11 @@
 define([
   'dat/utils/common'
 ], function(common) {
+  "use strict";
 
   return function(color) {
 
-    if (color.a == 1 || common.isUndefined(color.a)) {
+    if (color.a === 1 || common.isUndefined(color.a)) {
 
       var s = color.hex.toString(16);
       while (s.length < 6) {
@@ -32,6 +35,6 @@ define([
 
     }
 
-  }
+  };
 
 });

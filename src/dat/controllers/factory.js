@@ -22,7 +22,7 @@ define([
 ],
     function(OptionController, NumberControllerBox, NumberControllerSlider, StringController, FunctionController, BooleanController, common) {
 
-      return function(object, property, options_1, options_2) {
+      return function(object, property, options_1, options_2, options_3) {
 
         var initialValue = object[property];
 
@@ -38,7 +38,10 @@ define([
           if (common.isNumber(options_1) && common.isNumber(options_2)) {
 
             // Has min and max.
-            return new NumberControllerSlider(object, property, options_1, options_2);
+            if (common.isNumber(options_3)) // has step
+                return new NumberControllerSlider(object, property, options_1, options_2, options_3);
+            else
+                return new NumberControllerSlider(object, property, options_1, options_2);
 
           } else {
 

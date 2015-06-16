@@ -713,7 +713,7 @@
           this.__impliedStep = 1; // What are we, psychics?
         } else {
           // Hey Doug, check this out.
-          this.__impliedStep = Math.pow(10, Math.floor(Math.log(this.initialValue)/Math.LN10))/10;
+          this.__impliedStep = Math.pow(10, Math.floor(Math.log(Math.abs(this.initialValue))/Math.LN10))/10;
         }
   
       } else {
@@ -2061,7 +2061,7 @@
   
             // TODO listening?
             this.__ul.removeChild(controller.__li);
-            this.__controllers.slice(this.__controllers.indexOf(controller), 1);
+            this.__controllers.splice(this.__controllers.indexOf(controller), 1);
             var _this = this;
             common.defer(function() {
               _this.onResize();
@@ -3581,7 +3581,8 @@
      * http://paulirish.com/2011/requestanimationframe-for-smart-animating/
      */
   
-    return window.webkitRequestAnimationFrame ||
+  return window.requestAnimationFrame ||
+      window.webkitRequestAnimationFrame ||
         window.mozRequestAnimationFrame ||
         window.oRequestAnimationFrame ||
         window.msRequestAnimationFrame ||
@@ -3604,7 +3605,8 @@
         display: 'none',
         zIndex: '1000',
         opacity: 0,
-        WebkitTransition: 'opacity 0.2s linear'
+        WebkitTransition: 'opacity 0.2s linear',
+        transition: 'opacity 0.2s linear'
       });
   
       dom.makeFullscreen(this.backgroundElement);
@@ -3616,7 +3618,8 @@
         display: 'none',
         zIndex: '1001',
         opacity: 0,
-        WebkitTransition: '-webkit-transform 0.2s ease-out, opacity 0.2s linear'
+        WebkitTransition: '-webkit-transform 0.2s ease-out, opacity 0.2s linear',
+        transition: 'transform 0.2s ease-out, opacity 0.2s linear'
       });
   
   
@@ -3634,8 +3637,6 @@
     CenteredDiv.prototype.show = function() {
   
       var _this = this;
-      
-  
   
       this.backgroundElement.style.display = 'block';
   

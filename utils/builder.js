@@ -47,7 +47,7 @@ function build(_params, destfile) {
 
   var deps = [];
 
-  exports.license = read_file(params.licenseFile || 'LICENSE');
+  exports.license = read_file(params.licenseFile || 'license.txt');
 
   load_module(params.baseUrl + params.main + '.js', params.main);
 

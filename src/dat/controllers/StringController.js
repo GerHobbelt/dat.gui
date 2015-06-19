@@ -28,8 +28,8 @@ define([
    *
    * @member dat.controllers
    */
-  var StringController = function(object, property) {
-    StringController.superclass.call(this, object, property);
+  var StringController = function(object, property, options) {
+    StringController.superclass.call(this, object, property, 'string', options);
 
     var _this = this;
 

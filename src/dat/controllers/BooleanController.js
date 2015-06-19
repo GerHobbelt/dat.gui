@@ -27,8 +27,8 @@ define([
    *
    * @member dat.controllers
    */
-  var BooleanController = function(object, property) {
-    BooleanController.superclass.call(this, object, property);
+  var BooleanController = function(object, property, options) {
+    BooleanController.superclass.call(this, object, property, 'boolean', options);
 
     var _this = this;
     this.__prev = this.getValue();

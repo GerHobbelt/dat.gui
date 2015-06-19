@@ -32,10 +32,13 @@ function(Controller, dom, common) {
    *
    * @member dat.controllers
    */
-  var OptionController = function(object, property, options) {
-    OptionController.superclass.call(this, object, property);
+  var OptionController = function(object, property, params, options) {
+    OptionController.superclass.call(this, object, property, 'option', options);
 
     var _this = this;
+    this.CUSTOM_FLAG = '';
+
+    params = params || {};
 
     /**
      * The drop down menu
@@ -43,15 +46,15 @@ function(Controller, dom, common) {
      */
     this.__select = document.createElement('select');
 
-    if (common.isArray(options)) {
+    if (common.isArray(params)) {
       var map = {};
-      common.each(options, function(element) {
+      common.each(params, function(element) {
         map[element] = element;
       });
-      options = map;
+      params = map;
     }
 
-    common.each(options, function(value, key) {
+    common.each(params, function(value, key) {
       var opt = document.createElement('option');
       opt.innerHTML = key;
       opt.setAttribute('value', value);
@@ -59,15 +62,36 @@ function(Controller, dom, common) {
 
     });
 
+    if (params.custom) {
+      var opt = document.createElement('option');
+      opt.innerHTML = params.custom.display || 'Custom';
+      opt.setAttribute('value', _this.CUSTOM_FLAG);
+      _this.__select.appendChild(opt);
+
+      this.__custom_controller = params.custom.controller;
+    }
+
     // Acknowledge original value
     this.updateDisplay();
 
     dom.bind(this.__select, 'change', function() {
       var value = this.options[this.selectedIndex].value;
+      if (value == _this.CUSTOM_FLAG)
+        value = _this.__custom_controller.getValue();
       _this.setValue(value);
     });
 
+    if (this.__custom_controller) {
+      this.__custom_controller.onChange(function() {
+        var value = this.getValue();
+        _this.setValue(value);
+      });
+    }
+
     this.domElement.appendChild(this.__select);
+    if (this.__custom_controller) {
+      this.domElement.appendChild(this.__custom_controller.el);
+    }
   };
 
   OptionController.superclass = Controller;
@@ -85,7 +109,22 @@ function(Controller, dom, common) {
         },
 
         updateDisplay: function() {
-          this.__select.value = this.getValue();
+          var value = this.getValue();
+          var custom = true;
+          if (value != this.CUSTOM_FLAG) {
+            common.each(this.__select.options, function(option) {
+              if (value == option.value) {
+                custom = false;
+              }
+            });
+          }
+
+          this.__select.value = custom ? this.CUSTOM_FLAG : value;
+
+          if (this.__custom_controller) {
+            this.__custom_controller.el.style.display = custom ? 'block' : 'none';
+          }
+
           return OptionController.superclass.prototype.updateDisplay.call(this);
         }
       }

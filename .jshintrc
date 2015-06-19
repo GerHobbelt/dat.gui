@@ -45,12 +45,13 @@
 
     "newcap"        : true,
     "noempty"       : true,
-    "nonew"         : false,
+    "nonew"         : true,
     "nomen"         : false,
     "onevar"        : false,
     "plusplus"      : false,
     "sub"           : false,
     "trailing"      : true,
+    "validthis"     : true,
 
     "esnext"        : true,
     "camelcase"     : false,

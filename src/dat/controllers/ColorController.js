@@ -20,8 +20,8 @@ define([
 ], function(Controller, dom, Color, interpret, common) {
   'use strict';
 
-  var ColorController = function(object, property) {
-    ColorController.superclass.call(this, object, property);
+  var ColorController = function(object, property, options) {
+    ColorController.superclass.call(this, object, property, 'color', options);
 
     this.__color = new Color(this.getValue());
     this.__temp = new Color(0);
@@ -224,8 +224,9 @@ define([
 
       var w = dom.getWidth(_this.__saturation_field);
       var o = dom.getOffset(_this.__saturation_field);
-      var s = (e.clientX - o.left /* + document.body.scrollLeft */ ) / w;
-      var v = 1 - (e.clientY - o.top /* + document.body.scrollTop */ ) / w;
+      var scroll = getScroll(_this.__saturation_field);
+      var s = (e.clientX - o.left + scroll.left) / w;
+      var v = 1 - (e.clientY - o.top + scroll.top) / w;
 
       if (v > 1) {
         v = 1;
@@ -254,7 +255,8 @@ define([
 
       var s = dom.getHeight(_this.__hue_field);
       var o = dom.getOffset(_this.__hue_field);
-      var h = 1 - (e.clientY - o.top /* + document.body.scrollTop */ ) / s;
+      var scroll = getScroll(_this.__hue_field);
+      var h = 1 - (e.clientY - o.top + scroll.top) / s;
 
       if (h > 1) {
         h = 1;
@@ -279,6 +281,15 @@ define([
     function setHonTouch(e) {
       e.clientY = e.touches[0].clientY;
       return setH(e);
+    }
+
+    function getScroll(el) {
+      var scroll = { top: el.scrollTop, left: el.scrollLeft };
+      while(el = el.parentNode) {
+        scroll.top += (el.scrollTop || 0);
+        scroll.left += (el.scrollLeft || 0);
+      }
+      return scroll;
     }
   };
 

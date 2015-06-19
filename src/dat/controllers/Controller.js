@@ -112,7 +112,7 @@ define([
    *
    * @member dat.controllers
    */
-  var Controller = function(object, property) {
+  var Controller = function(object, property, type, options) {
     this.initialValue = object[property];
 
     /**
@@ -132,6 +132,11 @@ define([
      * @type {String}
      */
     this.property = property;
+
+    /**
+     * Keep track of the options
+     */
+    this.__options = options || {};
 
     /**
      * The function to be called on change.
@@ -184,10 +189,12 @@ define([
          * Change the value of <code>object[property]</code>
          *
          * @param {Object} newValue The new value of <code>object[property]</code>
+         *
+         * @param {Boolean} silent If true, don't call the onChange handler
          */
-        setValue: function(newValue) {
+        setValue: function(newValue, silent) {
           this.object[this.property] = newValue;
-          if (this.__onChange) {
+          if (this.__onChange && !silent) {
             this.__onChange.call(this, newValue);
           }
           // Whenever you call setValue, the display will be updated automatically.
@@ -203,6 +210,23 @@ define([
          */
         getValue: function() {
           return this.object[this.property];
+        },
+
+        getOption: function(name) {
+          return this.__options[name];
+        },
+
+        setOption: function(name, value) {
+          this.__options[name] = value;
+        },
+
+        getReadonly: function() {
+          return this.getOption('readonly');
+        },
+
+        setReadonly: function(value) {
+          this.setOption('readonly', value);
+          this.updateDisplay();
         },
 
         /**

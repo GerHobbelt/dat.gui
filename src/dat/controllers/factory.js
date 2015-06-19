@@ -12,15 +12,17 @@
  */
 
 define([
+  'dat/controllers/Controller',
   'dat/controllers/OptionController',
   'dat/controllers/NumberControllerBox',
   'dat/controllers/NumberControllerSlider',
   'dat/controllers/StringController',
   'dat/controllers/FunctionController',
   'dat/controllers/BooleanController',
+  'dat/controllers/ImageController',
   'dat/utils/common'
 ],
-    function(OptionController, NumberControllerBox, NumberControllerSlider, StringController, FunctionController, BooleanController, common) {
+    function(Controller, OptionController, NumberControllerBox, NumberControllerSlider, StringController, FunctionController, BooleanController, ImageController, common) {
       'use strict';
       
       return function(object, property, options_1, options_2, options_3) {

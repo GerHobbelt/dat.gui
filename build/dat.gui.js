@@ -39,7 +39,6 @@
   dat.color = dat.color || {};
   
   dat.utils.css = (function () {
-  
     'use strict';
   
     return {
@@ -59,12 +58,10 @@
         doc.getElementsByTagName('head')[0].appendChild(injected);
       }
     };
-  
   })();
   
   
   dat.utils.common = (function () {
-    
     'use strict';
   
     var ARR_EACH = Array.prototype.forEach;
@@ -77,39 +74,30 @@
      */
   
     return { 
-      
       BREAK: {},
     
       extend: function(target) {
-        
         this.each(ARR_SLICE.call(arguments, 1), function(obj) {
-          
           for (var key in obj) {
             if (!this.isUndefined(obj[key])) {
               target[key] = obj[key];
             }
           }
-          
         }, this);
         
         return target;
-        
       },
       
       defaults: function(target) {
-        
         this.each(ARR_SLICE.call(arguments, 1), function(obj) {
-          
           for (var key in obj) {
             if (this.isUndefined(target[key])) {
               target[key] = obj[key];
             }
           }
-          
         }, this);
         
         return target;
-      
       },
       
       compose: function() {
@@ -124,33 +112,25 @@
       },
       
       each: function(obj, itr, scope) {
-  
         if (!obj) {
           return;
         }
   
         if (ARR_EACH && obj.forEach && obj.forEach === ARR_EACH) { 
-          
           obj.forEach(itr, scope);
-          
         } else if (obj.length === obj.length + 0) { // Is number but not NaN
-          
           for (var key = 0, l = obj.length; key < l; key++) {
             if (key in obj && itr.call(scope, obj[key], key) === this.BREAK) {
               return;
             }
           }
-              
         } else {
-  
           for (var objkey in obj) {
             if (itr.call(scope, obj[objkey], objkey) === this.BREAK) {
               return;
             }
           }
-              
         }
-              
       },
       
       defer: function(fnc) {
@@ -207,14 +187,11 @@
       isImagePath: function(obj) {
         return typeof obj === 'string' && obj.search(/\.(gif|jpg|jpeg|png)$/) > -1;
       }
-    
     };
-      
   })();
   
   
   dat.controllers.Controller = (function (common) {
-  
     'use strict';
   
     /**
@@ -225,8 +202,7 @@
      *
      * @member dat.controllers
      */
-    var Controller = function(object, property) {
-  
+    var Controller = function(object, property, type, options) {
       this.initialValue = object[property];
   
       /**
@@ -248,6 +224,11 @@
       this.property = property;
   
       /**
+       * Keep track of the options
+       */
+      this.__options = options || {};
+  
+      /**
        * The function to be called on change.
        * @type {Function}
        * @ignore
@@ -260,16 +241,13 @@
        * @ignore
        */
       this.__onFinishChange = undefined;
-  
     };
   
     common.extend(
-  
         Controller.prototype,
   
         /** @lends dat.controllers.Controller.prototype */
         {
-  
           /**
            * Specify that a function fire every time someone changes the value with
            * this Controller.
@@ -301,12 +279,16 @@
            * Change the value of <code>object[property]</code>
            *
            * @param {Object} newValue The new value of <code>object[property]</code>
+           *
+           * @param {Boolean} silent If true, don't call the onChange handler
            */
-          setValue: function(newValue) {
+          setValue: function(newValue, silent) {
             this.object[this.property] = newValue;
-            if (this.__onChange) {
+            if (this.__onChange && !silent) {
               this.__onChange.call(this, newValue);
             }
+            // Whenever you call setValue, the display will be updated automatically.
+            // This reduces some clutter in subclasses.
             this.updateDisplay();
             return this;
           },
@@ -318,6 +300,23 @@
            */
           getValue: function() {
             return this.object[this.property];
+          },
+  
+          getOption: function(name) {
+            return this.__options[name];
+          },
+  
+          setOption: function(name, value) {
+            this.__options[name] = value;
+          },
+  
+          getReadonly: function() {
+            return this.getOption('readonly');
+          },
+  
+          setReadonly: function(value) {
+            this.setOption('readonly', value);
+            this.updateDisplay();
           },
   
           /**
@@ -333,15 +332,12 @@
            * @returns {Boolean} true if the value has deviated from initialValue
            */
           isModified: function() {
-            return this.initialValue !== this.getValue()
+            return this.initialValue !== this.getValue();
           }
-  
         }
-  
     );
   
     return Controller;
-  
   })(dat.utils.common);
   
   
@@ -636,7 +632,6 @@
   
   
   dat.controllers.OptionController = (function (Controller, dom, common) {
-  
     'use strict';
   
     /**
@@ -652,11 +647,13 @@
      *
      * @member dat.controllers
      */
-    var OptionController = function(object, property, options) {
-  
-      OptionController.superclass.call(this, object, property);
+    var OptionController = function(object, property, params, options) {
+      OptionController.superclass.call(this, object, property, 'option', options);
   
       var _this = this;
+      this.CUSTOM_FLAG = '';
+  
+      params = params || {};
   
       /**
        * The drop down menu
@@ -664,16 +661,15 @@
        */
       this.__select = document.createElement('select');
   
-      if (common.isArray(options)) {
+      if (common.isArray(params)) {
         var map = {};
-        common.each(options, function(element) {
+        common.each(params, function(element) {
           map[element] = element;
         });
-        options = map;
+        params = map;
       }
   
-      common.each(options, function(value, key) {
-  
+      common.each(params, function(value, key) {
         var opt = document.createElement('option');
         opt.innerHTML = key;
         opt.setAttribute('value', value);
@@ -681,27 +677,44 @@
   
       });
   
+      if (params.custom) {
+        var opt = document.createElement('option');
+        opt.innerHTML = params.custom.display || 'Custom';
+        opt.setAttribute('value', _this.CUSTOM_FLAG);
+        _this.__select.appendChild(opt);
+  
+        this.__custom_controller = params.custom.controller;
+      }
+  
       // Acknowledge original value
       this.updateDisplay();
   
       dom.bind(this.__select, 'change', function() {
-        var desiredValue = this.options[this.selectedIndex].value;
-        _this.setValue(desiredValue);
+        var value = this.options[this.selectedIndex].value;
+        if (value == _this.CUSTOM_FLAG)
+          value = _this.__custom_controller.getValue();
+        _this.setValue(value);
       });
   
-      this.domElement.appendChild(this.__select);
+      if (this.__custom_controller) {
+        this.__custom_controller.onChange(function() {
+          var value = this.getValue();
+          _this.setValue(value);
+        });
+      }
   
+      this.domElement.appendChild(this.__select);
+      if (this.__custom_controller) {
+        this.domElement.appendChild(this.__custom_controller.el);
+      }
     };
   
     OptionController.superclass = Controller;
   
     common.extend(
-  
         OptionController.prototype,
         Controller.prototype,
-  
         {
-  
           setValue: function(v) {
             var toReturn = OptionController.superclass.prototype.setValue.call(this, v);
             if (this.__onFinishChange) {
@@ -711,23 +724,34 @@
           },
   
           updateDisplay: function() {
-            this.__select.value = this.getValue();
+            var value = this.getValue();
+            var custom = true;
+            if (value != this.CUSTOM_FLAG) {
+              common.each(this.__select.options, function(option) {
+                if (value == option.value) {
+                  custom = false;
+                }
+              });
+            }
+  
+            this.__select.value = custom ? this.CUSTOM_FLAG : value;
+  
+            if (this.__custom_controller) {
+              this.__custom_controller.el.style.display = custom ? 'block' : 'none';
+            }
+  
             return OptionController.superclass.prototype.updateDisplay.call(this);
           }
-  
         }
-  
     );
   
     return OptionController;
-  
   })(dat.controllers.Controller,
   dat.dom.dom,
   dat.utils.common);
   
   
   dat.controllers.NumberController = (function (Controller, common) {
-  
     'use strict';
   
     /**
@@ -764,9 +788,12 @@
      *
      * @member dat.controllers
      */
-    var NumberController = function(object, property, params) {
+    var NumberController = function(object, property, params, options) {
+      NumberController.superclass.call(this, object, property, 'number', options);
   
-      NumberController.superclass.call(this, object, property);
+      if (typeof this.getValue() !== 'number') {
+        throw 'Provided value is not a number';
+      }
   
       params = params || {};
   
@@ -780,21 +807,17 @@
       this.__impliedStep = guestimateImpliedStep(this.initialValue, this.__step, this.__minimumSaneStepSize, this.__maximumSaneStepSize);
   
       this.__precision = numDecimals(this.__impliedStep);
-  
     };
   
     NumberController.superclass = Controller;
   
     common.extend(
-  
         NumberController.prototype,
         Controller.prototype,
   
         /** @lends dat.controllers.NumberController.prototype */
         {
-  
           setValue: function(v) {
-  
             if (this.__min !== undefined && v < this.__min) {
               v = this.__min;
             } else if (this.__max !== undefined && v > this.__max) {
@@ -815,7 +838,6 @@
             }
   
             return NumberController.superclass.prototype.setValue.call(this, v);
-  
           },
   
           /**
@@ -877,9 +899,7 @@
               mode: this.__mode
             };
           }
-  
         }
-  
     );
   
     function numDecimals(x) {
@@ -892,13 +912,11 @@
     }
   
     return NumberController;
-  
   })(dat.controllers.Controller,
   dat.utils.common);
   
   
   dat.controllers.NumberControllerBox = (function (NumberController, dom, common) {
-  
     'use strict';
   
     /**
@@ -918,7 +936,6 @@
      * @member dat.controllers
      */
     var NumberControllerBox = function(object, property, params) {
-  
       this.__truncationSuspended = false;
   
       NumberControllerBox.superclass.call(this, object, property, params);
@@ -931,7 +948,16 @@
        */
       var prev_y;
   
+      this.__input = document.createElement('input');
+      this.__input.setAttribute('type', 'text');
+  
       // Makes it so manually specified values are not truncated.
+  
+      dom.bind(this.__input, 'change', onChange);
+      dom.bind(this.__input, 'blur', onBlur);
+      dom.bind(this.__input, 'touchdown', onTouchDown);
+      dom.bind(this.__input, 'mousedown', onMouseDown);
+      dom.bind(this.__input, 'keydown', onKeyDown);
   
       function onKeyDown(e) {
         // When pressing ENTER key, you can be as precise as you want.
@@ -997,20 +1023,9 @@
         dom.unbind(window, 'mouseup', onMouseUp);
       }
   
-  
-      this.__input = document.createElement('input');
-      this.__input.setAttribute('type', 'text');
-  
-      dom.bind(this.__input, 'change', onChange);
-      dom.bind(this.__input, 'blur', onBlur);
-      dom.bind(this.__input, 'touchdown', onTouchDown);
-      dom.bind(this.__input, 'mousedown', onMouseDown);
-      dom.bind(this.__input, 'keydown', onKeyDown);
-  
       this.updateDisplay();
   
       this.domElement.appendChild(this.__input);
-  
     };
   
     NumberControllerBox.superclass = NumberController;
@@ -1032,14 +1047,12 @@
     }
   
     return NumberControllerBox;
-  
   })(dat.controllers.NumberController,
   dat.dom.dom,
   dat.utils.common);
   
   
   dat.controllers.NumberControllerSlider = (function (NumberController, dom, css, common, styleSheet) {
-  
     'use strict';
   
     /**
@@ -1061,7 +1074,6 @@
      * @member dat.controllers
      */
     var NumberControllerSlider = function(object, property, min, max, step) {
-  
       NumberControllerSlider.superclass.call(this, object, property, { min: min, max: max, step: step });
   
       var _this = this;
@@ -1122,11 +1134,9 @@
         }
       }
   
-  
       this.__background = document.createElement('div');
       this.__foreground = document.createElement('div');
       
-  
       dom.bind(this.__background, 'touchstart', onTouchDown);
       dom.bind(this.__background, 'mousedown', onMouseDown);
       
@@ -1137,7 +1147,6 @@
   
       this.__background.appendChild(this.__foreground);
       this.domElement.appendChild(this.__background);
-  
     };
   
     NumberControllerSlider.superclass = NumberController;
@@ -1161,9 +1170,9 @@
         }
     );
   
-  	function map(v, i1, i2, o1, o2) {
-  		return o1 + (o2 - o1) * ((v - i1) / (i2 - i1));
-  	}
+    function map(v, i1, i2, o1, o2) {
+      return o1 + (o2 - o1) * ((v - i1) / (i2 - i1));
+    }
   
     return NumberControllerSlider;
   })(dat.controllers.NumberController,
@@ -1174,7 +1183,6 @@
   
   
   dat.controllers.StringController = (function (Controller, dom, common) {
-  
     'use strict';
   
     /**
@@ -1187,14 +1195,20 @@
      *
      * @member dat.controllers
      */
-    var StringController = function(object, property) {
-  
-      StringController.superclass.call(this, object, property);
+    var StringController = function(object, property, options) {
+      StringController.superclass.call(this, object, property, 'string', options);
   
       var _this = this;
   
-      function onKeyDown(e) {
+      this.__input = document.createElement('input');
+      this.__input.setAttribute('type', 'text');
   
+      dom.bind(this.__input, 'keyup', onChange);
+      dom.bind(this.__input, 'change', onChange);
+      dom.bind(this.__input, 'blur', onBlur);
+      dom.bind(this.__input, 'keydown', onKeyDown);
+  
+      function onKeyDown(e) {
         if (e.keyCode === 13) {
           /* jshint validthis: true */
           this.blur(); 
@@ -1212,30 +1226,17 @@
         }
       }
   
-  
-      this.__input = document.createElement('input');
-      this.__input.setAttribute('type', 'text');
-  
-      dom.bind(this.__input, 'keyup', onChange);
-      dom.bind(this.__input, 'change', onChange);
-      dom.bind(this.__input, 'blur', onBlur);
-      dom.bind(this.__input, 'keydown', onKeyDown);
-  
       this.updateDisplay();
   
       this.domElement.appendChild(this.__input);
-  
     };
   
     StringController.superclass = Controller;
   
     common.extend(
-  
         StringController.prototype,
         Controller.prototype,
-  
         {
-  
           updateDisplay: function() {
             // Stops the caret from moving on account of:
             // keyup -> setValue -> updateDisplay
@@ -1244,20 +1245,16 @@
             }
             return StringController.superclass.prototype.updateDisplay.call(this);
           }
-  
         }
-  
     );
   
     return StringController;
-  
   })(dat.controllers.Controller,
   dat.dom.dom,
   dat.utils.common);
   
   
   dat.controllers.FunctionController = (function (Controller, dom, common) {
-  
     'use strict';
     
     /**
@@ -1273,7 +1270,6 @@
      * @member dat.controllers
      */
     var FunctionController = function(object, property, text, user_data) {
-      
       if (!common.isUndefined(user_data) && !common.isArray(user_data)) {
         user_data = [user_data];
       }
@@ -1294,17 +1290,14 @@
       dom.addClass(this.__button, 'button');
   
       this.domElement.appendChild(this.__button);
-  
     };
   
     FunctionController.superclass = Controller;
   
     common.extend(
-  
         FunctionController.prototype,
         Controller.prototype,
         {
-          
           fire: function(user_data) {
             if (this.__onChange) {
               this.__onChange.call(this, this.getValue(), user_data);
@@ -1315,18 +1308,15 @@
             }
           }
         }
-  
     );
   
     return FunctionController;
-  
   })(dat.controllers.Controller,
   dat.dom.dom,
   dat.utils.common);
   
   
   dat.controllers.BooleanController = (function (Controller, dom, common) {
-  
     'use strict';
   
     /**
@@ -1338,20 +1328,14 @@
      *
      * @member dat.controllers
      */
-    var BooleanController = function(object, property) {
-  
-      BooleanController.superclass.call(this, object, property);
+    var BooleanController = function(object, property, options) {
+      BooleanController.superclass.call(this, object, property, 'boolean', options);
   
       var _this = this;
       this.__prev = this.getValue();
   
-      function onChange() {
-        _this.setValue(!_this.__prev);
-      }
-  
       this.__checkbox = document.createElement('input');
       this.__checkbox.setAttribute('type', 'checkbox');
-  
   
       dom.bind(this.__checkbox, 'change', onChange, false);
   
@@ -1360,17 +1344,17 @@
       // Match original value
       this.updateDisplay();
   
+      function onChange() {
+        _this.setValue(!_this.__prev);
+      }
     };
   
     BooleanController.superclass = Controller;
   
     common.extend(
-  
         BooleanController.prototype,
         Controller.prototype,
-  
         {
-  
           setValue: function(v) {
             var toReturn = BooleanController.superclass.prototype.setValue.call(this, v);
             if (this.__onFinishChange) {
@@ -1381,7 +1365,6 @@
           },
   
           updateDisplay: function() {
-            
             if (this.getValue() === true) {
               this.__checkbox.setAttribute('checked', 'checked');
               this.__checkbox.checked = true;    
@@ -1390,22 +1373,17 @@
             }
   
             return BooleanController.superclass.prototype.updateDisplay.call(this);
-  
           }
-  
         }
-  
     );
   
     return BooleanController;
-  
   })(dat.controllers.Controller,
   dat.dom.dom,
   dat.utils.common);
   
   
   dat.controllers.ImageController = (function (Controller, dom, css, common, styleSheet) {
-  
     'use strict';
   
       /**
@@ -1419,7 +1397,6 @@
        * @member dat.controllers
        */
       function ImageController(Object, property) {
-  
           ImageController.superclass.call(this, Object, property);
   
           var _this = this;
@@ -1442,7 +1419,6 @@
               var url = URL.createObjectURL(file);
               _this.__previewImage.src = url;
               _this.setValue( url );
-  
   
               if (_this.__onFinishChange) {
                   _this.__onFinishChange.call(_this, _this.getValue());
@@ -1478,12 +1454,11 @@
       )
   
       return ImageController;
-  
   })(dat.controllers.Controller,
   dat.dom.dom,
   dat.utils.css,
   dat.utils.common,
-  "\n.GUI-preview-image{\n    float: left;\n    padding: 0.4em;\n    max-width: 2em;\n    max-height: 2em;\n\n}\n\n.GUI-label-image{\n    color:rgb(214, 214, 245);\n    text-decoration: underline;\n    display: block;\n    background-color: #3c3c3c;\n    width: 100%;\n    cursor: pointer;\n}\n\n.GUI-label-image:hover{\n    background: #3c3c3c;\n}");
+  "\n.GUI-preview-image\n{\n    float: left;\n    padding: 0.4em;\n    max-width: 2em;\n    max-height: 2em;\n\n}\n\n.GUI-label-image\n{\n    color:rgb(214, 214, 245);\n    text-decoration: underline;\n    display: block;\n    background-color: #3c3c3c;\n    width: 100%;\n    cursor: pointer;\n}\n\n.GUI-label-image:hover\n{\n    background: #3c3c3c;\n}\n\n");
   
   
   dat.color.toString = (function (common) {
@@ -1507,7 +1482,7 @@
   
       }
   
-    }
+    };
   
   })(dat.utils.common);
   
@@ -1667,7 +1642,7 @@
                 space: 'HEX',
                 hex: original,
                 conversionName: 'HEX'
-              }
+              };
             },
   
             write: function(color) {
@@ -1750,7 +1725,7 @@
                   g: original.g,
                   b: original.b,
                   a: original.a
-                }
+                };
               }
               return false;
             },
@@ -1761,7 +1736,7 @@
                 g: color.g,
                 b: color.b,
                 a: color.a
-              }
+              };
             }
           },
   
@@ -1775,7 +1750,7 @@
                   r: original.r,
                   g: original.g,
                   b: original.b
-                }
+                };
               }
               return false;
             },
@@ -1785,7 +1760,7 @@
                 r: color.r,
                 g: color.g,
                 b: color.b
-              }
+              };
             }
           },
   
@@ -1801,7 +1776,7 @@
                   s: original.s,
                   v: original.v,
                   a: original.a
-                }
+                };
               }
               return false;
             },
@@ -1812,7 +1787,7 @@
                 s: color.s,
                 v: color.v,
                 a: color.a
-              }
+              };
             }
           },
   
@@ -1826,7 +1801,7 @@
                   h: original.h,
                   s: original.s,
                   v: original.v
-                }
+                };
               }
               return false;
             },
@@ -1836,7 +1811,7 @@
                 h: color.h,
                 s: color.s,
                 v: color.v
-              }
+              };
             }
   
           }
@@ -1854,7 +1829,6 @@
   
   
   dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, controllerFactory, Controller, BooleanController, FunctionController, NumberController, NumberControllerBox, NumberControllerSlider, OptionController, StringController, ImageController, ColorController, requestAnimationFrame, CenteredDiv, dom, common) {
-  
     'use strict';
   
     //var ARR_EACH = Array.prototype.forEach;
@@ -1910,7 +1884,6 @@
      * @param {Boolean} [params.closed] If true, starts closed
      */
     var GUI = function(params) {
-  
       var _this = this;
   
       this.__typeControllers = {
@@ -1986,16 +1959,12 @@
   
   
       if (!common.isUndefined(params.load)) {
-  
         // Explicit preset
         if (params.preset) {
           params.load.preset = params.preset;
         }
-  
       } else {
-  
         params.load = { preset: DEFAULT_DEFAULT_PRESET_NAME };
-  
       }
   
       if (common.isUndefined(params.parent) && params.hideable) {
@@ -2020,10 +1989,8 @@
       var saveToLocalStorage;
   
       Object.defineProperties(this,
-  
         /** @lends dat.gui.GUI.prototype */
         {
-  
           /**
            * The parent <code>GUI</code>
            * @type dat.gui.GUI
@@ -2055,7 +2022,6 @@
            * @type String
            */
           preset: {
-  
             get: function() {
               if (_this.parent) {
                 return _this.getRoot().preset;
@@ -2074,7 +2040,6 @@
               _this.revert();
               return _this;
             }
-  
           },
   
           /**
@@ -2154,7 +2119,6 @@
            * @type Boolean
            */
           useLocalStorage: {
-  
             get: function() {
               return use_local_storage;
             },
@@ -2170,14 +2134,11 @@
               }
               return _this;
             }
-  
           }
-  
         });
   
       // Are we a root level GUI?
       if (common.isUndefined(params.parent)) {
-  
         params.closed = false;
   
         dom.addClass(this.domElement, GUI.CLASS_MAIN);
@@ -2185,9 +2146,7 @@
   
         // Are we supposed to be loading locally?
         if (SUPPORTS_LOCAL_STORAGE) {
-  
           if (use_local_storage) {
-  
             this.useLocalStorage = true;
   
             var saved_gui = localStorage.getItem(getLocalStorageHash(this, 'gui'));
@@ -2195,9 +2154,7 @@
             if (saved_gui) {
               params.load = JSON.parse(saved_gui);
             }
-  
           }
-  
         }
   
         this.__closeButton = document.createElement('div');
@@ -2206,14 +2163,11 @@
         this.domElement.appendChild(this.__closeButton);
   
         dom.bind(this.__closeButton, 'click', function() {
-  
           _this.closed = !_this.closed;
-  
         });
   
         // Oh, you're a nested GUI!
       } else {
-  
         if (params.closed === undefined) {
           params.closed = true;
         }
@@ -2237,13 +2191,10 @@
         if (!params.closed) {
           this.closed = false;
         }
-  
       }
   
       if (params.autoPlace) {
-  
         if (common.isUndefined(params.parent)) {
-  
           if (auto_place_virgin) {
             auto_place_container = document.createElement('div');
             dom.addClass(auto_place_container, CSS_NAMESPACE);
@@ -2257,14 +2208,12 @@
   
           // Apply the auto styles
           dom.addClass(this.domElement, GUI.CLASS_AUTO_PLACE);
-  
         }
   
         // Make it not elastic.
         if (!this.parent) {
           setWidth(this, params.width);
         }
-  
       }
   
       dom.bind(window, 'resize', function() { _this.onResize(); });
@@ -2272,7 +2221,6 @@
       dom.bind(this.__ul, 'transitionend', function() { _this.onResize(); });
       dom.bind(this.__ul, 'oTransitionEnd', function() { _this.onResize(); });
       this.onResize();
-  
   
       if (params.resizable) {
         addResizeHandle(this);
@@ -2301,11 +2249,9 @@
       if (!params.parent) {
         resetWidth();
       }
-  
     };
   
     GUI.toggleHide = function() {
-  
       hide = !hide;
       common.each(hideable_guis, function(gui) {
         gui.domElement.style.zIndex = hide ? -999 : 999;
@@ -2327,16 +2273,13 @@
     GUI.TEXT_OPEN = 'Open Controls';
   
     dom.bind(window, 'keydown', function(e) {
-  
       if (document.activeElement.type !== 'text' &&
           (e.which === HIDE_KEY_CODE || e.keyCode === HIDE_KEY_CODE)) {
         GUI.toggleHide();
       }
-  
     }, false);
   
     common.extend(
-  
       GUI.prototype,
   
       /** @lends dat.gui.GUI */
@@ -2365,7 +2308,6 @@
          * @instance
          */
         add: function(object, property /* ...args */) {
-  
           return add(
               this,
               object,
@@ -2374,7 +2316,6 @@
                 factoryArgs: ARR_SLICE.call(arguments, 2)
               }
           );
-  
         },
   
         /**
@@ -2384,7 +2325,6 @@
          * @instance
          */
         addColor: function(object, property) {
-  
           return add(
               this,
               object,
@@ -2393,7 +2333,6 @@
                 controller: 'color'
               }
           );
-  
         },
   
         /**
@@ -2403,7 +2342,6 @@
          * @instance
          */
         addAs: function(object, property, controller /* ...args */) {
-  
           return add(
               this,
               object,
@@ -2413,7 +2351,6 @@
                 factoryArgs: ARR_SLICE.call(arguments, 3)
               }
           );
-  
         },
   
         /**
@@ -2421,24 +2358,20 @@
          * @instance
          */
         remove: function(controller) {
-  
           // TODO listening?
           this.__ul.removeChild(controller.__li);
-          this.__controllers.slice(this.__controllers.indexOf(controller), 1);
+          this.__controllers.splice(this.__controllers.indexOf(controller), 1);
           var _this = this;
           common.defer(function() {
             _this.onResize();
           });
           return this;
-  
         },
   
         destroy: function() {
-  
           if (this.autoPlace) {
             auto_place_container.removeChild(this.domElement);
           }
-  
         },
   
         /**
@@ -2449,7 +2382,6 @@
          * @instance
          */
         addFolder: function(name) {
-  
           // We have to prevent collisions on names in order to have a key
           // by which to remember saved values
           if (this.__folders[name] !== undefined) {
@@ -2475,7 +2407,6 @@
   
             // Pass down the loaded data
             new_gui_params.load = this.load.folders[name];
-  
           }
   
           var gui = new GUI(new_gui_params);
@@ -2484,7 +2415,6 @@
           var li = addRow(this, gui.domElement);
           dom.addClass(li, 'folder');
           return gui;
-  
         },
   
         open: function() {
@@ -2498,11 +2428,9 @@
         },
   
         onResize: function() {
-  
           var root = this.getRoot();
   
           if (root.scrollable) {
-  
             var top = dom.getOffset(root.__ul).top;
             var h = 0;
   
@@ -2519,7 +2447,6 @@
               dom.removeClass(root.domElement, GUI.CLASS_TOO_TALL);
               root.__ul.style.height = 'auto';
             }
-  
           }
   
           if (root.__resize_handle) {
@@ -2531,7 +2458,6 @@
           if (root.__closeButton) {
             root.__closeButton.style.width = root.width + 'px';
           }
-  
         },
   
         /**
@@ -2544,7 +2470,6 @@
          * @instance
          */
         remember: function(/*...args*/) {
-  
           if (common.isUndefined(SAVE_DIALOGUE)) {
             SAVE_DIALOGUE = new CenteredDiv();
             SAVE_DIALOGUE.domElement.innerHTML = saveDialogueContents;
@@ -2570,7 +2495,6 @@
             setWidth(this, this.width);
           }
           return this;
-  
         },
   
         /**
@@ -2591,14 +2515,12 @@
          * @instance
          */
         getSaveObject: function() {
-  
           var toReturn = this.load;
   
           toReturn.closed = this.closed;
   
           // Am I remembering any values?
           if (this.__rememberedObjects.length > 0) {
-  
             toReturn.preset = this.preset;
   
             if (!toReturn.remembered) {
@@ -2606,7 +2528,6 @@
             }
   
             toReturn.remembered[this.preset] = getCurrentPreset(this);
-  
           }
   
           toReturn.folders = {};
@@ -2615,11 +2536,9 @@
           });
   
           return toReturn;
-  
         },
   
         save: function() {
-  
           if (!this.load.remembered) {
             this.load.remembered = {};
           }
@@ -2628,17 +2547,13 @@
           markPresetModified(this, false);
           this.saveToLocalStorageIfPossible();
           return this;
-  
         },
   
         saveAs: function(presetName) {
-  
           if (!this.load.remembered) {
-  
             // Retain default values upon first save
             this.load.remembered = {};
             this.load.remembered[DEFAULT_DEFAULT_PRESET_NAME] = getCurrentPreset(this, true);
-  
           }
   
           this.load.remembered[presetName] = getCurrentPreset(this);
@@ -2646,11 +2561,9 @@
           addPresetOption(this, presetName, true);
           this.saveToLocalStorageIfPossible();
           return this;
-  
         },
   
         revert: function(gui) {
-  
           common.each(this.__controllers, function(controller) {
             // Make revert work on Default.
             if (!this.getRoot().load.remembered) {
@@ -2668,26 +2581,20 @@
             markPresetModified(this.getRoot(), false);
           }
           return this;
-  
         },
   
         listen: function(controller) {
-  
           var init = this.__listening.length === 0;
           this.__listening.push(controller);
           if (init) {
             updateDisplays(this.__listening);
           }
           return this;
-  
         }
-  
       }
-  
     );
   
     function add(gui, object, property, params) {
-  
       var factoryArgs = [object, property, params.controller, gui.__typeControllers].concat(params.factoryArgs);
       var controller = controllerFactory.apply(gui, factoryArgs);
   
@@ -2725,7 +2632,6 @@
       gui.__controllers.push(controller);
   
       return controller;
-  
     }
   
     /**
@@ -2750,14 +2656,11 @@
     }
   
     function augmentController(gui, li, controller) {
-  
       controller.__li = li;
       controller.__gui = gui;
   
       common.extend(controller, {
-  
         options: function(options) {
-  
           var next_sibling;
   
           if (arguments.length > 1) {
@@ -2773,7 +2676,6 @@
                   factoryArgs: [common.toArray(arguments)]
                 }
             );
-  
           }
   
           if (common.isArray(options) || common.isObject(options)) {
@@ -2789,9 +2691,7 @@
                   factoryArgs: [options]
                 }
             );
-  
           }           
-  
         },
   
         name: function(v) {
@@ -2808,12 +2708,10 @@
           controller.__gui.remove(controller);
           return controller;
         }
-  
       });
   
       // All sliders should be accompanied by a box.
       if (controller instanceof NumberControllerSlider) {
-  
         var box = new NumberControllerBox(controller.object, controller.property,
             { min: controller.__min, max: controller.__max, step: controller.__step });
   
@@ -2829,10 +2727,8 @@
   
         dom.addClass(li, 'has-slider');
         controller.domElement.insertBefore(box.domElement, controller.domElement.firstElementChild);
-  
       }
       else if (controller instanceof NumberControllerBox) {
-  
         var r = function(returned) {
           // Have we defined both boundaries?
           if (common.isNumber(controller.__min) && common.isNumber(controller.__max)) {
@@ -2853,10 +2749,8 @@
   
         controller.min = common.compose(r, controller.min);
         controller.max = common.compose(r, controller.max);
-  
       }
       else if (controller instanceof BooleanController) {
-  
         dom.bind(li, 'click', function() {
           dom.fakeEvent(controller.__checkbox, 'click');
         });
@@ -2864,10 +2758,8 @@
         dom.bind(controller.__checkbox, 'click', function(e) {
           e.stopPropagation(); // Prevents double-toggle
         })
-  
       }
       else if (controller instanceof FunctionController) {
-  
         dom.bind(li, 'click', function() {
           dom.fakeEvent(controller.__button, 'click');
         });
@@ -2879,10 +2771,8 @@
         dom.bind(li, 'mouseout', function() {
           dom.removeClass(controller.__button, 'hover');
         });
-  
       }
       else if (controller instanceof ColorController) {
-  
         dom.addClass(li, 'color');
         controller.updateDisplay = common.compose(function(r) {
           li.style.borderLeftColor = controller.__color.toString();
@@ -2890,7 +2780,6 @@
         }, controller.updateDisplay);
   
         controller.updateDisplay();
-  
       }
   
       controller.setValue = common.compose(function(r) {
@@ -2899,11 +2788,9 @@
         }
         return r;
       }, controller.setValue);
-  
     }
   
     function recallSavedValue(gui, controller) {
-  
       // Find the topmost GUI, that's where remembered objects live.
       var root = gui.getRoot();
   
@@ -2913,7 +2800,6 @@
   
       // Why yes, it does!
       if (matched_index !== -1) {
-  
         // Let me fetch a map of controllers for thcommon.isObject.
         var controller_map =
             root.__rememberedObjectIndecesToControllers[matched_index];
@@ -2930,59 +2816,43 @@
   
         // Okay, now have we saved any values for this controller?
         if (root.load && root.load.remembered) {
-  
           var preset_map = root.load.remembered;
   
           // Which preset are we trying to load?
           var preset;
   
           if (preset_map[gui.preset]) {
-  
             preset = preset_map[gui.preset];
-  
           } else if (preset_map[DEFAULT_DEFAULT_PRESET_NAME]) {
-  
             // Uhh, you can have the default instead?
             preset = preset_map[DEFAULT_DEFAULT_PRESET_NAME];
-  
           } else {
-  
             // Nada.
   
             return;
-  
           }
-  
   
           // Did the loaded object remember thcommon.isObject?
           if (preset[matched_index] &&
-  
-            // Did we remember this particular property?
+              // Did we remember this particular property?
               preset[matched_index][controller.property] !== undefined) {
-  
             // We did remember something for this guy ...
             var value = preset[matched_index][controller.property];
   
             // And that's what it is.
             controller.initialValue = value;
             controller.setValue(value);
-  
           }
-  
         }
-  
       }
-  
     }
   
     function getLocalStorageHash(gui, key) {
       // TODO how does this deal with multiple GUI's?
       return document.location.href + '.' + key;
-  
     }
   
     function addSaveMenu(gui) {
-  
       var div = gui.__save_row = document.createElement('li');
   
       dom.addClass(gui.domElement, 'has-save');
@@ -3014,24 +2884,19 @@
       var select = gui.__preset_select = document.createElement('select');
   
       if (gui.load && gui.load.remembered) {
-  
         common.each(gui.load.remembered, function(value, key) {
           addPresetOption(gui, key, key === gui.preset);
         });
-  
       } else {
         addPresetOption(gui, DEFAULT_DEFAULT_PRESET_NAME, false);
       }
   
       dom.bind(select, 'change', function() {
-  
-  
         for (var index = 0; index < gui.__preset_select.length; index++) {
           gui.__preset_select[index].innerHTML = gui.__preset_select[index].value;
         }
   
         gui.preset = this.value;
-  
       });
   
       div.appendChild(select);
@@ -3045,7 +2910,6 @@
       }
   
       if (SUPPORTS_LOCAL_STORAGE) {
-  
         var saveLocally = document.getElementById('dg-save-locally');
         var explain = document.getElementById('dg-local-explain');
   
@@ -3064,7 +2928,6 @@
           gui.useLocalStorage = !gui.useLocalStorage;
           showHideExplain();
         });
-  
       }
   
       var newConstructorTextArea = document.getElementById('dg-new-constructor');
@@ -3096,28 +2959,28 @@
       dom.bind(button3, 'click', function() {
         gui.revert();
       });
-  
     }
   
     function addResizeHandle(gui) {
-  
       gui.__resize_handle = document.createElement('div');
   
       common.extend(gui.__resize_handle.style, {
-  
         width: '6px',
         marginLeft: '-3px',
         height: '200px',
         cursor: 'ew-resize',
         position: 'absolute'
   //      border: '1px solid blue'
-  
       });
   
       var pmouseX;
   
-      function dragStart(e) {
+      dom.bind(gui.__resize_handle, 'mousedown', dragStart);
+      dom.bind(gui.__closeButton, 'mousedown', dragStart);
   
+      gui.domElement.insertBefore(gui.__resize_handle, gui.domElement.firstElementChild);
+  
+      function dragStart(e) {
         e.preventDefault();
   
         pmouseX = e.clientX;
@@ -3127,11 +2990,9 @@
         dom.bind(window, 'mouseup', dragStop);
   
         return false;
-  
       }
   
       function drag(e) {
-  
         e.preventDefault();
   
         gui.width += pmouseX - e.clientX;
@@ -3139,22 +3000,13 @@
         pmouseX = e.clientX;
   
         return false;
-  
       }
   
       function dragStop() {
-  
         dom.removeClass(gui.__closeButton, GUI.CLASS_DRAG);
         dom.unbind(window, 'mousemove', drag);
         dom.unbind(window, 'mouseup', dragStop);
-  
       }
-  
-      dom.bind(gui.__resize_handle, 'mousedown', dragStart);
-      dom.bind(gui.__closeButton, 'mousedown', dragStart);
-  
-      gui.domElement.insertBefore(gui.__resize_handle, gui.domElement.firstElementChild);
-  
     }
   
     function setWidth(gui, w) {
@@ -3170,12 +3022,10 @@
     }
   
     function getCurrentPreset(gui, useInitialValues) {
-  
       var toReturn = {};
   
       // For each object I'm remembering
       common.each(gui.__rememberedObjects, function(val, index) {
-  
         var saved_values = {};
   
         // The controllers I've made for thcommon.isObject by property
@@ -3189,11 +3039,9 @@
   
         // Save the values for thcommon.isObject
         toReturn[index] = saved_values;
-  
       });
   
       return toReturn;
-  
     }
   
     function addPresetOption(gui, name, setSelected) {
@@ -3239,9 +3087,8 @@
     return GUI;
   })(dat.utils.css,
   "<div id=\"dg-save\" class=\"dg dialogue\">\n\n  Here's the new load parameter for your <code>GUI</code>'s constructor:\n\n  <textarea id=\"dg-new-constructor\"></textarea>\n\n  <div id=\"dg-save-locally\">\n\n    <input id=\"dg-local-storage\" type=\"checkbox\"/> Automatically save\n    values to <code>localStorage</code> on exit.\n\n    <div id=\"dg-local-explain\">The values saved to <code>localStorage</code> will\n      override those passed to <code>dat.GUI</code>'s constructor. This makes it\n      easier to work incrementally, but <code>localStorage</code> is fragile,\n      and your friends may not see the same values you do.\n      \n    </div>\n    \n  </div>\n\n</div>",
-  ".dg {\n  /** Clear list styles */\n  /* Auto-place container */\n  /* Auto-placed GUI's */\n  /* Line items that don't contain folders. */\n  /** Folder names */\n  /** Hides closed items */\n  /** Controller row */\n  /** Name-half (left) */\n  /** Controller-half (right) */\n  /** Controller placement */\n  /** Shorter number boxes when slider is present. */\n  /** Ensure the entire boolean and function row shows a hand */ }\n  .dg ul {\n    list-style: none;\n    margin: 0;\n    padding: 0;\n    width: 100%;\n    clear: both; }\n  .dg.ac {\n    position: fixed;\n    top: 0;\n    left: 0;\n    right: 0;\n    height: 0;\n    z-index: 0; }\n  .dg:not(.ac) .main {\n    /** Exclude mains in ac so that we don't hide close button */\n    overflow: hidden; }\n  .dg.main {\n    -webkit-transition: opacity 0.1s linear;\n    -o-transition: opacity 0.1s linear;\n    -moz-transition: opacity 0.1s linear;\n    transition: opacity 0.1s linear; }\n    .dg.main.taller-than-window {\n      overflow-y: auto; }\n      .dg.main.taller-than-window .close-button {\n        opacity: 1;\n        /* TODO, these are style notes */\n        margin-top: -1px;\n        border-top: 1px solid #2c2c2c; }\n    .dg.main ul.closed .close-button {\n      opacity: 1 !important; }\n    .dg.main:hover .close-button,\n    .dg.main .close-button.drag {\n      opacity: 1; }\n    .dg.main .close-button {\n      /*opacity: 0;*/\n      -webkit-transition: opacity 0.1s linear;\n      -o-transition: opacity 0.1s linear;\n      -moz-transition: opacity 0.1s linear;\n      transition: opacity 0.1s linear;\n      border: 0;\n      position: absolute;\n      line-height: 19px;\n      height: 20px;\n      /* TODO, these are style notes */\n      cursor: pointer;\n      text-align: center;\n      background-color: #000; }\n      .dg.main .close-button:hover {\n        background-color: #111; }\n  .dg.a {\n    float: right;\n    margin-right: 15px;\n    overflow-x: hidden; }\n    .dg.a.has-save > ul {\n      margin-top: 27px; }\n      .dg.a.has-save > ul.closed {\n        margin-top: 0; }\n    .dg.a .save-row {\n      position: fixed;\n      top: 0;\n      z-index: 1002; }\n  .dg li {\n    -webkit-transition: height 0.1s ease-out;\n    -o-transition: height 0.1s ease-out;\n    -moz-transition: height 0.1s ease-out;\n    transition: height 0.1s ease-out; }\n  .dg li:not(.folder) {\n    cursor: auto;\n    height: 27px;\n    line-height: 27px;\n    overflow: hidden;\n    padding: 0 4px 0 5px; }\n  .dg li.folder {\n    padding: 0;\n    border-left: 4px solid rgba(0, 0, 0, 0); }\n  .dg li.title {\n    cursor: pointer;\n    margin-left: -4px; }\n  .dg .closed li:not(.title),\n  .dg .closed ul li,\n  .dg .closed ul li > * {\n    height: 0;\n    overflow: hidden;\n    border: 0; }\n  .dg .cr {\n    clear: both;\n    padding-left: 3px;\n    height: 27px; }\n  .dg .property-name {\n    cursor: default;\n    float: left;\n    clear: left;\n    width: 40%;\n    overflow: hidden;\n    text-overflow: ellipsis; \n    text-overflow: \"…\" \"…\";\n    white-space: nowrap;\n  }\n  .dg .c {\n    float: left;\n    width: 60%; }\n  .dg .c input[type=text] {\n    border: 0;\n    margin-top: 4px;\n    padding: 3px;\n    width: 100%;\n    float: right; }\n  .dg .has-slider input[type=text] {\n    width: 30%;\n    /*display: none;*/\n    margin-left: 0; }\n  .dg .slider {\n    float: left;\n    width: 66%;\n    margin-left: -5px;\n    margin-right: 0;\n    height: 19px;\n    margin-top: 4px; }\n  .dg .slider-fg {\n    height: 100%; }\n  .dg .c input[type=checkbox] {\n    margin-top: 9px; }\n  .dg .c select {\n    margin-top: 5px; }\n  .dg .cr.function,\n  .dg .cr.function .property-name,\n  .dg .cr.function *,\n  .dg .cr.boolean,\n  .dg .cr.boolean * {\n    cursor: pointer; }\n  .dg .cr.function .button {\n    margin: 3px 0px;\n    padding: 2px 3px;\n    /* border: 2px solid #666; */\n    line-height: 18px;\n    background: #333;\n    border-radius: 2px;\n  }\n  .dg .selector {\n    display: none;\n    position: absolute;\n    margin-left: -9px;\n    margin-top: 23px;\n    z-index: 10; }\n  .dg .c:hover .selector,\n  .dg .selector.drag {\n    display: block; }\n  .dg li.save-row {\n    padding: 0; }\n    .dg li.save-row .button {\n      display: inline-block;\n      padding: 0px 6px; }\n  .dg.dialogue {\n    background-color: #222;\n    width: 460px;\n    padding: 15px;\n    font-size: 13px;\n    line-height: 15px; }\n\n/* TODO Separate style and structure */\n#dg-new-constructor {\n  padding: 10px;\n  color: #222;\n  font-family: Monaco, monospace;\n  font-size: 10px;\n  border: 0;\n  resize: none;\n  box-shadow: inset 1px 1px 1px #888;\n  word-wrap: break-word;\n  margin: 12px 0;\n  display: block;\n  width: 440px;\n  overflow-y: scroll;\n  height: 100px;\n  position: relative; }\n\n#dg-local-explain {\n  display: none;\n  font-size: 11px;\n  line-height: 17px;\n  border-radius: 3px;\n  background-color: #333;\n  padding: 8px;\n  margin-top: 10px; }\n  #dg-local-explain code {\n    font-size: 10px; }\n\n#dat-gui-save-locally {\n  display: none; }\n\n/** Main type */\n.dg {\n  color: #eee;\n  font: 11px 'Lucida Grande', sans-serif;\n  text-shadow: 0 -1px 0 #111;\n  /** Auto place */\n  /* Controller row, <li> */\n  /** Controllers */ }\n  .dg.main {\n    /** Scrollbar */ }\n    .dg.main::-webkit-scrollbar {\n      width: 5px;\n      background: #1a1a1a; }\n    .dg.main::-webkit-scrollbar-corner {\n      height: 0;\n      display: none; }\n    .dg.main::-webkit-scrollbar-thumb {\n      border-radius: 5px;\n      background: #676767; }\n  .dg li:not(.folder) {\n    background: #1a1a1a;\n    border-bottom: 1px solid #2c2c2c; }\n  .dg li.save-row {\n    line-height: 25px;\n    background: #dad5cb;\n    border: 0; }\n    .dg li.save-row select {\n      margin-left: 5px;\n      width: 108px; }\n    .dg li.save-row .button {\n      margin-left: 5px;\n      margin-top: 1px;\n      border-radius: 2px;\n      font-size: 9px;\n      line-height: 7px;\n      padding: 4px 4px 5px 4px;\n      background: #c5bdad;\n      color: #fff;\n      text-shadow: 0 1px 0 #b0a58f;\n      box-shadow: 0 -1px 0 #b0a58f;\n      cursor: pointer; }\n      .dg li.save-row .button.gears {\n        background: #c5bdad url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAANCAYAAAB/9ZQ7AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAQJJREFUeNpiYKAU/P//PwGIC/ApCABiBSAW+I8AClAcgKxQ4T9hoMAEUrxx2QSGN6+egDX+/vWT4e7N82AMYoPAx/evwWoYoSYbACX2s7KxCxzcsezDh3evFoDEBYTEEqycggWAzA9AuUSQQgeYPa9fPv6/YWm/Acx5IPb7ty/fw+QZblw67vDs8R0YHyQhgObx+yAJkBqmG5dPPDh1aPOGR/eugW0G4vlIoTIfyFcA+QekhhHJhPdQxbiAIguMBTQZrPD7108M6roWYDFQiIAAv6Aow/1bFwXgis+f2LUAynwoIaNcz8XNx3Dl7MEJUDGQpx9gtQ8YCueB+D26OECAAQDadt7e46D42QAAAABJRU5ErkJggg==) 2px 1px no-repeat;\n        height: 7px;\n        width: 8px; }\n      .dg li.save-row .button:hover {\n        background-color: #bab19e;\n        box-shadow: 0 -1px 0 #b0a58f; }\n  .dg li.folder {\n    border-bottom: 0; }\n  .dg li.title {\n    padding-left: 16px;\n    background: black url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlI+hKgFxoCgAOw==) 6px 10px no-repeat;\n    cursor: pointer;\n    border-bottom: 1px solid rgba(255, 255, 255, 0.2); }\n  .dg .closed li.title {\n    background-image: url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlGIWqMCbWAEAOw==); }\n  .dg .cr.boolean {\n    border-left: 3px solid #806787; }\n  .dg .cr.function {\n    border-left: 3px solid #e61d5f; }\n  .dg .cr.number {\n    border-left: 3px solid #2fa1d6; }\n    .dg .cr.number input[type=text] {\n      color: #2fa1d6; }\n  .dg .cr.string {\n    border-left: 3px solid #1ed36f; }\n    .dg .cr.string input[type=text] {\n      color: #1ed36f; }\n  .dg .cr.function:hover, .dg .cr.boolean:hover {\n    background: #111; }\n  .dg .c input[type=text] {\n    background: #303030;\n    outline: none; }\n    .dg .c input[type=text]:hover {\n      background: #3c3c3c; }\n    .dg .c input[type=text]:focus {\n      background: #494949;\n      color: #fff; }\n  .dg .c .slider {\n    background: #303030;\n    cursor: ew-resize; }\n  .dg .c .slider-fg {\n    background: #2fa1d6; }\n  .dg .c .slider:hover {\n    background: #3c3c3c; }\n    .dg .c .slider:hover .slider-fg {\n      background: #44abda; }\n",
+  ".dg {\n  /** Clear list styles */\n  /* Auto-place container */\n  /* Auto-placed GUI's */\n  /* Line items that don't contain folders. */\n  /** Folder names */\n  /** Hides closed items */\n  /** Controller row */\n  /** Name-half (left) */\n  /** Controller-half (right) */\n  /** Controller placement */\n  /** Shorter number boxes when slider is present. */\n  /** Ensure the entire boolean and function row shows a hand */ }\n  .dg ul {\n    list-style: none;\n    margin: 0;\n    padding: 0;\n    width: 100%;\n    clear: both; }\n  .dg.ac {\n    position: fixed;\n    top: 0;\n    left: 0;\n    right: 0;\n    height: 0;\n    z-index: 0; }\n  .dg:not(.ac) .main {\n    /** Exclude mains in ac so that we don't hide close button */\n    overflow: hidden; }\n  .dg.main {\n    -webkit-transition: opacity 0.1s linear;\n    -o-transition: opacity 0.1s linear;\n    -moz-transition: opacity 0.1s linear;\n    transition: opacity 0.1s linear; }\n    .dg.main.taller-than-window {\n      overflow-y: auto; }\n      .dg.main.taller-than-window .close-button {\n        opacity: 1;\n        /* TODO, these are style notes */\n        margin-top: -1px;\n        border-top: 1px solid #2c2c2c; }\n    .dg.main ul.closed .close-button {\n      opacity: 1 !important; }\n    .dg.main:hover .close-button,\n    .dg.main .close-button.drag {\n      opacity: 1; }\n    .dg.main .close-button {\n      /*opacity: 0;*/\n      -webkit-transition: opacity 0.1s linear;\n      -o-transition: opacity 0.1s linear;\n      -moz-transition: opacity 0.1s linear;\n      transition: opacity 0.1s linear;\n      border: 0;\n      position: absolute;\n      line-height: 19px;\n      height: 20px;\n      /* TODO, these are style notes */\n      cursor: pointer;\n      text-align: center;\n      background-color: #000; }\n      .dg.main .close-button:hover {\n        background-color: #111; }\n  .dg.a {\n    float: right;\n    margin-right: 15px;\n    overflow-x: hidden; }\n    .dg.a.has-save > ul {\n      margin-top: 27px; }\n      .dg.a.has-save > ul.closed {\n        margin-top: 0; }\n    .dg.a .save-row {\n      position: fixed;\n      top: 0;\n      z-index: 1002; }\n  .dg li {\n    -webkit-transition: height 0.1s ease-out;\n    -o-transition: height 0.1s ease-out;\n    -moz-transition: height 0.1s ease-out;\n    transition: height 0.1s ease-out; }\n  .dg li:not(.folder) {\n    cursor: auto;\n    height: 27px;\n    line-height: 27px;\n    overflow: hidden;\n    padding: 0 4px 0 5px; }\n  .dg li.folder {\n    padding: 0;\n    border-left: 4px solid rgba(0, 0, 0, 0); }\n  .dg li.title {\n    cursor: pointer;\n    margin-left: -4px; }\n  .dg .closed li:not(.title),\n  .dg .closed ul li,\n  .dg .closed ul li > * {\n    height: 0;\n    overflow: hidden;\n    border: 0; }\n  .dg .cr {\n    clear: both;\n    padding-left: 3px;\n    height: 27px; }\n  .dg .property-name {\n    cursor: default;\n    float: left;\n    clear: left;\n    width: 40%;\n    overflow: hidden;\n    text-overflow: ellipsis; \n    text-overflow: \"…\" \"…\";\n    white-space: nowrap;\n  }\n  .dg .c {\n    float: left;\n    width: 60%; }\n  .dg .c input[type=text] {\n    border: 0;\n    margin-top: 4px;\n    padding: 3px;\n    width: 100%;\n    float: right; }\n  .dg .has-slider input[type=text] {\n    width: 30%;\n    /*display: none;*/\n    margin-left: 0; }\n  .dg .slider {\n    float: left;\n    width: 66%;\n    margin-left: -5px;\n    margin-right: 0;\n    height: 19px;\n    margin-top: 4px; }\n  .dg .slider-fg {\n    height: 100%; }\n  .dg .c input[type=checkbox] {\n    margin-top: 9px; }\n  .dg .c select {\n    margin-top: 5px; }\n  .dg .cr.function,\n  .dg .cr.function .property-name,\n  .dg .cr.function *,\n  .dg .cr.boolean,\n  .dg .cr.boolean * {\n    cursor: pointer; }\n  .dg .cr.function .button {\n    margin: 3px 0px;\n    padding: 2px 3px;\n    /* border: 2px solid #666; */\n    line-height: 18px;\n    background: #333;\n    border-radius: 2px;\n  }\n  .dg .selector {\n    display: none;\n    position: absolute;\n    margin-left: -9px;\n    margin-top: 23px;\n    z-index: 10; }\n  .dg .c:hover .selector,\n  .dg .selector.drag {\n    display: block; }\n  .dg li.save-row {\n    padding: 0; }\n    .dg li.save-row .button {\n      display: inline-block;\n      padding: 0px 6px; }\n  .dg.dialogue {\n    background-color: #222;\n    width: 460px;\n    padding: 15px;\n    font-size: 13px;\n    line-height: 15px; }\n\n/* TODO Separate style and structure */\n#dg-new-constructor {\n  padding: 10px;\n  color: #222;\n  font-family: Monaco, monospace;\n  font-size: 10px;\n  border: 0;\n  resize: none;\n  box-shadow: inset 1px 1px 1px #888;\n  word-wrap: break-word;\n  margin: 12px 0;\n  display: block;\n  width: 440px;\n  overflow-y: scroll;\n  height: 100px;\n  position: relative; }\n\n#dg-local-explain {\n  display: none;\n  font-size: 11px;\n  line-height: 17px;\n  border-radius: 3px;\n  background-color: #333;\n  padding: 8px;\n  margin-top: 10px; }\n  #dg-local-explain code {\n    font-size: 10px; }\n\n#dat-gui-save-locally {\n  display: none; }\n\n/** Main type */\n.dg {\n  color: #eee;\n  font: 11px 'Lucida Grande', sans-serif;\n  text-shadow: 0 -1px 0 #111;\n  /** Auto place */\n  /* Controller row, <li> */\n  /** Controllers */ }\n  .dg.main {\n    /** Scrollbar */ }\n    .dg.main::-webkit-scrollbar {\n      width: 5px;\n      background: #1a1a1a; }\n    .dg.main::-webkit-scrollbar-corner {\n      height: 0;\n      display: none; }\n    .dg.main::-webkit-scrollbar-thumb {\n      border-radius: 5px;\n      background: #676767; }\n  .dg li:not(.folder) {\n    background: #1a1a1a;\n    border-bottom: 1px solid #2c2c2c; }\n  .dg li.save-row {\n    line-height: 25px;\n    background: #dad5cb;\n    border: 0; }\n    .dg li.save-row select {\n      margin-left: 5px;\n      width: 108px; }\n    .dg li.save-row .button {\n      margin-left: 5px;\n      margin-top: 1px;\n      border-radius: 2px;\n      font-size: 9px;\n      line-height: 7px;\n      padding: 4px 4px 5px 4px;\n      background: #c5bdad;\n      color: #fff;\n      text-shadow: 0 1px 0 #b0a58f;\n      box-shadow: 0 -1px 0 #b0a58f;\n      cursor: pointer; }\n      .dg li.save-row .button.gears {\n        background: #c5bdad url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAANCAYAAAB/9ZQ7AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAQJJREFUeNpiYKAU/P//PwGIC/ApCABiBSAW+I8AClAcgKxQ4T9hoMAEUrxx2QSGN6+egDX+/vWT4e7N82AMYoPAx/evwWoYoSYbACX2s7KxCxzcsezDh3evFoDEBYTEEqycggWAzA9AuUSQQgeYPa9fPv6/YWm/Acx5IPb7ty/fw+QZblw67vDs8R0YHyQhgObx+yAJkBqmG5dPPDh1aPOGR/eugW0G4vlIoTIfyFcA+QekhhHJhPdQxbiAIguMBTQZrPD7108M6roWYDFQiIAAv6Aow/1bFwXgis+f2LUAynwoIaNcz8XNx3Dl7MEJUDGQpx9gtQ8YCueB+D26OECAAQDadt7e46D42QAAAABJRU5ErkJggg==) 2px 1px no-repeat;\n        height: 7px;\n        width: 8px; }\n      .dg li.save-row .button:hover {\n        background-color: #bab19e;\n        box-shadow: 0 -1px 0 #b0a58f; }\n  .dg li.folder {\n    border-bottom: 0; }\n  .dg li.title {\n    padding-left: 16px;\n    background: black url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlI+hKgFxoCgAOw==) 6px 10px no-repeat;\n    cursor: pointer;\n    border-bottom: 1px solid rgba(255, 255, 255, 0.2); }\n  .dg .closed li.title {\n    background-image: url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlGIWqMCbWAEAOw==); }\n  .dg .cr.boolean {\n    border-left: 3px solid #806787; }\n  .dg .cr.color {\n    border-left: 3px solid; }\n  .dg .cr.function {\n    border-left: 3px solid #e61d5f; }\n  .dg .cr.number {\n    border-left: 3px solid #2fa1d6; }\n    .dg .cr.number input[type=text] {\n      color: #2fa1d6; }\n  .dg .cr.string {\n    border-left: 3px solid #1ed36f; }\n    .dg .cr.string input[type=text] {\n      color: #1ed36f; }\n  .dg .cr.function:hover, .dg .cr.boolean:hover {\n    background: #111; }\n  .dg .c input[type=text] {\n    background: #303030;\n    outline: none; }\n    .dg .c input[type=text]:hover {\n      background: #3c3c3c; }\n    .dg .c input[type=text]:focus {\n      background: #494949;\n      color: #fff; }\n  .dg .c .slider {\n    background: #303030;\n    cursor: ew-resize; }\n  .dg .c .slider-fg {\n    background: #2fa1d6; }\n  .dg .c .slider:hover {\n    background: #3c3c3c; }\n    .dg .c .slider:hover .slider-fg {\n      background: #44abda; }\n",
   dat.controllers.factory = (function (Controller, OptionController, NumberControllerBox, NumberControllerSlider, StringController, FunctionController, BooleanController, ImageController, common) {
-  
         'use strict';
         
         var firstTimeImageController = true;
@@ -3259,7 +3106,6 @@
         }
   
         return function(object, property, controllerName, controllers, options_1, options_2, options_3, options_4, options_5, options_6) {
-  
           // when the user specified a specific controller, we'll be using that one, otherwise we 'sniff' the correct controller giving the input values & ditto types.
           var ControllerConstructor = controllers[controllerName];
           if (!ControllerConstructor && /* controllerName instanceof Controller */ isControllerTemplate(controllerName)) {
@@ -3279,14 +3125,10 @@
           // Providing a map?
   
           if (common.isNumber(initialValue)) {
-  
             if (common.isNumber(options_1) && common.isNumber(options_2)) {
-  
               // Has min and max.
               return new NumberControllerSlider(object, property, options_1, options_2, options_3, options_4, options_5, options_6);
-  
             } else {
-  
               return new NumberControllerBox(object, property, { 
                 min: options_1, 
                 max: options_2, 
@@ -3295,9 +3137,7 @@
                 maximumSaneStepSize: options_5,
                 mode: options_6
               });
-  
             }
-  
           }
   
           if (common.isImagePath(initialValue)) {
@@ -3328,7 +3168,6 @@
           // `initialValue` is null or undefined.
           return false;
         }
-  
       })(dat.controllers.Controller,
   dat.controllers.OptionController,
   dat.controllers.NumberControllerBox,
@@ -3348,59 +3187,15 @@
   dat.controllers.StringController,
   dat.controllers.ImageController,
   dat.controllers.ColorController = (function (Controller, dom, Color, interpret, common) {
-  
     'use strict';
   
-    var ColorController = function(object, property) {
-  
-      ColorController.superclass.call(this, object, property);
+    var ColorController = function(object, property, options) {
+      ColorController.superclass.call(this, object, property, 'color', options);
   
       this.__color = new Color(this.getValue());
       this.__temp = new Color(0);
   
       var _this = this;
-  
-      function fieldDown(e) {
-        setSV(e);
-        // document.body.style.cursor = 'none';
-        dom.bind(window, 'mousemove', setSV);
-        dom.bind(window, 'mouseup', unbindSV);
-        dom.bind(window, 'touchmove', setSVonTouch);
-        dom.bind(window, 'touchend', unbindSV);
-      }
-  
-      function fieldDownOnTouch(e) {
-        e.clientX = e.touches[0].clientX;
-        e.clientY = e.touches[0].clientY;
-        fieldDown(e);
-      }
-  
-      function unbindSV() {
-        dom.unbind(window, 'mousemove', setSV);
-        dom.unbind(window, 'mouseup', unbindSV);
-        dom.unbind(window, 'touchmove', setSVonTouch);
-        dom.unbind(window, 'touchend', unbindSV);
-        // document.body.style.cursor = 'default';
-      }
-  
-      function onBlur() {
-        /* jshint validthis: true */
-        var i = interpret(this.value);
-        if (i !== false) {
-          _this.__color.__state = i;
-          _this.setValue(_this.__color.toOriginal());
-        } else {
-          this.value = _this.__color.toString();
-        }
-        /* jshint validthis: false */
-      }
-  
-      function unbindH() {
-        dom.unbind(window, 'mousemove', setH);
-        dom.unbind(window, 'mouseup', unbindH);
-        dom.unbind(window, 'touchmove', setHonTouch);
-        dom.unbind(window, 'touchend', unbindH);
-      }
   
       this.domElement = document.createElement('div');
   
@@ -3437,27 +3232,22 @@
       dom.bind(this.__input, 'blur', onBlur);
   
       dom.bind(this.__selector, 'mousedown', function(e) {
-  
         dom
           .addClass(this, 'drag')
           .bind(window, 'mouseup', function(e) {
             dom.removeClass(_this.__selector, 'drag');
           });
-  
       });
   
       dom.bind(this.__selector, 'touchstart', function(e) {
-  
         dom
           .addClass(this, 'drag')
           .bind(window, 'touchend', function(e) {
             dom.removeClass(_this.__selector, 'drag');
           });
-  
       });
   
       /* jshint unused: true */
-  
   
       var value_field = document.createElement('div');
   
@@ -3545,6 +3335,48 @@
         dom.bind(window, 'touchend', unbindH);
       });
   
+      function fieldDown(e) {
+        setSV(e);
+        // document.body.style.cursor = 'none';
+        dom.bind(window, 'mousemove', setSV);
+        dom.bind(window, 'mouseup', unbindSV);
+        dom.bind(window, 'touchmove', setSVonTouch);
+        dom.bind(window, 'touchend', unbindSV);
+      }
+  
+      function fieldDownOnTouch(e) {
+        e.clientX = e.touches[0].clientX;
+        e.clientY = e.touches[0].clientY;
+        fieldDown(e);
+      }
+  
+      function unbindSV() {
+        dom.unbind(window, 'mousemove', setSV);
+        dom.unbind(window, 'mouseup', unbindSV);
+        dom.unbind(window, 'touchmove', setSVonTouch);
+        dom.unbind(window, 'touchend', unbindSV);
+        // document.body.style.cursor = 'default';
+      }
+  
+      function onBlur() {
+        /* jshint validthis: true */
+        var i = interpret(this.value);
+        if (i !== false) {
+          _this.__color.__state = i;
+          _this.setValue(_this.__color.toOriginal());
+        } else {
+          this.value = _this.__color.toString();
+        }
+        /* jshint validthis: false */
+      }
+  
+      function unbindH() {
+        dom.unbind(window, 'mousemove', setH);
+        dom.unbind(window, 'mouseup', unbindH);
+        dom.unbind(window, 'touchmove', setHonTouch);
+        dom.unbind(window, 'touchend', unbindH);
+      }
+  
       this.__saturation_field.appendChild(value_field);
       this.__selector.appendChild(this.__field_knob);
       this.__selector.appendChild(this.__saturation_field);
@@ -3557,13 +3389,13 @@
       this.updateDisplay();
   
       function setSV(e) {
-  
         e.preventDefault();
   
         var w = dom.getWidth(_this.__saturation_field);
         var o = dom.getOffset(_this.__saturation_field);
-        var s = (e.clientX - o.left /* + document.body.scrollLeft */ ) / w;
-        var v = 1 - (e.clientY - o.top /* + document.body.scrollTop */ ) / w;
+        var scroll = getScroll(_this.__saturation_field);
+        var s = (e.clientX - o.left + scroll.left) / w;
+        var v = 1 - (e.clientY - o.top + scroll.top) / w;
   
         if (v > 1) {
           v = 1;
@@ -3585,16 +3417,15 @@
         _this.setValue(_this.__color.toOriginal());
   
         return false;
-  
       }
   
       function setH(e) {
-  
         e.preventDefault();
   
         var s = dom.getHeight(_this.__hue_field);
         var o = dom.getOffset(_this.__hue_field);
-        var h = 1 - (e.clientY - o.top /* + document.body.scrollTop */ ) / s;
+        var scroll = getScroll(_this.__hue_field);
+        var h = 1 - (e.clientY - o.top + scroll.top) / s;
   
         if (h > 1) {
           h = 1;
@@ -3608,41 +3439,39 @@
         _this.setValue(_this.__color.toOriginal());
   
         return false;
-  
       }
   
       function setSVonTouch(e) {
-  
         e.clientX = e.touches[0].clientX;
         e.clientY = e.touches[0].clientY;
         return setSV(e);
-  
       }
   
       function setHonTouch(e) {
-  
         e.clientY = e.touches[0].clientY;
         return setH(e);
-  
       }
   
+      function getScroll(el) {
+        var scroll = { top: el.scrollTop, left: el.scrollLeft };
+        while(el = el.parentNode) {
+          scroll.top += (el.scrollTop || 0);
+          scroll.left += (el.scrollLeft || 0);
+        }
+        return scroll;
+      }
     };
   
     ColorController.superclass = Controller;
   
     common.extend(
-  
         ColorController.prototype,
         Controller.prototype,
-  
         {
-  
           updateDisplay: function() {
-  
             var i = interpret(this.getValue());
   
             if (i !== false) {
-  
               var mismatch = false;
   
               // Check for mismatch on the interpreted value.
@@ -3661,7 +3490,6 @@
               if (mismatch) {
                 common.extend(this.__color.__state, i);
               }
-  
             }
   
             common.extend(this.__temp.__state, this.__color.__state);
@@ -3694,9 +3522,7 @@
             });
   
           }
-  
         }
-  
     );
     
     var vendors = ['-moz-','-o-','-webkit-','-ms-',''];
@@ -3717,9 +3543,7 @@
       elem.style.cssText += 'background: linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);'
     }
   
-  
     return ColorController;
-  
   })(dat.controllers.Controller,
   dat.dom.dom,
   dat.color.Color = (function (interpret, math, toString, common) {
@@ -3736,7 +3560,6 @@
   
       this.__state.a = this.__state.a || 1;
   
-  
     };
   
     Color.COMPONENTS = ['r','g','b','h','s','v','hex','a'];
@@ -3749,6 +3572,47 @@
   
       toOriginal: function() {
         return this.__state.conversion.write(this);
+      }
+  
+    });
+  
+    defineRGBComponent(Color.prototype, 'r', 2);
+    defineRGBComponent(Color.prototype, 'g', 1);
+    defineRGBComponent(Color.prototype, 'b', 0);
+  
+    defineHSVComponent(Color.prototype, 'h');
+    defineHSVComponent(Color.prototype, 's');
+    defineHSVComponent(Color.prototype, 'v');
+  
+    Object.defineProperty(Color.prototype, 'a', {
+  
+      get: function() {
+        return this.__state.a;
+      },
+  
+      set: function(v) {
+        this.__state.a = v;
+      }
+  
+    });
+  
+    Object.defineProperty(Color.prototype, 'hex', {
+  
+      get: function() {
+  
+        if (this.__state.space !== 'HEX') {
+          this.__state.hex = math.rgb_to_hex(this.r, this.g, this.b);
+        }
+  
+        return this.__state.hex;
+  
+      },
+  
+      set: function(v) {
+  
+        this.__state.space = 'HEX';
+        this.__state.hex = v;
+  
       }
   
     });
@@ -3852,47 +3716,6 @@
   
     }
   
-    defineRGBComponent(Color.prototype, 'r', 2);
-    defineRGBComponent(Color.prototype, 'g', 1);
-    defineRGBComponent(Color.prototype, 'b', 0);
-  
-    defineHSVComponent(Color.prototype, 'h');
-    defineHSVComponent(Color.prototype, 's');
-    defineHSVComponent(Color.prototype, 'v');
-  
-    Object.defineProperty(Color.prototype, 'a', {
-  
-      get: function() {
-        return this.__state.a;
-      },
-  
-      set: function(v) {
-        this.__state.a = v;
-      }
-  
-    });
-  
-    Object.defineProperty(Color.prototype, 'hex', {
-  
-      get: function() {
-  
-        if (this.__state.space !== 'HEX') {
-          this.__state.hex = math.rgb_to_hex(this.r, this.g, this.b);
-        }
-  
-        return this.__state.hex;
-  
-      },
-  
-      set: function(v) {
-  
-        this.__state.space = 'HEX';
-        this.__state.hex = v;
-  
-      }
-  
-    });
-  
     return Color;
   
   })(dat.color.interpret,
@@ -3980,7 +3803,7 @@
         return value << (tmpComponent = componentIndex * 8) | (hex & ~ (0xFF << tmpComponent));
       }
   
-    }
+    };
   
   })(),
   dat.color.toString,
@@ -3988,7 +3811,6 @@
   dat.color.interpret,
   dat.utils.common),
   dat.utils.requestAnimationFrame = (function () {
-  
     'use strict';
   
     /**
@@ -4003,18 +3825,13 @@
         window.msRequestAnimationFrame ||
         /* jshint unused: false */
         function(callback, element) {
-  
           window.setTimeout(callback, 1000 / 60);
-  
         };
-  
   })(),
   dat.dom.CenteredDiv = (function (dom, common) {
-  
     'use strict';
   
     var CenteredDiv = function() {
-  
       this.backgroundElement = document.createElement('div');
       common.extend(this.backgroundElement.style, {
         backgroundColor: 'rgba(0,0,0,0.8)',
@@ -4040,7 +3857,6 @@
         transition: 'transform 0.2s ease-out, opacity 0.2s linear'
       });
   
-  
       document.body.appendChild(this.backgroundElement);
       document.body.appendChild(this.domElement);
   
@@ -4048,12 +3864,9 @@
       dom.bind(this.backgroundElement, 'click', function() {
         _this.hide();
       });
-  
-  
     };
   
     CenteredDiv.prototype.show = function() {
-  
       var _this = this;
   
       this.backgroundElement.style.display = 'block';
@@ -4070,22 +3883,18 @@
         _this.domElement.style.opacity = 1;
         _this.domElement.style.webkitTransform = 'scale(1)';
       });
-  
     };
   
     CenteredDiv.prototype.hide = function() {
-  
       var _this = this;
   
       var hide = function() {
-  
         _this.domElement.style.display = 'none';
         _this.backgroundElement.style.display = 'none';
   
         dom.unbind(_this.domElement, 'webkitTransitionEnd', hide);
         dom.unbind(_this.domElement, 'transitionend', hide);
         dom.unbind(_this.domElement, 'oTransitionEnd', hide);
-  
       };
   
       dom.bind(this.domElement, 'webkitTransitionEnd', hide);
@@ -4096,7 +3905,6 @@
   //    this.domElement.style.top = '48%';
       this.domElement.style.opacity = 0;
       this.domElement.style.webkitTransform = 'scale(1.1)';
-  
     };
   
     CenteredDiv.prototype.layout = function() {
@@ -4105,7 +3913,6 @@
     };
     
     return CenteredDiv;
-  
   })(dat.dom.dom,
   dat.utils.common),
   dat.dom.dom,

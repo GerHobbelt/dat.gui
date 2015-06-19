@@ -55,8 +55,9 @@ define([
     dom.bind(this.__input, 'change', onChange);
     dom.bind(this.__input, 'blur', onBlur);
     dom.bind(this.__input, 'mousedown', onMouseDown);
-    dom.bind(this.__input, 'keydown', function(e) {
+    dom.bind(this.__input, 'keydown', onKeyDown);
 
+    function onKeyDown(e) {
       // When pressing ENTER key, you can be as precise as you want.
       if (e.keyCode === 13) {
         _this.__truncationSuspended = true;
@@ -65,7 +66,7 @@ define([
         /* jshint validthis: false */
         _this.__truncationSuspended = false;
       }
-    });
+    }
 
     function onChange() {
       var attempted = parseFloat(_this.__input.value);

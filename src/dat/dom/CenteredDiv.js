@@ -98,10 +98,6 @@ define([
     this.domElement.style.top = (window.innerHeight / 2 - dom.getHeight(this.domElement) / 2) + 'px';
   };
   
-  function lockScroll(e) {
-    console.log(e);
-  }
-
   return CenteredDiv;
 });
 

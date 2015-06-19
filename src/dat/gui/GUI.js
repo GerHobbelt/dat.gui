@@ -1172,8 +1172,6 @@ define([
     dom.bind(button3, 'click', function() {
       gui.revert();
     });
-
-//    div.appendChild(button2);
   }
 
   function addResizeHandle(gui) {

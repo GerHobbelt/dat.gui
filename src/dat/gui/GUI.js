@@ -71,7 +71,6 @@ define([
 
   'dat/utils/common'
 ], function(css, saveDialogueContents, styleSheet, controllerFactory, Controller, BooleanController, FunctionController, NumberController, NumberControllerBox, NumberControllerSlider, OptionController, StringController, ImageController, ColorController, requestAnimationFrame, CenteredDiv, dom, common) {
-
   'use strict';
 
   //var ARR_EACH = Array.prototype.forEach;
@@ -1001,10 +1000,8 @@ define([
       dom.bind(controller.__checkbox, 'click', function(e) {
         e.stopPropagation(); // Prevents double-toggle
       })
-
     }
     else if (controller instanceof FunctionController) {
-
       dom.bind(li, 'click', function() {
         dom.fakeEvent(controller.__button, 'click');
       });
@@ -1016,10 +1013,8 @@ define([
       dom.bind(li, 'mouseout', function() {
         dom.removeClass(controller.__button, 'hover');
       });
-
     }
     else if (controller instanceof ColorController) {
-
       dom.addClass(li, 'color');
       controller.updateDisplay = common.compose(function(r) {
         li.style.borderLeftColor = controller.__color.toString();
@@ -1027,7 +1022,6 @@ define([
       }, controller.updateDisplay);
 
       controller.updateDisplay();
-
     }
 
     controller.setValue = common.compose(function(r) {
@@ -1036,11 +1030,9 @@ define([
       }
       return r;
     }, controller.setValue);
-
   }
 
   function recallSavedValue(gui, controller) {
-
     // Find the topmost GUI, that's where remembered objects live.
     var root = gui.getRoot();
 
@@ -1050,7 +1042,6 @@ define([
 
     // Why yes, it does!
     if (matched_index !== -1) {
-
       // Let me fetch a map of controllers for thcommon.isObject.
       var controller_map =
           root.__rememberedObjectIndecesToControllers[matched_index];
@@ -1067,59 +1058,43 @@ define([
 
       // Okay, now have we saved any values for this controller?
       if (root.load && root.load.remembered) {
-
         var preset_map = root.load.remembered;
 
         // Which preset are we trying to load?
         var preset;
 
         if (preset_map[gui.preset]) {
-
           preset = preset_map[gui.preset];
-
         } else if (preset_map[DEFAULT_DEFAULT_PRESET_NAME]) {
-
           // Uhh, you can have the default instead?
           preset = preset_map[DEFAULT_DEFAULT_PRESET_NAME];
-
         } else {
-
           // Nada.
 
           return;
-
         }
-
 
         // Did the loaded object remember thcommon.isObject?
         if (preset[matched_index] &&
-
-          // Did we remember this particular property?
+            // Did we remember this particular property?
             preset[matched_index][controller.property] !== undefined) {
-
           // We did remember something for this guy ...
           var value = preset[matched_index][controller.property];
 
           // And that's what it is.
           controller.initialValue = value;
           controller.setValue(value);
-
         }
-
       }
-
     }
-
   }
 
   function getLocalStorageHash(gui, key) {
     // TODO how does this deal with multiple GUI's?
     return document.location.href + '.' + key;
-
   }
 
   function addSaveMenu(gui) {
-
     var div = gui.__save_row = document.createElement('li');
 
     dom.addClass(gui.domElement, 'has-save');
@@ -1151,24 +1126,19 @@ define([
     var select = gui.__preset_select = document.createElement('select');
 
     if (gui.load && gui.load.remembered) {
-
       common.each(gui.load.remembered, function(value, key) {
         addPresetOption(gui, key, key === gui.preset);
       });
-
     } else {
       addPresetOption(gui, DEFAULT_DEFAULT_PRESET_NAME, false);
     }
 
     dom.bind(select, 'change', function() {
-
-
       for (var index = 0; index < gui.__preset_select.length; index++) {
         gui.__preset_select[index].innerHTML = gui.__preset_select[index].value;
       }
 
       gui.preset = this.value;
-
     });
 
     div.appendChild(select);
@@ -1182,7 +1152,6 @@ define([
     }
 
     if (SUPPORTS_LOCAL_STORAGE) {
-
       var saveLocally = document.getElementById('dg-save-locally');
       var explain = document.getElementById('dg-local-explain');
 
@@ -1201,7 +1170,6 @@ define([
         gui.useLocalStorage = !gui.useLocalStorage;
         showHideExplain();
       });
-
     }
 
     var newConstructorTextArea = document.getElementById('dg-new-constructor');
@@ -1233,28 +1201,28 @@ define([
     dom.bind(button3, 'click', function() {
       gui.revert();
     });
-
   }
 
   function addResizeHandle(gui) {
-
     gui.__resize_handle = document.createElement('div');
 
     common.extend(gui.__resize_handle.style, {
-
       width: '6px',
       marginLeft: '-3px',
       height: '200px',
       cursor: 'ew-resize',
       position: 'absolute'
 //      border: '1px solid blue'
-
     });
 
     var pmouseX;
 
-    function dragStart(e) {
+    dom.bind(gui.__resize_handle, 'mousedown', dragStart);
+    dom.bind(gui.__closeButton, 'mousedown', dragStart);
 
+    gui.domElement.insertBefore(gui.__resize_handle, gui.domElement.firstElementChild);
+
+    function dragStart(e) {
       e.preventDefault();
 
       pmouseX = e.clientX;
@@ -1264,11 +1232,9 @@ define([
       dom.bind(window, 'mouseup', dragStop);
 
       return false;
-
     }
 
     function drag(e) {
-
       e.preventDefault();
 
       gui.width += pmouseX - e.clientX;
@@ -1276,22 +1242,13 @@ define([
       pmouseX = e.clientX;
 
       return false;
-
     }
 
     function dragStop() {
-
       dom.removeClass(gui.__closeButton, GUI.CLASS_DRAG);
       dom.unbind(window, 'mousemove', drag);
       dom.unbind(window, 'mouseup', dragStop);
-
     }
-
-    dom.bind(gui.__resize_handle, 'mousedown', dragStart);
-    dom.bind(gui.__closeButton, 'mousedown', dragStart);
-
-    gui.domElement.insertBefore(gui.__resize_handle, gui.domElement.firstElementChild);
-
   }
 
   function setWidth(gui, w) {
@@ -1307,12 +1264,10 @@ define([
   }
 
   function getCurrentPreset(gui, useInitialValues) {
-
     var toReturn = {};
 
     // For each object I'm remembering
     common.each(gui.__rememberedObjects, function(val, index) {
-
       var saved_values = {};
 
       // The controllers I've made for thcommon.isObject by property
@@ -1326,11 +1281,9 @@ define([
 
       // Save the values for thcommon.isObject
       toReturn[index] = saved_values;
-
     });
 
     return toReturn;
-
   }
 
   function addPresetOption(gui, name, setSelected) {

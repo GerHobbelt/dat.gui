@@ -218,7 +218,7 @@ define([
          * @returns {Boolean} true if the value has deviated from initialValue
          */
         isModified: function() {
-          return this.initialValue !== this.getValue()
+          return this.initialValue !== this.getValue();
         }
       }
   );

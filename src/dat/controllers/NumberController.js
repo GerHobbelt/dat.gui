@@ -15,7 +15,6 @@ define([
     'dat/controllers/Controller',
     'dat/utils/common'
 ], function(Controller, common) {
-
   'use strict';
 
   /**
@@ -53,7 +52,6 @@ define([
    * @member dat.controllers
    */
   var NumberController = function(object, property, params) {
-
     NumberController.superclass.call(this, object, property);
 
     params = params || {};
@@ -79,7 +77,6 @@ define([
       /** @lends dat.controllers.NumberController.prototype */
       {
         setValue: function(v) {
-
           if (this.__min !== undefined && v < this.__min) {
             v = this.__min;
           } else if (this.__max !== undefined && v > this.__max) {
@@ -100,7 +97,6 @@ define([
           }
 
           return NumberController.superclass.prototype.setValue.call(this, v);
-
         },
 
         /**

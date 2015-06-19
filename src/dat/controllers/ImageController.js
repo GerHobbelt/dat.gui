@@ -9,7 +9,6 @@ define([
     'dat/utils/common',
     'text!dat/controllers/ImageController.css'
 ], function(Controller, dom, css, common, styleSheet) {
-
   'use strict';
 
     /**
@@ -23,7 +22,6 @@ define([
      * @member dat.controllers
      */
     function ImageController(Object, property) {
-
         ImageController.superclass.call(this, Object, property);
 
         var _this = this;
@@ -82,6 +80,5 @@ define([
     )
 
     return ImageController;
-
 });
 

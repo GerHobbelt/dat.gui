@@ -16,7 +16,6 @@ define([
   'dat/dom/dom',
   'dat/utils/common'
 ], function(NumberController, dom, common) {
-
   'use strict';
 
   /**
@@ -149,6 +148,5 @@ define([
   }
 
   return NumberControllerBox;
-
 });
 

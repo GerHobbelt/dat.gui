@@ -19,7 +19,6 @@ define([
     'text!dat/controllers/NumberControllerSlider.css'
 ], 
 function(NumberController, dom, css, common, styleSheet) {
-
   'use strict';
 
   /**
@@ -41,7 +40,6 @@ function(NumberController, dom, css, common, styleSheet) {
    * @member dat.controllers
    */
   var NumberControllerSlider = function(object, property, min, max, step) {
-
     NumberControllerSlider.superclass.call(this, object, property, { min: min, max: max, step: step });
 
     var _this = this;
@@ -115,7 +113,6 @@ function(NumberController, dom, css, common, styleSheet) {
 
     this.__background.appendChild(this.__foreground);
     this.domElement.appendChild(this.__background);
-
   };
 
   NumberControllerSlider.superclass = NumberController;
@@ -139,9 +136,9 @@ function(NumberController, dom, css, common, styleSheet) {
       }
   );
 
-	function map(v, i1, i2, o1, o2) {
-		return o1 + (o2 - o1) * ((v - i1) / (i2 - i1));
-	}
+  function map(v, i1, i2, o1, o2) {
+    return o1 + (o2 - o1) * ((v - i1) / (i2 - i1));
+  }
 
   return NumberControllerSlider;
 });

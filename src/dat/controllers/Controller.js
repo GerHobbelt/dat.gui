@@ -102,7 +102,6 @@
 define([
    'dat/utils/common'
 ], function(common) {
-
   'use strict';
 
   /**
@@ -114,7 +113,6 @@ define([
    * @member dat.controllers
    */
   var Controller = function(object, property) {
-
     this.initialValue = object[property];
 
     /**
@@ -148,16 +146,13 @@ define([
      * @ignore
      */
     this.__onFinishChange = undefined;
-
   };
 
   common.extend(
-
       Controller.prototype,
 
       /** @lends dat.controllers.Controller.prototype */
       {
-
         /**
          * Specify that a function fire every time someone changes the value with
          * this Controller.
@@ -195,6 +190,8 @@ define([
           if (this.__onChange) {
             this.__onChange.call(this, newValue);
           }
+          // Whenever you call setValue, the display will be updated automatically.
+          // This reduces some clutter in subclasses.
           this.updateDisplay();
           return this;
         },
@@ -223,12 +220,9 @@ define([
         isModified: function() {
           return this.initialValue !== this.getValue()
         }
-
       }
-
   );
 
   return Controller;
-
 });
 

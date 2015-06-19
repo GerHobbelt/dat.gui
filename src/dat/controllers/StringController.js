@@ -16,7 +16,6 @@ define([
     'dat/dom/dom',
     'dat/utils/common'
 ], function(Controller, dom, common) {
-
   'use strict';
 
   /**
@@ -30,7 +29,6 @@ define([
    * @member dat.controllers
    */
   var StringController = function(object, property) {
-
     StringController.superclass.call(this, object, property);
 
     var _this = this;
@@ -64,18 +62,14 @@ define([
     this.updateDisplay();
 
     this.domElement.appendChild(this.__input);
-
   };
 
   StringController.superclass = Controller;
 
   common.extend(
-
       StringController.prototype,
       Controller.prototype,
-
       {
-
         updateDisplay: function() {
           // Stops the caret from moving on account of:
           // keyup -> setValue -> updateDisplay
@@ -84,11 +78,9 @@ define([
           }
           return StringController.superclass.prototype.updateDisplay.call(this);
         }
-
       }
-
   );
 
   return StringController;
-
 });
+

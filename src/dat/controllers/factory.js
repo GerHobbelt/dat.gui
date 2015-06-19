@@ -23,7 +23,6 @@ define([
   'dat/utils/common'
 ],
     function(Controller, OptionController, NumberControllerBox, NumberControllerSlider, StringController, FunctionController, BooleanController, ImageController, common) {
-
       'use strict';
       
       var firstTimeImageController = true;
@@ -41,7 +40,6 @@ define([
       }
 
       return function(object, property, controllerName, controllers, options_1, options_2, options_3, options_4, options_5, options_6) {
-
         // when the user specified a specific controller, we'll be using that one, otherwise we 'sniff' the correct controller giving the input values & ditto types.
         var ControllerConstructor = controllers[controllerName];
         if (!ControllerConstructor && /* controllerName instanceof Controller */ isControllerTemplate(controllerName)) {
@@ -61,14 +59,10 @@ define([
         // Providing a map?
 
         if (common.isNumber(initialValue)) {
-
           if (common.isNumber(options_1) && common.isNumber(options_2)) {
-
             // Has min and max.
             return new NumberControllerSlider(object, property, options_1, options_2, options_3, options_4, options_5, options_6);
-
           } else {
-
             return new NumberControllerBox(object, property, { 
               min: options_1, 
               max: options_2, 
@@ -77,9 +71,7 @@ define([
               maximumSaneStepSize: options_5,
               mode: options_6
             });
-
           }
-
         }
 
         if (common.isImagePath(initialValue)) {
@@ -110,5 +102,5 @@ define([
         // `initialValue` is null or undefined.
         return false;
       }
-
     });
+

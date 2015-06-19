@@ -16,7 +16,6 @@ define([
   'dat/dom/dom',
   'dat/utils/common'
 ], function(Controller, dom, common) {
-
   'use strict';
 
   /**
@@ -29,19 +28,13 @@ define([
    * @member dat.controllers
    */
   var BooleanController = function(object, property) {
-
     BooleanController.superclass.call(this, object, property);
 
     var _this = this;
     this.__prev = this.getValue();
 
-    function onChange() {
-      _this.setValue(!_this.__prev);
-    }
-
     this.__checkbox = document.createElement('input');
     this.__checkbox.setAttribute('type', 'checkbox');
-
 
     dom.bind(this.__checkbox, 'change', onChange, false);
 
@@ -50,17 +43,17 @@ define([
     // Match original value
     this.updateDisplay();
 
+    function onChange() {
+      _this.setValue(!_this.__prev);
+    }
   };
 
   BooleanController.superclass = Controller;
 
   common.extend(
-
       BooleanController.prototype,
       Controller.prototype,
-
       {
-
         setValue: function(v) {
           var toReturn = BooleanController.superclass.prototype.setValue.call(this, v);
           if (this.__onFinishChange) {
@@ -71,7 +64,6 @@ define([
         },
 
         updateDisplay: function() {
-          
           if (this.getValue() === true) {
             this.__checkbox.setAttribute('checked', 'checked');
             this.__checkbox.checked = true;    
@@ -80,13 +72,10 @@ define([
           }
 
           return BooleanController.superclass.prototype.updateDisplay.call(this);
-
         }
-
       }
-
   );
 
   return BooleanController;
-
 });
+

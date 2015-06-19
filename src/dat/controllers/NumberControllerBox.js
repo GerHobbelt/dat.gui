@@ -16,7 +16,6 @@ define([
   'dat/dom/dom',
   'dat/utils/common'
 ], function(NumberController, dom, common) {
-
   'use strict';
 
   /**
@@ -36,7 +35,6 @@ define([
    * @member dat.controllers
    */
   var NumberControllerBox = function(object, property, params) {
-
     this.__truncationSuspended = false;
 
     NumberControllerBox.superclass.call(this, object, property, params);
@@ -104,7 +102,6 @@ define([
     this.updateDisplay();
 
     this.domElement.appendChild(this.__input);
-
   };
 
   NumberControllerBox.superclass = NumberController;
@@ -126,6 +123,5 @@ define([
   }
 
   return NumberControllerBox;
-
 });
 

@@ -18,11 +18,9 @@ define([
   'dat/color/interpret',
   'dat/utils/common'
 ], function(Controller, dom, Color, interpret, common) {
-
   'use strict';
 
   var ColorController = function(object, property, options) {
-
     ColorController.superclass.call(this, object, property, 'color', options);
 
     this.__color = new Color(this.getValue());
@@ -57,6 +55,8 @@ define([
     this.__input_container = document.createElement('div');
     this.__input_container.style.marginLeft = '28px';
 
+    /* jshint unused: false */
+
     dom.bind(this.__input, 'keydown', function(e) {
       if (e.keyCode === 13) { // on enter
         onBlur.call(this);
@@ -66,14 +66,14 @@ define([
     dom.bind(this.__input, 'blur', onBlur);
 
     dom.bind(this.__selector, 'mousedown', function(e) {
-
       dom
         .addClass(this, 'drag')
         .bind(window, 'mouseup', function(e) {
           dom.removeClass(_this.__selector, 'drag');
         });
-
     });
+
+    /* jshint unused: true */
 
     var value_field = document.createElement('div');
 
@@ -195,7 +195,6 @@ define([
     this.updateDisplay();
 
     function setSV(e) {
-
       e.preventDefault();
 
       var w = dom.getWidth(_this.__saturation_field);
@@ -224,11 +223,9 @@ define([
       _this.setValue(_this.__color.toOriginal());
 
       return false;
-
     }
 
     function setH(e) {
-
       e.preventDefault();
 
       var s = dom.getHeight(_this.__hue_field);
@@ -248,37 +245,28 @@ define([
       _this.setValue(_this.__color.toOriginal());
 
       return false;
-
     }
 
     function getScroll(el) {
-
       var scroll = { top: el.scrollTop, left: el.scrollLeft };
       while(el = el.parentNode) {
         scroll.top += (el.scrollTop || 0);
         scroll.left += (el.scrollLeft || 0);
       }
       return scroll;
-
     }
-
   };
 
   ColorController.superclass = Controller;
 
   common.extend(
-
       ColorController.prototype,
       Controller.prototype,
-
       {
-
         updateDisplay: function() {
-
           var i = interpret(this.getValue());
 
           if (i !== false) {
-
             var mismatch = false;
 
             // Check for mismatch on the interpreted value.
@@ -297,7 +285,6 @@ define([
             if (mismatch) {
               common.extend(this.__color.__state, i);
             }
-
           }
 
           common.extend(this.__temp.__state, this.__color.__state);
@@ -330,11 +317,8 @@ define([
           });
 
           this.__input.disabled = this.getReadonly();
-
         }
-
       }
-
   );
   
   var vendors = ['-moz-','-o-','-webkit-','-ms-',''];
@@ -355,7 +339,6 @@ define([
     elem.style.cssText += 'background: linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);'
   }
 
-
   return ColorController;
-
 });
+

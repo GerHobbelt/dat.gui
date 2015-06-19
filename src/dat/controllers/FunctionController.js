@@ -16,7 +16,6 @@ define([
     'dat/dom/dom',
     'dat/utils/common'
 ], function(Controller, dom, common) {
-
   'use strict';
   
   /**
@@ -31,7 +30,6 @@ define([
    * @member dat.controllers
    */
   var FunctionController = function(object, property, text) {
-
     FunctionController.superclass.call(this, object, property);
 
     var _this = this;
@@ -48,17 +46,14 @@ define([
     dom.addClass(this.__button, 'button');
 
     this.domElement.appendChild(this.__button);
-
   };
 
   FunctionController.superclass = Controller;
 
   common.extend(
-
       FunctionController.prototype,
       Controller.prototype,
       {
-        
         fire: function() {
           if (this.__onChange) {
             this.__onChange.call(this);
@@ -69,9 +64,8 @@ define([
           }
         }
       }
-
   );
 
   return FunctionController;
-
 });
+

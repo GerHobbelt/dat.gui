@@ -21,11 +21,9 @@ define([
   'dat/utils/common'
 ],
     function(OptionController, NumberControllerBox, NumberControllerSlider, StringController, FunctionController, BooleanController, common) {
-
       'use strict';
       
       return function(object, property, options_1, options_2, options_3) {
-
         var initialValue = object[property];
 
         // Providing options?
@@ -36,21 +34,15 @@ define([
         // Providing a map?
 
         if (common.isNumber(initialValue)) {
-
           if (common.isNumber(options_1) && common.isNumber(options_2)) {
-
             // Has min and max.
             if (common.isNumber(options_3)) // has step
                 return new NumberControllerSlider(object, property, options_1, options_2, options_3);
             else
                 return new NumberControllerSlider(object, property, options_1, options_2);
-
           } else {
-
             return new NumberControllerBox(object, property, { min: options_1, max: options_2 });
-
           }
-
         }
 
         if (common.isString(initialValue)) {
@@ -64,7 +56,6 @@ define([
         if (common.isBoolean(initialValue)) {
           return new BooleanController(object, property);
         }
-
       }
-
     });
+

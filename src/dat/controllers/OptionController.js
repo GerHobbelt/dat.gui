@@ -17,7 +17,6 @@ define([
     'dat/utils/common'
 ],
 function(Controller, dom, common) {
-
   'use strict';
 
   /**
@@ -34,7 +33,6 @@ function(Controller, dom, common) {
    * @member dat.controllers
    */
   var OptionController = function(object, property, params, options) {
-
     OptionController.superclass.call(this, object, property, 'option', options);
 
     var _this = this;
@@ -60,7 +58,6 @@ function(Controller, dom, common) {
     }
 
     common.each(params, function(value, key) {
-
       var opt = document.createElement('option');
       opt.innerHTML = key;
       opt.setAttribute('value', value);
@@ -104,12 +101,9 @@ function(Controller, dom, common) {
   OptionController.superclass = Controller;
 
   common.extend(
-
       OptionController.prototype,
       Controller.prototype,
-
       {
-
         setValue: function(v) {
           var toReturn = OptionController.superclass.prototype.setValue.call(this, v);
           if (this.__onFinishChange) {
@@ -137,12 +131,9 @@ function(Controller, dom, common) {
 
           return OptionController.superclass.prototype.updateDisplay.call(this);
         }
-
       }
-
   );
 
   return OptionController;
-
 });
 

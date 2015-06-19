@@ -26,6 +26,7 @@ define([
   'dat/controllers/NumberControllerSlider',
   'dat/controllers/OptionController',
   'dat/controllers/StringController',
+  'dat/controllers/ImageController',
   'dat/controllers/ColorController',
 
   'dat/utils/requestAnimationFrame',
@@ -99,6 +100,7 @@ define([
       numberBox: NumberControllerBox,
       number: NumberController,
       string: StringController,
+      image: ImageController,
       'function': FunctionController,
       'boolean': BooleanController
     };

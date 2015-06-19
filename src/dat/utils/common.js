@@ -133,6 +133,10 @@ define([
     
     isFunction: function(obj) {
       return Object.prototype.toString.call(obj) === '[object Function]';
+    },
+
+    isImagePath: function(obj) {
+      return typeof obj === 'string' && obj.search(/\.(gif|jpg|jpeg|png)$/) > -1;
     }
   };
 });

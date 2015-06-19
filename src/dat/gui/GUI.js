@@ -802,17 +802,15 @@ define([
   );
 
   function add(gui, object, property, params) {
-    if (object[property] === undefined) {
-      throw new Error('Object ' + object + ' has no property "' + property + '"');
-    }
+    var factoryArgs = [object, property, params.controller, gui.__typeControllers].concat(params.factoryArgs);
+    var controller = controllerFactory.apply(gui, factoryArgs);
 
-    var controller;
-
-    if (params.color) {
-      controller = new ColorController(object, property);
-    } else {
-      var factoryArgs = [object,property].concat(params.factoryArgs);
-      controller = controllerFactory.apply(gui, factoryArgs);
+    if (!controller) {
+      if (object[property] === undefined) {
+        throw new Error('Object ' + object + ' has no property "' + property + '"');
+      } else {
+        throw new Error('Object ' + object + ' has a (probably null-ed) property "' + property + '" for which you did not explicitly specify a suitable controller');
+      }
     }
 
     if (params.before instanceof Controller) {
@@ -834,11 +832,7 @@ define([
     var li = addRow(gui, container, params.before);
 
     dom.addClass(li, GUI.CLASS_CONTROLLER_ROW);
-    if (controller instanceof ColorController) {
-      dom.addClass(li, "color");
-    } else {
-      dom.addClass(li, typeof controller.getValue());
-    }
+    dom.addClass(li, typeof controller.getValue());
 
     augmentController(gui, li, controller);
 

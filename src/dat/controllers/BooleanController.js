@@ -35,7 +35,6 @@ define([
 
     this.__checkbox = document.createElement('input');
     this.__checkbox.setAttribute('type', 'checkbox');
-    this.__checkbox.style.display = 'block';
 
     dom.bind(this.__checkbox, 'change', onChange, false);
 

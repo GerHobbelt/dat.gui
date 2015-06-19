@@ -172,3 +172,4 @@ define([
 
   return NumberController;
 });
+

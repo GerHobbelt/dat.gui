@@ -6,7 +6,6 @@
 
 
 define([
-
   'dat/gui/GUI',
 
   'dat/controllers/Controller',
@@ -32,7 +31,6 @@ define([
   'dat/utils/css',
   'dat/utils/common',
   'dat/utils/requestAnimationFrame',
-
 ], function(
   dat_gui_GUI,
 
@@ -60,7 +58,6 @@ define([
   dat_utils_common,
   dat_utils_requestAnimationFrame
 ) {
-
   'use strict';
 
   var dat = {
@@ -99,5 +96,4 @@ define([
 
   return dat;
 });
-
 

@@ -13,7 +13,6 @@
 
 define([],
 function() {
-
   'use strict';
 
   return {
@@ -33,5 +32,5 @@ function() {
       doc.getElementsByTagName('head')[0].appendChild(injected);
     }
   };
-
 });
+

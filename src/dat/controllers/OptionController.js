@@ -63,8 +63,8 @@ function(Controller, dom, common) {
     this.updateDisplay();
 
     dom.bind(this.__select, 'change', function() {
-      var desiredValue = this.options[this.selectedIndex].value;
-      _this.setValue(desiredValue);
+      var value = this.options[this.selectedIndex].value;
+      _this.setValue(value);
     });
 
     this.domElement.appendChild(this.__select);

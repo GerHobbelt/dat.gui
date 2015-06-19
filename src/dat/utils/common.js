@@ -13,7 +13,6 @@
 
 define([
 ], function() {
-  
   'use strict';
 
   var ARR_EACH = Array.prototype.forEach;
@@ -26,39 +25,30 @@ define([
    */
 
   return { 
-    
     BREAK: {},
   
     extend: function(target) {
-      
       this.each(ARR_SLICE.call(arguments, 1), function(obj) {
-        
         for (var key in obj) {
           if (!this.isUndefined(obj[key])) {
             target[key] = obj[key];
           }
         }
-        
       }, this);
       
       return target;
-      
     },
     
     defaults: function(target) {
-      
       this.each(ARR_SLICE.call(arguments, 1), function(obj) {
-        
         for (var key in obj) {
           if (this.isUndefined(target[key])) {
             target[key] = obj[key];
           }
         }
-        
       }, this);
       
       return target;
-    
     },
     
     compose: function() {
@@ -73,33 +63,25 @@ define([
     },
     
     each: function(obj, itr, scope) {
-
       if (!obj) {
         return;
       }
 
       if (ARR_EACH && obj.forEach && obj.forEach === ARR_EACH) { 
-        
         obj.forEach(itr, scope);
-        
       } else if (obj.length === obj.length + 0) { // Is number but not NaN
-        
         for (var key = 0, l = obj.length; key < l; key++) {
           if (key in obj && itr.call(scope, obj[key], key) === this.BREAK) {
             return;
           }
         }
-            
       } else {
-
         for (var objkey in obj) {
           if (itr.call(scope, obj[objkey], objkey) === this.BREAK) {
             return;
           }
         }
-            
       }
-            
     },
     
     defer: function(fnc) {
@@ -156,7 +138,6 @@ define([
     isImagePath: function(obj) {
       return typeof obj === 'string' && obj.search(/\.(gif|jpg|jpeg|png)$/) > -1;
     }
-  
   };
-    
 });
+

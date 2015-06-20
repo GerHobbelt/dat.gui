@@ -216,17 +216,16 @@ define([
     // Only root level GUI's are resizable.
     params.resizable = common.isUndefined(params.parent) && params.resizable;
 
-
     if (params.autoPlace && common.isUndefined(params.scrollable)) {
       params.scrollable = true;
     }
 //    params.scrollable = common.isUndefined(params.parent) && params.scrollable === true;
 
-    // Not part of params because I don't want people passing this in via
-    // constructor. Should be a 'remembered' value.
-    var use_local_storage =
-        SUPPORTS_LOCAL_STORAGE &&
-            localStorage.getItem(getLocalStorageHash(this, 'isLocal')) === 'true';
+    // // Not part of params because I don't want people passing this in via
+    // // constructor. Should be a 'remembered' value.
+    // var use_local_storage =
+    //     SUPPORTS_LOCAL_STORAGE &&
+    //         localStorage.getItem(getLocalStorageHash(this, 'isLocal')) === 'true';
 
     var saveToLocalStorage;
 
@@ -334,7 +333,7 @@ define([
               dom.removeClass(_this.__ul, GUI.CLASS_CLOSED);
             }
             // For browsers that aren't going to respect the CSS transition,
-            // Lets just check our height against the window height right off
+            // Let's just check our height against the window height right off
             // the bat.
             _this.onResize();
 
@@ -361,16 +360,40 @@ define([
          * @type Boolean
          */
         useLocalStorage: {
+          // Return:
+          // - FALSE when localStorage has been *explicitly disabled* (by executing `this.useLocalStorage = false;` some time before)
+          // - NULL when localStorage is not available
+          // - TRUE when localStorage is available and has been enabled (localStorage is enabled by default)
           get: function() {
-            return use_local_storage;
+            if (!SUPPORTS_LOCAL_STORAGE) {
+              return null;
+            }
+            var rv = localStorage.getItem(getLocalStorageHash(_this, 'isLocal'));
+            if (rv === '0') {
+              return true;      // **default behaviour**: when the browser supports localStorage, it is available for dat.gui data storage
+            } else {
+              return rv === 'true';
+            }
           },
+          // @param {bool}:
+          // - truthy value: explicitly enables localStorage (when the browser supports it)
+          // 
+          // - falsey value (except `null` or `undefined`): explicitly *disables* localStorage automatic data
+          //   storage for `dat.gui`.
+          //   
+          // - `null` or `undefined`: *clear* the explicit configuration: localStorage use is determined
+          //   solely by the available browser support from this point forward. 
+          //   
+          //   (You can use this `bool` value to clear previous explicit dat.gui configuration 
+          //   and data storage and revert to using the coded default(s) once again.)
           set: function(bool) {
+            dom.unbind(window, 'unload', saveToLocalStorage);
             if (SUPPORTS_LOCAL_STORAGE) {
-              use_local_storage = bool;
-              if (bool) {
-                dom.bind(window, 'unload', saveToLocalStorage);
+              dom.bind(window, 'unload', saveToLocalStorage);
+              if (bool == null) {
+                bool = 0;
               } else {
-                dom.unbind(window, 'unload', saveToLocalStorage);
+                bool = !!bool;              // coerce any input type to boolean
               }
               localStorage.setItem(getLocalStorageHash(_this, 'isLocal'), bool);
             }
@@ -388,14 +411,15 @@ define([
 
       // Are we supposed to be loading locally?
       if (SUPPORTS_LOCAL_STORAGE) {
-        if (use_local_storage) {
-          this.useLocalStorage = true;
+        var rv = this.useLocalStorage;
+        if (rv !== null) {
+        this.useLocalStorage = true;
 
-          var saved_gui = localStorage.getItem(getLocalStorageHash(this, 'gui'));
+        var saved_gui = localStorage.getItem(getLocalStorageHash(this, 'gui'));
 
-          if (saved_gui) {
-            params.load = JSON.parse(saved_gui);
-          }
+        if (saved_gui) {
+          params.load = JSON.parse(saved_gui);
+        }
         }
       }
 
@@ -458,18 +482,24 @@ define([
       }
     }
 
-    dom.bind(window, 'resize', function() { _this.onResize(); });
-    dom.bind(this.__ul, 'webkitTransitionEnd', function() { _this.onResize(); });
-    dom.bind(this.__ul, 'transitionend', function() { _this.onResize(); });
-    dom.bind(this.__ul, 'oTransitionEnd', function() { _this.onResize(); });
-    this.onResize();
+    function onResizeHandler() { 
+      _this.onResize(); 
+    }
+
+    dom.bind(window, 'resize', onResizeHandler);
+    dom.bind(this.__ul, 'webkitTransitionEnd', onResizeHandler);
+    dom.bind(this.__ul, 'transitionend', onResizeHandler);
+    dom.bind(this.__ul, 'oTransitionEnd', onResizeHandler);
+    onResizeHandler();
 
     if (params.resizable) {
       addResizeHandle(this);
     }
 
     saveToLocalStorage = function () {
-      if (SUPPORTS_LOCAL_STORAGE && localStorage.getItem(getLocalStorageHash(_this, 'isLocal')) === 'true') {
+      // only save the dat.gui data when localStorage is available *and* has been enabled 
+      // (which it is by default; see `.useLocalStorage` get/set)
+      if (_this.useLocalStorage) {
         localStorage.setItem(getLocalStorageHash(_this, 'gui'), JSON.stringify(_this.getSaveObject()));
       }
     };
@@ -974,7 +1004,7 @@ define([
       var r = function(returned) {
         // Have we defined both boundaries?
         if (common.isNumber(controller.__min) && common.isNumber(controller.__max)) {
-          // Well, then lets just replace this with a slider.
+          // Well, then let's just replace this with a slider.
           controller.remove();
           return add(
               gui,
@@ -1042,12 +1072,12 @@ define([
 
     // Why yes, it does!
     if (matched_index !== -1) {
-      // Let me fetch a map of controllers for thcommon.isObject.
+      // Let me fetch a map of controllers for this object.
       var controller_map =
           root.__rememberedObjectIndecesToControllers[matched_index];
 
-      // Ohp, I believe this is the first controller we've created for this
-      // object. Lets make the map fresh.
+      // I believe this is the first controller we've created for this
+      // object. Let's make a fresh map.
       if (controller_map === undefined) {
         controller_map = {};
         root.__rememberedObjectIndecesToControllers[matched_index] = controller_map;
@@ -1074,7 +1104,7 @@ define([
           return;
         }
 
-        // Did the loaded object remember thcommon.isObject?
+        // Did the loaded object remember this object?
         if (preset[matched_index] &&
             // Did we remember this particular property?
             preset[matched_index][controller.property] !== undefined) {
@@ -1270,7 +1300,7 @@ define([
     common.each(gui.__rememberedObjects, function(val, index) {
       var saved_values = {};
 
-      // The controllers I've made for thcommon.isObject by property
+      // The controllers I've made for this object by property
       var controller_map =
           gui.__rememberedObjectIndecesToControllers[index];
 
@@ -1279,7 +1309,7 @@ define([
         saved_values[property] = useInitialValues ? controller.initialValue : controller.getValue();
       });
 
-      // Save the values for thcommon.isObject
+      // Save the values for this object
       toReturn[index] = saved_values;
     });
 

@@ -4191,7 +4191,7 @@ define('dat/gui/GUI',[
     // Why yes, it does!
     if (matched_index !== -1) {
 
-      // Let me fetch a map of controllers for thcommon.isObject.
+      // Let me fetch a map of controllers for this object.
       var controller_map =
           root.__rememberedObjectIndecesToControllers[matched_index];
 
@@ -4231,7 +4231,7 @@ define('dat/gui/GUI',[
         }
 
 
-        // Did the loaded object remember thcommon.isObject?
+        // Did the loaded object remember this object?
         if (preset[matched_index] &&
 
           // Did we remember this particular property?
@@ -4455,7 +4455,7 @@ define('dat/gui/GUI',[
 
       var saved_values = {};
 
-      // The controllers I've made for thcommon.isObject by property
+      // The controllers I've made for this object by property
       var controller_map =
           gui.__rememberedObjectIndecesToControllers[index];
 
@@ -4464,7 +4464,7 @@ define('dat/gui/GUI',[
         saved_values[property] = useInitialValues ? controller.initialValue : controller.getValue();
       });
 
-      // Save the values for thcommon.isObject
+      // Save the values for this object
       toReturn[index] = saved_values;
 
     });

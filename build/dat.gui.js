@@ -2732,7 +2732,7 @@
         var r = function(returned) {
           // Have we defined both boundaries?
           if (common.isNumber(controller.__min) && common.isNumber(controller.__max)) {
-            // Well, then lets just replace this with a slider.
+            // Well, then let's just replace this with a slider.
             controller.remove();
             return add(
                 gui,
@@ -2800,12 +2800,12 @@
   
       // Why yes, it does!
       if (matched_index !== -1) {
-        // Let me fetch a map of controllers for thcommon.isObject.
+        // Let me fetch a map of controllers for this object.
         var controller_map =
             root.__rememberedObjectIndecesToControllers[matched_index];
   
-        // Ohp, I believe this is the first controller we've created for this
-        // object. Lets make the map fresh.
+        // I believe this is the first controller we've created for this
+        // object. Let's make a fresh map.
         if (controller_map === undefined) {
           controller_map = {};
           root.__rememberedObjectIndecesToControllers[matched_index] = controller_map;
@@ -2832,7 +2832,7 @@
             return;
           }
   
-          // Did the loaded object remember thcommon.isObject?
+          // Did the loaded object remember this object?
           if (preset[matched_index] &&
               // Did we remember this particular property?
               preset[matched_index][controller.property] !== undefined) {
@@ -3028,7 +3028,7 @@
       common.each(gui.__rememberedObjects, function(val, index) {
         var saved_values = {};
   
-        // The controllers I've made for thcommon.isObject by property
+        // The controllers I've made for this object by property
         var controller_map =
             gui.__rememberedObjectIndecesToControllers[index];
   
@@ -3037,7 +3037,7 @@
           saved_values[property] = useInitialValues ? controller.initialValue : controller.getValue();
         });
   
-        // Save the values for thcommon.isObject
+        // Save the values for this object
         toReturn[index] = saved_values;
       });
   

@@ -1974,17 +1974,16 @@
       // Only root level GUI's are resizable.
       params.resizable = common.isUndefined(params.parent) && params.resizable;
   
-  
       if (params.autoPlace && common.isUndefined(params.scrollable)) {
         params.scrollable = true;
       }
   //    params.scrollable = common.isUndefined(params.parent) && params.scrollable === true;
   
-      // Not part of params because I don't want people passing this in via
-      // constructor. Should be a 'remembered' value.
-      var use_local_storage =
-          SUPPORTS_LOCAL_STORAGE &&
-              localStorage.getItem(getLocalStorageHash(this, 'isLocal')) === 'true';
+      // // Not part of params because I don't want people passing this in via
+      // // constructor. Should be a 'remembered' value.
+      // var use_local_storage =
+      //     SUPPORTS_LOCAL_STORAGE &&
+      //         localStorage.getItem(getLocalStorageHash(this, 'isLocal')) === 'true';
   
       var saveToLocalStorage;
   
@@ -2092,7 +2091,7 @@
                 dom.removeClass(_this.__ul, GUI.CLASS_CLOSED);
               }
               // For browsers that aren't going to respect the CSS transition,
-              // Lets just check our height against the window height right off
+              // Let's just check our height against the window height right off
               // the bat.
               _this.onResize();
   
@@ -2119,16 +2118,40 @@
            * @type Boolean
            */
           useLocalStorage: {
+            // Return:
+            // - FALSE when localStorage has been *explicitly disabled* (by executing `this.useLocalStorage = false;` some time before)
+            // - NULL when localStorage is not available
+            // - TRUE when localStorage is available and has been enabled (localStorage is enabled by default)
             get: function() {
-              return use_local_storage;
+              if (!SUPPORTS_LOCAL_STORAGE) {
+                return null;
+              }
+              var rv = localStorage.getItem(getLocalStorageHash(_this, 'isLocal'));
+              if (rv === '0') {
+                return true;      // **default behaviour**: when the browser supports localStorage, it is available for dat.gui data storage
+              } else {
+                return rv === 'true';
+              }
             },
+            // @param {bool}:
+            // - truthy value: explicitly enables localStorage (when the browser supports it)
+            // 
+            // - falsey value (except `null` or `undefined`): explicitly *disables* localStorage automatic data
+            //   storage for `dat.gui`.
+            //   
+            // - `null` or `undefined`: *clear* the explicit configuration: localStorage use is determined
+            //   solely by the available browser support from this point forward. 
+            //   
+            //   (You can use this `bool` value to clear previous explicit dat.gui configuration 
+            //   and data storage and revert to using the coded default(s) once again.)
             set: function(bool) {
+              dom.unbind(window, 'unload', saveToLocalStorage);
               if (SUPPORTS_LOCAL_STORAGE) {
-                use_local_storage = bool;
-                if (bool) {
-                  dom.bind(window, 'unload', saveToLocalStorage);
+                dom.bind(window, 'unload', saveToLocalStorage);
+                if (bool == null) {
+                  bool = 0;
                 } else {
-                  dom.unbind(window, 'unload', saveToLocalStorage);
+                  bool = !!bool;              // coerce any input type to boolean
                 }
                 localStorage.setItem(getLocalStorageHash(_this, 'isLocal'), bool);
               }
@@ -2146,14 +2169,15 @@
   
         // Are we supposed to be loading locally?
         if (SUPPORTS_LOCAL_STORAGE) {
-          if (use_local_storage) {
-            this.useLocalStorage = true;
+          var rv = this.useLocalStorage;
+          if (rv !== null) {
+          this.useLocalStorage = true;
   
-            var saved_gui = localStorage.getItem(getLocalStorageHash(this, 'gui'));
+          var saved_gui = localStorage.getItem(getLocalStorageHash(this, 'gui'));
   
-            if (saved_gui) {
-              params.load = JSON.parse(saved_gui);
-            }
+          if (saved_gui) {
+            params.load = JSON.parse(saved_gui);
+          }
           }
         }
   
@@ -2216,18 +2240,24 @@
         }
       }
   
-      dom.bind(window, 'resize', function() { _this.onResize(); });
-      dom.bind(this.__ul, 'webkitTransitionEnd', function() { _this.onResize(); });
-      dom.bind(this.__ul, 'transitionend', function() { _this.onResize(); });
-      dom.bind(this.__ul, 'oTransitionEnd', function() { _this.onResize(); });
-      this.onResize();
+      function onResizeHandler() { 
+        _this.onResize(); 
+      }
+  
+      dom.bind(window, 'resize', onResizeHandler);
+      dom.bind(this.__ul, 'webkitTransitionEnd', onResizeHandler);
+      dom.bind(this.__ul, 'transitionend', onResizeHandler);
+      dom.bind(this.__ul, 'oTransitionEnd', onResizeHandler);
+      onResizeHandler();
   
       if (params.resizable) {
         addResizeHandle(this);
       }
   
       saveToLocalStorage = function () {
-        if (SUPPORTS_LOCAL_STORAGE && localStorage.getItem(getLocalStorageHash(_this, 'isLocal')) === 'true') {
+        // only save the dat.gui data when localStorage is available *and* has been enabled 
+        // (which it is by default; see `.useLocalStorage` get/set)
+        if (_this.useLocalStorage) {
           localStorage.setItem(getLocalStorageHash(_this, 'gui'), JSON.stringify(_this.getSaveObject()));
         }
       };

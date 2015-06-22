@@ -1,6 +1,5 @@
 
 module.exports = function(grunt) {
-
     'use strict';
 
     var fs = require('fs'),
@@ -14,21 +13,22 @@ module.exports = function(grunt) {
 
     var dat_builder = require('./utils/builder.js');
     var amdclean = require('amdclean');
+    var license_text = fs.readFileSync('./utils/license.txt');
 
     grunt.initConfig({
 
         pkg: grunt.file.readJSON('package.json'),
 
         concat: {
-        	// Patch the requireJS library file to include our configuration so we have a guaranteed initialized requireJS lib immediately on page load.
+          // Patch the requireJS library file to include our configuration so we have a guaranteed initialized requireJS lib immediately on page load.
             patch_requireJS: {
                 options: {
                     separator: '\n\n',
                     banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - <%= grunt.template.today("yyyy-mm-dd") %> */\n\n',
                 },
                 src: [
-                	'examples/assets/requirejs/require.js', 
-                	'examples/requireJS-config.js.include'
+                  'examples/assets/requirejs/require.js', 
+                  'examples/requireJS-config.js.include'
                 ],
                 dest: 'examples/assets/require-plus-config.js',
             },
@@ -62,7 +62,7 @@ module.exports = function(grunt) {
             //},
         },
 
-		requirejs: {
+        requirejs: {
             lib: {
                 options: {
                     //rjs: '../requirejs-optimizer/r.js',
@@ -70,7 +70,7 @@ module.exports = function(grunt) {
                     buildFile: 'build.js',
                 }
             }
-		},
+        },
 
         amdclean: {
             lib: {
@@ -84,69 +84,14 @@ module.exports = function(grunt) {
                         // This string is prepended to the file
                         start: '\n' +
                                '\n' +
-                               '/**\n' +
-                               ' * dat-gui JavaScript Controller Library\n' +
-                               ' * http://code.google.com/p/dat-gui\n' +
-                               ' *\n' +
-                               ' * Copyright 2011 Data Arts Team, Google Creative Lab\n' +
-                               ' *\n' +
-                               ' * Licensed under the Apache License, Version 2.0 (the "License");\n' +
-                               ' * you may not use this file except in compliance with the License.\n' +
-                               ' * You may obtain a copy of the License at\n' +
-                               ' *\n' +
-                               ' * http://www.apache.org/licenses/LICENSE-2.0\n' +
-                               ' */\n' +
+                               license_text +
                                '\n' +
-                               '(function (root, factory) {\n' +
-                               '  if (typeof define === \'function\' && define.amd) {\n' +
-                               '    // AMD. Register as an anonymous module.\n' +
-                               '    define(factory);\n' +
-                               '  } else {\n' +
-                               '    // Browser globals\n' +
-                               '    root.dat = factory();\n' +
-                               '  }\n' +
-                               '}(this, function () {\n' +
-                               '\n' +
-                               '  \'use strict\';\n' +
+                               fs.readFileSync('./utils/start.frag') +
                                '\n\n\n',
                         // This string is appended to the file
                         end:   '\n\n\n' +
-                               '    var dat = {\n' +
-                               '        utils: {\n' +
-                               '            css: dat_utils_css,\n' +
-                               '            common: dat_utils_common,\n' +
-                               '            requestAnimationFrame: dat_utils_requestAnimationFrame,\n' +
-                               '        },\n' +
-                               '        controller: {\n' +
-                               '            Controller: dat_controllers_Controller,\n' +
-                               '            OptionController: dat_controllers_OptionController,\n' +
-                               '            NumberController: dat_controllers_NumberController,\n' +
-                               '            NumberControllerBox: dat_controllers_NumberControllerBox,\n' +
-                               '            NumberControllerSlider: dat_controllers_NumberControllerSlider,\n' +
-                               '            StringController: dat_controllers_StringController,\n' +
-                               '            FunctionController: dat_controllers_FunctionController,\n' +
-                               '            BooleanController: dat_controllers_BooleanController,\n' +
-                               '            ImageController: dat_controllers_ImageController,\n' +
-                               '            ColorController: dat_controllers_ColorController,\n' +
-                               '            factory: dat_controllers_factory,\n' +
-                               '        },\n' +
-                               '        dom: {\n' +
-                               '            dom: dat_dom_dom,\n' +
-                               '            CenteredDiv: dat_dom_CenteredDiv,\n' +
-                               '        },\n' +
-                               '        color: {\n' +
-                               '            toString: dat_color_toString,\n' +
-                               '            interpret: dat_color_interpret,\n' +
-                               '            math: dat_color_math,\n' +
-                               '            Color: dat_color_Color,\n' +
-                               '        },\n' +
-                               '        gui: {\n' +
-                               '            GUI: dat_gui_GUI\n' +
-                               '        }\n' +
-                               '    };\n' +
-                               '\n' +
-                               '    return dat;\n' +
-                               '}));\n\n'
+                               fs.readFileSync('./utils/end.frag') +
+                               '\n'
                     }
                 },
                 files: {
@@ -193,7 +138,7 @@ module.exports = function(grunt) {
 
         var files = this.files.slice();
 
-	    var options = this.options({
+        var options = this.options({
             verbose: false,
             baseUrl: './src/',
             main: null,
@@ -202,7 +147,7 @@ module.exports = function(grunt) {
             shortcut: 'bundled',
             licenseFile: './utils/license.txt',
             paths: {}
-	    });
+        });
 
         function process() {
             if (files.length <= 0) {
@@ -222,7 +167,7 @@ module.exports = function(grunt) {
               });
 
               try {
-              dat_builder.build(options, file.dest, srcfileset);
+                dat_builder.build(options, file.dest, srcfileset);
               } catch (ex) {
                 console.log('exception: ', ex, ex.stack);
               } 

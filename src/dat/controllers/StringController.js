@@ -76,6 +76,7 @@ define([
           if (!dom.isActive(this.__input)) {
             this.__input.value = this.getValue();
           }
+          this.__input.disabled = this.getReadonly();
           return StringController.superclass.prototype.updateDisplay.call(this);
         }
       }

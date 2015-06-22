@@ -352,6 +352,7 @@ define([
             }).join(', ')
           });
 
+          this.__input.disabled = this.getReadonly();
         }
       }
   );

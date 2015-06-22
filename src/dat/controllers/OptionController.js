@@ -46,6 +46,9 @@ function(Controller, dom, common) {
      */
     this.__select = document.createElement('select');
 
+    this.__arrow = document.createElement('label');
+    this.__arrow.className = 'caret-down';
+
     if (common.isArray(params)) {
       var map = {};
       common.each(params, function(element) {
@@ -89,6 +92,7 @@ function(Controller, dom, common) {
     }
 
     this.domElement.appendChild(this.__select);
+    this.domElement.appendChild(this.__arrow);
     if (this.__custom_controller) {
       this.domElement.appendChild(this.__custom_controller.el);
     }
@@ -117,9 +121,11 @@ function(Controller, dom, common) {
           }
 
           this.__select.value = custom ? this.CUSTOM_FLAG : value;
+          this.__select.disabled = this.getReadonly();
 
           if (this.__custom_controller) {
             this.__custom_controller.el.style.display = custom ? 'block' : 'none';
+            this.__custom_controller.setReadonly(this.getReadonly());
           }
 
           return OptionController.superclass.prototype.updateDisplay.call(this);

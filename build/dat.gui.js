@@ -743,6 +743,9 @@
        */
       this.__select = document.createElement('select');
   
+      this.__arrow = document.createElement('label');
+      this.__arrow.className = 'caret-down';
+  
       if (common.isArray(params)) {
         var map = {};
         common.each(params, function(element) {
@@ -786,6 +789,7 @@
       }
   
       this.domElement.appendChild(this.__select);
+      this.domElement.appendChild(this.__arrow);
       if (this.__custom_controller) {
         this.domElement.appendChild(this.__custom_controller.el);
       }
@@ -814,9 +818,11 @@
             }
   
             this.__select.value = custom ? this.CUSTOM_FLAG : value;
+            this.__select.disabled = this.getReadonly();
   
             if (this.__custom_controller) {
               this.__custom_controller.el.style.display = custom ? 'block' : 'none';
+              this.__custom_controller.setReadonly(this.getReadonly());
             }
   
             return OptionController.superclass.prototype.updateDisplay.call(this);
@@ -1316,6 +1322,7 @@
             if (!dom.isActive(this.__input)) {
               this.__input.value = this.getValue();
             }
+            this.__input.disabled = this.getReadonly();
             return StringController.superclass.prototype.updateDisplay.call(this);
           }
         }
@@ -1440,6 +1447,8 @@
             } else {
               this.__checkbox.checked = false;
             }
+  
+            this.__checkbox.disabled = this.getReadonly();
   
             return BooleanController.superclass.prototype.updateDisplay.call(this);
           }
@@ -3616,6 +3625,7 @@
               }).join(', ')
             });
   
+            this.__input.disabled = this.getReadonly();
           }
         }
     );

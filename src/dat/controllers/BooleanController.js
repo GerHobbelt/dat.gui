@@ -68,6 +68,8 @@ define([
             this.__checkbox.checked = false;
           }
 
+          this.__checkbox.disabled = this.getReadonly();
+
           return BooleanController.superclass.prototype.updateDisplay.call(this);
         }
       }

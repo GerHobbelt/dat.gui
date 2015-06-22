@@ -22,7 +22,7 @@ requirejs.config({
     
         domReady: '../examples/assets/requireJS-domReady/domReady',
         text: '../examples/assets/text/text',
-        'dat.gui': './index',
+        'dat.GUI': './index',
 
         'gui': '../examples/gui',
         'gui.timer': '../time/timer',

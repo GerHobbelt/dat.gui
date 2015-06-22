@@ -23,7 +23,7 @@
     //is not explicitly set, then all modules are loaded relative to
     //the directory that holds the build file. If appDir is set, then
     //baseUrl should be specified as relative to the appDir.
-    baseUrl: "./src/",
+    baseUrl: "../src/",
 
     //By default all the configuration for optimization happens from the command
     //line or by properties in the config file, and configuration that was
@@ -35,7 +35,7 @@
     //or require.config({}) call found in that file will be used.
     //As of 2.1.10, mainConfigFile can be an array of values, with the last
     //value's config take precedence over previous values in the array.
-    mainConfigFile: './examples/requireJS-config.js.include',
+    mainConfigFile: '../examples/requireJS-config.js.include',
 
     //Set paths for modules. If relative paths, set relative to baseUrl above.
     //If a special value of "empty:" is used for the path value, then that
@@ -61,7 +61,7 @@
     //the path will default to be a directory called "build" as a sibling
     //to the build file. All relative paths are relative to the build file.
 
-    dir: "./build",
+    dir: "../build",
 
     //As of RequireJS 2.0.2, the dir above will be deleted before the
     //build starts again. If you have a big build and are not doing
@@ -239,7 +239,7 @@
 
     //Inlines the text for any text! dependencies, to avoid the separate
     //async XMLHttpRequest calls to load those dependencies.
-    inlineText: false,
+    inlineText: true,
 
     //Allow "use strict"; be included in the RequireJS files.
     //Default is false because there are not many browsers that can properly
@@ -261,9 +261,10 @@
     //Pragmas also remove code in non-minified source, where has branch
     //trimming is only done if the code is minified via UglifyJS or
     //Closure Compiler.
-    pragmas: {
-        fooExclude: true
-    },
+
+    // pragmas: {
+    //     fooExclude: true
+    // },
 
     //Same as "pragmas", but only applied once during the file save phase
     //of an optimization. "pragmas" are applied both during the dependency
@@ -284,18 +285,20 @@
     //The code branch trimming only happens if minification with UglifyJS or
     //Closure Compiler is done. For more information, see:
     //http://requirejs.org/docs/optimization.html#hasjs
-    has: {
-        'function-bind': true,
-        'string-trim': false
-    },
+
+    // has: {
+    //     'function-bind': true,
+    //     'string-trim': false
+    // },
 
     //Similar to pragmasOnSave, but for has tests -- only applied during the
     //file save phase of optimization, where "has" is applied to both
     //dependency mapping and file save phases.
-    hasOnSave: {
-        'function-bind': true,
-        'string-trim': false
-    },
+
+    // hasOnSave: {
+    //     'function-bind': true,
+    //     'string-trim': false
+    // },
 
     //Allows namespacing requirejs, require and define calls to a new name.
     //This allows stronger assurances of getting a module space that will
@@ -331,7 +334,8 @@
     //normalize() method). In those cases, an AMD loader just needs to know
     //that the module has a definition. These small stubs can be used instead of
     //including the full source for a plugin.
-    stubModules: ['text', 'bar'],
+
+    // stubModules: ['text', 'bar'],
 
     //If it is not a one file optimization, scan through all .js files in the
     //output directory for any plugin resource dependencies, and if the plugin
@@ -370,7 +374,7 @@
             exclude: ["text", "domReady"],
             // excludeShallow: ["foo/bar/boo"],
             
-            out: "./build/dat.gui.js",
+            out: "dat.gui.RAW.js",
 
             //create: true can be used to create the module layer at the given
             //name, if it does not already exist in the source location. If
@@ -506,8 +510,8 @@
     //File paths are relative to the build file, or if running a commmand
     //line build, the current directory.
     wrap: {
-        startFile: "start.frag",
-        endFile: "end.frag"
+        startFile: "../utils/start.frag",
+        endFile: "../utils/end.frag"
     },
 
     //As of r.js 2.1.0, startFile and endFile can be arrays of files, and
@@ -566,19 +570,21 @@
     //A function that if defined will be called for every file read in the
     //build that is done to trace JS dependencies. This allows transforms of
     //the content.
-    onBuildRead: function (moduleName, path, contents) {
-        //Always return a value.
-        //This is just a contrived example.
-        return contents.replace(/foo/g, 'bar');
-    },
+
+    // onBuildRead: function (moduleName, path, contents) {
+    //     //Always return a value.
+    //     //This is just a contrived example.
+    //     return contents.replace(/foo/g, 'bar');
+    // },
 
     //A function that will be called for every write to an optimized bundle
     //of modules. This allows transforms of the content before serialization.
-    onBuildWrite: function (moduleName, path, contents) {
-        //Always return a value.
-        //This is just a contrived example.
-        return contents.replace(/bar/g, 'foo');
-    },
+
+    // onBuildWrite: function (moduleName, path, contents) {
+    //     //Always return a value.
+    //     //This is just a contrived example.
+    //     return contents.replace(/bar/g, 'foo');
+    // },
 
     //A function that is called for each JS module bundle that has been
     //completed. This function is called after all module bundles have
@@ -586,29 +592,30 @@
     //"modules" entry or if just a single file JS optimization, the
     //optimized JS file.
     //Introduced in r.js version 2.1.6
-    onModuleBundleComplete: function (data) {
-        /*
-        data.name: the bundle name.
-        data.path: the bundle path relative to the output directory.
-        data.included: an array of items included in the build bundle.
-        If a file path, it is relative to the output directory. Loader
-        plugin IDs are also included in this array, but depending
-        on the plugin, may or may not have something inlined in the
-        module bundle.
-        */
-        'use strict';
 
-        console.log('onModuleBundleComplete: ', data);
-        
-        var fs = module.require('fs'),
-            amdclean = module.require('amdclean'),
-            outputFile = data.path,
-            cleanedCode = amdclean.clean({
-                filePath: outputFile
-            });
-
-        fs.writeFileSync(outputFile, cleanedCode);
-    },
+    // onModuleBundleComplete: function (data) {
+    //    /*
+    //    data.name: the bundle name.
+    //    data.path: the bundle path relative to the output directory.
+    //    data.included: an array of items included in the build bundle.
+    //    If a file path, it is relative to the output directory. Loader
+    //    plugin IDs are also included in this array, but depending
+    //    on the plugin, may or may not have something inlined in the
+    //    module bundle.
+    //    */
+    //    'use strict';
+    //
+    //    console.log('onModuleBundleComplete: ', data);
+    //        
+    //    // var fs = module.require('fs'),
+    //    //     amdclean = module.require('amdclean'),
+    //    //     outputFile = data.path,
+    //    //     cleanedCode = amdclean.clean({
+    //    //         filePath: outputFile
+    //    //     });
+    //
+    //    // fs.writeFileSync(outputFile, cleanedCode);
+    //},
 
     //Introduced in 2.1.3: Seed raw text contents for the listed module IDs.
     //These text contents will be used instead of doing a file IO call for

@@ -16,7 +16,6 @@ module.exports = function(grunt) {
     var license_text = fs.readFileSync('./utils/license.txt');
 
     grunt.initConfig({
-
         pkg: grunt.file.readJSON('package.json'),
 
         concat: {
@@ -67,7 +66,7 @@ module.exports = function(grunt) {
                 options: {
                     //rjs: '../requirejs-optimizer/r.js',
                     //mainConfigFile: 'build.js',
-                    buildFile: 'build.js',
+                    buildFile: 'utils/build.js',
                 }
             }
         },

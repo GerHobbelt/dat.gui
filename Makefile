@@ -1,6 +1,8 @@
 
 all:
-	cd utils && node build_gui.js
+	grunt build_B
+	grunt
+#cd utils && node build_gui.js
 
 clean:
 	-rm build/*.js

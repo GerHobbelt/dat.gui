@@ -60,13 +60,12 @@ define([
       Controller.prototype,
       {
         fire: function(user_data) {
-          if (this.__onChange) {
-            this.__onChange.call(this, this.getValue(), user_data);
+          var no_go = this.fireBeforeChange(user_data);
+          if (!no_go) {
+            this.getValue().apply(this.object, user_data);
           }
-          this.getValue().apply(this.object, user_data);
-          if (this.__onFinishChange) {
-            this.__onFinishChange.call(this, this.getValue(), user_data);
-          }
+          this.fireChange(user_data);
+          this.fireFinishChange(user_data);
         }
       }
   );

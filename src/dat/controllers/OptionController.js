@@ -59,7 +59,6 @@ function(Controller, dom, common) {
       opt.innerHTML = key;
       opt.setAttribute('value', value);
       _this.__select.appendChild(opt);
-
     });
 
     if (params.custom) {
@@ -76,8 +75,9 @@ function(Controller, dom, common) {
 
     dom.bind(this.__select, 'change', function() {
       var value = this.options[this.selectedIndex].value;
-      if (value == _this.CUSTOM_FLAG)
+      if (value === _this.CUSTOM_FLAG) {
         value = _this.__custom_controller.getValue();
+      }
       _this.setValue(value);
     });
 
@@ -102,16 +102,13 @@ function(Controller, dom, common) {
       {
         setValue: function(v) {
           var toReturn = OptionController.superclass.prototype.setValue.call(this, v);
-          if (this.__onFinishChange) {
-            this.__onFinishChange.call(this, this.getValue());
-          }
           return toReturn;
         },
 
         updateDisplay: function() {
           var value = this.getValue();
           var custom = true;
-          if (value != this.CUSTOM_FLAG) {
+          if (value !== this.CUSTOM_FLAG) {
             common.each(this.__select.options, function(option) {
               if (value == option.value) {
                 custom = false;

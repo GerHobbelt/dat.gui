@@ -43,11 +43,7 @@ define([
             var file = _this.__input.files[0];
             var url = URL.createObjectURL(file);
             _this.__previewImage.src = url;
-            _this.setValue( url );
-
-            if (_this.__onFinishChange) {
-                _this.__onFinishChange.call(_this, _this.getValue());
-            }
+            _this.setValue(url);
         }
 
         dom.bind(this.__input, 'change', onChange);

@@ -78,9 +78,7 @@ define([
 
     function onBlur() {
       onChange();
-      if (_this.__onFinishChange) {
-        _this.__onFinishChange.call(_this, _this.getValue());
-      }
+      _this.fireFinishChange();
     }
 
     function onTouchDown(e) {

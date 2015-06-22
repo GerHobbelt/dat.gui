@@ -56,9 +56,6 @@ define([
       {
         setValue: function(v) {
           var toReturn = BooleanController.superclass.prototype.setValue.call(this, v);
-          if (this.__onFinishChange) {
-            this.__onFinishChange.call(this, this.getValue());
-          }
           this.__prev = this.getValue();
           return toReturn;
         },
@@ -68,7 +65,7 @@ define([
             this.__checkbox.setAttribute('checked', 'checked');
             this.__checkbox.checked = true;    
           } else {
-              this.__checkbox.checked = false;
+            this.__checkbox.checked = false;
           }
 
           return BooleanController.superclass.prototype.updateDisplay.call(this);

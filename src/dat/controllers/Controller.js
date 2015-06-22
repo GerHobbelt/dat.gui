@@ -1,14 +1,3 @@
-//
-// OBSOLETE STUFF?
-//
-// old v0.4 code which needs to be integrated or otherwise thrown away
-//
-
-
-
-
-
-
 // GUI.Controller = function() {
 
 // 	this.parent = arguments[0];
@@ -65,12 +54,6 @@
 // 	this.updateDisplay();
 // 	return this;
 // }
-    
-// GUI.Controller.prototype.getValue = function() {
-// 	return this.object[this.propertyName];
-// }
-
-// GUI.Controller.prototype.updateDisplay = function() {}
     
 // GUI.Controller.prototype.addChangeListener = function(fnc) {
 // 	this.changeListeners.push(fnc);
@@ -146,6 +129,13 @@ define([
     this.__onChange = undefined;
 
     /**
+     * The function to be called before applying a change.
+     * @type {Function}
+     * @ignore
+     */
+    this.__onBeforeChange = undefined;
+
+    /**
      * The function to be called on finishing change.
      * @type {Function}
      * @ignore
@@ -159,11 +149,11 @@ define([
       /** @lends dat.controllers.Controller.prototype */
       {
         /**
-         * Specify that a function fire every time someone changes the value with
+         * Specify a function which fires every time someone has changed the value with
          * this Controller.
          *
          * @param {Function} fnc This function will be called whenever the value
-         * is modified via this Controller.
+         * has been modified via this Controller.
          * @returns {dat.controllers.Controller} this
          */
         onChange: function(fnc) {
@@ -172,8 +162,21 @@ define([
         },
 
         /**
-         * Specify that a function fire every time someone "finishes" changing
-         * the value wih this Controller. Useful for values that change
+         * Specify a function which fires every time when someone is about to change the value with
+         * this Controller.
+         *
+         * @param {Function} fnc This function will be called whenever the value
+         * is going to be modified via this Controller.
+         * @returns {dat.controllers.Controller} this
+         */
+        onBeforeChange: function(fnc) {
+          this.__onBeforeChange = fnc;
+          return this;
+        },
+
+        /**
+         * Specify a function which fires every time someone "finishes" changing
+         * the value with this Controller. Useful for values that change
          * incrementally like numbers or strings.
          *
          * @param {Function} fnc This function will be called whenever
@@ -186,6 +189,52 @@ define([
         },
 
         /**
+         * Fire the registered onChange function if it exists. The first argument will be the current
+         * property value, while the second argument carries any optional user-specified extra event info.
+         *
+         * @param  {object} event_info Optional user-specified extra event info.
+         *
+         * @returns {dat.controllers.Controller} this
+         */
+        fireChange: function(event_info) {
+          if (this.__onChange) {
+            this.__onChange(this.getValue(), event_info);
+          }
+          return this;
+        },
+
+        /**
+         * Fire the registered onBeforeChange function if it exists. The first argument will be the current
+         * property value, while the second argument carries any optional user-specified extra event info.
+         *
+         * @param  {object} event_info Optional user-specified extra event info.
+         *
+         * @returns {boolean} A truthy return value signals us to *not* apply the change; a falsey return
+         * value permits the change to happen.
+         */
+        fireBeforeChange: function(event_info) {
+          if (this.__onBeforeChange) {
+            return this.__onBeforeChange(this.getValue(), event_info);
+          }
+          return false;  // default: you are cleared to apply the change. 
+        },
+
+        /**
+         * Fire the registered onFinishChange function if it exists. The first argument will be the current
+         * property value, while the second argument carries any optional user-specified extra event info.
+         *
+         * @param  {object} event_info Optional user-specified extra event info.
+         *
+         * @returns {dat.controllers.Controller} this
+         */
+        fireFinishChange: function(event_info) {
+          if (this.__onFinishChange) {
+            this.__onFinishChange(this.getValue(), event_info);
+          }
+          return this;
+        },
+
+        /**
          * Change the value of <code>object[property]</code>
          *
          * @param {Object} newValue The new value of <code>object[property]</code>
@@ -193,9 +242,25 @@ define([
          * @param {Boolean} silent If true, don't call the onChange handler
          */
         setValue: function(newValue, silent) {
-          this.object[this.property] = newValue;
-          if (this.__onChange && !silent) {
-            this.__onChange.call(this, newValue);
+          var no_go = false;
+          var changed = (this.object[this.property] !== newValue);
+          if (!silent) {
+            // `newValue` will end up in the second argument of the event listener, thus
+            // userland code can look at both existing and new values for this property
+            // and decide what to do accordingly!
+            no_go = this.fireBeforeChange({
+              newValue: newValue, 
+              isChange: changed,
+              silent: silent
+            });
+          }
+          if (!no_go) {
+            this.object[this.property] = newValue;
+          }
+          // Always fire the change event; inform the userland code whether the change was 'real'
+          // or aborted:
+          if (!silent) {
+            this.fireChange(changed);
           }
           // Whenever you call setValue, the display will be updated automatically.
           // This reduces some clutter in subclasses.

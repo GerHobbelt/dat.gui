@@ -67,9 +67,7 @@ function(NumberController, dom, css, common, styleSheet) {
     function onTouchUp() {
       dom.unbind(window, 'touchmove', onTouchDrag);
       dom.unbind(window, 'touchend', onTouchUp);
-      if (_this.__onFinishChange) {
-        _this.__onFinishChange.call(_this, _this.getValue());
-      }
+      _this.fireFinishChange();
     }    
 
     function onMouseDown(e) {
@@ -95,9 +93,7 @@ function(NumberController, dom, css, common, styleSheet) {
     function onMouseUp() {
       dom.unbind(window, 'mousemove', onMouseDrag);
       dom.unbind(window, 'mouseup', onMouseUp);
-      if (_this.__onFinishChange) {
-        _this.__onFinishChange.call(_this, _this.getValue());
-      }
+      _this.fireFinishChange();
     }
 
     this.__background = document.createElement('div');

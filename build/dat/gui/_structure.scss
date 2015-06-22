@@ -4,7 +4,6 @@ $row-height: 27px;
 $button-height: 20px;
 
 .dg {
-
   /** Clear list styles */
   ul {
     list-style: none;
@@ -30,29 +29,23 @@ $button-height: 20px;
   }
 
   &.main {
-
     @include transition(opacity, 0.1s, linear);
 
     &.taller-than-window {
-
       overflow-y: auto;
 
       .close-button {
-
         opacity: 1;
 
         /* TODO, these are style notes */
         margin-top: -1px;
         border-top: 1px solid $border-color;
-
       }
-
     }
 
     ul.closed .close-button {
       opacity: 1 !important;
     }
-
 
     &:hover .close-button,
     .close-button.drag {
@@ -68,21 +61,18 @@ $button-height: 20px;
       line-height: $button-height - 1;
       height: $button-height;
 
-        /* TODO, these are style notes */
+      /* TODO, these are style notes */
       cursor: pointer;
       text-align: center;
       background-color: #000;
       &:hover {
         background-color: #111;
       }
-
     }
-
   }
 
   /* Auto-placed GUI's */
   &.a {
-
     float: right;
     margin-right: 15px;
     overflow-x: hidden;
@@ -94,14 +84,11 @@ $button-height: 20px;
       }
     }
 
-
-
     .save-row {
       position: fixed;
       top: 0;
       z-index: 1002;
     }
-
   }
 
   li {   
@@ -120,7 +107,6 @@ $button-height: 20px;
   li.folder {   
       padding: 0;
       border-left: $nest-margin solid rgba(0,0,0,0);
-      
   }
 
   /** Folder names */
@@ -158,7 +144,7 @@ $button-height: 20px;
   }
 
   /** Controller-half (right) */
-  .c  {
+  .c {
     float: left;
     width: 60%;
   }
@@ -200,7 +186,7 @@ $button-height: 20px;
     margin-top: 5px;
   }
   
-	/** Ensure the entire boolean and function row shows a hand */
+  /** Ensure the entire boolean and function row shows a hand */
   .cr.function,
   .cr.function .property-name, /* Don't know why I need to be this explicit */
   .cr.function *,
@@ -226,14 +212,12 @@ $button-height: 20px;
 
 
   li.save-row {
-
     padding: 0;
 
     .button {
       display: inline-block;
       padding: 0px 6px;
     }
-
   }
 
   &.dialogue {
@@ -243,8 +227,6 @@ $button-height: 20px;
     font-size: 13px;
     line-height: 15px;
   }
-
-
 }
 
 /* TODO Separate style and structure */
@@ -275,7 +257,7 @@ $button-height: 20px;
   margin-top: 10px;
   code {
     font-size: 10px;
-    }
+  }
 }
 
 #dat-gui-save-locally {
@@ -305,3 +287,4 @@ $button-height: 20px;
 .dg .slider {
   height: 50px !important;
 }
+

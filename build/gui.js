@@ -1,9 +1,7 @@
 
 define([], function() {
 
-
 var GUI = function() {
-
     GUI.allGuis.push(this);
 
     var json;
@@ -61,7 +59,6 @@ var GUI = function() {
 
     // Firefox hack to prevent horizontal scrolling
     controllerContainer.addEventListener('DOMMouseScroll', function(e) {
-
         var scrollAmount = this.scrollTop;
 
         if (e.wheelDelta) {
@@ -76,7 +73,6 @@ var GUI = function() {
         e.returnValue = false;
 
         controllerContainer.scrollTop = scrollAmount;
-
     }, false);
 
     controllerContainer.style.height = '0px';
@@ -158,7 +154,6 @@ var GUI = function() {
 
     toggleButton.addEventListener('click', function(e) {
         e.preventDefault();
-        e.stopPropagation();
         return false;
     }, false);
 
@@ -172,9 +167,7 @@ var GUI = function() {
     };
 
     document.addEventListener('mouseup', function(e) {
-
         if (togglePressed && !toggleDragged) {
-
             _this.toggle();
 
             if (!_this.timer) {
@@ -183,7 +176,6 @@ var GUI = function() {
         }
 
         if (togglePressed && toggleDragged) {
-
             if (dragDisplacementX == 0 && !_this.timer) {
                 correctWidth();
             }
@@ -205,7 +197,6 @@ var GUI = function() {
                     beginResize();
                 }
             }
-
         }
 
         document.removeEventListener('mousemove', resize, false);
@@ -214,7 +205,6 @@ var GUI = function() {
         togglePressed = false;
 
         return false;
-
     }, false);
 
     this.domElement.appendChild(controllerContainer);
@@ -421,8 +411,8 @@ var GUI = function() {
                 break;
             }
             values.push(val);
-
         }
+
         var obj = {
             open: open,
             width: width,
@@ -512,7 +502,6 @@ var GUI = function() {
             }
         }, false);
     }
-
 };
 
 // Do not set this directly.
@@ -590,7 +579,6 @@ GUI.getOffset = function(obj, relativeTo) {
             if (relativeTo) {
                 c = c && obj !== relativeTo;
             }
-
         } while (c);
         return {
             left: curleft,
@@ -612,3 +600,4 @@ GUI.extendController = function(clazz) {
 
     return GUI;
 });
+

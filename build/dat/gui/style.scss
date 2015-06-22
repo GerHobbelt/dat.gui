@@ -50,14 +50,12 @@ $input-color: lighten($background-color, 8.5%);
 
 /** Main type */
 .dg {
-
   color: #eee;
   font: 11px 'Lucida Grande', sans-serif;
   text-shadow: 0 -1px 0 #111;
 
   /** Auto place */
   &.main {
-
     /** Scrollbar */
     &::-webkit-scrollbar {
       width: 5px;
@@ -71,18 +69,15 @@ $input-color: lighten($background-color, 8.5%);
       border-radius: 5px;
       background: lighten($background-color, 30%);
     }
-
   }
 
   li {
-
     &:not(.folder) {
       background: $background-color;
       border-bottom: 1px solid $border-color;
     }
 
     &.save-row {
-
       line-height: 25px;
       background: $save-row-color;
       border: 0;
@@ -90,11 +85,9 @@ $input-color: lighten($background-color, 8.5%);
       select {
         margin-left: 5px;
         width: 108px;
-
       }
 
       .button {
-
         &.gears {
           @include gears;
         }
@@ -105,9 +98,7 @@ $input-color: lighten($background-color, 8.5%);
           background-color: darken($button-color, 5%);
           box-shadow: 0 -1px 0 darken($button-color, 10%);
         }
-
       }
-
     }
 
     &.folder {
@@ -120,7 +111,6 @@ $input-color: lighten($background-color, 8.5%);
       cursor: pointer;
       border-bottom: 1px solid rgba(255, 255, 255, 0.2);
     }
-
   }
 
   .closed li.title {
@@ -129,9 +119,12 @@ $input-color: lighten($background-color, 8.5%);
 
   /* Controller row, <li> */
   .cr {
-
     &.boolean {
       border-left: 3px solid $boolean-color;
+    }
+
+    &.color {
+      border-left: 3px solid;
     }
 
     &.function {
@@ -156,15 +149,12 @@ $input-color: lighten($background-color, 8.5%);
     &.boolean:hover {
       background: #111;
     }
-
   }
 
 
   /** Controllers */
   .c {
-
     input[type=text] {
-
       background: $input-color;
       outline: none;
       &:hover {
@@ -174,9 +164,7 @@ $input-color: lighten($background-color, 8.5%);
         background: lighten($input-color, $active-lighten);
         color: #fff;
       }
-
     }
-
 
     .slider {
       background: $input-color;
@@ -193,7 +181,6 @@ $input-color: lighten($background-color, 8.5%);
         background: lighten($number-color, $hover-lighten);
       }
     }
-
   }
-
 }
+

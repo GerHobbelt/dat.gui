@@ -2,7 +2,7 @@
  * dat-gui JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2015 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,6 @@
   dat.utils = dat.utils || {};
   
   dat.utils.common = (function () {
-    
     'use strict';
   
     var ARR_EACH = Array.prototype.forEach;
@@ -43,39 +42,30 @@
      */
   
     return { 
-      
       BREAK: {},
     
       extend: function(target) {
-        
         this.each(ARR_SLICE.call(arguments, 1), function(obj) {
-          
           for (var key in obj) {
             if (!this.isUndefined(obj[key])) {
               target[key] = obj[key];
             }
           }
-          
         }, this);
         
         return target;
-        
       },
       
       defaults: function(target) {
-        
         this.each(ARR_SLICE.call(arguments, 1), function(obj) {
-          
           for (var key in obj) {
             if (this.isUndefined(target[key])) {
               target[key] = obj[key];
             }
           }
-          
         }, this);
         
         return target;
-      
       },
       
       compose: function() {
@@ -90,33 +80,25 @@
       },
       
       each: function(obj, itr, scope) {
-  
         if (!obj) {
           return;
         }
   
         if (ARR_EACH && obj.forEach && obj.forEach === ARR_EACH) { 
-          
           obj.forEach(itr, scope);
-          
         } else if (obj.length === obj.length + 0) { // Is number but not NaN
-          
           for (var key = 0, l = obj.length; key < l; key++) {
             if (key in obj && itr.call(scope, obj[key], key) === this.BREAK) {
               return;
             }
           }
-              
         } else {
-  
           for (var objkey in obj) {
             if (itr.call(scope, obj[objkey], objkey) === this.BREAK) {
               return;
             }
           }
-              
         }
-              
       },
       
       defer: function(fnc) {
@@ -173,9 +155,7 @@
       isImagePath: function(obj) {
         return typeof obj === 'string' && obj.search(/\.(gif|jpg|jpeg|png)$/) > -1;
       }
-    
     };
-      
   })();
   
   
@@ -200,7 +180,7 @@
   
       }
   
-    }
+    };
   
   })(dat.utils.common);
   
@@ -219,7 +199,6 @@
   
       this.__state.a = this.__state.a || 1;
   
-  
     };
   
     Color.COMPONENTS = ['r','g','b','h','s','v','hex','a'];
@@ -232,6 +211,47 @@
   
       toOriginal: function() {
         return this.__state.conversion.write(this);
+      }
+  
+    });
+  
+    defineRGBComponent(Color.prototype, 'r', 2);
+    defineRGBComponent(Color.prototype, 'g', 1);
+    defineRGBComponent(Color.prototype, 'b', 0);
+  
+    defineHSVComponent(Color.prototype, 'h');
+    defineHSVComponent(Color.prototype, 's');
+    defineHSVComponent(Color.prototype, 'v');
+  
+    Object.defineProperty(Color.prototype, 'a', {
+  
+      get: function() {
+        return this.__state.a;
+      },
+  
+      set: function(v) {
+        this.__state.a = v;
+      }
+  
+    });
+  
+    Object.defineProperty(Color.prototype, 'hex', {
+  
+      get: function() {
+  
+        if (this.__state.space !== 'HEX') {
+          this.__state.hex = math.rgb_to_hex(this.r, this.g, this.b);
+        }
+  
+        return this.__state.hex;
+  
+      },
+  
+      set: function(v) {
+  
+        this.__state.space = 'HEX';
+        this.__state.hex = v;
+  
       }
   
     });
@@ -334,47 +354,6 @@
       }
   
     }
-  
-    defineRGBComponent(Color.prototype, 'r', 2);
-    defineRGBComponent(Color.prototype, 'g', 1);
-    defineRGBComponent(Color.prototype, 'b', 0);
-  
-    defineHSVComponent(Color.prototype, 'h');
-    defineHSVComponent(Color.prototype, 's');
-    defineHSVComponent(Color.prototype, 'v');
-  
-    Object.defineProperty(Color.prototype, 'a', {
-  
-      get: function() {
-        return this.__state.a;
-      },
-  
-      set: function(v) {
-        this.__state.a = v;
-      }
-  
-    });
-  
-    Object.defineProperty(Color.prototype, 'hex', {
-  
-      get: function() {
-  
-        if (this.__state.space !== 'HEX') {
-          this.__state.hex = math.rgb_to_hex(this.r, this.g, this.b);
-        }
-  
-        return this.__state.hex;
-  
-      },
-  
-      set: function(v) {
-  
-        this.__state.space = 'HEX';
-        this.__state.hex = v;
-  
-      }
-  
-    });
   
     return Color;
   
@@ -533,7 +512,7 @@
                 space: 'HEX',
                 hex: original,
                 conversionName: 'HEX'
-              }
+              };
             },
   
             write: function(color) {
@@ -616,7 +595,7 @@
                   g: original.g,
                   b: original.b,
                   a: original.a
-                }
+                };
               }
               return false;
             },
@@ -627,7 +606,7 @@
                 g: color.g,
                 b: color.b,
                 a: color.a
-              }
+              };
             }
           },
   
@@ -641,7 +620,7 @@
                   r: original.r,
                   g: original.g,
                   b: original.b
-                }
+                };
               }
               return false;
             },
@@ -651,7 +630,7 @@
                 r: color.r,
                 g: color.g,
                 b: color.b
-              }
+              };
             }
           },
   
@@ -667,7 +646,7 @@
                   s: original.s,
                   v: original.v,
                   a: original.a
-                }
+                };
               }
               return false;
             },
@@ -678,7 +657,7 @@
                 s: color.s,
                 v: color.v,
                 a: color.a
-              }
+              };
             }
           },
   
@@ -692,7 +671,7 @@
                   h: original.h,
                   s: original.s,
                   v: original.v
-                }
+                };
               }
               return false;
             },
@@ -702,7 +681,7 @@
                 h: color.h,
                 s: color.s,
                 v: color.v
-              }
+              };
             }
   
           }
@@ -801,7 +780,7 @@
         return value << (tmpComponent = componentIndex * 8) | (hex & ~ (0xFF << tmpComponent));
       }
   
-    }
+    };
   
   })(),
   dat.color.toString,

@@ -2,7 +2,7 @@
  * dat-gui JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2015 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -236,6 +236,13 @@
       this.__onChange = undefined;
   
       /**
+       * The function to be called before applying a change.
+       * @type {Function}
+       * @ignore
+       */
+      this.__onBeforeChange = undefined;
+  
+      /**
        * The function to be called on finishing change.
        * @type {Function}
        * @ignore
@@ -249,11 +256,11 @@
         /** @lends dat.controllers.Controller.prototype */
         {
           /**
-           * Specify that a function fire every time someone changes the value with
+           * Specify a function which fires every time someone has changed the value with
            * this Controller.
            *
            * @param {Function} fnc This function will be called whenever the value
-           * is modified via this Controller.
+           * has been modified via this Controller.
            * @returns {dat.controllers.Controller} this
            */
           onChange: function(fnc) {
@@ -262,8 +269,21 @@
           },
   
           /**
-           * Specify that a function fire every time someone "finishes" changing
-           * the value wih this Controller. Useful for values that change
+           * Specify a function which fires every time when someone is about to change the value with
+           * this Controller.
+           *
+           * @param {Function} fnc This function will be called whenever the value
+           * is going to be modified via this Controller.
+           * @returns {dat.controllers.Controller} this
+           */
+          onBeforeChange: function(fnc) {
+            this.__onBeforeChange = fnc;
+            return this;
+          },
+  
+          /**
+           * Specify a function which fires every time someone "finishes" changing
+           * the value with this Controller. Useful for values that change
            * incrementally like numbers or strings.
            *
            * @param {Function} fnc This function will be called whenever
@@ -276,6 +296,52 @@
           },
   
           /**
+           * Fire the registered onChange function if it exists. The first argument will be the current
+           * property value, while the second argument carries any optional user-specified extra event info.
+           *
+           * @param  {object} event_info Optional user-specified extra event info.
+           *
+           * @returns {dat.controllers.Controller} this
+           */
+          fireChange: function(event_info) {
+            if (this.__onChange) {
+              this.__onChange(this.getValue(), event_info);
+            }
+            return this;
+          },
+  
+          /**
+           * Fire the registered onBeforeChange function if it exists. The first argument will be the current
+           * property value, while the second argument carries any optional user-specified extra event info.
+           *
+           * @param  {object} event_info Optional user-specified extra event info.
+           *
+           * @returns {boolean} A truthy return value signals us to *not* apply the change; a falsey return
+           * value permits the change to happen.
+           */
+          fireBeforeChange: function(event_info) {
+            if (this.__onBeforeChange) {
+              return this.__onBeforeChange(this.getValue(), event_info);
+            }
+            return false;  // default: you are cleared to apply the change. 
+          },
+  
+          /**
+           * Fire the registered onFinishChange function if it exists. The first argument will be the current
+           * property value, while the second argument carries any optional user-specified extra event info.
+           *
+           * @param  {object} event_info Optional user-specified extra event info.
+           *
+           * @returns {dat.controllers.Controller} this
+           */
+          fireFinishChange: function(event_info) {
+            if (this.__onFinishChange) {
+              this.__onFinishChange(this.getValue(), event_info);
+            }
+            return this;
+          },
+  
+          /**
            * Change the value of <code>object[property]</code>
            *
            * @param {Object} newValue The new value of <code>object[property]</code>
@@ -283,9 +349,25 @@
            * @param {Boolean} silent If true, don't call the onChange handler
            */
           setValue: function(newValue, silent) {
-            this.object[this.property] = newValue;
-            if (this.__onChange && !silent) {
-              this.__onChange.call(this, newValue);
+            var no_go = false;
+            var changed = (this.object[this.property] !== newValue);
+            if (!silent) {
+              // `newValue` will end up in the second argument of the event listener, thus
+              // userland code can look at both existing and new values for this property
+              // and decide what to do accordingly!
+              no_go = this.fireBeforeChange({
+                newValue: newValue, 
+                isChange: changed,
+                silent: silent
+              });
+            }
+            if (!no_go) {
+              this.object[this.property] = newValue;
+            }
+            // Always fire the change event; inform the userland code whether the change was 'real'
+            // or aborted:
+            if (!silent) {
+              this.fireChange(changed);
             }
             // Whenever you call setValue, the display will be updated automatically.
             // This reduces some clutter in subclasses.
@@ -674,7 +756,6 @@
         opt.innerHTML = key;
         opt.setAttribute('value', value);
         _this.__select.appendChild(opt);
-  
       });
   
       if (params.custom) {
@@ -691,8 +772,9 @@
   
       dom.bind(this.__select, 'change', function() {
         var value = this.options[this.selectedIndex].value;
-        if (value == _this.CUSTOM_FLAG)
+        if (value === _this.CUSTOM_FLAG) {
           value = _this.__custom_controller.getValue();
+        }
         _this.setValue(value);
       });
   
@@ -717,16 +799,13 @@
         {
           setValue: function(v) {
             var toReturn = OptionController.superclass.prototype.setValue.call(this, v);
-            if (this.__onFinishChange) {
-              this.__onFinishChange.call(this, this.getValue());
-            }
             return toReturn;
           },
   
           updateDisplay: function() {
             var value = this.getValue();
             var custom = true;
-            if (value != this.CUSTOM_FLAG) {
+            if (value !== this.CUSTOM_FLAG) {
               common.each(this.__select.options, function(option) {
                 if (value == option.value) {
                   custom = false;
@@ -979,9 +1058,7 @@
   
       function onBlur() {
         onChange();
-        if (_this.__onFinishChange) {
-          _this.__onFinishChange.call(_this, _this.getValue());
-        }
+        _this.fireFinishChange();
       }
   
       function onTouchDown(e) {
@@ -1101,9 +1178,7 @@
       function onTouchUp() {
         dom.unbind(window, 'touchmove', onTouchDrag);
         dom.unbind(window, 'touchend', onTouchUp);
-        if (_this.__onFinishChange) {
-          _this.__onFinishChange.call(_this, _this.getValue());
-        }
+        _this.fireFinishChange();
       }    
   
       function onMouseDown(e) {
@@ -1129,9 +1204,7 @@
       function onMouseUp() {
         dom.unbind(window, 'mousemove', onMouseDrag);
         dom.unbind(window, 'mouseup', onMouseUp);
-        if (_this.__onFinishChange) {
-          _this.__onFinishChange.call(_this, _this.getValue());
-        }
+        _this.fireFinishChange();
       }
   
       this.__background = document.createElement('div');
@@ -1299,13 +1372,12 @@
         Controller.prototype,
         {
           fire: function(user_data) {
-            if (this.__onChange) {
-              this.__onChange.call(this, this.getValue(), user_data);
+            var no_go = this.fireBeforeChange(user_data);
+            if (!no_go) {
+              this.getValue().apply(this.object, user_data);
             }
-            this.getValue().apply(this.object, user_data);
-            if (this.__onFinishChange) {
-              this.__onFinishChange.call(this, this.getValue(), user_data);
-            }
+            this.fireChange(user_data);
+            this.fireFinishChange(user_data);
           }
         }
     );
@@ -1357,9 +1429,6 @@
         {
           setValue: function(v) {
             var toReturn = BooleanController.superclass.prototype.setValue.call(this, v);
-            if (this.__onFinishChange) {
-              this.__onFinishChange.call(this, this.getValue());
-            }
             this.__prev = this.getValue();
             return toReturn;
           },
@@ -1369,7 +1438,7 @@
               this.__checkbox.setAttribute('checked', 'checked');
               this.__checkbox.checked = true;    
             } else {
-                this.__checkbox.checked = false;
+              this.__checkbox.checked = false;
             }
   
             return BooleanController.superclass.prototype.updateDisplay.call(this);
@@ -1418,11 +1487,7 @@
               var file = _this.__input.files[0];
               var url = URL.createObjectURL(file);
               _this.__previewImage.src = url;
-              _this.setValue( url );
-  
-              if (_this.__onFinishChange) {
-                  _this.__onFinishChange.call(_this, _this.getValue());
-              }
+              _this.setValue(url);
           }
   
           dom.bind(this.__input, 'change', onChange);
@@ -3116,7 +3181,7 @@
   
     return GUI;
   })(dat.utils.css,
-  "<div id=\"dg-save\" class=\"dg dialogue\">\n\n  Here's the new load parameter for your <code>GUI</code>'s constructor:\n\n  <textarea id=\"dg-new-constructor\"></textarea>\n\n  <div id=\"dg-save-locally\">\n\n    <input id=\"dg-local-storage\" type=\"checkbox\"/> Automatically save\n    values to <code>localStorage</code> on exit.\n\n    <div id=\"dg-local-explain\">The values saved to <code>localStorage</code> will\n      override those passed to <code>dat.GUI</code>'s constructor. This makes it\n      easier to work incrementally, but <code>localStorage</code> is fragile,\n      and your friends may not see the same values you do.\n      \n    </div>\n    \n  </div>\n\n</div>",
+  "<div id=\"dg-save\" class=\"dg dialogue\">\n  Here's the new load parameter for your <code>GUI</code>'s constructor:\n\n  <textarea id=\"dg-new-constructor\"></textarea>\n\n  <div id=\"dg-save-locally\">\n    <input id=\"dg-local-storage\" type=\"checkbox\"/> \n	Automatically save values to <code>localStorage</code> on exit.\n\n    <div id=\"dg-local-explain\">\n	  The values saved to <code>localStorage</code> will\n      override those passed to <code>dat.GUI</code>'s constructor. This makes it\n      easier to work incrementally, but <code>localStorage</code> is fragile,\n      and your friends may not see the same values you do.\n    </div>\n  </div>\n</div>\n",
   ".dg {\n  /** Clear list styles */\n  /* Auto-place container */\n  /* Auto-placed GUI's */\n  /* Line items that don't contain folders. */\n  /** Folder names */\n  /** Hides closed items */\n  /** Controller row */\n  /** Name-half (left) */\n  /** Controller-half (right) */\n  /** Controller placement */\n  /** Shorter number boxes when slider is present. */\n  /** Ensure the entire boolean and function row shows a hand */ }\n  .dg ul {\n    list-style: none;\n    margin: 0;\n    padding: 0;\n    width: 100%;\n    clear: both; }\n  .dg.ac {\n    position: fixed;\n    top: 0;\n    left: 0;\n    right: 0;\n    height: 0;\n    z-index: 0; }\n  .dg:not(.ac) .main {\n    /** Exclude mains in ac so that we don't hide close button */\n    overflow: hidden; }\n  .dg.main {\n    -webkit-transition: opacity 0.1s linear;\n    -o-transition: opacity 0.1s linear;\n    -moz-transition: opacity 0.1s linear;\n    transition: opacity 0.1s linear; }\n    .dg.main.taller-than-window {\n      overflow-y: auto; }\n      .dg.main.taller-than-window .close-button {\n        opacity: 1;\n        /* TODO, these are style notes */\n        margin-top: -1px;\n        border-top: 1px solid #2c2c2c; }\n    .dg.main ul.closed .close-button {\n      opacity: 1 !important; }\n    .dg.main:hover .close-button,\n    .dg.main .close-button.drag {\n      opacity: 1; }\n    .dg.main .close-button {\n      /*opacity: 0;*/\n      -webkit-transition: opacity 0.1s linear;\n      -o-transition: opacity 0.1s linear;\n      -moz-transition: opacity 0.1s linear;\n      transition: opacity 0.1s linear;\n      border: 0;\n      position: absolute;\n      line-height: 19px;\n      height: 20px;\n      /* TODO, these are style notes */\n      cursor: pointer;\n      text-align: center;\n      background-color: #000; }\n      .dg.main .close-button:hover {\n        background-color: #111; }\n  .dg.a {\n    float: right;\n    margin-right: 15px;\n    overflow-x: hidden; }\n    .dg.a.has-save > ul {\n      margin-top: 27px; }\n      .dg.a.has-save > ul.closed {\n        margin-top: 0; }\n    .dg.a .save-row {\n      position: fixed;\n      top: 0;\n      z-index: 1002; }\n  .dg li {\n    -webkit-transition: height 0.1s ease-out;\n    -o-transition: height 0.1s ease-out;\n    -moz-transition: height 0.1s ease-out;\n    transition: height 0.1s ease-out; }\n  .dg li:not(.folder) {\n    cursor: auto;\n    height: 27px;\n    line-height: 27px;\n    overflow: hidden;\n    padding: 0 4px 0 5px; }\n  .dg li.folder {\n    padding: 0;\n    border-left: 4px solid rgba(0, 0, 0, 0); }\n  .dg li.title {\n    cursor: pointer;\n    margin-left: -4px; }\n  .dg .closed li:not(.title),\n  .dg .closed ul li,\n  .dg .closed ul li > * {\n    height: 0;\n    overflow: hidden;\n    border: 0; }\n  .dg .cr {\n    clear: both;\n    padding-left: 3px;\n    height: 27px; }\n  .dg .property-name {\n    cursor: default;\n    float: left;\n    clear: left;\n    width: 40%;\n    overflow: hidden;\n    text-overflow: ellipsis; \n    text-overflow: \"…\" \"…\";\n    white-space: nowrap;\n  }\n  .dg .c {\n    float: left;\n    width: 60%; }\n  .dg .c input[type=text] {\n    border: 0;\n    margin-top: 4px;\n    padding: 3px;\n    width: 100%;\n    float: right; }\n  .dg .has-slider input[type=text] {\n    width: 30%;\n    /*display: none;*/\n    margin-left: 0; }\n  .dg .slider {\n    float: left;\n    width: 66%;\n    margin-left: -5px;\n    margin-right: 0;\n    height: 19px;\n    margin-top: 4px; }\n  .dg .slider-fg {\n    height: 100%; }\n  .dg .c input[type=checkbox] {\n    margin-top: 9px; }\n  .dg .c select {\n    margin-top: 5px; }\n  .dg .cr.function,\n  .dg .cr.function .property-name,\n  .dg .cr.function *,\n  .dg .cr.boolean,\n  .dg .cr.boolean * {\n    cursor: pointer; }\n  .dg .cr.function .button {\n    margin: 3px 0px;\n    padding: 2px 3px;\n    /* border: 2px solid #666; */\n    line-height: 18px;\n    background: #333;\n    border-radius: 2px;\n  }\n  .dg .selector {\n    display: none;\n    position: absolute;\n    margin-left: -9px;\n    margin-top: 23px;\n    z-index: 10; }\n  .dg .c:hover .selector,\n  .dg .selector.drag {\n    display: block; }\n  .dg li.save-row {\n    padding: 0; }\n    .dg li.save-row .button {\n      display: inline-block;\n      padding: 0px 6px; }\n  .dg.dialogue {\n    background-color: #222;\n    width: 460px;\n    padding: 15px;\n    font-size: 13px;\n    line-height: 15px; }\n\n/* TODO Separate style and structure */\n#dg-new-constructor {\n  padding: 10px;\n  color: #222;\n  font-family: Monaco, monospace;\n  font-size: 10px;\n  border: 0;\n  resize: none;\n  box-shadow: inset 1px 1px 1px #888;\n  word-wrap: break-word;\n  margin: 12px 0;\n  display: block;\n  width: 440px;\n  overflow-y: scroll;\n  height: 100px;\n  position: relative; }\n\n#dg-local-explain {\n  display: none;\n  font-size: 11px;\n  line-height: 17px;\n  border-radius: 3px;\n  background-color: #333;\n  padding: 8px;\n  margin-top: 10px; }\n  #dg-local-explain code {\n    font-size: 10px; }\n\n#dat-gui-save-locally {\n  display: none; }\n\n/** Main type */\n.dg {\n  color: #eee;\n  font: 11px 'Lucida Grande', sans-serif;\n  text-shadow: 0 -1px 0 #111;\n  /** Auto place */\n  /* Controller row, <li> */\n  /** Controllers */ }\n  .dg.main {\n    /** Scrollbar */ }\n    .dg.main::-webkit-scrollbar {\n      width: 5px;\n      background: #1a1a1a; }\n    .dg.main::-webkit-scrollbar-corner {\n      height: 0;\n      display: none; }\n    .dg.main::-webkit-scrollbar-thumb {\n      border-radius: 5px;\n      background: #676767; }\n  .dg li:not(.folder) {\n    background: #1a1a1a;\n    border-bottom: 1px solid #2c2c2c; }\n  .dg li.save-row {\n    line-height: 25px;\n    background: #dad5cb;\n    border: 0; }\n    .dg li.save-row select {\n      margin-left: 5px;\n      width: 108px; }\n    .dg li.save-row .button {\n      margin-left: 5px;\n      margin-top: 1px;\n      border-radius: 2px;\n      font-size: 9px;\n      line-height: 7px;\n      padding: 4px 4px 5px 4px;\n      background: #c5bdad;\n      color: #fff;\n      text-shadow: 0 1px 0 #b0a58f;\n      box-shadow: 0 -1px 0 #b0a58f;\n      cursor: pointer; }\n      .dg li.save-row .button.gears {\n        background: #c5bdad url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAANCAYAAAB/9ZQ7AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAQJJREFUeNpiYKAU/P//PwGIC/ApCABiBSAW+I8AClAcgKxQ4T9hoMAEUrxx2QSGN6+egDX+/vWT4e7N82AMYoPAx/evwWoYoSYbACX2s7KxCxzcsezDh3evFoDEBYTEEqycggWAzA9AuUSQQgeYPa9fPv6/YWm/Acx5IPb7ty/fw+QZblw67vDs8R0YHyQhgObx+yAJkBqmG5dPPDh1aPOGR/eugW0G4vlIoTIfyFcA+QekhhHJhPdQxbiAIguMBTQZrPD7108M6roWYDFQiIAAv6Aow/1bFwXgis+f2LUAynwoIaNcz8XNx3Dl7MEJUDGQpx9gtQ8YCueB+D26OECAAQDadt7e46D42QAAAABJRU5ErkJggg==) 2px 1px no-repeat;\n        height: 7px;\n        width: 8px; }\n      .dg li.save-row .button:hover {\n        background-color: #bab19e;\n        box-shadow: 0 -1px 0 #b0a58f; }\n  .dg li.folder {\n    border-bottom: 0; }\n  .dg li.title {\n    padding-left: 16px;\n    background: black url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlI+hKgFxoCgAOw==) 6px 10px no-repeat;\n    cursor: pointer;\n    border-bottom: 1px solid rgba(255, 255, 255, 0.2); }\n  .dg .closed li.title {\n    background-image: url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlGIWqMCbWAEAOw==); }\n  .dg .cr.boolean {\n    border-left: 3px solid #806787; }\n  .dg .cr.color {\n    border-left: 3px solid; }\n  .dg .cr.function {\n    border-left: 3px solid #e61d5f; }\n  .dg .cr.number {\n    border-left: 3px solid #2fa1d6; }\n    .dg .cr.number input[type=text] {\n      color: #2fa1d6; }\n  .dg .cr.string {\n    border-left: 3px solid #1ed36f; }\n    .dg .cr.string input[type=text] {\n      color: #1ed36f; }\n  .dg .cr.function:hover, .dg .cr.boolean:hover {\n    background: #111; }\n  .dg .c input[type=text] {\n    background: #303030;\n    outline: none; }\n    .dg .c input[type=text]:hover {\n      background: #3c3c3c; }\n    .dg .c input[type=text]:focus {\n      background: #494949;\n      color: #fff; }\n  .dg .c .slider {\n    background: #303030;\n    cursor: ew-resize; }\n  .dg .c .slider-fg {\n    background: #2fa1d6; }\n  .dg .c .slider:hover {\n    background: #3c3c3c; }\n    .dg .c .slider:hover .slider-fg {\n      background: #44abda; }\n",
   dat.controllers.factory = (function (Controller, OptionController, NumberControllerBox, NumberControllerSlider, StringController, FunctionController, BooleanController, ImageController, common) {
         'use strict';

@@ -1,44 +1,132 @@
-//
-// OBSOLETE STUFF?
-//
-// old v0.4 code which needs to be integrated or otherwise thrown away
-//
+/**
+ * dat-gui JavaScript Controller Library
+ * http://code.google.com/p/dat-gui
+ *
+ * Copyright 2011 Data Arts Team, Google Creative Lab
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
 
+define([
+    'dat/controllers/Controller',
+    'dat/dom/dom',
+    'dat/utils/common'
+],
+function(Controller, dom, common) {
+  'use strict';
 
+  /**
+   * @class Provides a select input to alter the property of an object, using a
+   * list of accepted values.
+   *
+   * @extends dat.controllers.Controller
+   *
+   * @param {Object} object The object to be manipulated
+   * @param {string} property The name of the property to be manipulated
+   * @param {Object|string[]} options A map of labels to acceptable values, or
+   * a list of acceptable string values.
+   *
+   * @member dat.controllers
+   */
+  var OptionController = function(object, property, params, options) {
+    OptionController.superclass.call(this, object, property, 'option', options);
 
+    var _this = this;
+    this.CUSTOM_FLAG = '';
 
-// DAT.GUI.ControllerObject = function( gui, object, propertyName, options ) {
+    params = params || {};
 
-//   this.type = "object";
-//   DAT.GUI.Controller.apply(this, arguments);
+    /**
+     * The drop down menu
+     * @ignore
+     */
+    this.__select = document.createElement('select');
 
-//   var _this = this;
-//   var select = document.createElement('select');
+    if (common.isArray(params)) {
+      var map = {};
+      common.each(params, function(element) {
+        map[element] = element;
+      });
+      params = map;
+    }
 
-//   for( var key in options ) {
-//     var option = document.createElement('option');
-//     option.value = key;
-//     option.innerHTML = options[key];
-//     select.appendChild( option );
-//   }
+    common.each(params, function(value, key) {
+      var opt = document.createElement('option');
+      opt.innerHTML = value;
+      opt.setAttribute('value', key);
+      _this.__select.appendChild(opt);
+    });
 
-//   this.setValue(this.getValue());
+    if (params.custom) {
+      var opt = document.createElement('option');
+      opt.innerHTML = params.custom.display || 'Custom';
+      opt.setAttribute('value', _this.CUSTOM_FLAG);
+      _this.__select.appendChild(opt);
 
-//   this.domElement.addEventListener('change', function(e) {
-//     e.preventDefault();
-//     _this.setValue(select.value);
-//   }, false);
+      this.__custom_controller = params.custom.controller;
+    }
 
-//   this.domElement.appendChild(select);
+    // Acknowledge original value
+    this.updateDisplay();
 
-//   this.setValue = function(val) {
-//     val = select.value;
-//     return DAT.GUI.Controller.prototype.setValue.call(this, val);
-//   };
+    dom.bind(this.__select, 'change', function() {
+      var value = this.options[this.selectedIndex].value;
+      if (value === _this.CUSTOM_FLAG) {
+        value = _this.__custom_controller.getValue();
+      }
+      _this.setValue(value);
+    });
 
-// };
-// DAT.GUI.extendController(DAT.GUI.ControllerObject);
+    if (this.__custom_controller) {
+      this.__custom_controller.onChange(function() {
+        var value = this.getValue();
+        _this.setValue(value);
+      });
+    }
 
+    this.domElement.appendChild(this.__select);
+    if (this.__custom_controller) {
+      this.domElement.appendChild(this.__custom_controller.el);
+    }
+  };
 
+  OptionController.superclass = Controller;
 
+  common.extend(
+      OptionController.prototype,
+      Controller.prototype,
+      {
+        setValue: function(v) {
+          var toReturn = OptionController.superclass.prototype.setValue.call(this, v);
+          return toReturn;
+        },
+
+        updateDisplay: function() {
+          var value = this.getValue();
+          var custom = true;
+          if (value !== this.CUSTOM_FLAG) {
+            common.each(this.__select.options, function(option) {
+              if (value === option.value) {
+                custom = false;
+              }
+            });
+          }
+
+          this.__select.value = custom ? this.CUSTOM_FLAG : value;
+
+          if (this.__custom_controller) {
+            this.__custom_controller.el.style.display = custom ? 'block' : 'none';
+          }
+
+          return OptionController.superclass.prototype.updateDisplay.call(this);
+        }
+      }
+  );
+
+  return OptionController;
+});
 

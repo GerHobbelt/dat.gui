@@ -1,5 +1,5 @@
 /**
- * dat-gui JavaScript Controller Library
+ * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
  * Copyright 2011-2015 Data Arts Team, Google Creative Lab
@@ -1258,7 +1258,7 @@
   dat.dom.dom,
   dat.utils.css,
   dat.utils.common,
-  "/**\n * dat-gui JavaScript Controller Library\n * http://code.google.com/p/dat-gui\n *\n * Copyright 2011 Data Arts Team, Google Creative Lab\n *\n * Licensed under the Apache License, Version 2.0 (the \"License\");\n * you may not use this file except in compliance with the License.\n * You may obtain a copy of the License at\n *\n * http://www.apache.org/licenses/LICENSE-2.0\n */\n\n.slider {\n  box-shadow: inset 0 2px 4px rgba(0,0,0,0.15);\n  height: 1em;\n  border-radius: 1em;\n  background-color: #eee;\n  padding: 0 0.5em;\n  overflow: hidden;\n}\n\n.slider-fg {\n  padding: 1px 0 2px 0;\n  background-color: #aaa;\n  height: 1em;\n  margin-left: -0.5em;\n  padding-right: 0.5em;\n  border-radius: 1em 0 0 1em;\n}\n\n.slider-fg:after {\n  display: inline-block;\n  border-radius: 1em;\n  background-color: #fff;\n  border:  1px solid #aaa;\n  content: '';\n  float: right;\n  margin-right: -1em;\n  margin-top: -1px;\n  height: 0.9em;\n  width: 0.9em;\n}");
+  "/**\n * dat.GUI JavaScript Controller Library\n * http://code.google.com/p/dat-gui\n *\n * Copyright 2011 Data Arts Team, Google Creative Lab\n *\n * Licensed under the Apache License, Version 2.0 (the \"License\");\n * you may not use this file except in compliance with the License.\n * You may obtain a copy of the License at\n *\n * http://www.apache.org/licenses/LICENSE-2.0\n */\n\n.slider {\n  box-shadow: inset 0 2px 4px rgba(0,0,0,0.15);\n  height: 1em;\n  border-radius: 1em;\n  background-color: #eee;\n  padding: 0 0.5em;\n  overflow: hidden;\n}\n\n.slider-fg {\n  padding: 1px 0 2px 0;\n  background-color: #aaa;\n  height: 1em;\n  margin-left: -0.5em;\n  padding-right: 0.5em;\n  border-radius: 1em 0 0 1em;\n}\n\n.slider-fg:after {\n  display: inline-block;\n  border-radius: 1em;\n  background-color: #fff;\n  border:  1px solid #aaa;\n  content: '';\n  float: right;\n  margin-right: -1em;\n  margin-top: -1px;\n  height: 0.9em;\n  width: 0.9em;\n}\n");
   
   
   dat.controllers.StringController = (function (Controller, dom, common) {
@@ -1947,7 +1947,7 @@
      * manipulate variables and fire functions on the fly.
      * @class
      *
-     * @member dat.gui
+     * @member dat.GUI
      *
      * @param {Object} [params]
      * @param {String} [params.name] The name of this GUI.
@@ -2202,7 +2202,7 @@
               }
               var rv = localStorage.getItem(getLocalStorageHash(_this, 'isLocal'));
               if (rv === '0') {
-                return true;      // **default behaviour**: when the browser supports localStorage, it is available for dat.gui data storage
+                return true;      // **default behaviour**: when the browser supports localStorage, it is available for dat.GUI data storage
               } else {
                 return rv === 'true';
               }
@@ -2211,12 +2211,12 @@
             // - truthy value: explicitly enables localStorage (when the browser supports it)
             // 
             // - falsey value (except `null` or `undefined`): explicitly *disables* localStorage automatic data
-            //   storage for `dat.gui`.
+            //   storage for `dat.GUI`.
             //   
             // - `null` or `undefined`: *clear* the explicit configuration: localStorage use is determined
             //   solely by the available browser support from this point forward. 
             //   
-            //   (You can use this `bool` value to clear previous explicit dat.gui configuration 
+            //   (You can use this `bool` value to clear previous explicit dat.GUI configuration 
             //   and data storage and revert to using the coded default(s) once again.)
             set: function(bool) {
               dom.unbind(window, 'unload', saveToLocalStorage);
@@ -2329,7 +2329,7 @@
       }
   
       saveToLocalStorage = function () {
-        // only save the dat.gui data when localStorage is available *and* has been enabled 
+        // only save the dat.GUI data when localStorage is available *and* has been enabled 
         // (which it is by default; see `.useLocalStorage` get/set)
         if (_this.useLocalStorage) {
           localStorage.setItem(getLocalStorageHash(_this, 'gui'), JSON.stringify(_this.getSaveObject()));

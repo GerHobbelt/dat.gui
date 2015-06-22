@@ -1,5 +1,5 @@
 
-dat.gui.RAW.js
+dat.GUI.RAW.js
 ----------------
 dat/utils/css.js
 text!dat/gui/saveDialogue.html

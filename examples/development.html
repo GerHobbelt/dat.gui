@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>dat.gui</title>
+  <title>dat.GUI</title>
 
   <link rel='icon' type='image/png' href='assets/favicon.png'/>
 
@@ -11,7 +11,7 @@
   <script type='text/javascript'>
     //<![CDATA[
 
-  require(['domReady', 'dat.gui', 'demo'], function (domReady, dat, FizzyText) {
+  require(['domReady', 'dat.GUI', 'demo'], function (domReady, dat, FizzyText) {
     domReady(function () {
       //This function is called once the DOM is ready.
       //It will be safe to query the DOM and manipulate
@@ -19,7 +19,7 @@
 
       //prettyPrint();
 
-      //window.fizzyText = new FizzyText('dat.gui', 0);
+      //window.fizzyText = new FizzyText('dat.GUI', 0);
       window.fizzyText = {
         message: "message",
         maxSize: 0,
@@ -136,26 +136,26 @@
 <div id='notifier'></div>
 
 <h1><a href='http://twitter.com/guidat'><img src='assets/profile.png'
-                                             border='0' alt='dat.gui flag'/></a>
+                                             border='0' alt='dat.GUI flag'/></a>
 </h1>
 
-<p><strong>dat.gui</strong> is a lightweight controller library for JavaScript.
+<p><strong>dat.GUI</strong> is a lightweight controller library for JavaScript.
   It allows you to easily manipulate variables and fire functions on the fly.
 </p>
 
 <ul>
   <li>
-    <a href='../build/dat.gui.min.js'><strong>Download the minified source</strong></a>
+    <a href='../build/dat.GUI.min.js'><strong>Download the minified source</strong></a>
     <small id='buildsizemin'>[19.6kb]
     </small>
   </li>
   <li>
-    <a href='../build/dat.gui.js'><strong>Download the uncompressed source</strong></a>
+    <a href='../build/dat.GUI.js'><strong>Download the uncompressed source</strong></a>
     <small id='buildsize'>[33.9kb]
     </small>
   </li>
   <li>
-    <a href='../build/dat.color.js'><strong>Download the dat.gui COLOR add-on source</strong></a>
+    <a href='../build/dat.color.js'><strong>Download the dat.GUI COLOR add-on source</strong></a>
     <small id='buildsize'>[33.9kb]
     </small>
   </li>
@@ -220,7 +220,7 @@
 
 window.onload = function() {
 
-   var fizzyText = new <a href='demo.js'>FizzyText</a>('dat.gui');
+   var fizzyText = new <a href='demo.js'>FizzyText</a>('dat.GUI');
 
    var gui = new dat.GUI();
 
@@ -354,7 +354,7 @@ gui.add(obj, 'propertyName').options({'Small': 1, 'Medium': 2, 'Large': 3});
       <p>Finally, if you'd like to do a little something extra when a function
         is called, use the following:</p>
                 <pre class='prettyprint last'>gui.add(obj, 'functionName').onFire(function() {
-   alert('You called a function with dat.gui');
+   alert('You called a function with dat.GUI');
 });</pre>
     </div>
   </div>

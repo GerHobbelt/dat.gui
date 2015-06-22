@@ -94,8 +94,8 @@ module.exports = function(grunt) {
                     }
                 },
                 files: {
-                    'build/dat.gui.js': [ 
-                        'build/dat.gui.RAW.js' 
+                    'build/dat.GUI.js': [ 
+                        'build/dat.GUI.RAW.js' 
                     ]
                 }
             },
@@ -111,7 +111,7 @@ module.exports = function(grunt) {
                     }
                 },
                 files: {
-                    'build/dat.gui.js': [ 'src/**/*.js' ]
+                    'build/dat.GUI.js': [ 'src/**/*.js' ]
                 }
             },
             color: {
@@ -132,7 +132,7 @@ module.exports = function(grunt) {
     // These plugins provide necessary tasks.
     require('load-grunt-tasks')(grunt, {scope: 'devDependencies'});
 
-    grunt.registerMultiTask('builder', 'building the dat.gui library', function() {
+    grunt.registerMultiTask('builder', 'building the dat.GUI library', function() {
         var done = this.async();
 
         var files = this.files.slice();
@@ -178,7 +178,7 @@ module.exports = function(grunt) {
         process();
     });
 
-    grunt.registerMultiTask('amdclean', 'cleaning the combined dat.gui library', function() {
+    grunt.registerMultiTask('amdclean', 'cleaning the combined dat.GUI library', function() {
         var done = this.async();
 
         var files = this.files.slice();

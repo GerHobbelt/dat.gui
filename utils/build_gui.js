@@ -4,7 +4,7 @@ require('./builder.js').build({
     verbose: true,
     baseUrl: "../src/",
     main: "dat/gui/GUI",
-    out: "../build/dat.gui" + (minify ? ".min" : "") + ".js",
+    out: "../build/dat.GUI" + (minify ? ".min" : "") + ".js",
     minify: minify,
     shortcut: "dat.GUI",
     paths: {},

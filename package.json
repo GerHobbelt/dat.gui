@@ -1,5 +1,5 @@
 {
-  "name": "dat.gui",
+  "name": "dat.GUI",
   "version": "0.5.0",
   "description": "a lightweight controller library for JavaScript from ChromeExperiments",
   "main": "index.js",

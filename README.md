@@ -8,12 +8,12 @@ Get started with dat.GUI by reading the tutorial at http://workshop.chromeexperi
 
 ## Packaged Builds
 
-The easiest way to use dat.GUI in your code is by using the built source at `build/dat.gui.min.js`. These built JavaScript files bundle all the necessary dependencies to run dat.GUI.
+The easiest way to use dat.GUI in your code is by using the built source at `build/dat.GUI.min.js`. These built JavaScript files bundle all the necessary dependencies to run dat.GUI.
 
 In your `head` tag, include the following code:
 
 ```html
-<script type="text/javascript" src="dat.gui.min.js"></script>
+<script type="text/javascript" src="dat.GUI.min.js"></script>
 ```
 
 
@@ -59,9 +59,9 @@ $ cd utils
 $ node build_gui.js
 ```
 
-This will create a namespaced, unminified build of dat.GUI at `build/dat.gui.js`
+This will create a namespaced, unminified build of dat.GUI at `build/dat.GUI.js`
 
-To create a namespaced, _minified_ build of dat.GUI at `build/dat.gui.min.js`, using Closure Compiler, use the `min` parameter:
+To create a namespaced, _minified_ build of dat.GUI at `build/dat.GUI.min.js`, using Closure Compiler, use the `min` parameter:
 
 ```sh
 $ node ../utils/build_gui.js min

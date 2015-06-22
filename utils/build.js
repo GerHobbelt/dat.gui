@@ -374,7 +374,7 @@
             exclude: ["text", "domReady"],
             // excludeShallow: ["foo/bar/boo"],
             
-            out: "dat.gui.RAW.js",
+            out: "dat.GUI.RAW.js",
 
             //create: true can be used to create the module layer at the given
             //name, if it does not already exist in the source location. If
@@ -459,7 +459,7 @@
     // include: ["foo/bar/bee"],
     // insertRequire: ['foo/bar/bop'],
     
-    // out: "./build/dat.gui.-------bogus.js",
+    // out: "./build/dat.GUI.-------bogus.js",
 
     //An alternative to "include". Normally only used in a requirejs.config()
     //call for a module used for mainConfigFile, since requirejs will read

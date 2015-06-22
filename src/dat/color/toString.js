@@ -1,5 +1,5 @@
 /**
- * dat-gui JavaScript Controller Library
+ * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
  * Copyright 2011 Data Arts Team, Google Creative Lab

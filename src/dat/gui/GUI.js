@@ -1,5 +1,5 @@
 /**
- * dat-gui JavaScript Controller Library
+ * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
  * Copyright 2011 Data Arts Team, Google Creative Lab
@@ -115,7 +115,7 @@ define([
    * manipulate variables and fire functions on the fly.
    * @class
    *
-   * @member dat.gui
+   * @member dat.GUI
    *
    * @param {Object} [params]
    * @param {String} [params.name] The name of this GUI.
@@ -370,7 +370,7 @@ define([
             }
             var rv = localStorage.getItem(getLocalStorageHash(_this, 'isLocal'));
             if (rv === '0') {
-              return true;      // **default behaviour**: when the browser supports localStorage, it is available for dat.gui data storage
+              return true;      // **default behaviour**: when the browser supports localStorage, it is available for dat.GUI data storage
             } else {
               return rv === 'true';
             }
@@ -379,12 +379,12 @@ define([
           // - truthy value: explicitly enables localStorage (when the browser supports it)
           // 
           // - falsey value (except `null` or `undefined`): explicitly *disables* localStorage automatic data
-          //   storage for `dat.gui`.
+          //   storage for `dat.GUI`.
           //   
           // - `null` or `undefined`: *clear* the explicit configuration: localStorage use is determined
           //   solely by the available browser support from this point forward. 
           //   
-          //   (You can use this `bool` value to clear previous explicit dat.gui configuration 
+          //   (You can use this `bool` value to clear previous explicit dat.GUI configuration 
           //   and data storage and revert to using the coded default(s) once again.)
           set: function(bool) {
             dom.unbind(window, 'unload', saveToLocalStorage);
@@ -497,7 +497,7 @@ define([
     }
 
     saveToLocalStorage = function () {
-      // only save the dat.gui data when localStorage is available *and* has been enabled 
+      // only save the dat.GUI data when localStorage is available *and* has been enabled 
       // (which it is by default; see `.useLocalStorage` get/set)
       if (_this.useLocalStorage) {
         localStorage.setItem(getLocalStorageHash(_this, 'gui'), JSON.stringify(_this.getSaveObject()));

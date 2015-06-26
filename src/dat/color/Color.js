@@ -65,6 +65,15 @@ define([
     }
 
   });
+  
+  Object.defineProperty(Color.prototype, 'rgb', {
+    get: function() {
+      return math.hsv_to_rgb(this.__state.h, 1, 1);
+    },
+    set: function(v) {
+
+    }
+  });
 
   Object.defineProperty(Color.prototype, 'hex', {
 

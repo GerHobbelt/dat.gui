@@ -762,6 +762,24 @@ define([
           if (_this.__rememberedObjects.indexOf(object) === -1) {
             _this.__rememberedObjects.push(object);
           }
+
+          // Check if any controllers which access this object have already been registered:
+          // if so, update those controllers and the controller-to-object mapping.
+          var root = _this.getRoot();
+
+          function scan_controllers(gui) {
+            common.each(gui.__controllers, function(controller) {
+              if (controller.object === object) {
+                recallSavedValue(gui, controller);
+              }
+            });
+
+            common.each(gui.__folders, function(folder) {
+              scan_controllers(folder);
+            });
+          }
+
+          scan_controllers(root);
         });
 
         if (this.autoPlace) {
@@ -1102,7 +1120,6 @@ define([
           preset = preset_map[DEFAULT_DEFAULT_PRESET_NAME];
         } else {
           // Nada.
-
           return;
         }
 

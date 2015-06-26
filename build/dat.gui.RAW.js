@@ -1777,6 +1777,259 @@ define('dat/controllers/ImageController',[
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
+define('dat/controllers/ObjectController',[
+    'dat/controllers/Controller',
+    'dat/dom/dom',
+    'dat/utils/common'
+],
+function(Controller, dom, common) {
+  'use strict';
+
+  /**
+   * @class Provides a select input to alter the property of an object, using a
+   * list of accepted values.
+   *
+   * @extends dat.controllers.Controller
+   *
+   * @param {Object} object The object to be manipulated
+   * @param {string} property The name of the property to be manipulated
+   * @param {Object|string[]} options A map of labels to acceptable values, or
+   * a list of acceptable string values.
+   *
+   * @member dat.controllers
+   */
+  var OptionController = function(object, property, params, options) {
+    OptionController.superclass.call(this, object, property, 'option', options);
+
+    var _this = this;
+    this.CUSTOM_FLAG = '';
+
+    params = params || {};
+
+    /**
+     * The drop down menu
+     * @ignore
+     */
+    this.__select = document.createElement('select');
+
+    if (common.isArray(params)) {
+      var map = {};
+      common.each(params, function(element) {
+        map[element] = element;
+      });
+      params = map;
+    }
+
+    common.each(params, function(value, key) {
+      var opt = document.createElement('option');
+      opt.innerHTML = value;
+      opt.setAttribute('value', key);
+      _this.__select.appendChild(opt);
+    });
+
+    if (params.custom) {
+      var opt = document.createElement('option');
+      opt.innerHTML = params.custom.display || 'Custom';
+      opt.setAttribute('value', _this.CUSTOM_FLAG);
+      _this.__select.appendChild(opt);
+
+      this.__custom_controller = params.custom.controller;
+    }
+
+    // Acknowledge original value
+    this.updateDisplay();
+
+    dom.bind(this.__select, 'change', function() {
+      var value = this.options[this.selectedIndex].value;
+      if (value === _this.CUSTOM_FLAG) {
+        value = _this.__custom_controller.getValue();
+      }
+      _this.setValue(value);
+    });
+
+    if (this.__custom_controller) {
+      this.__custom_controller.onChange(function() {
+        var value = this.getValue();
+        _this.setValue(value);
+      });
+    }
+
+    this.domElement.appendChild(this.__select);
+    if (this.__custom_controller) {
+      this.domElement.appendChild(this.__custom_controller.el);
+    }
+  };
+
+  OptionController.superclass = Controller;
+
+  common.extend(
+      OptionController.prototype,
+      Controller.prototype,
+      {
+        setValue: function(v) {
+          var toReturn = OptionController.superclass.prototype.setValue.call(this, v);
+          return toReturn;
+        },
+
+        updateDisplay: function() {
+          var value = this.getValue();
+          var custom = true;
+          if (value !== this.CUSTOM_FLAG) {
+            common.each(this.__select.options, function(option) {
+              if (value === option.value) {
+                custom = false;
+              }
+            });
+          }
+
+          this.__select.value = custom ? this.CUSTOM_FLAG : value;
+
+          if (this.__custom_controller) {
+            this.__custom_controller.el.style.display = custom ? 'block' : 'none';
+          }
+
+          return OptionController.superclass.prototype.updateDisplay.call(this);
+        }
+      }
+  );
+
+  return OptionController;
+});
+
+
+/**
+ * dat.GUI JavaScript Controller Library
+ * http://code.google.com/p/dat-gui
+ *
+ * Copyright 2011 Data Arts Team, Google Creative Lab
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
+define('dat/controllers/NullController',[
+  'dat/controllers/Controller',
+  'dat/dom/dom',
+  'dat/utils/common'
+], function(Controller, dom, common) {
+    'use strict';
+
+    /**
+     * @class Provides a NULL controller to represent a NULL property of an object.
+     * @extends dat.controllers.Controller
+     *
+     * @param {Object} object The object to be manipulated
+     * @param {string} property The name of the property to be manipulated
+     *
+     * @member dat.controllers
+     */
+    var NullController = function(object, property, options) {
+
+        NullController.superclass.call(this, object, property, 'null', options);
+
+        var _this = this;
+        this.__prev = this.getValue();
+
+        this.__elem = document.createElement('em');
+        this.domElement.appendChild(this.__elem);
+
+        // Match original value
+        this.updateDisplay();
+    };
+
+    NullController.superclass = Controller;
+
+    common.extend(
+        NullController.prototype, 
+        Controller.prototype,
+        {
+            updateDisplay: function() {
+                this.__elem.innerText = '<null>';
+    			return NullController.superclass.prototype.updateDisplay.call(this);
+            }
+        }
+    );
+
+    return NullController;
+});
+
+
+/**
+ * dat.GUI JavaScript Controller Library
+ * http://code.google.com/p/dat-gui
+ *
+ * Copyright 2011 Data Arts Team, Google Creative Lab
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
+define('dat/controllers/UndefinedController',[
+  'dat/controllers/Controller',
+  'dat/dom/dom',
+  'dat/utils/common'
+], function(Controller, dom, common) {
+    'use strict';
+
+    /**
+     * @class Provides a controller to represent an UNDEFINED-valued property of an object.
+     * @extends dat.controllers.Controller
+     *
+     * @param {Object} object The object to be manipulated
+     * @param {string} property The name of the property to be manipulated
+     *
+     * @member dat.controllers
+     */
+    var UndefinedController = function(object, property, options) {
+
+        UndefinedController.superclass.call(this, object, property, 'undefined', options);
+
+        var _this = this;
+        this.__prev = this.getValue();
+
+        this.__elem = document.createElement('em');
+        this.domElement.appendChild(this.__elem);
+
+        // Match original value
+        this.updateDisplay();
+    };
+
+    UndefinedController.superclass = Controller;
+
+    common.extend(
+        UndefinedController.prototype, 
+        Controller.prototype,
+        {
+            updateDisplay: function() {
+                this.__elem.innerText = '<undefined>';
+    			return UndefinedController.superclass.prototype.updateDisplay.call(this);
+            }
+        }
+    );
+
+    return UndefinedController;
+});
+
+
+/**
+ * dat.GUI JavaScript Controller Library
+ * http://code.google.com/p/dat-gui
+ *
+ * Copyright 2011 Data Arts Team, Google Creative Lab
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 define('dat/controllers/factory',[
   'dat/controllers/Controller',
   'dat/controllers/OptionController',
@@ -1786,9 +2039,12 @@ define('dat/controllers/factory',[
   'dat/controllers/FunctionController',
   'dat/controllers/BooleanController',
   'dat/controllers/ImageController',
+  'dat/controllers/ObjectController',
+  'dat/controllers/NullController',
+  'dat/controllers/UndefinedController',
   'dat/utils/common'
 ],
-    function(Controller, OptionController, NumberControllerBox, NumberControllerSlider, StringController, FunctionController, BooleanController, ImageController, common) {
+    function(Controller, OptionController, NumberControllerBox, NumberControllerSlider, StringController, FunctionController, BooleanController, ImageController, ObjectController, NullController, UndefinedController, common) {
       'use strict';
       
       var firstTimeImageController = true;
@@ -1866,6 +2122,18 @@ define('dat/controllers/factory',[
 
         // otherwise: we cannot 'sniff' the type of controller you want, since the
         // `initialValue` is null or undefined.
+
+        if (common.isArray(initialValue) || common.isObject(initialValue)) {
+          return new ObjectController(object, property);
+        }
+
+        if (initialValue === null) {
+          return new NullController(object, property);
+        }
+        if (initialValue === undefined && (property in object)) {
+          return new UndefinedController(object, property);
+        }
+
         return false;
       }
     });
@@ -3145,6 +3413,9 @@ define('dat/gui/GUI',[
   'dat/controllers/StringController',
   'dat/controllers/ImageController',
   'dat/controllers/ColorController',
+  'dat/controllers/ObjectController',
+  // 'dat/controllers/NullController',
+  // 'dat/controllers/UndefinedController',
 
   'dat/utils/requestAnimationFrame',
 
@@ -3152,7 +3423,7 @@ define('dat/gui/GUI',[
   'dat/dom/dom',
 
   'dat/utils/common'
-], function(css, saveDialogueContents, styleSheet, controllerFactory, Controller, BooleanController, FunctionController, NumberController, NumberControllerBox, NumberControllerSlider, OptionController, StringController, ImageController, ColorController, requestAnimationFrame, CenteredDiv, dom, common) {
+], function(css, saveDialogueContents, styleSheet, controllerFactory, Controller, BooleanController, FunctionController, NumberController, NumberControllerBox, NumberControllerSlider, OptionController, StringController, ImageController, ColorController, ObjectController, /* NullController, UndefinedController, */ requestAnimationFrame, CenteredDiv, dom, common) {
   'use strict';
 
   //var ARR_EACH = Array.prototype.forEach;
@@ -3219,7 +3490,12 @@ define('dat/gui/GUI',[
       string: StringController,
       image: ImageController,
       'function': FunctionController,
-      boolean: BooleanController
+      boolean: BooleanController,
+      object: ObjectController,
+      // WARNING: never add the Null and Undefined controllers to the standard lookup list as this will break the ControllerFactory internals:
+      // 
+      // 'null': NullController,
+      // 'undefined': UndefinedController
     };
 
     /**
@@ -3973,7 +4249,7 @@ define('dat/gui/GUI',[
     var controller = controllerFactory.apply(gui, factoryArgs);
 
     if (!controller) {
-      if (object[property] === undefined) {
+      if (!(property in object)) {
         throw new Error('Object ' + object + ' has no property "' + property + '"');
       } else {
         throw new Error('Object ' + object + ' has a (probably null-ed) property "' + property + '" for which you did not explicitly specify a suitable controller');

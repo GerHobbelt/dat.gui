@@ -17,6 +17,9 @@ dat/controllers/FunctionController.js
 dat/controllers/BooleanController.js
 text!dat/controllers/ImageController.css
 dat/controllers/ImageController.js
+dat/controllers/ObjectController.js
+dat/controllers/NullController.js
+dat/controllers/UndefinedController.js
 dat/controllers/factory.js
 dat/color/toString.js
 dat/color/interpret.js

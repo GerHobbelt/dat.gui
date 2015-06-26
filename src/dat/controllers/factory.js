@@ -20,9 +20,12 @@ define([
   'dat/controllers/FunctionController',
   'dat/controllers/BooleanController',
   'dat/controllers/ImageController',
+  'dat/controllers/ObjectController',
+  'dat/controllers/NullController',
+  'dat/controllers/UndefinedController',
   'dat/utils/common'
 ],
-    function(Controller, OptionController, NumberControllerBox, NumberControllerSlider, StringController, FunctionController, BooleanController, ImageController, common) {
+    function(Controller, OptionController, NumberControllerBox, NumberControllerSlider, StringController, FunctionController, BooleanController, ImageController, ObjectController, NullController, UndefinedController, common) {
       'use strict';
       
       var firstTimeImageController = true;
@@ -100,6 +103,18 @@ define([
 
         // otherwise: we cannot 'sniff' the type of controller you want, since the
         // `initialValue` is null or undefined.
+
+        if (common.isArray(initialValue) || common.isObject(initialValue)) {
+          return new ObjectController(object, property);
+        }
+
+        if (initialValue === null) {
+          return new NullController(object, property);
+        }
+        if (initialValue === undefined && (property in object)) {
+          return new UndefinedController(object, property);
+        }
+
         return false;
       }
     });

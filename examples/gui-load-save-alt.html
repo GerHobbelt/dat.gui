@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>dat.GUI - remember() before adding controllers</title>
+  <title>dat.GUI - remember() after adding controllers</title>
 
   <link rel='icon' type='image/png' href='assets/favicon.png'/>
 
@@ -45,11 +45,11 @@ blockquote h1
     </blockquote>
 
     <p>
-      This example shows the new, alternative <code>remember()</code>-<em>after</em>-adding-controllers way of coding.
+      This example shows the original <code>remember()</code>-before-adding-controllers way of coding.
     </p>
     <p>
-      See <a href="gui-load-save-alt.html"><code>gui-load-save-alt.html</code></a> for example code which exhibits
-      the original documented call order.
+      See <a href="gui-load-save.html"><code>gui-load-save.html</code></a> for example code which has
+      that call order inverted.
     </p>
   </div>
 
@@ -67,15 +67,14 @@ require(['domReady', 'dat.GUI'], function (domReady, dat) {
       z: 5,
     };
     var gui = new dat.gui.GUI();
+
+    // WARNING: the documentation hints (through the code examples there) that you should invoke
+    // `.remember()` **before** you add the related controllers.
+    gui.remember(obj);
+
     gui.addAs(obj, 'x', 'numberBox');
     gui.addAs(obj, 'y', 'numberBox', -10, 100, 5);
     gui.add(obj, 'z').min(-10).max(100).step(5);
-
-    // WARNING: the documentation hints (through the code examples there) that you should invoke
-    // `.remember()` **before** you add the related controllers, but the new dat.GUI supports
-    // both ways -- any not-yet-remembered objects/controllers will be updated to their saved 
-    // state by the `.remember()` call.
-    gui.remember(obj);
   });
 });
   </script>

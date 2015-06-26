@@ -63,6 +63,9 @@ define([
   'dat/controllers/StringController',
   'dat/controllers/ImageController',
   'dat/controllers/ColorController',
+  'dat/controllers/ObjectController',
+  // 'dat/controllers/NullController',
+  // 'dat/controllers/UndefinedController',
 
   'dat/utils/requestAnimationFrame',
 
@@ -70,7 +73,7 @@ define([
   'dat/dom/dom',
 
   'dat/utils/common'
-], function(css, saveDialogueContents, styleSheet, controllerFactory, Controller, BooleanController, FunctionController, NumberController, NumberControllerBox, NumberControllerSlider, OptionController, StringController, ImageController, ColorController, requestAnimationFrame, CenteredDiv, dom, common) {
+], function(css, saveDialogueContents, styleSheet, controllerFactory, Controller, BooleanController, FunctionController, NumberController, NumberControllerBox, NumberControllerSlider, OptionController, StringController, ImageController, ColorController, ObjectController, /* NullController, UndefinedController, */ requestAnimationFrame, CenteredDiv, dom, common) {
   'use strict';
 
   //var ARR_EACH = Array.prototype.forEach;
@@ -137,7 +140,12 @@ define([
       string: StringController,
       image: ImageController,
       'function': FunctionController,
-      boolean: BooleanController
+      boolean: BooleanController,
+      object: ObjectController,
+      // WARNING: never add the Null and Undefined controllers to the standard lookup list as this will break the ControllerFactory internals:
+      // 
+      // 'null': NullController,
+      // 'undefined': UndefinedController
     };
 
     /**
@@ -891,7 +899,7 @@ define([
     var controller = controllerFactory.apply(gui, factoryArgs);
 
     if (!controller) {
-      if (object[property] === undefined) {
+      if (!(property in object)) {
         throw new Error('Object ' + object + ' has no property "' + property + '"');
       } else {
         throw new Error('Object ' + object + ' has a (probably null-ed) property "' + property + '" for which you did not explicitly specify a suitable controller');

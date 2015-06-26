@@ -2031,7 +2031,6 @@
         hideable: params.autoPlace
       });
   
-  
       if (!common.isUndefined(params.load)) {
         // Explicit preset
         if (params.preset) {
@@ -2059,7 +2058,14 @@
       //     SUPPORTS_LOCAL_STORAGE &&
       //         localStorage.getItem(getLocalStorageHash(this, 'isLocal')) === 'true';
   
-      var saveToLocalStorage;
+      function saveToLocalStorage() {
+        // only save the dat.GUI data when localStorage is available *and* has been enabled 
+        // (which it is by default; see `.useLocalStorage` get/set)
+        if (_this.useLocalStorage) {
+          var save_record = _this.getSaveObject();
+          localStorage.setItem(getLocalStorageHash(_this, 'gui'), JSON.stringify(save_record));
+        }
+      }
   
       Object.defineProperties(this,
         /** @lends dat.gui.GUI.prototype */
@@ -2245,13 +2251,13 @@
         if (SUPPORTS_LOCAL_STORAGE) {
           var rv = this.useLocalStorage;
           if (rv !== null) {
-          this.useLocalStorage = true;
+            this.useLocalStorage = true;
   
-          var saved_gui = localStorage.getItem(getLocalStorageHash(this, 'gui'));
+            var saved_gui = localStorage.getItem(getLocalStorageHash(this, 'gui'));
   
-          if (saved_gui) {
-            params.load = JSON.parse(saved_gui);
-          }
+            if (saved_gui) {
+              params.load = JSON.parse(saved_gui);
+            }
           }
         }
   
@@ -2327,14 +2333,6 @@
       if (params.resizable) {
         addResizeHandle(this);
       }
-  
-      saveToLocalStorage = function () {
-        // only save the dat.GUI data when localStorage is available *and* has been enabled 
-        // (which it is by default; see `.useLocalStorage` get/set)
-        if (_this.useLocalStorage) {
-          localStorage.setItem(getLocalStorageHash(_this, 'gui'), JSON.stringify(_this.getSaveObject()));
-        }
-      };
   
       // expose this method publicly
       this.saveToLocalStorageIfPossible = function () {

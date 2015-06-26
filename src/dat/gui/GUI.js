@@ -895,7 +895,7 @@ define([
     var li = addRow(gui, container, params.before);
 
     dom.addClass(li, GUI.CLASS_CONTROLLER_ROW);
-    dom.addClass(li, typeof controller.getValue());
+    dom.addClass(li, controller.getDisplayClass());
 
     augmentController(gui, li, controller);
 

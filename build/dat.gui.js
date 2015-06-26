@@ -3567,6 +3567,12 @@
       this.__hue_field = document.createElement('div');
       this.__hue_field.className = 'hue-field';
   
+    this.__alpha_knob = document.createElement('div');
+    this.__alpha_knob.className = 'alpha-knob';
+
+    this.__alpha_field = document.createElement('div');
+    this.__alpha_field.className = 'alpha-field';
+
       this.__input = document.createElement('input');
       this.__input.type = 'text';
       this.__input_textShadow = ['1px 0px 0px ', '-1px 0px 0px ', '0px 1px 0px ', '0px -1px 0px '];
@@ -3602,7 +3608,7 @@
       var value_field = document.createElement('div');
   
       common.extend(this.__selector.style, {
-        width: '122px',
+      width: '144px',
         height: '102px',
         padding: '3px',
         backgroundColor: '#222',
@@ -3627,6 +3633,14 @@
         zIndex: 1
       });
   
+    common.extend(this.__alpha_knob.style, {
+      position: 'absolute',
+      width: '15px',
+      height: '2px',
+      borderRight: '4px solid #fff',
+      zIndex: 1
+    });
+
       common.extend(this.__saturation_field.style, {
         width: '100px',
         height: '100px',
@@ -3668,11 +3682,37 @@
         }).join(', ')
       });
   
+    common.extend(this.__alpha_field.style , {
+      width: '15px',
+      height: '100px',
+      marginLeft: '3px',
+      display: 'inline-block',
+      border: '1px solid #555',
+      cursor: 'ns-resize'
+    });
+
+    alphaGradient(this.__alpha_field, _this.__color);
+
       dom.bind(this.__saturation_field, 'mousedown', fieldDown);
       dom.bind(this.__field_knob, 'mousedown', fieldDown);
       dom.bind(this.__saturation_field, 'touchstart', fieldDownOnTouch);
       dom.bind(this.__field_knob, 'touchstart', fieldDownOnTouch);
-  
+    dom.bind(this.__alpha_field, 'mousedown', function (e) {
+      setA(e);
+      dom.bind(window, 'mousemove', setA);
+      dom.bind(window, 'mouseup', unbindA);
+    });
+
+    var setHValues = function (e) {
+      setH(e);
+      alphaGradient(_this.__alpha_field, _this.__color); 
+    };
+
+    var setSVValues = function (e) {
+      setSV(e);
+      alphaGradient(_this.__alpha_field, _this.__color); 
+    };
+
       dom.bind(this.__hue_field, 'mousedown', function(e) {
         setH(e);
         dom.bind(window, 'mousemove', setH);
@@ -3731,7 +3771,9 @@
       this.__selector.appendChild(this.__field_knob);
       this.__selector.appendChild(this.__saturation_field);
       this.__selector.appendChild(this.__hue_field);
+    this.__selector.appendChild(this.__alpha_field);
       this.__hue_field.appendChild(this.__hue_knob);
+    this.__alpha_field.appendChild(this.__alpha_knob);
   
       this.domElement.appendChild(this.__input);
       this.domElement.appendChild(this.__selector);
@@ -3790,6 +3832,25 @@
   
         return false;
       }
+
+    function setA(e) {
+
+      e.preventDefault();
+
+      var s = dom.getHeight(_this.__alpha_field);
+      var o = dom.getOffset(_this.__alpha_field);
+      var a = 1 - (e.clientY - o.top + document.body.scrollTop) / s;
+
+      if (a > 1) a = 1;
+      else if (a < 0) a = 0;
+
+      _this.__color.a = a.toFixed(2);
+
+      _this.setValue(_this.__color.toOriginal());
+
+      return false;
+
+    }
   
       function setSVonTouch(e) {
         e.clientX = e.touches[0].clientX;
@@ -3856,7 +3917,8 @@
               border: this.__field_knob_border + 'rgb(' + flip + ',' + flip + ',' + flip +')'
             });
   
-            this.__hue_knob.style.marginTop = (1 - this.__color.h / 360) * 100 + 'px'
+          this.__alpha_knob.style.marginTop = (1 - this.__color.a) * 100 + 'px';
+          this.__hue_knob.style.marginTop = (1 - this.__color.h / 360) * 100 + 'px';
   
             this.__temp.s = 1;
             this.__temp.v = 1;
@@ -3893,7 +3955,23 @@
       elem.style.cssText += 'background: -ms-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);'
       elem.style.cssText += 'background: linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);'
     }
-  
+
+  function alphaGradient(elem, color) {
+    elem.style.background = '';
+
+    var rgb = color.rgb,
+        r = Math.floor(color.r),
+        g = Math.floor(color.g),
+        b = Math.floor(color.b),
+        rgbaStart = 'rgba('+r+','+g+','+b+',1)',
+        rgbaEnd = 'rgba('+r+','+g+','+b+',0)';
+
+    
+    common.each(vendors, function(vendor) {
+      elem.style.cssText += 'background: ' + vendor + 'linear-gradient(top, '+rgbaStart+ ' , '+rgbaEnd+'); ';
+    });
+  }
+
     return ColorController;
   })(dat.controllers.Controller,
   dat.dom.dom,
@@ -3947,6 +4025,15 @@
   
     });
   
+  Object.defineProperty(Color.prototype, 'rgb', {
+    get: function() {
+      return math.hsv_to_rgb(this.__state.h, 1, 1);
+    },
+    set: function(v) {
+
+    }
+  });
+
     Object.defineProperty(Color.prototype, 'hex', {
   
       get: function() {

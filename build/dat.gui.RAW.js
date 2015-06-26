@@ -3234,7 +3234,7 @@ define('dat/gui/GUI',[
       string: StringController,
       image: ImageController,
       'function': FunctionController,
-      'boolean': BooleanController
+      boolean: BooleanController
     };
 
     /**
@@ -3411,7 +3411,12 @@ define('dat/gui/GUI',[
             return params.name;
           },
           set: function(v) {
-            // TODO Check for collisions among sibling folders
+            // Check for collisions among sibling folders:
+            // We have to prevent collisions on names in order to have a key
+            // by which to remember saved values.
+            if (v !== params.name && _this.__folders[v] !== undefined) {
+              throw new Error('name collision: another sibling GUI folder has the same name');
+            }
             params.name = v;
             if (title_row_name) {
               title_row_name.innerHTML = params.name;
@@ -3768,7 +3773,6 @@ define('dat/gui/GUI',[
         if (this.load && // Anything loaded?
             this.load.folders && // Was my parent a dead-end?
             this.load.folders[name]) { // Did daddy remember me?
-
           // Start me closed if I was closed
           new_gui_params.closed = this.load.folders[name].closed;
 

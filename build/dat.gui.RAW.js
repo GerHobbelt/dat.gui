@@ -315,6 +315,12 @@ define('dat/controllers/Controller',[
     this.property = property;
 
     /**
+     * The name of the controller. Default value is the controller *type*.
+     * @type {String}
+     */
+    this.name = type;
+
+    /**
      * Keep track of the options
      */
     this.__options = options || {};
@@ -474,27 +480,6 @@ define('dat/controllers/Controller',[
         getValue: function() {
           return this.object[this.property];
         },
-
-        /**
-         * Produce the class name representing this controller's value/type. It can be used
-         * as a CSS `class` name to help customize the styling of the various controllers.
-         *
-         * @param  {string} prefix Optional prefix for the produced class name, 
-         * e.g. `ctl.getDisplayClass("type-is-") --> "type-is-number"`
-         *
-         * @return {string}      The (prefixed) controller class name. The default behaviour
-         * is to produce the type of the controlled property, e.g. "number".
-         */
-        getDisplayClass: function (prefix) {
-          prefix = prefix || '';
-
-          var v = this.getValue();
-          var t = typeof v;
-          if (Array.isArray(v)) {
-            t = 'array';
-          }
-          return prefix + t;
-        }, 
 
         getOption: function(name) {
           return this.__options[name];
@@ -3996,7 +3981,7 @@ define('dat/gui/GUI',[
     var li = addRow(gui, container, params.before);
 
     dom.addClass(li, GUI.CLASS_CONTROLLER_ROW);
-    dom.addClass(li, controller.getDisplayClass());
+    dom.addClass(li, controller.name);
 
     augmentController(gui, li, controller);
 

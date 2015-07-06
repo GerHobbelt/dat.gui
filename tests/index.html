@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-
   <link rel="stylesheet" href="qunit.css" type="text/css" media="screen"/>
   <script type="text/javascript" src="qunit.js"></script>
   <script type="text/javascript" src="jquery.js"></script>
@@ -11,6 +10,7 @@
 
   $.noConflict();
   jQuery(document).ready(function($) {
+    "use strict";
 
     var math = dat.color.math;
     var interpret = dat.color.interpret;
@@ -1322,6 +1322,9 @@ console.log(c2.__checkbox.getAttribute('checked'));
       };
 
       var gui = new GUI();
+
+      gui.resetLocalStorage();
+
       gui.remember(object);
 
       for (i in object) {
@@ -1344,8 +1347,8 @@ console.log(c2.__checkbox.getAttribute('checked'));
       gui.destroy();
 
       gui = new GUI({
-            load: saveObject
-          });
+        load: saveObject
+      });
 
       gui.remember(object);
 
@@ -1360,9 +1363,9 @@ console.log(c2.__checkbox.getAttribute('checked'));
       gui.destroy();
 
       gui = new GUI({
-            preset: "Default",
-            load: saveObject
-          });
+        preset: "Default",
+        load: saveObject
+      });
 
       gui.remember(object);
 
@@ -1398,16 +1401,16 @@ console.log(c2.__checkbox.getAttribute('checked'));
     }
 
 });
-</script>
+  </script>
 </head>
 <body>
-<h1 id="qunit-header"></h1>
+  <h1 id="qunit-header"></h1>
 
-<h2 id="qunit-banner"></h2>
+  <h2 id="qunit-banner"></h2>
 
-<div id="qunit-testrunner-toolbar"></div>
-<h2 id="qunit-userAgent"></h2>
-<ol id="qunit-tests"></ol>
-<div id="qunit-fixture">test markup, will be hidden</div>
+  <div id="qunit-testrunner-toolbar"></div>
+  <h2 id="qunit-userAgent"></h2>
+  <ol id="qunit-tests"></ol>
+  <div id="qunit-fixture">test markup, will be hidden</div>
 </body>
 </html>

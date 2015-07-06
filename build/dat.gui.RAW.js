@@ -294,6 +294,11 @@ define('dat/controllers/Controller',[
    * @member dat.controllers
    */
   var Controller = function(object, property, type, options) {
+    /**
+     * The initial value of the given property; this is the reference for the
+     * `isModified()` and other APIs.
+     * @type {Any}
+     */
     this.initialValue = object[property];
 
     /**
@@ -439,6 +444,18 @@ define('dat/controllers/Controller',[
         },
 
         /**
+         * @internal 
+         * Change the value of <code>object[property]</code>. Do not fire any events. Invoked
+         * by the `setValue()` API.
+         *
+         * @param {Object} newValue The new value of <code>object[property]</code>
+         */
+        __setValue: function(newValue) {
+          this.object[this.property] = newValue;
+          return this;
+        },
+
+        /**
          * Change the value of <code>object[property]</code>
          *
          * @param {Object} newValue The new value of <code>object[property]</code>
@@ -446,27 +463,29 @@ define('dat/controllers/Controller',[
          * @param {Boolean} silent If true, don't call the onChange handler
          */
         setValue: function(newValue, silent) {
-          var no_go = false;
           var changed = (this.object[this.property] !== newValue);
+          var msg = {
+            newValue: newValue, 
+            isChange: changed,
+            silent: silent,
+            noGo: false,
+            eventSource: 'setValue'
+          };
           if (!silent) {
             // `newValue` will end up in the second argument of the event listener, thus
             // userland code can look at both existing and new values for this property
             // and decide what to do accordingly!
-            no_go = this.fireBeforeChange({
-              newValue: newValue, 
-              isChange: changed,
-              silent: silent
-            });
+            msg.noGo = this.fireBeforeChange(msg);
           }
-          if (!no_go) {
-            this.object[this.property] = newValue;
+          if (!msg.noGo) {
+            this.__setValue(newValue);
           }
           // Always fire the change event; inform the userland code whether the change was 'real'
           // or aborted:
           if (!silent) {
-            this.fireChange(changed);
+            this.fireChange(msg);
           }
-          // Whenever you call setValue, the display will be updated automatically.
+          // Whenever you call `setValue`, the display will be updated automatically.
           // This reduces some clutter in subclasses.
           this.updateDisplay();
           return this;
@@ -1214,21 +1233,25 @@ define('dat/controllers/NumberControllerBox',[
       }
     }
 
-    function onChange() {
+    function onChange(e) {
       var attempted = parseFloat(_this.__input.value);
       if (!common.isNaN(attempted)) {
         _this.setValue(attempted);
       }
     }
 
-    function onBlur() {
-      onChange();
-      _this.fireFinishChange();
+    function onBlur(e) {
+      onChange(e);
+      _this.fireFinishChange({
+        eventData: e,
+        eventSource: 'onBlur'
+      });
     }
 
     function onTouchDown(e) {
       dom.bind(window, 'touchmove', onTouchDrag);
       dom.bind(window, 'touchend', onTouchUp);
+
       e.preventDefault();
       prev_y = e.touches[0].clientY;
     }
@@ -1244,12 +1267,20 @@ define('dat/controllers/NumberControllerBox',[
     function onTouchUp(e) {
       dom.unbind(window, 'touchmove', onTouchDrag);
       dom.unbind(window, 'touchend', onTouchUp);
+
       e.preventDefault();    
+
+      _this.fireFinishChange({
+        eventData: e,
+        eventSource: 'onTouchUp'
+      });
     }
 
     function onMouseDown(e) {
       dom.bind(window, 'mousemove', onMouseDrag);
       dom.bind(window, 'mouseup', onMouseUp);
+
+      e.preventDefault();    
       prev_y = e.clientY;
     }
 
@@ -1258,11 +1289,19 @@ define('dat/controllers/NumberControllerBox',[
       _this.setValue(_this.getValue() + diff * _this.__impliedStep);
 
       prev_y = e.clientY;
+      e.preventDefault();    
     }
 
-    function onMouseUp() {
+    function onMouseUp(e) {
       dom.unbind(window, 'mousemove', onMouseDrag);
       dom.unbind(window, 'mouseup', onMouseUp);
+
+      e.preventDefault();    
+
+      _this.fireFinishChange({
+        eventData: e,
+        eventSource: 'onMouseUp'
+      });
     }
 
     this.updateDisplay();
@@ -1361,10 +1400,16 @@ function(NumberController, dom, css, common, styleSheet) {
       return false;
     }
     
-    function onTouchUp() {
+    function onTouchUp(e) {
       dom.unbind(window, 'touchmove', onTouchDrag);
       dom.unbind(window, 'touchend', onTouchUp);
-      _this.fireFinishChange();
+
+      e.preventDefault();
+
+      _this.fireFinishChange({
+        eventData: e,
+        eventSource: 'onTouchUp'
+      });
     }    
 
     function onMouseDown(e) {
@@ -1387,10 +1432,16 @@ function(NumberController, dom, css, common, styleSheet) {
       return false;
     }
 
-    function onMouseUp() {
+    function onMouseUp(e) {
       dom.unbind(window, 'mousemove', onMouseDrag);
       dom.unbind(window, 'mouseup', onMouseUp);
-      _this.fireFinishChange();
+
+      e.preventDefault();
+
+      _this.fireFinishChange({
+        eventData: e,
+        eventSource: 'onMouseUp'
+      });
     }
 
     this.__background = document.createElement('div');
@@ -1585,13 +1636,53 @@ define('dat/controllers/FunctionController',[
       FunctionController.prototype,
       Controller.prototype,
       {
-        fire: function(user_data) {
-          var no_go = this.fireBeforeChange(user_data);
-          if (!no_go) {
+        /**
+         * Invoke the function (property of the object), passing the `user_data` array as function
+         * arguments.
+         *
+         * Before the function is invoked, the dat.GUI `beforeChange` callback will be invoked
+         *  
+         *
+         * @param  {Array} user_data  The array of function arguments; when the `user_data` is not
+         * an array, it will be assumed to be a single argument by itself and will be 
+         * passed to the invoked function as is.
+         *
+         * @param  {boolean} silent   When truthy, no onBeforeChange/onChange events will be fired.
+         * 
+         * @return {Controller}           This controller.
+         */
+        fire: function(user_data, silent) {
+          if (!common.isUndefined(user_data) && !common.isArray(user_data)) {
+            user_data = [user_data];
+          }
+
+          var msg = {
+            userData: user_data, 
+            //isChange: undefined,
+            silent: silent,
+            noGo: false,
+            //eventData: undefined,
+            eventSource: 'fire'
+          };
+          if (!silent) {
+            // `userData` will end up in the second argument of the event listener, thus
+            // userland code can look at both existing and new values for this property
+            // and decide what to do accordingly!
+            msg.noGo = this.fireBeforeChange(msg);
+          }
+          if (!msg.noGo) {
             this.getValue().apply(this.object, user_data);
           }
-          this.fireChange(user_data);
-          this.fireFinishChange(user_data);
+          // Always fire the change event; inform the userland code whether the change was 'real'
+          // or aborted:
+          if (!silent) {
+            this.fireChange(msg);
+            this.fireFinishChange(msg);
+          }
+          // Whenever you call `fire`, the display will be updated automatically.
+          // This reduces some clutter in subclasses.
+          this.updateDisplay();
+          return this;
         }
       }
   );
@@ -3643,9 +3734,8 @@ define('dat/gui/GUI',[
       if (params.preset) {
         params.load.preset = params.preset;
       }
-    } else {
-      params.load = { preset: DEFAULT_DEFAULT_PRESET_NAME };
     }
+    // else: get the load+preset from localStorage further below...
 
     if (common.isUndefined(params.parent) && params.hideable) {
       hideable_guis.push(this);
@@ -3867,8 +3957,10 @@ define('dat/gui/GUI',[
 
           var saved_gui = localStorage.getItem(getLocalStorageHash(this, 'gui'));
 
+          // Mix the localStorage data with the optional user-provided load data:
+          // user-provided load data prevails over localStorage data.
           if (saved_gui) {
-            params.load = JSON.parse(saved_gui);
+            params.load = common.defaults(params.load || {}, JSON.parse(saved_gui));
           }
         }
       }
@@ -3909,6 +4001,17 @@ define('dat/gui/GUI',[
       }
     }
 
+    // Now that we also checked localStorage, it's time to assign a default load+preset if none
+    // have been provided yet.
+    params.load = common.defaults(params.load || {}, { 
+      preset: DEFAULT_DEFAULT_PRESET_NAME 
+    });
+    
+    // Did the user request an explicit preset?
+    if (params.preset) {
+      params.load.preset = params.preset;
+    }
+    
     if (params.autoPlace) {
       if (common.isUndefined(params.parent)) {
         if (auto_place_virgin) {
@@ -4310,6 +4413,19 @@ define('dat/gui/GUI',[
 
         if (!gui) {
           markPresetModified(this.getRoot(), false);
+        }
+        return this;
+      },
+
+      /**
+       * Delete/destroy all data and metadata stored in localStorage. Use this method 
+       * to clear/erase stored settings and/or object property values and reset the 
+       * persisted state to the default/original values where possible.
+       */
+      resetLocalStorage: function () {
+        if (SUPPORTS_LOCAL_STORAGE) {
+          localStorage.removeItem(getLocalStorageHash(this, 'isLocal'));
+          localStorage.removeItem(getLocalStorageHash(this, 'gui'));
         }
         return this;
       },

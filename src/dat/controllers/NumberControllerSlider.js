@@ -64,10 +64,16 @@ function(NumberController, dom, css, common, styleSheet) {
       return false;
     }
     
-    function onTouchUp() {
+    function onTouchUp(e) {
       dom.unbind(window, 'touchmove', onTouchDrag);
       dom.unbind(window, 'touchend', onTouchUp);
-      _this.fireFinishChange();
+
+      e.preventDefault();
+
+      _this.fireFinishChange({
+        eventData: e,
+        eventSource: 'onTouchUp'
+      });
     }    
 
     function onMouseDown(e) {
@@ -90,10 +96,16 @@ function(NumberController, dom, css, common, styleSheet) {
       return false;
     }
 
-    function onMouseUp() {
+    function onMouseUp(e) {
       dom.unbind(window, 'mousemove', onMouseDrag);
       dom.unbind(window, 'mouseup', onMouseUp);
-      _this.fireFinishChange();
+
+      e.preventDefault();
+
+      _this.fireFinishChange({
+        eventData: e,
+        eventSource: 'onMouseUp'
+      });
     }
 
     this.__background = document.createElement('div');

@@ -69,21 +69,25 @@ define([
       }
     }
 
-    function onChange() {
+    function onChange(e) {
       var attempted = parseFloat(_this.__input.value);
       if (!common.isNaN(attempted)) {
         _this.setValue(attempted);
       }
     }
 
-    function onBlur() {
-      onChange();
-      _this.fireFinishChange();
+    function onBlur(e) {
+      onChange(e);
+      _this.fireFinishChange({
+        eventData: e,
+        eventSource: 'onBlur'
+      });
     }
 
     function onTouchDown(e) {
       dom.bind(window, 'touchmove', onTouchDrag);
       dom.bind(window, 'touchend', onTouchUp);
+
       e.preventDefault();
       prev_y = e.touches[0].clientY;
     }
@@ -99,12 +103,20 @@ define([
     function onTouchUp(e) {
       dom.unbind(window, 'touchmove', onTouchDrag);
       dom.unbind(window, 'touchend', onTouchUp);
+
       e.preventDefault();    
+
+      _this.fireFinishChange({
+        eventData: e,
+        eventSource: 'onTouchUp'
+      });
     }
 
     function onMouseDown(e) {
       dom.bind(window, 'mousemove', onMouseDrag);
       dom.bind(window, 'mouseup', onMouseUp);
+
+      e.preventDefault();    
       prev_y = e.clientY;
     }
 
@@ -113,11 +125,19 @@ define([
       _this.setValue(_this.getValue() + diff * _this.__impliedStep);
 
       prev_y = e.clientY;
+      e.preventDefault();    
     }
 
-    function onMouseUp() {
+    function onMouseUp(e) {
       dom.unbind(window, 'mousemove', onMouseDrag);
       dom.unbind(window, 'mouseup', onMouseUp);
+
+      e.preventDefault();    
+
+      _this.fireFinishChange({
+        eventData: e,
+        eventSource: 'onMouseUp'
+      });
     }
 
     this.updateDisplay();

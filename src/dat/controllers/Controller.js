@@ -96,6 +96,11 @@ define([
    * @member dat.controllers
    */
   var Controller = function(object, property, type, options) {
+    /**
+     * The initial value of the given property; this is the reference for the
+     * `isModified()` and other APIs.
+     * @type {Any}
+     */
     this.initialValue = object[property];
 
     /**
@@ -241,6 +246,18 @@ define([
         },
 
         /**
+         * @internal 
+         * Change the value of <code>object[property]</code>. Do not fire any events. Invoked
+         * by the `setValue()` API.
+         *
+         * @param {Object} newValue The new value of <code>object[property]</code>
+         */
+        __setValue: function(newValue) {
+          this.object[this.property] = newValue;
+          return this;
+        },
+
+        /**
          * Change the value of <code>object[property]</code>
          *
          * @param {Object} newValue The new value of <code>object[property]</code>
@@ -248,27 +265,29 @@ define([
          * @param {Boolean} silent If true, don't call the onChange handler
          */
         setValue: function(newValue, silent) {
-          var no_go = false;
           var changed = (this.object[this.property] !== newValue);
+          var msg = {
+            newValue: newValue, 
+            isChange: changed,
+            silent: silent,
+            noGo: false,
+            eventSource: 'setValue'
+          };
           if (!silent) {
             // `newValue` will end up in the second argument of the event listener, thus
             // userland code can look at both existing and new values for this property
             // and decide what to do accordingly!
-            no_go = this.fireBeforeChange({
-              newValue: newValue, 
-              isChange: changed,
-              silent: silent
-            });
+            msg.noGo = this.fireBeforeChange(msg);
           }
-          if (!no_go) {
-            this.object[this.property] = newValue;
+          if (!msg.noGo) {
+            this.__setValue(newValue);
           }
           // Always fire the change event; inform the userland code whether the change was 'real'
           // or aborted:
           if (!silent) {
-            this.fireChange(changed);
+            this.fireChange(msg);
           }
-          // Whenever you call setValue, the display will be updated automatically.
+          // Whenever you call `setValue`, the display will be updated automatically.
           // This reduces some clutter in subclasses.
           this.updateDisplay();
           return this;

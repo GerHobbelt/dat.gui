@@ -59,13 +59,53 @@ define([
       FunctionController.prototype,
       Controller.prototype,
       {
-        fire: function(user_data) {
-          var no_go = this.fireBeforeChange(user_data);
-          if (!no_go) {
+        /**
+         * Invoke the function (property of the object), passing the `user_data` array as function
+         * arguments.
+         *
+         * Before the function is invoked, the dat.GUI `beforeChange` callback will be invoked
+         *  
+         *
+         * @param  {Array} user_data  The array of function arguments; when the `user_data` is not
+         * an array, it will be assumed to be a single argument by itself and will be 
+         * passed to the invoked function as is.
+         *
+         * @param  {boolean} silent   When truthy, no onBeforeChange/onChange events will be fired.
+         * 
+         * @return {Controller}           This controller.
+         */
+        fire: function(user_data, silent) {
+          if (!common.isUndefined(user_data) && !common.isArray(user_data)) {
+            user_data = [user_data];
+          }
+
+          var msg = {
+            userData: user_data, 
+            //isChange: undefined,
+            silent: silent,
+            noGo: false,
+            //eventData: undefined,
+            eventSource: 'fire'
+          };
+          if (!silent) {
+            // `userData` will end up in the second argument of the event listener, thus
+            // userland code can look at both existing and new values for this property
+            // and decide what to do accordingly!
+            msg.noGo = this.fireBeforeChange(msg);
+          }
+          if (!msg.noGo) {
             this.getValue().apply(this.object, user_data);
           }
-          this.fireChange(user_data);
-          this.fireFinishChange(user_data);
+          // Always fire the change event; inform the userland code whether the change was 'real'
+          // or aborted:
+          if (!silent) {
+            this.fireChange(msg);
+            this.fireFinishChange(msg);
+          }
+          // Whenever you call `fire`, the display will be updated automatically.
+          // This reduces some clutter in subclasses.
+          this.updateDisplay();
+          return this;
         }
       }
   );

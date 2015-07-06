@@ -212,9 +212,8 @@ define([
       if (params.preset) {
         params.load.preset = params.preset;
       }
-    } else {
-      params.load = { preset: DEFAULT_DEFAULT_PRESET_NAME };
     }
+    // else: get the load+preset from localStorage further below...
 
     if (common.isUndefined(params.parent) && params.hideable) {
       hideable_guis.push(this);
@@ -436,8 +435,10 @@ define([
 
           var saved_gui = localStorage.getItem(getLocalStorageHash(this, 'gui'));
 
+          // Mix the localStorage data with the optional user-provided load data:
+          // user-provided load data prevails over localStorage data.
           if (saved_gui) {
-            params.load = JSON.parse(saved_gui);
+            params.load = common.defaults(params.load || {}, JSON.parse(saved_gui));
           }
         }
       }
@@ -478,6 +479,17 @@ define([
       }
     }
 
+    // Now that we also checked localStorage, it's time to assign a default load+preset if none
+    // have been provided yet.
+    params.load = common.defaults(params.load || {}, { 
+      preset: DEFAULT_DEFAULT_PRESET_NAME 
+    });
+    
+    // Did the user request an explicit preset?
+    if (params.preset) {
+      params.load.preset = params.preset;
+    }
+    
     if (params.autoPlace) {
       if (common.isUndefined(params.parent)) {
         if (auto_place_virgin) {
@@ -879,6 +891,19 @@ define([
 
         if (!gui) {
           markPresetModified(this.getRoot(), false);
+        }
+        return this;
+      },
+
+      /**
+       * Delete/destroy all data and metadata stored in localStorage. Use this method 
+       * to clear/erase stored settings and/or object property values and reset the 
+       * persisted state to the default/original values where possible.
+       */
+      resetLocalStorage: function () {
+        if (SUPPORTS_LOCAL_STORAGE) {
+          localStorage.removeItem(getLocalStorageHash(this, 'isLocal'));
+          localStorage.removeItem(getLocalStorageHash(this, 'gui'));
         }
         return this;
       },

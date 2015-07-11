@@ -35,6 +35,7 @@ define([
       function isControllerTemplate(f) {
         return typeof f === 'function' &&
             f.prototype &&
+            typeof f.prototype.onBeforeChange === 'function' &&
             typeof f.prototype.onChange === 'function' &&
             typeof f.prototype.onFinishChange === 'function' &&
             typeof f.prototype.setValue === 'function' &&

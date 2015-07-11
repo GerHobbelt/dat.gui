@@ -3465,6 +3465,7 @@
         function isControllerTemplate(f) {
           return typeof f === 'function' &&
               f.prototype &&
+              typeof f.prototype.onBeforeChange === 'function' &&
               typeof f.prototype.onChange === 'function' &&
               typeof f.prototype.onFinishChange === 'function' &&
               typeof f.prototype.setValue === 'function' &&
@@ -3809,6 +3810,8 @@
         setA(e);
         dom.bind(window, 'mousemove', setA);
         dom.bind(window, 'mouseup', unbindA);
+        dom.bind(window, 'touchmove', setAonTouch);
+        dom.bind(window, 'touchend', unbindA);
       });
   
       // TODO: make setValue always call alphaGradient like the two functions do below:
@@ -3878,6 +3881,13 @@
         dom.unbind(window, 'touchend', unbindH);
       }
   
+      function unbindA() {
+        dom.unbind(window, 'mousemove', setA);
+        dom.unbind(window, 'mouseup', unbindA);
+        dom.unbind(window, 'touchmove', setAonTouch);
+        dom.unbind(window, 'touchend', unbindA);
+      }
+  
       this.__saturation_field.appendChild(value_field);
       this.__selector.appendChild(this.__field_knob);
       this.__selector.appendChild(this.__saturation_field);
@@ -3944,24 +3954,31 @@
       }
   
       function setA(e) {
-  
         e.preventDefault();
   
         var s = dom.getHeight(_this.__alpha_field);
         var o = dom.getOffset(_this.__alpha_field);
         var a = 1 - (e.clientY - o.top + document.body.scrollTop) / s;
   
-        if (a > 1) a = 1;
-        else if (a < 0) a = 0;
+        if (a > 1) {
+          a = 1;
+        } 
+        else if (a < 0) {
+          a = 0;
+        }
   
         _this.__color.a = a.toFixed(2);
   
         _this.setValue(_this.__color.toOriginal());
   
         return false;
-  
       }
     
+      function setAonTouch(e) {
+        e.clientY = e.touches[0].clientY;
+        return setA(e);
+      }
+  
       function setSVonTouch(e) {
         e.clientX = e.touches[0].clientX;
         e.clientY = e.touches[0].clientY;
@@ -3975,7 +3992,7 @@
   
       function getScroll(el) {
         var scroll = { top: el.scrollTop, left: el.scrollLeft };
-        while(el = el.parentNode) {
+        while((el = el.parentNode)) {
           scroll.top += (el.scrollTop || 0);
           scroll.left += (el.scrollLeft || 0);
         }
@@ -4002,7 +4019,7 @@
                     !common.isUndefined(this.__color.__state[component]) &&
                     i[component] !== this.__color.__state[component]) {
                   mismatch = true;
-                  return {}; // break
+                  return common.BREAK; // break
                 }
               }, this);
   
@@ -4037,9 +4054,9 @@
   
             common.extend(this.__input.style, {
               backgroundColor: this.__input.value = this.__color.toString(),
-              color: 'rgb(' + flip + ',' + flip + ',' + flip +')',
+              color: 'rgb(' + flip + ',' + flip + ',' + flip + ')',
               textShadow: this.__input_textShadow.map(function (d) {
-                return d + ' rgba(' + _flip + ',' + _flip + ',' + _flip +',0.7)';
+                return d + ' rgba(' + _flip + ',' + _flip + ',' + _flip + ',0.7)';
               }).join(', ')
             });
   
@@ -4048,22 +4065,22 @@
         }
     );
     
-    var vendors = ['-moz-','-o-','-webkit-','-ms-',''];
+    var vendors = ['-moz-', '-o-', '-webkit-', '-ms-', ''];
     
     function linearGradient(elem, x, a, b) {
       elem.style.background = '';
       common.each(vendors, function(vendor) {
-        elem.style.cssText += 'background: ' + vendor + 'linear-gradient('+x+', '+a+' 0%, ' + b + ' 100%); ';
+        elem.style.cssText += 'background: ' + vendor + 'linear-gradient(' + x + ', ' + a + ' 0%, ' + b + ' 100%); ';
       });
     }
     
     function hueGradient(elem) {
       elem.style.background = '';
-      elem.style.cssText += 'background: -moz-linear-gradient(top,  #ff0000 0%, #ff00ff 17%, #0000ff 34%, #00ffff 50%, #00ff00 67%, #ffff00 84%, #ff0000 100%);'
-      elem.style.cssText += 'background: -webkit-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);'
-      elem.style.cssText += 'background: -o-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);'
-      elem.style.cssText += 'background: -ms-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);'
-      elem.style.cssText += 'background: linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);'
+      elem.style.cssText += 'background: -moz-linear-gradient(top,  #ff0000 0%, #ff00ff 17%, #0000ff 34%, #00ffff 50%, #00ff00 67%, #ffff00 84%, #ff0000 100%);';
+      elem.style.cssText += 'background: -webkit-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);';
+      elem.style.cssText += 'background: -o-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);';
+      elem.style.cssText += 'background: -ms-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);';
+      elem.style.cssText += 'background: linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);';
     }
   
     function alphaGradient(elem, color) {
@@ -4073,12 +4090,11 @@
           r = Math.floor(color.r),
           g = Math.floor(color.g),
           b = Math.floor(color.b),
-          rgbaStart = 'rgba('+r+','+g+','+b+',1)',
-          rgbaEnd = 'rgba('+r+','+g+','+b+',0)';
-  
+          rgbaStart = 'rgba(' + r + ',' + g + ',' + b + ',1)',
+          rgbaEnd = 'rgba(' + r + ',' + g + ',' + b + ',0)';
       
       common.each(vendors, function(vendor) {
-        elem.style.cssText += 'background: ' + vendor + 'linear-gradient(top, '+rgbaStart+ ' , '+rgbaEnd+'); ';
+        elem.style.cssText += 'background: ' + vendor + 'linear-gradient(top, ' + rgbaStart + ' , ' + rgbaEnd + '); ';
       });
     }
   

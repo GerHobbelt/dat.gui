@@ -1,17 +1,30 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>dat.GUI</title>
+  <title>dat.GUI - string controller</title>
 
   <link rel='icon' type='image/png' href='assets/favicon.png'/>
 
+  <link href="examples.css" media="screen" rel="stylesheet" type="text/css" />
+
   <!-- data-main attribute tells require.js to load examples/init.js after require.js loads. -->
   <script data-main='init' src='assets/require-plus-config.js'></script>
-
 </head>
 <body>
+  <div class="demo-info">
+    <h1>About this example</h1>
+    <p>
+      This example shows the dat.GUI controller for string values (UI: input field; API: <code>.add(object, "member")</code>).
+    </p>
+
+    <h2>Notes about the display below</h2>
+    <p>
+      Below the object data members, which are linked to dat.GUI controllers, are displayed; note that display update delays are due to the relatively low display refresh rate.
+    </p>
+  </div>
+
   <script type="text/javascript">
-require(['domReady', 'dat.GUI'], function (domReady, dat) {
+require(['domReady', 'dat.GUI', 'testbed'], function (domReady, dat, testbed) {
   'use strict';
 
   domReady(function () {
@@ -19,10 +32,13 @@ require(['domReady', 'dat.GUI'], function (domReady, dat) {
     //It will be safe to query the DOM and manipulate
     //DOM nodes in this function.
     var obj = { 
-		x: 'a message' 
-	};
+      x: 'a message' 
+    };
     var gui = new dat.gui.GUI();
     gui.add(obj, 'x');
+
+	// ---------------------------------------------------------------
+    testbed.init(obj, document);
   });
 });
   </script>

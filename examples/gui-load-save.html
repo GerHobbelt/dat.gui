@@ -5,32 +5,10 @@
 
   <link rel='icon' type='image/png' href='assets/favicon.png'/>
 
+  <link href="examples.css" media="screen" rel="stylesheet" type="text/css" />
+
   <!-- data-main attribute tells require.js to load examples/init.js after require.js loads. -->
   <script data-main='init' src='assets/require-plus-config.js'></script>
-
-  <style>
-blockquote
-{
-  background-color: #eee;
-  margin: 0;
-  border: 3px solid #ddd;
-  padding: 0.5em 2em;  
-}
-
-blockquote h1
-{
-  color: red;
-}
-
-.demo-info
-{
-  margin-right: 255px;
-  border: 1px dotted grey;
-  padding: 1em;
-  font-family: sans-serif;
-  line-height: 1.5em;
-}    
-  </style>
 </head>
 <body>
   <div class="demo-info">
@@ -44,6 +22,7 @@ blockquote h1
       </p>
     </blockquote>
 
+    <h1>About this example</h1>
     <p>
       This example shows the new, alternative <code>remember()</code>-<em>after</em>-adding-controllers way of coding.
     </p>
@@ -51,10 +30,15 @@ blockquote h1
       See <a href="gui-load-save-alt.html"><code>gui-load-save-alt.html</code></a> for example code which exhibits
       the original documented call order.
     </p>
+
+    <h2>Notes about the display below</h2>
+    <p>
+      Below the object data members, which are linked to dat.GUI controllers, are displayed; note that display update delays are due to the relatively low display refresh rate.
+    </p>
   </div>
 
   <script type="text/javascript">
-require(['domReady', 'dat.GUI'], function (domReady, dat) {
+require(['domReady', 'dat.GUI', 'testbed'], function (domReady, dat, testbed) {
   'use strict';
 
   domReady(function () {
@@ -76,6 +60,9 @@ require(['domReady', 'dat.GUI'], function (domReady, dat) {
     // both ways -- any not-yet-remembered objects/controllers will be updated to their saved 
     // state by the `.remember()` call.
     gui.remember(obj);
+
+	// ---------------------------------------------------------------
+    testbed.init(obj, document);
   });
 });
   </script>

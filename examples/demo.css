@@ -4,7 +4,7 @@
 }
 
 body {
-    font: 9.5px/13px Lucida Grande, sans-serif;
+    font: 9.5px/13px "Lucida Grande", sans-serif;
     padding: 0 20px 20px 20px;
 }
 
@@ -12,11 +12,15 @@ body {
 max-width: 530px;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1, 
+h2, 
+h3, 
+h4, 
+h5, 
+h6 {
     font-family: "Helvetica Neue", helvetica, arial, sans-serif;
     color: #222;
 }
-
 
 hr {
 border: 0;
@@ -32,7 +36,10 @@ h1 {
     margin: 39px 0 20px 0;
 }
 
-h1 a:link, h1 a:visited, h1 a:hover, h1 a:active {
+h1 a:link, 
+h1 a:visited, 
+h1 a:hover, 
+h1 a:active {
     text-decoration: none;
     margin-right: 7px;
 }
@@ -60,8 +67,8 @@ h2.section:hover {
 color: #00aeff;
 }
 
-div.collapsed h2, div.expanded h2 {
-
+div.collapsed h2, 
+div.expanded h2 {
     float: left;
     clear: both;
     width: 100%;
@@ -74,7 +81,8 @@ div.expanded h2:before {
 div.collapsed h2:before {
     content: '+';
 }
-div.expanded h2:before, div.collapsed h2:before {
+div.expanded h2:before, 
+div.collapsed h2:before {
     font-weight: normal;
     line-height: 2px;
     float: left;
@@ -94,7 +102,9 @@ div.expanded .collapsable {
     clear: both;
     height: auto;
 }
-div.expanded { cursor: pointer; }
+div.expanded { 
+    cursor: pointer; 
+}
 
 #helvetica-demo {
     position: absolute;
@@ -159,13 +169,12 @@ a:active {
 }
 
 footer {
-margin-top: 20px;
+    margin-top: 20px;
     background-color: #eee;
     width: 510px;
     padding: 10px;
     clear: both;
     color: #444;
-
 }
 
 pre a:link,
@@ -190,7 +199,9 @@ code strong {
 .com { color: #555; }
 .typ { color: #ccc; }
 .lit { color: #00aeff; }
-.pun, .opn, .clo { color: #777; }
+.pun, 
+.opn, 
+.clo { color: #777; }
 .pln { color: #ccc; }
 .tag { color: #555; }
 .atn { color: #555; }

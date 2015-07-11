@@ -32,6 +32,7 @@ requirejs.config({
         'gui.utils': '../time/utils',
 
         'demo': '../examples/demo',
+        'testbed': '../examples/testbed',
     }
 });
 

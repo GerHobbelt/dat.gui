@@ -174,6 +174,8 @@ define([
       setA(e);
       dom.bind(window, 'mousemove', setA);
       dom.bind(window, 'mouseup', unbindA);
+      dom.bind(window, 'touchmove', setAonTouch);
+      dom.bind(window, 'touchend', unbindA);
     });
 
     // TODO: make setValue always call alphaGradient like the two functions do below:
@@ -241,6 +243,13 @@ define([
       dom.unbind(window, 'mouseup', unbindH);
       dom.unbind(window, 'touchmove', setHonTouch);
       dom.unbind(window, 'touchend', unbindH);
+    }
+
+    function unbindA() {
+      dom.unbind(window, 'mousemove', setA);
+      dom.unbind(window, 'mouseup', unbindA);
+      dom.unbind(window, 'touchmove', setAonTouch);
+      dom.unbind(window, 'touchend', unbindA);
     }
 
     this.__saturation_field.appendChild(value_field);
@@ -329,6 +338,11 @@ define([
       return false;
     }
   
+    function setAonTouch(e) {
+      e.clientY = e.touches[0].clientY;
+      return setA(e);
+    }
+
     function setSVonTouch(e) {
       e.clientX = e.touches[0].clientX;
       e.clientY = e.touches[0].clientY;

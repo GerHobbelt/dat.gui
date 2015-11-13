@@ -55,7 +55,7 @@ define([
 
         var dyninfo = common.setupDynamicProperty(object, property);
 
-        var initialValue = (!__dyninfo ? object[property] : __dyninfo.getter.call(object));
+        var initialValue = (!dyninfo ? object[property] : dyninfo.getter.call(object));
 
         // Providing options?
         if (common.isArray(options_1) || common.isObject(options_1)) {

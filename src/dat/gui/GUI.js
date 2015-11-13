@@ -1037,10 +1037,9 @@ define([
 
     // All sliders should be accompanied by a box.
     if (controller instanceof NumberControllerSlider) {
-      var box = new NumberControllerBox(controller.object, controller.property,
-          { min: controller.__min, max: controller.__max, step: controller.__step });
+      var box = new NumberControllerBox(controller.object, controller.property, controller.getMetaInfo());
 
-      common.each(['updateDisplay', 'onChange', 'onFinishChange'], function(method) {
+      common.each(['updateDisplay', 'onChange', 'onFinishChange', 'setValue', 'min', 'max', 'step', 'mode', 'setOption', 'setReadonly'], function(method) {
         var pc = controller[method];
         var pb = box[method];
         controller[method] = box[method] = function() {

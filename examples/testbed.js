@@ -86,6 +86,9 @@ function perform_monitor_progress_countdown(duration) {
   for (var i = 0; i < steps; i++) {
     s += '.';
   }
+  if (s === '') {
+    s = '\u00a0';
+  }
   progress_div.textContent = s;
 }    
 
@@ -96,6 +99,8 @@ function do_monitor() {
   global_monitor_timer = setTimeout(do_monitor, Math.max(50, monitor_action_interval / monitor_action_interval_substeps));
 
   if (monitor_time_next_trigger <= t) {
+    perform_monitor_progress_countdown(0);
+
     // action!
     monitor_time_next_trigger = t + monitor_action_interval; 
     // regenerate the content in the parent DIV:
@@ -103,6 +108,12 @@ function do_monitor() {
   } else {
     perform_monitor_progress_countdown(monitor_time_next_trigger - t);    
   }
+}
+
+function do_observe() {
+  // force action!
+  monitor_time_next_trigger = 0;
+  do_monitor();
 }
 
 function init(obj, document) {
@@ -130,6 +141,10 @@ function init(obj, document) {
   div.setAttribute('class', 'monitor-one-object');
   div = monitor_div.appendChild(div);
   inspection_divs[index] = div;
+
+  if (typeof Object.observe === 'function') {
+    Object.observe(obj, do_observe);
+  }
 
   do_monitor();
 }

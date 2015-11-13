@@ -28,7 +28,7 @@ define([
 
     var _this = this;
 
-    this.domElement = document.createElement('div');
+    //this.domElement = document.createElement('div');
 
     dom.makeSelectable(this.domElement, false);
 
@@ -89,7 +89,7 @@ define([
     var value_field = document.createElement('div');
 
     common.extend(this.__selector.style, {
-      width: '122px',
+      width: '140px',
       height: '102px',
       padding: '3px',
       backgroundColor: '#222',
@@ -155,7 +155,7 @@ define([
       }).join(', ')
     });
   
-    common.extend(this.__alpha_field.style , {
+    common.extend(this.__alpha_field.style, {
       width: '15px',
       height: '100px',
       marginLeft: '3px',
@@ -166,12 +166,27 @@ define([
 
     alphaGradient(this.__alpha_field, _this.__color);
 
+    common.extend(this.__alpha_knob.style, {
+      position: 'absolute',
+      width: '15px',
+      height: '2px',
+      borderRight: '4px solid #fff',
+      zIndex: 1
+    });
+
     dom.bind(this.__saturation_field, 'mousedown', fieldDown);
     dom.bind(this.__field_knob, 'mousedown', fieldDown);
     dom.bind(this.__saturation_field, 'touchstart', fieldDownOnTouch);
     dom.bind(this.__field_knob, 'touchstart', fieldDownOnTouch);
     dom.bind(this.__alpha_field, 'mousedown', function (e) {
       setA(e);
+      dom.bind(window, 'mousemove', setA);
+      dom.bind(window, 'mouseup', unbindA);
+      dom.bind(window, 'touchmove', setAonTouch);
+      dom.bind(window, 'touchend', unbindA);
+    });
+    dom.bind(this.__alpha_field, 'touchstart', function (e) {
+      setAonTouch(e);
       dom.bind(window, 'mousemove', setA);
       dom.bind(window, 'mouseup', unbindA);
       dom.bind(window, 'touchmove', setAonTouch);
@@ -322,7 +337,8 @@ define([
 
       var s = dom.getHeight(_this.__alpha_field);
       var o = dom.getOffset(_this.__alpha_field);
-      var a = 1 - (e.clientY - o.top + document.body.scrollTop) / s;
+      var scroll = getScroll(_this.__alpha_field);
+      var a = 1 - (e.clientY - o.top + scroll.top) / s;
 
       if (a > 1) {
         a = 1;
@@ -355,10 +371,17 @@ define([
     }
 
     function getScroll(el) {
-      var scroll = { top: el.scrollTop, left: el.scrollLeft };
+      var scroll = { 
+        top: el.scrollTop || 0, 
+        left: el.scrollLeft || 0 
+      };
       while((el = el.parentNode)) {
         scroll.top += (el.scrollTop || 0);
         scroll.left += (el.scrollLeft || 0);
+        var cs = getComputedStyle(el, null);
+        if (cs.position === 'fixed') {
+          break;
+        }
       }
       return scroll;
     }

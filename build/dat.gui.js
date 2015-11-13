@@ -1032,6 +1032,7 @@
             this.__impliedStep = guestimateImpliedStep(this.getValue(), this.__step, this.__minimumSaneStepSize, this.__maximumSaneStepSize);
   
             this.__precision = numDecimals(this.__impliedStep);
+  
             return this;
           },
   
@@ -1048,7 +1049,10 @@
               step: this.__step, 
               minimumSaneStepSize: this.__minimumSaneStepSize, 
               maximumSaneStepSize: this.__maximumSaneStepSize,
-              mode: this.__mode
+              mode: this.__mode,
+  
+              impliedStep: this.__impliedStep,
+              precision: this.__precision
             };
           }
         }
@@ -3122,10 +3126,9 @@
   
       // All sliders should be accompanied by a box.
       if (controller instanceof NumberControllerSlider) {
-        var box = new NumberControllerBox(controller.object, controller.property,
-            { min: controller.__min, max: controller.__max, step: controller.__step });
+        var box = new NumberControllerBox(controller.object, controller.property, controller.getMetaInfo());
   
-        common.each(['updateDisplay', 'onChange', 'onFinishChange'], function(method) {
+        common.each(['updateDisplay', 'onChange', 'onFinishChange', 'setValue', 'min', 'max', 'step', 'mode', 'setOption', 'setReadonly'], function(method) {
           var pc = controller[method];
           var pb = box[method];
           controller[method] = box[method] = function() {
@@ -3527,7 +3530,7 @@
   
           var dyninfo = common.setupDynamicProperty(object, property);
   
-          var initialValue = (!__dyninfo ? object[property] : __dyninfo.getter.call(object));
+          var initialValue = (!dyninfo ? object[property] : dyninfo.getter.call(object));
   
           // Providing options?
           if (common.isArray(options_1) || common.isObject(options_1)) {

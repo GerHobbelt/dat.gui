@@ -143,6 +143,7 @@ define([
           this.__impliedStep = guestimateImpliedStep(this.getValue(), this.__step, this.__minimumSaneStepSize, this.__maximumSaneStepSize);
 
           this.__precision = numDecimals(this.__impliedStep);
+
           return this;
         },
 
@@ -159,7 +160,10 @@ define([
             step: this.__step, 
             minimumSaneStepSize: this.__minimumSaneStepSize, 
             maximumSaneStepSize: this.__maximumSaneStepSize,
-            mode: this.__mode
+            mode: this.__mode,
+
+            impliedStep: this.__impliedStep,
+            precision: this.__precision
           };
         }
       }

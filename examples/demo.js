@@ -3,20 +3,20 @@ define([], function() {
 
 // previously: GUI.constrain
 function constrain(v, o1, o2) {
-    if (v < o1) v = o1;
-    else if (v > o2) v = o2;
+    if (v < o1) 
+      v = o1;
+    else if (v > o2) 
+      v = o2;
     return v;
 }
 
 
 function FizzyText(message, font) {
-
   var that = this;
 
   // These are the variables that we manipulate with gui-dat.
   // Notice they're all defined with "this". That makes them public.
   // Otherwise, gui-dat can't see them.
-
 
   this.growthSpeed = 0.2;       // how fast do particles change size?
   this.maxSize = 5.59;          // how big can they get?
@@ -70,7 +70,6 @@ function FizzyText(message, font) {
   var textAscent = 101;
   var textOffsetLeft = 80;
   var noiseScale = 300;
-  var frameTime = 30;
 
   var colors = ["#00aeff", "#0fa954", "#54396e", "#e61d5f"];
 
@@ -111,7 +110,7 @@ function FizzyText(message, font) {
   // Stores a list of particles
   var particles = [];
 
-  // Set g.font to the same font as the bitmap canvas, incase we
+  // Set g.font to the same font as the bitmap canvas, in case we
   // want to draw some outlines.
   s.font = g.font = "800 82px " + this.allFonts[ this.font ];
 
@@ -133,12 +132,11 @@ function FizzyText(message, font) {
     // Pull reference
     var imageData = s.getImageData(0, 0, width, height);
     pixels = imageData.data;
-
   };
 
   // Called once per frame, updates the animation.
   var render = function () {
-    that.framesRendered ++;
+    that.framesRendered++;
 
     s.font = g.font = "800 82px " + that.allFonts[ that.font ];
 
@@ -147,7 +145,7 @@ function FizzyText(message, font) {
     if (_this.displayOutline) {
       g.globalCompositeOperation = "source-over";
       g.strokeStyle = "#000";
-      g.lineWidth = .5;
+      g.lineWidth = 0.5;
       g.strokeText(message, textOffsetLeft, textAscent);
     }
 
@@ -157,7 +155,6 @@ function FizzyText(message, font) {
       g.fillStyle = colors[i % colors.length];
       particles[i].render();
     }
-
   };
 
   // Returns x, y coordinates for a given index in the pixel array.
@@ -186,7 +183,6 @@ function FizzyText(message, font) {
   this.message = message;
 
   var loop = function() {
-
     requestAnimationFrame(loop);
 
     // Don't render if we don't see it.
@@ -194,8 +190,7 @@ function FizzyText(message, font) {
     if (document.body.scrollTop < height + 20) {
       render();
     }
-
-  }
+  };
 
   // This calls the render function every 30 milliseconds.
   loop();
@@ -203,7 +198,6 @@ function FizzyText(message, font) {
   // This class is responsible for drawing and moving those little
   // colored dots.
   function Particle(x, y, c) {
-
     // Position
     this.x = x;
     this.y = y;
@@ -217,7 +211,6 @@ function FizzyText(message, font) {
 
     // Called every frame
     this.render = function () {
-
       // What color is the pixel we're sitting on top of?
       var c = getColor(this.x, this.y);
 
@@ -261,16 +254,12 @@ function FizzyText(message, font) {
       g.beginPath();
       g.arc(this.x, this.y, this.r, 0, Math.PI * 2, false);
       g.fill();
-
     }
-
   }
-
 }
 
 
   return FizzyText;
-
 });
 
 

@@ -1406,12 +1406,14 @@ console.log(c2.__checkbox.getAttribute('checked'));
           return _numberProperty;
         }
       };
-      /*MyObject.prototype.setNumberProperty = function(value) {
+      /*
+	  MyObject.prototype.setNumberProperty = function(value) {
         this._numberProperty = value;
       };
       MyObject.prototype.getNumberProperty = function() {
         return this._numberProperty;
-      };*/
+      };
+	  */
       var object = new MyObject();
 
       dat.utils.common.setupDynamicProperty( object, "numberProperty" );
@@ -1421,10 +1423,13 @@ console.log(c2.__checkbox.getAttribute('checked'));
     test("Constraints", function() {
       var object = initObject2();
       // console.log("dat object", object);
-      var params = { min: 0, max: 10, step: 2 };
+      var params = { 
+	  	min: 0, 
+		max: 10, 
+		step: 2 
+	  };
 
-      var c1 = new NumberController(object,
-          'numberProperty', params);
+      var c1 = new NumberController(object, 'numberProperty', params);
 
       c1.setValue(12);
       equal(object.getNumberProperty(), params.max, "Maximum values");
@@ -1434,28 +1439,24 @@ console.log(c2.__checkbox.getAttribute('checked'));
 
       c1.setValue(1);
       equal(object.getNumberProperty(), 2, "Steps");
-
     });
 
     module("Dynamic properties  NumberControllerBox");
 
     test("Acknowledges original value", function() {
       var object = initObject2();
-      var c1 = new NumberControllerBox(object,
-          'numberProperty');
+      var c1 = new NumberControllerBox(object, 'numberProperty');
 
 //        var newVal = Date.now();
 //
 //        $(c1.__input).val(newVal).trigger('change');
 //
       equal($(c1.__input).val(), object.getNumberProperty().toString());
-
     });
 
     test("Modifies value", function() {
       var object = initObject2();
-      var c1 = new NumberControllerBox(object,
-          'numberProperty');
+      var c1 = new NumberControllerBox(object, 'numberProperty');
 
       var newVal = Date.now();
 
@@ -1464,14 +1465,12 @@ console.log(c2.__checkbox.getAttribute('checked'));
 
       equal(typeof object.getNumberProperty(), 'number');
       equal(object.getNumberProperty(), newVal);
-
     });
 
 
     test("Handles invalid input", function() {
       var object = initObject2();
-      var c1 = new NumberControllerBox(object,
-          'numberProperty');
+      var c1 = new NumberControllerBox(object, 'numberProperty');
 
       var newVal = '~! I98* omg this is not a N&^&*^umber.e-083.9';
       var prevVal = object.getNumberProperty();
@@ -1481,17 +1480,17 @@ console.log(c2.__checkbox.getAttribute('checked'));
 
       equal(typeof object.getNumberProperty(), 'number');
       equal(object.getNumberProperty(), prevVal);
-
     });
 
 
     test("Handles drag", function() {
 
       var object = initObject2();
-      var params = { step: Math.random() * 21 };
+      var params = { 
+	  	step: Math.random() * 21 
+	  };
 
-      var c1 = new NumberControllerBox(object,
-          'numberProperty', params);
+      var c1 = new NumberControllerBox(object, 'numberProperty', params);
 
       var prevVal = object.getNumberProperty();
       var disp = Math.round(Math.random() * 100);
@@ -1509,13 +1508,11 @@ console.log(c2.__checkbox.getAttribute('checked'));
       dom.fakeEvent(window, 'mouseup');
 
       equal(object.getNumberProperty(), prevVal + params.step * -disp);
-
     });
 
     module("Dynamic properties NumberControllerSlider");
 
     test("Acknowledges original value", function() {
-      
       var object = initObject2();
 
       var min = 0, max = 50;
@@ -1529,12 +1526,10 @@ console.log(c2.__checkbox.getAttribute('checked'));
 
       document.body.removeChild(c1.domElement);
 
-      equalish(fw/bw, (object.getNumberProperty() - min) / (max - min), 0.01, 'Slider width indicative of value.');
-
+      equalish(fw / bw, (object.getNumberProperty() - min) / (max - min), 0.01, 'Slider width indicative of value.');
     });
 
     test("Modifies values", function() {
-
       var object = initObject2();
 
       var min = 0, max = 50;
@@ -1547,16 +1542,16 @@ console.log(c2.__checkbox.getAttribute('checked'));
       var w = dom.getWidth(c1.domElement);
 
       dom.fakeEvent(c1.__background, 'mousedown', {
-        x: o.left + w/2,
+        x: o.left + w / 2,
         y: o.top
       });
 
       var bw = dom.getWidth(c1.__background);
       var fw = dom.getWidth(c1.__foreground);
 
-      equal(object.getNumberProperty(), (min+max)/2, 'Mouse down');
+      equal(object.getNumberProperty(), (min + max) / 2, 'Mouse down');
 
-      equalish(fw/bw, (object.getNumberProperty() - min) / (max - min), 0.01, 'Slider width still indicative of value.');
+      equalish(fw / bw, (object.getNumberProperty() - min) / (max - min), 0.01, 'Slider width still indicative of value.');
 
       dom.fakeEvent(window, 'mousemove', {
         x: o.left,
@@ -1565,32 +1560,25 @@ console.log(c2.__checkbox.getAttribute('checked'));
 
       fw = dom.getWidth(c1.__foreground);
 
-
       equal(object.getNumberProperty(), min, 'Mouse move');
 
-      equal(fw/bw, (object.getNumberProperty() - min) / (max - min), 'Slider width still indicative of value.');
-
+      equal(fw / bw, (object.getNumberProperty() - min) / (max - min), 'Slider width still indicative of value.');
 
       dom.fakeEvent(window, 'mouseup');
       
       dom.fakeEvent(window, 'mousemove', {
-        x: o.left+w,
+        x: o.left + w,
         y: o.top
       });
 
       equal(object.getNumberProperty(), min, 'Mouse releases drag');
 
       document.body.removeChild(c1.domElement);
-
-
     });
 
     function ensurePresetSelectDisplay(gui) {
-
       equal($(gui.__preset_select).children('option:selected')[0].value, gui.preset, "Dropdown display matches preset value");
-
     }
-
 });
   </script>
 </head>

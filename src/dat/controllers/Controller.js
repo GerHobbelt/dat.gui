@@ -101,7 +101,7 @@ define([
      * `isModified()` and other APIs.
      * @type {Any}
      */
-    this.initialValue = object[property];
+    this.initialValue = common.getPropertyValue( object, property );
 
     /**
      * Those who extend this class will put their DOM elements in here.
@@ -253,7 +253,7 @@ define([
          * @param {Object} newValue The new value of <code>object[property]</code>
          */
         __setValue: function(newValue) {
-          this.object[this.property] = newValue;
+          common.setPropertyValue( this.object, this.property, newValue );
           return this;
         },
 
@@ -299,7 +299,7 @@ define([
          * @returns {Object} The current value of <code>object[property]</code>
          */
         getValue: function() {
-          return this.object[this.property];
+          return common.getPropertyValue( this.object, this.property );
         },
 
         getOption: function(name) {

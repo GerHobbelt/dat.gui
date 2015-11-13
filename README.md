@@ -1,3 +1,16 @@
+## dynamic_properties branch
+
+This branch add the possibility for controllers to handle "dynamic properties".
+
+It means that the property supplied to the controller may not exist as such on the supplied object but in the form of a couple of standard getter/setter functions that match the property's name.
+
+Ie: the property `"position"` match the `getPosition()`/`setPosition()` functions.
+
+---
+Original dat.GUI readme below:
+
+---
+
 # dat.GUI
 
 A lightweight graphical user interface for changing variables in JavaScript.

@@ -30,16 +30,16 @@
   },
   "homepage": "https://github.com/dataarts/dat.gui",
   "devDependencies": {
-    "qunit": "^0.7.6",
-    "sass": "^0.5.0",
-    "less": "^2.5.1",
-    "requirejs": "^2.1.18",
-    "grunt": ">=0.4.5",
+    "qunit": "0.7.7",
+    "sass": "0.5.0",
+    "less": "2.5.3",
+    "requirejs": "2.1.20",
+    "grunt": "0.4.5",
     "grunt-contrib-jshint": "git://github.com/GerHobbelt/grunt-contrib-jshint.git#master",
-    "autoprefixer": ">=5.2.0",
-    "grunt-contrib-concat": ">=0.5.1",
-    "amdclean": ">=2.7.0",
+    "autoprefixer": "6.1.0",
+    "grunt-contrib-concat": "0.5.1",
+    "amdclean": "2.7.0",
     "grunt-contrib-requirejs": "git://github.com/GerHobbelt/grunt-contrib-requirejs.git#master",
-    "load-grunt-tasks": "^3.2.0"
+    "load-grunt-tasks": "3.3.0"
   }
 }

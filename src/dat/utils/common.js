@@ -28,11 +28,8 @@ define([
   var dynamicPropertiesByObject = {};
 
   // called by getPropertyValue() and setPropertyValue() below
-  var isPropertyDynamic = function( object, property ) {
-    if ( dynamicPropertiesByObject[ object ] !== undefined && dynamicPropertiesByObject[ object ][ property ] === Object( dynamicPropertiesByObject[ object ][ property ] ) ) {
-      return true;
-    }
-    return false;
+  var isPropertyDynamic = function(object, property) {
+    return dynamicPropertiesByObject[object] && dynamicPropertiesByObject[object][property];
   };
 
   return { 
@@ -148,44 +145,52 @@ define([
 
     isImagePath: function(obj) {
       return typeof obj === 'string' && obj.search(/\.(gif|jpg|jpeg|png)$/) > -1;
-    }
+    },
 
     // called from GUI.js add()
     // @return {boolean} Whether the property is indeed dynamic (true), or not (false).
-    setupDynamicProperty: function( object, property ) {
+    setupDynamicProperty: function(object, property) {
       var ucProperty = property.charAt(0).toUpperCase() + property.slice(1);
-      var getter = object[ "get"+ucProperty ];
-      var setter = object[ "set"+ucProperty ];
-      if ( typeof getter === "function" && typeof setter === "function" ) {
-        if ( dynamicPropertiesByObject[ object ] === undefined ) {
-          dynamicPropertiesByObject[ object ] = {};
+      var getter = object['get' + ucProperty];
+      var setter = object['set' + ucProperty];
+      if (typeof getter === 'function' && typeof setter === 'function') {
+        if (dynamicPropertiesByObject[object] === undefined) {
+          dynamicPropertiesByObject[object] = {};
         }
-        dynamicPropertiesByObject[ object ][ property ] = { getter: getter, setter: setter };
+        dynamicPropertiesByObject[object][property] = { 
+          getter: getter, 
+          setter: setter 
+        };
         return true;
+      }
+      if (dynamicPropertiesByObject[object][property]) {
+        delete dynamicPropertiesByObject[object][property];
+      }
+      if (Object.keys(dynamicPropertiesByObject[object]).length === 0) {
+        delete dynamicPropertiesByObject[object];
       }
       return false;
     },
 
     // called from Controller.prototype.getValue() and controllers/factory.js
-    getPropertyValue: function( object, property ) {
-      if ( isPropertyDynamic( object, property ) === true ) {
-        return dynamicPropertiesByObject[ object ][ property ].getter.call( object );
+    getPropertyValue: function(object, property) {
+      if (isPropertyDynamic(object, property) === true) {
+        return dynamicPropertiesByObject[object][property].getter.call(object);
       }
       else {
-        return object[ property ];
+        return object[property];
       }
     }, 
 
     // called from the Controller.prototype.setValue() and controllers/factory.js
-    setPropertyValue: function( object, property, value ) {
-      if ( isPropertyDynamic( object, property ) === true ) {
-        dynamicPropertiesByObject[ object ][ property ].setter.call( object, value );
+    setPropertyValue: function(object, property, value) {
+      if (isPropertyDynamic(object, property) === true) {
+        dynamicPropertiesByObject[object][property].setter.call(object, value);
       }
       else {
-        object[ property ] = value;
+        object[property] = value;
       }
     }
-  
   };
 });
 

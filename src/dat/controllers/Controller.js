@@ -97,11 +97,18 @@ define([
    */
   var Controller = function(object, property, type, options) {
     /**
+     * The dynamic property info chunk, if applicable. Carries the getter and setter for this object/property.
+     * @type {Object}
+     * @ignore
+     */
+    this.__dyninfo = common.setupDynamicProperty(object, property);
+
+    /**
      * The initial value of the given property; this is the reference for the
      * `isModified()` and other APIs.
      * @type {Any}
      */
-    this.initialValue = common.getPropertyValue( object, property );
+    this.initialValue = (!this.__dyninfo ? object[property] : this.__dyninfo.getter.call(object));
 
     /**
      * Those who extend this class will put their DOM elements in here.
@@ -253,7 +260,13 @@ define([
          * @param {Object} newValue The new value of <code>object[property]</code>
          */
         __setValue: function(newValue) {
-          common.setPropertyValue( this.object, this.property, newValue );
+          if (!this.__dyninfo) {
+            this.object[this.property] = newValue;
+          } else if (this.__dyninfo.setter) {
+            this.__dyninfo.setter.call(this.object, newValue);
+          } else {
+            throw new Error('Cannot modify the read-only ' + (this.__dyninfo ? 'dynamic ' : '') + 'property "' + this.property + '"');
+          }
           return this;
         },
 
@@ -265,12 +278,15 @@ define([
          * @param {Boolean} silent If true, don't call the onChange handler
          */
         setValue: function(newValue, silent) {
-          var changed = (this.object[this.property] !== newValue);
+          var readonly = this.getReadonly();
+          var oldValue = this.getValue();
+          var changed = (oldValue !== newValue);
           var msg = {
-            newValue: newValue, 
+            newValue: newValue,
+            oldValue: oldValue, 
             isChange: changed,
             silent: silent,
-            noGo: false,
+            noGo: readonly,
             eventSource: 'setValue'
           };
           if (!silent) {
@@ -280,11 +296,11 @@ define([
             msg.noGo = this.fireBeforeChange(msg);
           }
           if (!msg.noGo) {
-            this.__setValue(newValue);
+            this.__setValue(msg.newValue);
           }
           // Always fire the change event; inform the userland code whether the change was 'real'
           // or aborted:
-          if (!silent) {
+          if (!msg.silent) {
             this.fireChange(msg);
           }
           // Whenever you call `setValue`, the display will be updated automatically.
@@ -299,7 +315,7 @@ define([
          * @returns {Object} The current value of <code>object[property]</code>
          */
         getValue: function() {
-          return common.getPropertyValue( this.object, this.property );
+          return (!this.__dyninfo ? this.object[this.property] : this.__dyninfo.getter.call(this.object));
         },
 
         getOption: function(name) {
@@ -311,6 +327,10 @@ define([
         },
 
         getReadonly: function() {
+          // flag a read-only dynamic property irrespective of the actual option setting:
+          if (this.__dyninfo && !this.__dyninfo.setter) {
+            return true;
+          }
           return this.getOption('readonly');
         },
 

@@ -53,7 +53,9 @@ define([
           return new ControllerConstructor(object, property, options_1, options_2, options_3, options_4, options_5, options_6);
         }
 
-        var initialValue = common.getPropertyValue( object, property );
+        var dyninfo = common.setupDynamicProperty(object, property);
+
+        var initialValue = (!__dyninfo ? object[property] : __dyninfo.getter.call(object));
 
         // Providing options?
         if (common.isArray(options_1) || common.isObject(options_1)) {

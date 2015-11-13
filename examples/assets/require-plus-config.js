@@ -1,4 +1,4 @@
-/*! dat.GUI - v0.5.0 - 2015-11-13 */
+/*! dat.GUI - v0.5.0 - 2015-11-14 */
 
 /** vim: et:ts=4:sw=4:sts=4
  * @license RequireJS 2.1.14 Copyright (c) 2010-2014, The Dojo Foundation All Rights Reserved.

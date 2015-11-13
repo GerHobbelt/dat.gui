@@ -186,6 +186,28 @@
   
       isImagePath: function(obj) {
         return typeof obj === 'string' && obj.search(/\.(gif|jpg|jpeg|png)$/) > -1;
+      },
+  
+      setupDynamicProperty: function(object, property) {
+        // when the property is not available directly, we may have to get at it via getter/setter functions:
+        if (!(property in object)) {
+          var ucProperty = property.charAt(0).toUpperCase() + property.slice(1);
+          var getter = object['get' + ucProperty];
+          var setter = object['set' + ucProperty];
+          if (typeof getter === 'function' && typeof setter === 'function') {
+            return { 
+              getter: getter, 
+              setter: setter 
+            };
+          }
+          // or it's a read-only property?
+          if (typeof getter === 'function') {
+            return { 
+              getter: getter 
+            };
+          }
+        }
+        return false;
       }
     };
   })();
@@ -204,11 +226,18 @@
      */
     var Controller = function(object, property, type, options) {
       /**
+       * The dynamic property info chunk, if applicable. Carries the getter and setter for this object/property.
+       * @type {Object}
+       * @ignore
+       */
+      this.__dyninfo = common.setupDynamicProperty(object, property);
+  
+      /**
        * The initial value of the given property; this is the reference for the
        * `isModified()` and other APIs.
        * @type {Any}
        */
-      this.initialValue = object[property];
+      this.initialValue = (!this.__dyninfo ? object[property] : this.__dyninfo.getter.call(object));
   
       /**
        * Those who extend this class will put their DOM elements in here.
@@ -360,7 +389,13 @@
            * @param {Object} newValue The new value of <code>object[property]</code>
            */
           __setValue: function(newValue) {
-            this.object[this.property] = newValue;
+            if (!this.__dyninfo) {
+              this.object[this.property] = newValue;
+            } else if (this.__dyninfo.setter) {
+              this.__dyninfo.setter.call(this.object, newValue);
+            } else {
+              throw new Error('Cannot modify the read-only ' + (this.__dyninfo ? 'dynamic ' : '') + 'property "' + this.property + '"');
+            }
             return this;
           },
   
@@ -372,12 +407,15 @@
            * @param {Boolean} silent If true, don't call the onChange handler
            */
           setValue: function(newValue, silent) {
-            var changed = (this.object[this.property] !== newValue);
+            var readonly = this.getReadonly();
+            var oldValue = this.getValue();
+            var changed = (oldValue !== newValue);
             var msg = {
-              newValue: newValue, 
+              newValue: newValue,
+              oldValue: oldValue, 
               isChange: changed,
               silent: silent,
-              noGo: false,
+              noGo: readonly,
               eventSource: 'setValue'
             };
             if (!silent) {
@@ -387,11 +425,11 @@
               msg.noGo = this.fireBeforeChange(msg);
             }
             if (!msg.noGo) {
-              this.__setValue(newValue);
+              this.__setValue(msg.newValue);
             }
             // Always fire the change event; inform the userland code whether the change was 'real'
             // or aborted:
-            if (!silent) {
+            if (!msg.silent) {
               this.fireChange(msg);
             }
             // Whenever you call `setValue`, the display will be updated automatically.
@@ -406,7 +444,7 @@
            * @returns {Object} The current value of <code>object[property]</code>
            */
           getValue: function() {
-            return this.object[this.property];
+            return (!this.__dyninfo ? this.object[this.property] : this.__dyninfo.getter.call(this.object));
           },
   
           getOption: function(name) {
@@ -418,6 +456,10 @@
           },
   
           getReadonly: function() {
+            // flag a read-only dynamic property irrespective of the actual option setting:
+            if (this.__dyninfo && !this.__dyninfo.setter) {
+              return true;
+            }
             return this.getOption('readonly');
           },
   
@@ -3483,7 +3525,9 @@
             return new ControllerConstructor(object, property, options_1, options_2, options_3, options_4, options_5, options_6);
           }
   
-          var initialValue = object[property];
+          var dyninfo = common.setupDynamicProperty(object, property);
+  
+          var initialValue = (!__dyninfo ? object[property] : __dyninfo.getter.call(object));
   
           // Providing options?
           if (common.isArray(options_1) || common.isObject(options_1)) {
@@ -3664,7 +3708,7 @@
   
       var _this = this;
   
-      this.domElement = document.createElement('div');
+      //this.domElement = document.createElement('div');
   
       dom.makeSelectable(this.domElement, false);
   
@@ -3725,7 +3769,7 @@
       var value_field = document.createElement('div');
   
       common.extend(this.__selector.style, {
-        width: '122px',
+        width: '140px',
         height: '102px',
         padding: '3px',
         backgroundColor: '#222',
@@ -3791,7 +3835,7 @@
         }).join(', ')
       });
     
-      common.extend(this.__alpha_field.style , {
+      common.extend(this.__alpha_field.style, {
         width: '15px',
         height: '100px',
         marginLeft: '3px',
@@ -3802,12 +3846,27 @@
   
       alphaGradient(this.__alpha_field, _this.__color);
   
+      common.extend(this.__alpha_knob.style, {
+        position: 'absolute',
+        width: '15px',
+        height: '2px',
+        borderRight: '4px solid #fff',
+        zIndex: 1
+      });
+  
       dom.bind(this.__saturation_field, 'mousedown', fieldDown);
       dom.bind(this.__field_knob, 'mousedown', fieldDown);
       dom.bind(this.__saturation_field, 'touchstart', fieldDownOnTouch);
       dom.bind(this.__field_knob, 'touchstart', fieldDownOnTouch);
       dom.bind(this.__alpha_field, 'mousedown', function (e) {
         setA(e);
+        dom.bind(window, 'mousemove', setA);
+        dom.bind(window, 'mouseup', unbindA);
+        dom.bind(window, 'touchmove', setAonTouch);
+        dom.bind(window, 'touchend', unbindA);
+      });
+      dom.bind(this.__alpha_field, 'touchstart', function (e) {
+        setAonTouch(e);
         dom.bind(window, 'mousemove', setA);
         dom.bind(window, 'mouseup', unbindA);
         dom.bind(window, 'touchmove', setAonTouch);
@@ -3958,7 +4017,8 @@
   
         var s = dom.getHeight(_this.__alpha_field);
         var o = dom.getOffset(_this.__alpha_field);
-        var a = 1 - (e.clientY - o.top + document.body.scrollTop) / s;
+        var scroll = getScroll(_this.__alpha_field);
+        var a = 1 - (e.clientY - o.top + scroll.top) / s;
   
         if (a > 1) {
           a = 1;
@@ -3991,10 +4051,17 @@
       }
   
       function getScroll(el) {
-        var scroll = { top: el.scrollTop, left: el.scrollLeft };
+        var scroll = { 
+          top: el.scrollTop || 0, 
+          left: el.scrollLeft || 0 
+        };
         while((el = el.parentNode)) {
           scroll.top += (el.scrollTop || 0);
           scroll.left += (el.scrollLeft || 0);
+          var cs = getComputedStyle(el, null);
+          if (cs.position === 'fixed') {
+            break;
+          }
         }
         return scroll;
       }

@@ -301,7 +301,7 @@ function tab(str, tabs) {
 }
 
 function write(str) {
-  fs.writeFile(params.out, str);
+  fs.writeFileSync(params.out, str);
   console.log('Saved to ' + params.out);
 }
 

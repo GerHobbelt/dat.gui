@@ -154,6 +154,28 @@
   
       isImagePath: function(obj) {
         return typeof obj === 'string' && obj.search(/\.(gif|jpg|jpeg|png)$/) > -1;
+      },
+  
+      setupDynamicProperty: function(object, property) {
+        // when the property is not available directly, we may have to get at it via getter/setter functions:
+        if (!(property in object)) {
+          var ucProperty = property.charAt(0).toUpperCase() + property.slice(1);
+          var getter = object['get' + ucProperty];
+          var setter = object['set' + ucProperty];
+          if (typeof getter === 'function' && typeof setter === 'function') {
+            return { 
+              getter: getter, 
+              setter: setter 
+            };
+          }
+          // or it's a read-only property?
+          if (typeof getter === 'function') {
+            return { 
+              getter: getter 
+            };
+          }
+        }
+        return false;
       }
     };
   })();

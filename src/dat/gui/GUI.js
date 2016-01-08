@@ -825,7 +825,7 @@ define([
 
     var name = document.createElement('span');
     dom.addClass(name, 'property-name');
-    name.innerHTML = controller.property;
+    name.innerHTML = controller.label;
 
     var container = document.createElement('div');
     container.appendChild(name);

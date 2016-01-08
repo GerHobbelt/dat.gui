@@ -44,7 +44,13 @@ define([
      * @type {String}
      */
     this.property = property;
-
+    
+    /**
+     * The label displayed for this property
+     * @type {String}
+     */
+    this.label = property;
+    
     /**
      * The function to be called on change.
      * @type {Function}
@@ -117,7 +123,18 @@ define([
         getValue: function() {
           return this.object[this.property];
         },
-
+        
+         /**
+         * Change the label
+         *
+         * @param {string} newLabel
+         */
+        setLabel: function(newLabel) {
+          this.label = newLabel;
+          this.updateDisplay();
+          return this;
+        },
+        
         /**
          * Refreshes the visual display of a Controller in order to keep sync
          * with the object's current value.

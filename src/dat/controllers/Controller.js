@@ -46,12 +46,6 @@ define([
     this.property = property;
     
     /**
-     * The label displayed for this property
-     * @type {String}
-     */
-    this.label = property;
-    
-    /**
      * The function to be called on change.
      * @type {Function}
      * @ignore
@@ -125,13 +119,17 @@ define([
         },
         
          /**
-         * Change the label
+         * Set the drop handler
          *
-         * @param {string} newLabel
+         * @param {function} handler
          */
-        setLabel: function(newLabel) {
-          this.label = newLabel;
-          this.updateDisplay();
+        setDropHandler: function(handler) {
+			  this.domElement.ondragover = function(event){event.preventDefault()};
+			  this.domElement.ondrop = function(event){
+				  event.preventDefault();
+				  handler.call(this, event.dataTransfer.getData("text"));
+				  };
+
           return this;
         },
         

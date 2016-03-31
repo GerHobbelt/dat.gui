@@ -73,7 +73,7 @@ define([
     var value_field = document.createElement('div');
 
     common.extend(this.__selector.style, {
-      width: '122px',
+      width: '124px',
       height: '102px',
       padding: '3px',
       backgroundColor: '#222',

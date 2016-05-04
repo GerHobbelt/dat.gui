@@ -56,7 +56,7 @@
       height: 20px;
       /* TODO, these are style notes */
       cursor: pointer;
-      text-align: center;
+      text-align: right;
       background-color: #000; }
       .dg.main .close-button:hover {
         background-color: #111; }

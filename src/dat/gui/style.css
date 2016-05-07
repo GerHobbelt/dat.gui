@@ -79,8 +79,8 @@
     transition: height 0.1s ease-out; }
   .dg li:not(.folder) {
     cursor: auto;
-    height: 27px;
-    line-height: 27px;
+    height: 40px;
+    line-height: 40px;
     overflow: hidden;
     padding: 0 4px 0 5px; }
   .dg li.folder {
@@ -117,6 +117,8 @@
     float: right; }
   .dg .has-slider input[type=text] {
     width: 30%;
+    height: 15px;
+    margin-top: 10px;
     /*display: none;*/
     margin-left: 0; }
   .dg .slider {
@@ -124,8 +126,8 @@
     width: 66%;
     margin-left: -5px;
     margin-right: 0;
-    height: 19px;
-    margin-top: 4px; }
+    height: 20px;
+    margin-top: 10px; }
   .dg .slider-fg {
     height: 100%; }
   .dg .c input[type=checkbox] {
@@ -242,7 +244,7 @@
     border-bottom: 0; }
   .dg li.title {
     padding-left: 16px;
-    background: black url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlI+hKgFxoCgAOw==) 6px 10px no-repeat;
+    background: black url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlI+hKgFxoCgAOw==) 6px 16px no-repeat;
     cursor: pointer;
     border-bottom: 1px solid rgba(255, 255, 255, 0.2); }
   .dg .closed li.title {

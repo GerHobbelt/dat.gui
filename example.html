@@ -1,13 +1,49 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+	<meta charset="utf-8">
+	<title>My Test Example</title>
+	<script src="https://code.jquery.com/jquery-1.12.3.min.js"></script>
+	<script src="build/dat.gui.js"></script>
 </head>
 <body>
-  <script type="text/javascript" src="build/dat.gui.min.js"></script>
-  <script type="text/javascript">
-    var obj = { x: 5 };
-    var gui = new dat.GUI();
-	gui.add(obj, 'x');	
-  </script>
+	
+<script type="text/javascript" src="dat.gui.js"></script>
+<script type="text/javascript">
+    
+var myFizzyText;
+
+var FizzyText = function() {
+  this.message = 'dat.gui';
+  this.speed = 0.8;
+  this.displayOutline = false;
+  this.explode = function() {  console.log(myFizzyText); };
+  // Define render logic ...
+  this.testbool = false;
+  this.testbool2 = false;
+  this.description = '';
+};
+
+window.onload = function() {
+  var text =  myFizzyText = new FizzyText();
+  var gui = new dat.GUI();
+  gui.add(text, 'message');
+  gui.addTextArea(text, 'description').onChange( function(value) {
+	value = value.replace(/\r?\n/g, '<br />');
+	$("#output").html(value);
+  });
+  gui.add(text, 'speed', -5, 5);
+  gui.add(text, 'displayOutline');
+  gui.add(text, 'explode');
+  gui.add(text, 'testbool');
+  gui.add(text, 'testbool2');
+};
+
+    
+</script>
+
+<div id="output">
+	
+</div>
 </body>
 </html>

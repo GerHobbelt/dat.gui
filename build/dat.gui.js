@@ -2056,7 +2056,7 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
 
   dom.bind(window, 'keydown', function(e) {
 
-    if (document.activeElement.type !== 'text' &&
+    if ( (document.activeElement.type !== 'text' && document.activeElement.nodeName.toString().toLowerCase() !== "textarea") &&
         (e.which === HIDE_KEY_CODE || e.keyCode == HIDE_KEY_CODE)) {
       GUI.toggleHide();
     }

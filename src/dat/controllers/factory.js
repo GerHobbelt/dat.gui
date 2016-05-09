@@ -16,11 +16,12 @@ define([
   'dat/controllers/NumberControllerBox',
   'dat/controllers/NumberControllerSlider',
   'dat/controllers/StringController',
+  'dat/controllers/TextAreaController',
   'dat/controllers/FunctionController',
   'dat/controllers/BooleanController',
   'dat/utils/common'
 ],
-    function(OptionController, NumberControllerBox, NumberControllerSlider, StringController, FunctionController, BooleanController, common) {
+    function(OptionController, NumberControllerBox, NumberControllerSlider, StringController, TextAreaController, FunctionController, BooleanController, common) {
 
       return function(object, property) {
 

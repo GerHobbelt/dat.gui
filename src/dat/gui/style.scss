@@ -80,6 +80,7 @@ $input-color: lighten($background-color, 8.5%);
     &:not(.folder) {
       background: $background-color;
       border-bottom: 1px solid $border-color;
+	  
     }
 
     &.save-row {
@@ -144,11 +145,17 @@ $input-color: lighten($background-color, 8.5%);
       input[type=text] {
         color: $number-color;
       }
+	  textarea {
+        color: $number-color;
+      }
     }
 
     &.string {
       border-left: 3px solid $string-color;
       input[type=text] {
+        color: $string-color;
+      }
+	  textarea {
         color: $string-color;
       }
     }
@@ -163,10 +170,22 @@ $input-color: lighten($background-color, 8.5%);
 
   /** Controllers */
   .c {
-
-
-
+	  
     input[type=text] {
+
+      background: $input-color;
+      outline: none;
+      &:hover {
+        background: lighten($input-color, $hover-lighten);
+      }
+      &:focus {
+        background: lighten($input-color, $active-lighten);
+        color: #fff;
+      }
+
+    }
+	
+	 textarea {
 
       background: $input-color;
       outline: none;

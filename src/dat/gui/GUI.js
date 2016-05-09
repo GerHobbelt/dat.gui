@@ -26,6 +26,7 @@ define([
   'dat/controllers/NumberControllerSlider',
   'dat/controllers/OptionController',
   'dat/controllers/ColorController',
+  'dat/controllers/TextAreaController',
 
   'dat/utils/requestAnimationFrame',
 
@@ -34,7 +35,7 @@ define([
 
   'dat/utils/common'
 
-], function(css, saveDialogueContents, styleSheet, controllerFactory, Controller, BooleanController, FunctionController, NumberControllerBox, NumberControllerSlider, OptionController, ColorController, requestAnimationFrame, CenteredDiv, dom, common) {
+], function(css, saveDialogueContents, styleSheet, controllerFactory, Controller, BooleanController, FunctionController, NumberControllerBox, NumberControllerSlider, OptionController, ColorController, TextAreaController, requestAnimationFrame, CenteredDiv, dom, common) {
 
   css.inject(styleSheet);
 
@@ -535,6 +536,24 @@ define([
           );
 
         },
+		 /**
+         * @param object
+         * @param property
+         * @returns {dat.controllers.TextAreaController} The new controller that was added.
+         * @instance
+         */
+        addTextArea: function(object, property) {
+
+          return add(
+              this,
+              object,
+              property,
+              {
+                multiline: true
+              }
+          );
+
+        },
 
         /**
          * @param controller
@@ -804,11 +823,16 @@ define([
 
     var controller;
 
+	
     if (params.color) {
 
       controller = new ColorController(object, property);
 
-    } else {
+    }
+	else if (params.multiline) {
+		 controller = new TextAreaController(object, property);
+	}
+	else {
 
       var factoryArgs = [object,property].concat(params.factoryArgs);
       controller = controllerFactory.apply(gui, factoryArgs);
@@ -827,9 +851,12 @@ define([
     dom.addClass(name, 'property-name');
     name.innerHTML = controller.property;
 
+	var clear = document.createElement('div');
+	clear.style.clear = "both";
     var container = document.createElement('div');
     container.appendChild(name);
     container.appendChild(controller.domElement);
+	container.appendChild(clear);
 
     var li = addRow(gui, container, params.before);
 

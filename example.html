@@ -17,7 +17,7 @@ var FizzyText = function() {
   this.message = 'dat.gui';
   this.speed = 0.8;
   this.displayOutline = false;
-  this.explode = function() {  console.log(myFizzyText); };
+  this["Trace object!"] = function() {  console.log(myFizzyText); };
   // Define render logic ...
   this.testbool = false;
   this.testbool2 = false;
@@ -39,7 +39,7 @@ window.onload = function() {
   gui.add(text, 'speed', -5, 8);
   gui.add(text, 'enumerated', 0, 8,1, {  "None":0, "Low":1, "Medium":2, "High":3, "Very High":6, "Extreme":8  } );
   gui.add(text, 'displayOutline');
-  gui.add(text, 'explode');
+  gui.add(text, 'Trace object!');
   g = gui.add(text, 'testbool');
 
   $( g.domElement).addClass( "testClass");
@@ -55,8 +55,17 @@ window.onload = function() {
     
 </script>
 
+Description:
 <div id="output">
 	
+</div>
+<div id="info" style="width:65%">
+	<h1>Changelog:</h1>
+	<ul>
+		<li>Multiline TextArea support <i>(description)</i></li>
+		<li>Enumerated value >= threshold labeling for slider <i>(enumerated)</i></li>
+		<li>Removed implicit mouseDown/mouseDrag handlers on NumberControllerBox to prevent conflict with text highlighting</li>
+	</ul>
 </div>
 </body>
 </html>

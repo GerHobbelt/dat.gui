@@ -21,12 +21,15 @@ var FizzyText = function() {
   // Define render logic ...
   this.testbool = false;
   this.testbool2 = false;
+  this.testbool3 = false;
+  this.testbool4 = false;
   this.description = '';
 };
 
 window.onload = function() {
   var text =  myFizzyText = new FizzyText();
   var gui = new dat.GUI();
+  var g;
   gui.add(text, 'message');
   gui.addTextArea(text, 'description').onChange( function(value) {
 	value = value.replace(/\r?\n/g, '<br />');
@@ -35,8 +38,16 @@ window.onload = function() {
   gui.add(text, 'speed', -5, 5);
   gui.add(text, 'displayOutline');
   gui.add(text, 'explode');
-  gui.add(text, 'testbool');
+  g = gui.add(text, 'testbool');
+
+  $( g.domElement).addClass( "testClass");
   gui.add(text, 'testbool2');
+  
+  g = gui.addFolder("folder");
+  $( g.domElement).addClass( "testClass");
+  g.open();
+  g.add(text, 'testbool3');
+  g.add(text, 'testbool4');
 };
 
     

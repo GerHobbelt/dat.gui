@@ -82,7 +82,6 @@
   .dg li:not(.folder) {
     cursor: auto;
     height: auto;
-    min-height: 27px;
     line-height: 27px;
     overflow: visible;
     padding: 0 4px 0 5px; }
@@ -101,7 +100,6 @@
   .dg .cr {
     clear: both;
     padding-left: 3px;
-    min-height: 27px;
     height: auto; }
   .dg .property-name {
     cursor: default;

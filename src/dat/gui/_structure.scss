@@ -116,7 +116,7 @@ $button-height: 20px;
   li:not(.folder) {
     cursor: auto;
 	height:auto;
-    min-height: $row-height;
+    //min-height: $row-height;
     line-height: $row-height;
 	
     overflow: visible;
@@ -148,7 +148,7 @@ $button-height: 20px;
   .cr {
     clear: both;
     padding-left: 3px;
-	min-height:$row-height;
+	//min-height:$row-height;
     height: auto;
   }
 

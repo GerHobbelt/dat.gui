@@ -54,7 +54,7 @@ define([
 
     dom.bind(this.__input, 'change', onChange);
     dom.bind(this.__input, 'blur', onBlur);
-    dom.bind(this.__input, 'mousedown', onMouseDown);
+   // dom.bind(this.__input, 'mousedown', onMouseDown);
     dom.bind(this.__input, 'keydown', function(e) {
 
       // When pressing entire, you can be as precise as you want.
@@ -72,7 +72,7 @@ define([
     }
 
     function onBlur() {
-      onChange();
+	  onChange();
       if (_this.__onFinishChange) {
         _this.__onFinishChange.call(_this, _this.getValue());
       }

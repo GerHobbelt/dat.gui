@@ -35,25 +35,47 @@ function(NumberController, dom, css, common, styleSheet) {
    * @param {Number} minValue Minimum allowed value
    * @param {Number} maxValue Maximum allowed value
    * @param {Number} stepValue Increment by which to change value
+   * @param {Object} enumeration Dynamic object of key value pairs for enumerable values/ranges
    *
    * @member dat.controllers
    */
-  var NumberControllerSlider = function(object, property, min, max, step) {
-
+  var NumberControllerSlider = function(object, property, min, max, step, enumeration) {
     NumberControllerSlider.superclass.call(this, object, property, { min: min, max: max, step: step });
 
     var _this = this;
 
     this.__background = document.createElement('div');
+	this.__label = document.createElement('div');
     this.__foreground = document.createElement('div');
-    
-
-
+   
+	function getEnumArr(hash) {
+		var arr = [];
+		var k;
+		for (k in hash) {
+			arr.push({key:k, value:hash[k]});
+		}
+		arr = arr.sort(function (a, b) {
+			var result = true ? (a["value"] < b["value"]) : (a["value"] > b["value"]);
+			return result ? 1 : -1;
+		});
+		
+		return  arr.length > 0 ? arr : null;
+	}
+	
+	
+	if (enumeration) {
+		this.enumeration = getEnumArr(enumeration);
+	}
+	
+	this.__label.style.visibility = enumeration ? "visible" : "hidden";
+	
     dom.bind(this.__background, 'mousedown', onMouseDown);
     
     dom.addClass(this.__background, 'slider');
+	dom.addClass(this.__label, 'label');
     dom.addClass(this.__foreground, 'slider-fg');
-
+	
+	
     function onMouseDown(e) {
 
       dom.bind(window, 'mousemove', onMouseDrag);
@@ -87,7 +109,9 @@ function(NumberController, dom, css, common, styleSheet) {
 
     this.updateDisplay();
 
+	
     this.__background.appendChild(this.__foreground);
+	this.__background.appendChild(this.__label);
     this.domElement.appendChild(this.__background);
 
   };
@@ -109,8 +133,33 @@ function(NumberController, dom, css, common, styleSheet) {
       {
 
         updateDisplay: function() {
-          var pct = (this.getValue() - this.__min)/(this.__max - this.__min);
+		  var value = this.getValue();
+          var pct = (value - this.__min)/(this.__max - this.__min);
           this.__foreground.style.width = pct*100+'%';
+		 
+		  this.__label.innerHTML = value;
+		
+		  if (this.enumeration) {
+			  console.log(this.enumeration);
+			  var chosenValue = null;
+			  var chosenIndex = null;
+			  var i = this.enumeration.length;
+			  while(--i > -1) {
+				  chosenValue = this.enumeration[i].value;
+				  if ( value < chosenValue) {
+					break;
+				  }
+				  chosenIndex = i;
+			  }
+			  
+			  if (chosenIndex == null) {
+				  chosenValue = "";
+			  }
+			  else chosenValue = this.enumeration[chosenIndex].key;
+			  
+			  this.__label.innerHTML = chosenValue;
+		  }
+	
           return NumberControllerSlider.superclass.prototype.updateDisplay.call(this);
         }
 

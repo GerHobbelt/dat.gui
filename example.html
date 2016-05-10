@@ -23,6 +23,7 @@ var FizzyText = function() {
   this.testbool2 = false;
   this.testbool3 = false;
   this.testbool4 = false;
+  this.enumerated = 2;
   this.description = '';
 };
 
@@ -35,7 +36,8 @@ window.onload = function() {
 	value = value.replace(/\r?\n/g, '<br />');
 	$("#output").html(value);
   });
-  gui.add(text, 'speed', -5, 5);
+  gui.add(text, 'speed', -5, 8);
+  gui.add(text, 'enumerated', 0, 8,1, {  "None":0, "Low":1, "Medium":2, "High":3, "Very High":6, "Extreme":8  } );
   gui.add(text, 'displayOutline');
   gui.add(text, 'explode');
   g = gui.add(text, 'testbool');

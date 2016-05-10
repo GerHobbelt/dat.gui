@@ -506,7 +506,7 @@ define([
          * @instance
          */
         add: function(object, property) {
-
+			
           return add(
               this,
               object,
@@ -971,7 +971,7 @@ define([
     else if (controller instanceof NumberControllerBox) {
 
       var r = function(returned) {
-
+	
         // Have we defined both boundaries?
         if (common.isNumber(controller.__min) && common.isNumber(controller.__max)) {
 

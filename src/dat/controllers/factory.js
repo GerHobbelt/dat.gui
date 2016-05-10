@@ -37,9 +37,8 @@ define([
         if (common.isNumber(initialValue)) {
 
           if (common.isNumber(arguments[2]) && common.isNumber(arguments[3])) {
-
             // Has min and max.
-            return new NumberControllerSlider(object, property, arguments[2], arguments[3]);
+            return new NumberControllerSlider(object, property, arguments[2], arguments[3], arguments[4], arguments[5]);
 
           } else {
 

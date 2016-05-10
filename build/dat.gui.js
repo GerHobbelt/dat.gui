@@ -843,7 +843,7 @@ dat.controllers.NumberControllerBox = (function (NumberController, dom, common) 
 
     dom.bind(this.__input, 'change', onChange);
     dom.bind(this.__input, 'blur', onBlur);
-    dom.bind(this.__input, 'mousedown', onMouseDown);
+   // dom.bind(this.__input, 'mousedown', onMouseDown);
     dom.bind(this.__input, 'keydown', function(e) {
 
       // When pressing entire, you can be as precise as you want.
@@ -861,7 +861,7 @@ dat.controllers.NumberControllerBox = (function (NumberController, dom, common) 
     }
 
     function onBlur() {
-      onChange();
+	  onChange();
       if (_this.__onFinishChange) {
         _this.__onFinishChange.call(_this, _this.getValue());
       }
@@ -941,25 +941,47 @@ dat.controllers.NumberControllerSlider = (function (NumberController, dom, css, 
    * @param {Number} minValue Minimum allowed value
    * @param {Number} maxValue Maximum allowed value
    * @param {Number} stepValue Increment by which to change value
+   * @param {Object} enumeration Dynamic object of key value pairs for enumerable values/ranges
    *
    * @member dat.controllers
    */
-  var NumberControllerSlider = function(object, property, min, max, step) {
-
+  var NumberControllerSlider = function(object, property, min, max, step, enumeration) {
     NumberControllerSlider.superclass.call(this, object, property, { min: min, max: max, step: step });
 
     var _this = this;
 
     this.__background = document.createElement('div');
+	this.__label = document.createElement('div');
     this.__foreground = document.createElement('div');
-    
-
-
+   
+	function getEnumArr(hash) {
+		var arr = [];
+		var k;
+		for (k in hash) {
+			arr.push({key:k, value:hash[k]});
+		}
+		arr = arr.sort(function (a, b) {
+			var result = true ? (a["value"] < b["value"]) : (a["value"] > b["value"]);
+			return result ? 1 : -1;
+		});
+		
+		return  arr.length > 0 ? arr : null;
+	}
+	
+	
+	if (enumeration) {
+		this.enumeration = getEnumArr(enumeration);
+	}
+	
+	this.__label.style.visibility = enumeration ? "visible" : "hidden";
+	
     dom.bind(this.__background, 'mousedown', onMouseDown);
     
     dom.addClass(this.__background, 'slider');
+	dom.addClass(this.__label, 'label');
     dom.addClass(this.__foreground, 'slider-fg');
-
+	
+	
     function onMouseDown(e) {
 
       dom.bind(window, 'mousemove', onMouseDrag);
@@ -993,7 +1015,9 @@ dat.controllers.NumberControllerSlider = (function (NumberController, dom, css, 
 
     this.updateDisplay();
 
+	
     this.__background.appendChild(this.__foreground);
+	this.__background.appendChild(this.__label);
     this.domElement.appendChild(this.__background);
 
   };
@@ -1015,8 +1039,33 @@ dat.controllers.NumberControllerSlider = (function (NumberController, dom, css, 
       {
 
         updateDisplay: function() {
-          var pct = (this.getValue() - this.__min)/(this.__max - this.__min);
+		  var value = this.getValue();
+          var pct = (value - this.__min)/(this.__max - this.__min);
           this.__foreground.style.width = pct*100+'%';
+		 
+		  this.__label.innerHTML = value;
+		
+		  if (this.enumeration) {
+			  console.log(this.enumeration);
+			  var chosenValue = null;
+			  var chosenIndex = null;
+			  var i = this.enumeration.length;
+			  while(--i > -1) {
+				  chosenValue = this.enumeration[i].value;
+				  if ( value < chosenValue) {
+					break;
+				  }
+				  chosenIndex = i;
+			  }
+			  
+			  if (chosenIndex == null) {
+				  chosenValue = "";
+			  }
+			  else chosenValue = this.enumeration[chosenIndex].key;
+			  
+			  this.__label.innerHTML = chosenValue;
+		  }
+	
           return NumberControllerSlider.superclass.prototype.updateDisplay.call(this);
         }
 
@@ -2077,7 +2126,7 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
          * @instance
          */
         add: function(object, property) {
-
+			
           return add(
               this,
               object,
@@ -2542,7 +2591,7 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
     else if (controller instanceof NumberControllerBox) {
 
       var r = function(returned) {
-
+	
         // Have we defined both boundaries?
         if (common.isNumber(controller.__min) && common.isNumber(controller.__max)) {
 
@@ -2957,7 +3006,7 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
 
 })(dat.utils.css,
 "<div id=\"dg-save\" class=\"dg dialogue\">\r\n\r\n  Here's the new load parameter for your <code>GUI</code>'s constructor:\r\n\r\n  <textarea id=\"dg-new-constructor\"></textarea>\r\n\r\n  <div id=\"dg-save-locally\">\r\n\r\n    <input id=\"dg-local-storage\" type=\"checkbox\"/> Automatically save\r\n    values to <code>localStorage</code> on exit.\r\n\r\n    <div id=\"dg-local-explain\">The values saved to <code>localStorage</code> will\r\n      override those passed to <code>dat.GUI</code>'s constructor. This makes it\r\n      easier to work incrementally, but <code>localStorage</code> is fragile,\r\n      and your friends may not see the same values you do.\r\n      \r\n    </div>\r\n    \r\n  </div>\r\n\r\n</div>",
-".dg {\r\n  /** Clear list styles */\r\n  /* Auto-place container */\r\n  /* Auto-placed GUI's */\r\n  /* Line items that don't contain folders. */\r\n  /** Folder names */\r\n  /** Hides closed items */\r\n  /** Controller row */\r\n  /** Name-half (left) */\r\n  /** Controller-half (right) */\r\n  /** Controller placement */\r\n  /** Shorter number boxes when slider is present. */\r\n  /** Ensure the entire boolean and function row shows a hand */ }\r\n  .dg ul {\r\n    list-style: none;\r\n    margin: 0;\r\n    padding: 0;\r\n    width: 100%;\r\n    clear: both; }\r\n  .dg.ac {\r\n    position: fixed;\r\n    top: 0;\r\n    left: 0;\r\n    right: 0;\r\n    height: 0;\r\n    z-index: 0; }\r\n  .dg:not(.ac) .main {\r\n    /** Exclude mains in ac so that we don't hide close button */\r\n    overflow: hidden; }\r\n  .dg.main {\r\n    -webkit-transition: opacity 0.1s linear;\r\n    -o-transition: opacity 0.1s linear;\r\n    -moz-transition: opacity 0.1s linear;\r\n    transition: opacity 0.1s linear; }\r\n    .dg.main.taller-than-window {\r\n      overflow-y: auto; }\r\n      .dg.main.taller-than-window .close-button {\r\n        opacity: 1;\r\n        /* TODO, these are style notes */\r\n        margin-top: -1px;\r\n        border-top: 1px solid #2c2c2c; }\r\n    .dg.main ul.closed .close-button {\r\n      opacity: 1 !important; }\r\n    .dg.main:hover .close-button,\r\n    .dg.main .close-button.drag {\r\n      opacity: 1; }\r\n    .dg.main .close-button {\r\n      /*opacity: 0;*/\r\n      -webkit-transition: opacity 0.1s linear;\r\n      -o-transition: opacity 0.1s linear;\r\n      -moz-transition: opacity 0.1s linear;\r\n      transition: opacity 0.1s linear;\r\n      border: 0;\r\n      position: absolute;\r\n      line-height: 19px;\r\n      height: 20px;\r\n      /* TODO, these are style notes */\r\n      cursor: pointer;\r\n      text-align: center;\r\n      background-color: #000; }\r\n      .dg.main .close-button:hover {\r\n        background-color: #111; }\r\n  .dg.a {\r\n    float: right;\r\n    margin-right: 15px;\r\n    overflow-x: hidden; }\r\n    .dg.a.has-save > ul {\r\n      margin-top: 27px; }\r\n      .dg.a.has-save > ul.closed {\r\n        margin-top: 0; }\r\n    .dg.a .save-row {\r\n      position: fixed;\r\n      top: 0;\r\n      z-index: 1002; }\r\n  .dg li {\r\n    -webkit-transition: height 0.1s ease-out;\r\n    -o-transition: height 0.1s ease-out;\r\n    -moz-transition: height 0.1s ease-out;\r\n    transition: height 0.1s ease-out; }\r\n  .dg li.cr > div {\r\n    position: relative; }\r\n  .dg li:not(.folder) {\r\n    cursor: auto;\r\n    height: auto;\r\n    line-height: 27px;\r\n    overflow: visible;\r\n    padding: 0 4px 0 5px; }\r\n  .dg li.folder {\r\n    padding: 0;\r\n    border-left: 4px solid transparent; }\r\n  .dg li.title {\r\n    cursor: pointer;\r\n    margin-left: -4px; }\r\n  .dg .closed li:not(.title),\r\n  .dg .closed ul li,\r\n  .dg .closed ul li > * {\r\n    height: 0;\r\n    overflow: hidden;\r\n    border: 0; }\r\n  .dg .cr {\r\n    clear: both;\r\n    padding-left: 3px;\r\n    height: auto; }\r\n  .dg .property-name {\r\n    cursor: default;\r\n    float: left;\r\n    clear: left;\r\n    width: 40%;\r\n    overflow: hidden;\r\n    text-overflow: ellipsis; }\r\n  .dg .c {\r\n    float: left;\r\n    width: 60%; }\r\n  .dg .c input[type=text] {\r\n    border: 0;\r\n    margin-top: 4px;\r\n    padding: 3px;\r\n    width: 100%;\r\n    float: right; }\r\n  .dg .c textarea {\r\n    border: 0;\r\n    margin-top: 4px;\r\n    padding: 3px;\r\n    float: right;\r\n    max-width: 100%;\r\n    width: 100% !important; }\r\n  .dg .has-slider input[type=text] {\r\n    width: 30%;\r\n    /*display: none;*/\r\n    margin-left: 0; }\r\n  .dg .slider {\r\n    float: left;\r\n    width: 66%;\r\n    margin-left: -5px;\r\n    margin-right: 0;\r\n    height: 19px;\r\n    margin-top: 4px; }\r\n  .dg .slider-fg {\r\n    height: 100%; }\r\n  .dg .c input[type=checkbox] {\r\n    margin-top: 9px; }\r\n  .dg .c select {\r\n    margin-top: 5px; }\r\n  .dg .cr.function,\r\n  .dg .cr.function .property-name,\r\n  .dg .cr.function *,\r\n  .dg .cr.boolean,\r\n  .dg .cr.boolean * {\r\n    cursor: pointer; }\r\n  .dg .selector {\r\n    display: none;\r\n    position: absolute;\r\n    margin-left: -9px;\r\n    margin-top: 23px;\r\n    z-index: 10; }\r\n  .dg .c:hover .selector,\r\n  .dg .selector.drag {\r\n    display: block; }\r\n  .dg li.save-row {\r\n    padding: 0; }\r\n    .dg li.save-row .button {\r\n      display: inline-block;\r\n      padding: 0px 6px; }\r\n  .dg.dialogue {\r\n    background-color: #222;\r\n    width: 460px;\r\n    padding: 15px;\r\n    font-size: 13px;\r\n    line-height: 15px; }\r\n\r\n/* TODO Separate style and structure */\r\n#dg-new-constructor {\r\n  padding: 10px;\r\n  color: #222;\r\n  font-family: Monaco, monospace;\r\n  font-size: 10px;\r\n  border: 0;\r\n  resize: none;\r\n  box-shadow: inset 1px 1px 1px #888;\r\n  word-wrap: break-word;\r\n  margin: 12px 0;\r\n  display: block;\r\n  width: 440px;\r\n  overflow-y: scroll;\r\n  height: 100px;\r\n  position: relative; }\r\n\r\n#dg-local-explain {\r\n  display: none;\r\n  font-size: 11px;\r\n  line-height: 17px;\r\n  border-radius: 3px;\r\n  background-color: #333;\r\n  padding: 8px;\r\n  margin-top: 10px; }\r\n  #dg-local-explain code {\r\n    font-size: 10px; }\r\n\r\n#dat-gui-save-locally {\r\n  display: none; }\r\n\r\n/** Main type */\r\n.dg {\r\n  color: #eee;\r\n  font: 11px 'Lucida Grande', sans-serif;\r\n  text-shadow: 0 -1px 0 #111;\r\n  /** Auto place */\r\n  /* Controller row, <li> */\r\n  /** Controllers */ }\r\n  .dg.main {\r\n    /** Scrollbar */ }\r\n    .dg.main::-webkit-scrollbar {\r\n      width: 5px;\r\n      background: #1a1a1a; }\r\n    .dg.main::-webkit-scrollbar-corner {\r\n      height: 0;\r\n      display: none; }\r\n    .dg.main::-webkit-scrollbar-thumb {\r\n      border-radius: 5px;\r\n      background: #676767; }\r\n  .dg li:not(.folder) {\r\n    background: #1a1a1a;\r\n    border-bottom: 1px solid #2c2c2c; }\r\n  .dg li.save-row {\r\n    line-height: 25px;\r\n    background: #dad5cb;\r\n    border: 0; }\r\n    .dg li.save-row select {\r\n      margin-left: 5px;\r\n      width: 108px; }\r\n    .dg li.save-row .button {\r\n      margin-left: 5px;\r\n      margin-top: 1px;\r\n      border-radius: 2px;\r\n      font-size: 9px;\r\n      line-height: 7px;\r\n      padding: 4px 4px 5px 4px;\r\n      background: #c5bdad;\r\n      color: #fff;\r\n      text-shadow: 0 1px 0 #b0a58f;\r\n      box-shadow: 0 -1px 0 #b0a58f;\r\n      cursor: pointer; }\r\n      .dg li.save-row .button.gears {\r\n        background: #c5bdad url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAANCAYAAAB/9ZQ7AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAQJJREFUeNpiYKAU/P//PwGIC/ApCABiBSAW+I8AClAcgKxQ4T9hoMAEUrxx2QSGN6+egDX+/vWT4e7N82AMYoPAx/evwWoYoSYbACX2s7KxCxzcsezDh3evFoDEBYTEEqycggWAzA9AuUSQQgeYPa9fPv6/YWm/Acx5IPb7ty/fw+QZblw67vDs8R0YHyQhgObx+yAJkBqmG5dPPDh1aPOGR/eugW0G4vlIoTIfyFcA+QekhhHJhPdQxbiAIguMBTQZrPD7108M6roWYDFQiIAAv6Aow/1bFwXgis+f2LUAynwoIaNcz8XNx3Dl7MEJUDGQpx9gtQ8YCueB+D26OECAAQDadt7e46D42QAAAABJRU5ErkJggg==) 2px 1px no-repeat;\r\n        height: 7px;\r\n        width: 8px; }\r\n      .dg li.save-row .button:hover {\r\n        background-color: #bab19e;\r\n        box-shadow: 0 -1px 0 #b0a58f; }\r\n  .dg li.folder {\r\n    border-bottom: 0; }\r\n  .dg li.title {\r\n    padding-left: 16px;\r\n    background: black url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlI+hKgFxoCgAOw==) 6px 10px no-repeat;\r\n    cursor: pointer;\r\n    border-bottom: 1px solid rgba(255, 255, 255, 0.2); }\r\n  .dg .closed li.title {\r\n    background-image: url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlGIWqMCbWAEAOw==); }\r\n  .dg .cr.boolean {\r\n    border-left: 3px solid #806787; }\r\n  .dg .cr.function {\r\n    border-left: 3px solid #e61d5f; }\r\n  .dg .cr.number {\r\n    border-left: 3px solid #2fa1d6; }\r\n    .dg .cr.number input[type=text] {\r\n      color: #2fa1d6; }\r\n    .dg .cr.number textarea {\r\n      color: #2fa1d6; }\r\n  .dg .cr.string {\r\n    border-left: 3px solid #1ed36f; }\r\n    .dg .cr.string input[type=text] {\r\n      color: #1ed36f; }\r\n    .dg .cr.string textarea {\r\n      color: #1ed36f; }\r\n  .dg .cr.function:hover, .dg .cr.boolean:hover {\r\n    background: #111; }\r\n  .dg .c input[type=text] {\r\n    background: #303030;\r\n    outline: none; }\r\n    .dg .c input[type=text]:hover {\r\n      background: #3c3c3c; }\r\n    .dg .c input[type=text]:focus {\r\n      background: #494949;\r\n      color: #fff; }\r\n  .dg .c textarea {\r\n    background: #303030;\r\n    outline: none; }\r\n    .dg .c textarea:hover {\r\n      background: #3c3c3c; }\r\n    .dg .c textarea:focus {\r\n      background: #494949;\r\n      color: #fff; }\r\n  .dg .c .slider {\r\n    background: #303030;\r\n    cursor: ew-resize; }\r\n  .dg .c .slider-fg {\r\n    background: #2fa1d6; }\r\n  .dg .c .slider:hover {\r\n    background: #3c3c3c; }\r\n    .dg .c .slider:hover .slider-fg {\r\n      background: #44abda; }\r\n",
+".dg {\r\n  /** Clear list styles */\r\n  /* Auto-place container */\r\n  /* Auto-placed GUI's */\r\n  /* Line items that don't contain folders. */\r\n  /** Folder names */\r\n  /** Hides closed items */\r\n  /** Controller row */\r\n  /** Name-half (left) */\r\n  /** Controller-half (right) */\r\n  /** Controller placement */\r\n  /** Shorter number boxes when slider is present. */\r\n  /** Ensure the entire boolean and function row shows a hand */ }\r\n  .dg ul {\r\n    list-style: none;\r\n    margin: 0;\r\n    padding: 0;\r\n    width: 100%;\r\n    clear: both; }\r\n  .dg.ac {\r\n    position: fixed;\r\n    top: 0;\r\n    left: 0;\r\n    right: 0;\r\n    height: 0;\r\n    z-index: 0; }\r\n  .dg:not(.ac) .main {\r\n    /** Exclude mains in ac so that we don't hide close button */\r\n    overflow: hidden; }\r\n  .dg.main {\r\n    -webkit-transition: opacity 0.1s linear;\r\n    -o-transition: opacity 0.1s linear;\r\n    -moz-transition: opacity 0.1s linear;\r\n    transition: opacity 0.1s linear; }\r\n    .dg.main.taller-than-window {\r\n      overflow-y: auto; }\r\n      .dg.main.taller-than-window .close-button {\r\n        opacity: 1;\r\n        /* TODO, these are style notes */\r\n        margin-top: -1px;\r\n        border-top: 1px solid #2c2c2c; }\r\n    .dg.main ul.closed .close-button {\r\n      opacity: 1 !important; }\r\n    .dg.main:hover .close-button,\r\n    .dg.main .close-button.drag {\r\n      opacity: 1; }\r\n    .dg.main .close-button {\r\n      /*opacity: 0;*/\r\n      -webkit-transition: opacity 0.1s linear;\r\n      -o-transition: opacity 0.1s linear;\r\n      -moz-transition: opacity 0.1s linear;\r\n      transition: opacity 0.1s linear;\r\n      border: 0;\r\n      position: absolute;\r\n      line-height: 19px;\r\n      height: 20px;\r\n      /* TODO, these are style notes */\r\n      cursor: pointer;\r\n      text-align: center;\r\n      background-color: #000; }\r\n      .dg.main .close-button:hover {\r\n        background-color: #111; }\r\n  .dg.a {\r\n    float: right;\r\n    margin-right: 15px;\r\n    overflow-x: hidden; }\r\n    .dg.a.has-save > ul {\r\n      margin-top: 27px; }\r\n      .dg.a.has-save > ul.closed {\r\n        margin-top: 0; }\r\n    .dg.a .save-row {\r\n      position: fixed;\r\n      top: 0;\r\n      z-index: 1002; }\r\n  .dg li {\r\n    -webkit-transition: height 0.1s ease-out;\r\n    -o-transition: height 0.1s ease-out;\r\n    -moz-transition: height 0.1s ease-out;\r\n    transition: height 0.1s ease-out; }\r\n  .dg li.cr > div {\r\n    position: relative; }\r\n  .dg li:not(.folder) {\r\n    cursor: auto;\r\n    height: auto;\r\n    line-height: 27px;\r\n    overflow: visible;\r\n    padding: 0 4px 0 5px; }\r\n  .dg li.folder {\r\n    padding: 0;\r\n    border-left: 4px solid transparent; }\r\n  .dg li.title {\r\n    cursor: pointer;\r\n    margin-left: -4px; }\r\n  .dg .closed li:not(.title),\r\n  .dg .closed ul li,\r\n  .dg .closed ul li > * {\r\n    height: 0;\r\n    overflow: hidden;\r\n    border: 0; }\r\n  .dg .cr {\r\n    clear: both;\r\n    padding-left: 3px;\r\n    height: auto; }\r\n  .dg .property-name {\r\n    cursor: default;\r\n    float: left;\r\n    clear: left;\r\n    width: 40%;\r\n    overflow: hidden;\r\n    text-overflow: ellipsis; }\r\n  .dg .c {\r\n    float: left;\r\n    width: 60%; }\r\n  .dg .c input[type=text] {\r\n    border: 0;\r\n    margin-top: 4px;\r\n    padding: 3px;\r\n    width: 100%;\r\n    float: right; }\r\n  .dg .c textarea {\r\n    border: 0;\r\n    margin-top: 4px;\r\n    padding: 3px;\r\n    float: right;\r\n    max-width: 100%;\r\n    width: 100% !important; }\r\n  .dg .has-slider input[type=text] {\r\n    width: 30%;\r\n    /*display: none;*/\r\n    margin-left: 0; }\r\n  .dg .slider {\r\n    float: left;\r\n    width: 66%;\r\n    margin-left: -5px;\r\n    margin-right: 0;\r\n    height: 19px;\r\n    margin-top: 4px;\r\n    position: relative;\r\n    overflow: hidden; }\r\n  .dg .slider-fg {\r\n    height: 100%; }\r\n  .dg .slider .label {\r\n    pointer-events: none;\r\n    text-align: center;\r\n    position: absolute;\r\n    width: 100%;\r\n    height: 100%;\r\n    vertical-align: middle;\r\n    margin: 0px;\r\n    padding: 0px;\r\n    top: 0px;\r\n    line-height: 22px;\r\n    white-space: nowrap; }\r\n  .dg .c input[type=checkbox] {\r\n    margin-top: 9px; }\r\n  .dg .c select {\r\n    margin-top: 5px; }\r\n  .dg .cr.function,\r\n  .dg .cr.function .property-name,\r\n  .dg .cr.function *,\r\n  .dg .cr.boolean,\r\n  .dg .cr.boolean * {\r\n    cursor: pointer; }\r\n  .dg .selector {\r\n    display: none;\r\n    position: absolute;\r\n    margin-left: -9px;\r\n    margin-top: 23px;\r\n    z-index: 10; }\r\n  .dg .c:hover .selector,\r\n  .dg .selector.drag {\r\n    display: block; }\r\n  .dg li.save-row {\r\n    padding: 0; }\r\n    .dg li.save-row .button {\r\n      display: inline-block;\r\n      padding: 0px 6px; }\r\n  .dg.dialogue {\r\n    background-color: #222;\r\n    width: 460px;\r\n    padding: 15px;\r\n    font-size: 13px;\r\n    line-height: 15px; }\r\n\r\n/* TODO Separate style and structure */\r\n#dg-new-constructor {\r\n  padding: 10px;\r\n  color: #222;\r\n  font-family: Monaco, monospace;\r\n  font-size: 10px;\r\n  border: 0;\r\n  resize: none;\r\n  box-shadow: inset 1px 1px 1px #888;\r\n  word-wrap: break-word;\r\n  margin: 12px 0;\r\n  display: block;\r\n  width: 440px;\r\n  overflow-y: scroll;\r\n  height: 100px;\r\n  position: relative; }\r\n\r\n#dg-local-explain {\r\n  display: none;\r\n  font-size: 11px;\r\n  line-height: 17px;\r\n  border-radius: 3px;\r\n  background-color: #333;\r\n  padding: 8px;\r\n  margin-top: 10px; }\r\n  #dg-local-explain code {\r\n    font-size: 10px; }\r\n\r\n#dat-gui-save-locally {\r\n  display: none; }\r\n\r\n/** Main type */\r\n.dg {\r\n  color: #eee;\r\n  font: 11px 'Lucida Grande', sans-serif;\r\n  text-shadow: 0 -1px 0 #111;\r\n  /** Auto place */\r\n  /* Controller row, <li> */\r\n  /** Controllers */ }\r\n  .dg.main {\r\n    /** Scrollbar */ }\r\n    .dg.main::-webkit-scrollbar {\r\n      width: 5px;\r\n      background: #1a1a1a; }\r\n    .dg.main::-webkit-scrollbar-corner {\r\n      height: 0;\r\n      display: none; }\r\n    .dg.main::-webkit-scrollbar-thumb {\r\n      border-radius: 5px;\r\n      background: #676767; }\r\n  .dg li:not(.folder) {\r\n    background: #1a1a1a;\r\n    border-bottom: 1px solid #2c2c2c; }\r\n  .dg li.save-row {\r\n    line-height: 25px;\r\n    background: #dad5cb;\r\n    border: 0; }\r\n    .dg li.save-row select {\r\n      margin-left: 5px;\r\n      width: 108px; }\r\n    .dg li.save-row .button {\r\n      margin-left: 5px;\r\n      margin-top: 1px;\r\n      border-radius: 2px;\r\n      font-size: 9px;\r\n      line-height: 7px;\r\n      padding: 4px 4px 5px 4px;\r\n      background: #c5bdad;\r\n      color: #fff;\r\n      text-shadow: 0 1px 0 #b0a58f;\r\n      box-shadow: 0 -1px 0 #b0a58f;\r\n      cursor: pointer; }\r\n      .dg li.save-row .button.gears {\r\n        background: #c5bdad url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAANCAYAAAB/9ZQ7AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAQJJREFUeNpiYKAU/P//PwGIC/ApCABiBSAW+I8AClAcgKxQ4T9hoMAEUrxx2QSGN6+egDX+/vWT4e7N82AMYoPAx/evwWoYoSYbACX2s7KxCxzcsezDh3evFoDEBYTEEqycggWAzA9AuUSQQgeYPa9fPv6/YWm/Acx5IPb7ty/fw+QZblw67vDs8R0YHyQhgObx+yAJkBqmG5dPPDh1aPOGR/eugW0G4vlIoTIfyFcA+QekhhHJhPdQxbiAIguMBTQZrPD7108M6roWYDFQiIAAv6Aow/1bFwXgis+f2LUAynwoIaNcz8XNx3Dl7MEJUDGQpx9gtQ8YCueB+D26OECAAQDadt7e46D42QAAAABJRU5ErkJggg==) 2px 1px no-repeat;\r\n        height: 7px;\r\n        width: 8px; }\r\n      .dg li.save-row .button:hover {\r\n        background-color: #bab19e;\r\n        box-shadow: 0 -1px 0 #b0a58f; }\r\n  .dg li.folder {\r\n    border-bottom: 0; }\r\n  .dg li.title {\r\n    padding-left: 16px;\r\n    background: black url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlI+hKgFxoCgAOw==) 6px 10px no-repeat;\r\n    cursor: pointer;\r\n    border-bottom: 1px solid rgba(255, 255, 255, 0.2); }\r\n  .dg .closed li.title {\r\n    background-image: url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlGIWqMCbWAEAOw==); }\r\n  .dg .cr.boolean {\r\n    border-left: 3px solid #806787; }\r\n  .dg .cr.function {\r\n    border-left: 3px solid #e61d5f; }\r\n  .dg .cr.number {\r\n    border-left: 3px solid #2fa1d6; }\r\n    .dg .cr.number input[type=text] {\r\n      color: #2fa1d6; }\r\n    .dg .cr.number textarea {\r\n      color: #2fa1d6; }\r\n  .dg .cr.string {\r\n    border-left: 3px solid #1ed36f; }\r\n    .dg .cr.string input[type=text] {\r\n      color: #1ed36f; }\r\n    .dg .cr.string textarea {\r\n      color: #1ed36f; }\r\n  .dg .cr.function:hover, .dg .cr.boolean:hover {\r\n    background: #111; }\r\n  .dg .c input[type=text] {\r\n    background: #303030;\r\n    outline: none; }\r\n    .dg .c input[type=text]:hover {\r\n      background: #3c3c3c; }\r\n    .dg .c input[type=text]:focus {\r\n      background: #494949;\r\n      color: #fff; }\r\n  .dg .c textarea {\r\n    background: #303030;\r\n    outline: none; }\r\n    .dg .c textarea:hover {\r\n      background: #3c3c3c; }\r\n    .dg .c textarea:focus {\r\n      background: #494949;\r\n      color: #fff; }\r\n  .dg .c .slider {\r\n    background: #303030;\r\n    cursor: ew-resize; }\r\n  .dg .c .slider-fg {\r\n    background: #2fa1d6; }\r\n  .dg .c .slider:hover {\r\n    background: #3c3c3c; }\r\n    .dg .c .slider:hover .slider-fg {\r\n      background: #44abda; }\r\n",
 dat.controllers.factory = (function (OptionController, NumberControllerBox, NumberControllerSlider, StringController, TextAreaController, FunctionController, BooleanController, common) {
 
       return function(object, property) {
@@ -2974,9 +3023,8 @@ dat.controllers.factory = (function (OptionController, NumberControllerBox, Numb
         if (common.isNumber(initialValue)) {
 
           if (common.isNumber(arguments[2]) && common.isNumber(arguments[3])) {
-
             // Has min and max.
-            return new NumberControllerSlider(object, property, arguments[2], arguments[3]);
+            return new NumberControllerSlider(object, property, arguments[2], arguments[3], arguments[4], arguments[5]);
 
           } else {
 

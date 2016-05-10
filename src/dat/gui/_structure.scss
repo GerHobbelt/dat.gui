@@ -202,10 +202,17 @@ $button-height: 20px;
     margin-right: 0;
     height: 19px;
     margin-top: 4px;
+	position:relative;
+	overflow:hidden;
   }
 
   .slider-fg {
     height: 100%;
+  }
+  
+  .slider .label {
+	  pointer-events: none; text-align: center; position: absolute; width: 100%; height: 100%; vertical-align: middle; margin: 0px; padding: 0px; top: 0px; line-height: 22px;
+	  white-space:nowrap;
   }
 
   .c input[type=checkbox] {

@@ -31,7 +31,8 @@
     -webkit-transition: opacity 0.1s linear;
     -o-transition: opacity 0.1s linear;
     -moz-transition: opacity 0.1s linear;
-    transition: opacity 0.1s linear; }
+    transition: opacity 0.1s linear;
+    overflow: visible; }
     .dg.main.taller-than-window {
       overflow-y: auto; }
       .dg.main.taller-than-window .close-button {
@@ -62,8 +63,7 @@
         background-color: #111; }
   .dg.a {
     float: right;
-    margin-right: 15px;
-    overflow-x: hidden; }
+    margin-right: 15px; }
     .dg.a.has-save > ul {
       margin-top: 27px; }
       .dg.a.has-save > ul.closed {

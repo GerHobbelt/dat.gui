@@ -31,6 +31,7 @@ $button-height: 20px;
   &.main {
 
     @include transition(opacity, 0.1s, linear);
+	overflow:visible;
 
     &.taller-than-window {
 
@@ -84,7 +85,7 @@ $button-height: 20px;
 
     float: right;
     margin-right: 15px;
-    overflow-x: hidden;
+   // overflow-x: hidden;
 
     &.has-save > ul {
       margin-top: $row-height;

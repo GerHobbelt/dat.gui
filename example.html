@@ -18,6 +18,10 @@ var FizzyText = function() {
   this.speed = 0.8;
   this.displayOutline = false;
   this["Trace object!"] = function() {  console.log(myFizzyText); };
+  this["Trace folder find!"] = function() {   console.log("folder find test", gui.getFolderByName("folder") ); };
+  this["Trace cont find!"] = function() {   console.log("controller find test", gui.getControllerByName("testbool4", true) ); };
+  
+  
   // Define render logic ...
   this.testbool = false;
   this.testbool2 = false;
@@ -27,9 +31,11 @@ var FizzyText = function() {
   this.description = '';
 };
 
+var gui;
+
 window.onload = function() {
   var text =  myFizzyText = new FizzyText();
-  var gui = new dat.GUI();
+  gui = new dat.GUI();
   var g;
   gui.add(text, 'message');
   gui.addTextArea(text, 'description').onChange( function(value) {
@@ -50,6 +56,11 @@ window.onload = function() {
   g.open();
   g.add(text, 'testbool3');
   g.add(text, 'testbool4');
+  
+  gui.add(text, 'Trace folder find!');
+  gui.add(text, 'Trace cont find!');
+
+
 };
 
     
@@ -62,9 +73,11 @@ Description:
 <div id="info" style="width:65%">
 	<h1>Changelog:</h1>
 	<ul>
+		<li>Misc improvements for CSS and controllers</li>
 		<li>Multiline TextArea support <i>(description)</i></li>
 		<li>Enumerated value >= threshold labeling for slider <i>(enumerated)</i></li>
 		<li>Removed implicit mouseDown/mouseDrag handlers on NumberControllerBox to prevent conflict with text highlighting</li>
+		<li>Added GUI.addFolderByName(name) and GUI.getControllerByName(name,?recurse) utility methods</li>
 	</ul>
 </div>
 </body>

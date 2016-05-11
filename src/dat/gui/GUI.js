@@ -137,6 +137,8 @@ define([
     this.__listening = [];
 
     params = params || {};
+	
+	
 
     // Default parameters
     params = common.defaults(params, {
@@ -460,6 +462,30 @@ define([
 	    }
 
   };
+  
+  GUI.prototype.getControllerByName = function(name, recurse) {
+		  
+		var controllers = this.__controllers;
+		var i = controllers.length;
+		while(--i > -1) {
+			if (controllers[i].property === name) {
+				return controllers[i];
+			}
+		}
+		var folders = this.__folders;
+		var tryFI;
+		if (recurse) {
+			for (i in folders) {
+				tryFI = folders[i].getControllerByName(name, true);
+				if (tryFI != null) return tryFI;
+			}
+		}
+		return null;
+  }
+  
+	  GUI.prototype.getFolderByName = function(name) {
+			return this.__folders[name];
+	  }
 
   GUI.toggleHide = function() {
 
@@ -469,6 +495,8 @@ define([
       gui.domElement.style.opacity = hide ? 0 : 1;
     });
   };
+  
+
 
   GUI.CLASS_AUTO_PLACE = 'a';
   GUI.CLASS_AUTO_PLACE_CONTAINER = 'ac';
@@ -1381,6 +1409,8 @@ define([
     });
 
   }
+  
+  
 
   return GUI;
 

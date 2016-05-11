@@ -69,12 +69,17 @@ define([
     function onChange() {
       var attempted = parseFloat(_this.__input.value);
       if (!common.isNaN(attempted)) _this.setValue(attempted);
+	 
     }
 
     function onBlur() {
-	  onChange();
+	  var attempted = parseFloat(_this.__input.value);
+      if (!common.isNaN(attempted)) _this.setValue(attempted);
+	  else _this.updateDisplay();
+	  
       if (_this.__onFinishChange) {
         _this.__onFinishChange.call(_this, _this.getValue());
+		
       }
     }
 

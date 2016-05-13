@@ -142,7 +142,7 @@ $input-color: lighten($background-color, 8.5%);
 
     &.number {
       border-left: 3px solid $number-color;
-      input[type=text] {
+      input[type=text], input[type=number] {
         color: $number-color;
       }
 	  textarea {
@@ -152,7 +152,7 @@ $input-color: lighten($background-color, 8.5%);
 
     &.string {
       border-left: 3px solid $string-color;
-      input[type=text] {
+      input[type=text], input[type=number] {
         color: $string-color;
       }
 	  textarea {
@@ -171,7 +171,7 @@ $input-color: lighten($background-color, 8.5%);
   /** Controllers */
   .c {
 	  
-    input[type=text] {
+    input[type=text], input[type=number] {
 
       background: $input-color;
       outline: none;

@@ -170,7 +170,7 @@ $button-height: 20px;
   }
 
   /** Controller placement */
-  .c input[type=text] {
+  .c input[type=text], .c input[type=number] {
     border: 0;
     margin-top: 4px;
     padding: 3px;
@@ -190,11 +190,12 @@ $button-height: 20px;
   }
 
   /** Shorter number boxes when slider is present. */
-  .has-slider input[type=text] {
+  .has-slider input[type=text], .has-slider input[type=number] {
     width: 30%;
     /*display: none;*/
     margin-left: 0;
   }
+  
 
   .slider {
     float: left;

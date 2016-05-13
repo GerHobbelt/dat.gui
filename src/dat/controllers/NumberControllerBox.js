@@ -36,11 +36,12 @@ define([
   var NumberControllerBox = function(object, property, params) {
 
     this.__truncationSuspended = false;
-
+	this.__mouseIsDown = false;
+	
     NumberControllerBox.superclass.call(this, object, property, params);
 
     var _this = this;
-
+	
     /**
      * {Number} Previous mouse y position
      * @ignore
@@ -48,12 +49,19 @@ define([
     var prev_y;
 
     this.__input = document.createElement('input');
-    this.__input.setAttribute('type', 'text');
+   
+	if (this.__step != undefined) {
+		this.__input.setAttribute('step', this.__step);
+		this.__input.setAttribute('type', 'number');
+	}
+	else  this.__input.setAttribute('type', 'text');
 
     // Makes it so manually specified values are not truncated.
 
+	dom.bind(this.__input, 'input', onInput);
     dom.bind(this.__input, 'change', onChange);
     dom.bind(this.__input, 'blur', onBlur);
+	dom.bind(this.__input, "mousedown", onMouseDownDetect);
    // dom.bind(this.__input, 'mousedown', onMouseDown);
     dom.bind(this.__input, 'keydown', function(e) {
 
@@ -63,13 +71,34 @@ define([
         this.blur();
         _this.__truncationSuspended = false;
       }
+	  else if (  (e.keyCode === 38 || e.keyCode === 40) && _this.__step) {
+		onChange();
+	  }
 
     });
+	
+	function onMouseDownDetect() {
+		_this.__mouseIsDown = true;
+		dom.bind(window, 'mouseup', onMouseUpDetect);
+	}
+	
+	function onMouseUpDetect() {
+		_this.__mouseIsDown = false;
+		dom.unbind(window, 'mouseup', onMouseUpDetect);
+	}
 
     function onChange() {
       var attempted = parseFloat(_this.__input.value);
       if (!common.isNaN(attempted)) _this.setValue(attempted);
 	 
+    }
+	
+	function onInput() {
+	  if (!_this.__mouseIsDown) {
+		return;
+	  }
+      var attempted = parseFloat(_this.__input.value);
+      if (!common.isNaN(attempted)) _this.setValue(attempted);
     }
 
     function onBlur() {
@@ -122,6 +151,11 @@ define([
 
           this.__input.value = this.__truncationSuspended ? this.getValue() : roundToDecimal(this.getValue(), this.__precision);
           return NumberControllerBox.superclass.prototype.updateDisplay.call(this);
+        },
+		 step: function(v) {
+			if (this.__input.getAttribute("type") != "number") this.__input.setAttribute("type", "number");
+			this.__input.setAttribute("step", v);
+          return NumberControllerBox.superclass.prototype.step.apply(this, arguments);
         }
 
       }

@@ -111,7 +111,7 @@
   .dg .c {
     float: left;
     width: 60%; }
-  .dg .c input[type=text] {
+  .dg .c input[type=text], .dg .c input[type=number] {
     border: 0;
     margin-top: 4px;
     padding: 3px;
@@ -124,7 +124,7 @@
     float: right;
     max-width: 100%;
     width: 100% !important; }
-  .dg .has-slider input[type=text] {
+  .dg .has-slider input[type=text], .dg .has-slider input[type=number] {
     width: 30%;
     /*display: none;*/
     margin-left: 0; }
@@ -265,7 +265,7 @@
     border-bottom: 0; }
   .dg li.title {
     padding-left: 16px;
-    background: black url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlI+hKgFxoCgAOw==) 6px 10px no-repeat;
+    background: #000 url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlI+hKgFxoCgAOw==) 6px 10px no-repeat;
     cursor: pointer;
     border-bottom: 1px solid rgba(255, 255, 255, 0.2); }
   .dg .closed li.title {
@@ -275,25 +275,25 @@
   .dg .cr.function {
     border-left: 3px solid #e61d5f; }
   .dg .cr.number {
-    border-left: 3px solid #2fa1d6; }
-    .dg .cr.number input[type=text] {
-      color: #2fa1d6; }
+    border-left: 3px solid #2FA1D6; }
+    .dg .cr.number input[type=text], .dg .cr.number input[type=number] {
+      color: #2FA1D6; }
     .dg .cr.number textarea {
-      color: #2fa1d6; }
+      color: #2FA1D6; }
   .dg .cr.string {
     border-left: 3px solid #1ed36f; }
-    .dg .cr.string input[type=text] {
+    .dg .cr.string input[type=text], .dg .cr.string input[type=number] {
       color: #1ed36f; }
     .dg .cr.string textarea {
       color: #1ed36f; }
   .dg .cr.function:hover, .dg .cr.boolean:hover {
     background: #111; }
-  .dg .c input[type=text] {
+  .dg .c input[type=text], .dg .c input[type=number] {
     background: #303030;
     outline: none; }
-    .dg .c input[type=text]:hover {
+    .dg .c input[type=text]:hover, .dg .c input[type=number]:hover {
       background: #3c3c3c; }
-    .dg .c input[type=text]:focus {
+    .dg .c input[type=text]:focus, .dg .c input[type=number]:focus {
       background: #494949;
       color: #fff; }
   .dg .c textarea {
@@ -308,8 +308,10 @@
     background: #303030;
     cursor: ew-resize; }
   .dg .c .slider-fg {
-    background: #2fa1d6; }
+    background: #2FA1D6; }
   .dg .c .slider:hover {
     background: #3c3c3c; }
     .dg .c .slider:hover .slider-fg {
       background: #44abda; }
+
+/*# sourceMappingURL=style.css.map */

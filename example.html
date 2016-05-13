@@ -23,6 +23,9 @@ var FizzyText = function() {
   
   
   // Define render logic ...
+  this.number1 = 0;
+  this.number2 = 0;
+  this.number3 = 0.3;
   this.testbool = false;
   this.testbool2 = false;
   this.testbool3 = false;
@@ -34,29 +37,38 @@ var FizzyText = function() {
 var gui;
 
 window.onload = function() {
+
+  function displayOutput(value) {
+	$("#output").html(value);
+  }
+	  
   var text =  myFizzyText = new FizzyText();
   gui = new dat.GUI();
   var g;
-  gui.add(text, 'message');
+  gui.add(text, 'message').onChange( displayOutput);
   gui.addTextArea(text, 'description').onChange( function(value) {
 	value = value.replace(/\r?\n/g, '<br />');
 	$("#output").html(value);
   });
-  gui.add(text, 'speed', -5, 8);
-  gui.add(text, 'enumerated', 0, 8,1, {  "None":0, "Low":1, "Medium":2, "High":3, "Very High":6, "Extreme":8  } );
-  gui.add(text, 'displayOutline');
+  gui.add(text, 'speed', -5, 8).onChange( displayOutput);
+  gui.add(text, 'enumerated', 0, 8,1, {  "None":0, "Low":1, "Medium":2, "High":3, "Very High":6, "Extreme":8  } ).onChange( displayOutput);
+  gui.add(text, 'displayOutline').onChange( displayOutput);
   gui.add(text, 'Trace object!');
-  g = gui.add(text, 'testbool');
+  g = gui.add(text, 'testbool').onChange( displayOutput);
 
   $( g.domElement).addClass( "testClass");
-  gui.add(text, 'testbool2');
+  gui.add(text, 'testbool2').onChange( displayOutput);
+  
+   gui.add(text, 'number1').onChange( displayOutput);
+    gui.add(text, 'number2').step(.5).onChange( displayOutput);
+	  gui.add(text, 'number3').min(0).step(0.01).onChange( displayOutput);
   
   g = gui.addFolder("folder");
   $( g.domElement).addClass( "testClass");
   g.open();
-  g.add(text, 'testbool3');
+  g.add(text, 'testbool3').onChange( displayOutput);
   g = g.addFolder("folder2");
-  g.add(text, 'testbool4');
+  g.add(text, 'testbool4').onChange( displayOutput);
   
   gui.add(text, 'Trace folder find!');
   gui.add(text, 'Trace cont find!');
@@ -70,7 +82,7 @@ window.onload = function() {
     
 </script>
 
-Description:
+Output:
 <div id="output">
 	
 </div>
@@ -80,8 +92,9 @@ Description:
 		<li>Misc improvements for CSS and controllers</li>
 		<li>Multiline TextArea support <i>(description)</i></li>
 		<li>Enumerated value >= threshold labeling for slider <i>(enumerated)</i></li>
-		<li>Removed implicit mouseDown/mouseDrag handlers on NumberControllerBox to prevent conflict with text highlighting</li>
-		<li>Added GUI instance utility methods: getFolderByName(name), getControllerByName(name,?recurse), getAllGUIs(?recurse, ?myArray)</li>
+		<li>Removed implicit horizontal mouseDown+mouseDrag step handlers on NumberControllerBox to prevent conflict with text highlighting.</li>
+		<li>If you define explicit "step" value for your controller component, the input now uses the HTML5 input type="number", with a "step" attribute, which should provide native stepper UI functionality if available.</li>
+		<li>Added GUI instance utility methods: getFolderByName(name), getControllerByName(name,?recurse), getAllGUIs(?recurse, ?myArray), getAllControllers(?recurse, ?myArray)</li>
 	</ul>
 </div>
 </body>

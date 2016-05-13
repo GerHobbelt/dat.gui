@@ -1051,7 +1051,6 @@ dat.controllers.NumberControllerSlider = (function (NumberController, dom, css, 
 		  this.__label.innerHTML = value;
 		
 		  if (this.enumeration) {
-			  console.log(this.enumeration);
 			  var chosenValue = null;
 			  var chosenIndex = null;
 			  var i = this.enumeration.length;
@@ -2112,10 +2111,30 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
 			return this.__folders[name];
 	  }
 	  
+	  GUI.prototype.getAllControllers = function(recurse, myArray) {
+		if (recurse == undefined) recurse = true;
+		var i;
+		var arr = myArray!= null ? myArray : [];
+
+		var controllers = this.__controllers;
+		for (i in controllers) {
+			arr.push(controllers[i]);
+		}
+		
+		if (recurse) {
+			var folders = this.__folders;
+			for (i in folders) {
+				folders[i].getAllControllers(true, arr);
+			}
+		}
+		return arr;
+	  }
+	  
 	  /*
 	  *  Gets this current GUI (usually) and all sub-folder GUIs under this GUI as an array of {name/gui} pairs. The "this" current gui uses empty string.
 	  *  @param  recurse (optional) By default, it will recurse multiple levels deep. Set to false to only scan current level from current GUI.
-	  *  @param  myArray (optional) Supply an existing array to use.  If used, will not push this current GUI into array, only the subfolder GUIs.
+	  *  @param  myArray (optional) Supply an existing array to use instead.  If supplied, will not push current GUI into array, only the subfolder GUIs.
+	  *  @return   The array of {name/gui} value pairs
 	  */
 	  GUI.prototype.getAllGUIs = function(recurse, myArray) {
 		if (recurse == undefined) recurse = true;
@@ -2123,6 +2142,8 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
 		var arr = myArray!= null ? myArray : [{name:'', gui:this}];
 		var obj;
 		var folders = this.__folders;
+		
+
 		for (i in folders) {
 			obj = {};
 			obj.name = i;
@@ -3098,7 +3119,7 @@ dat.controllers.factory = (function (OptionController, NumberControllerBox, Numb
 
           } else {
 
-            return new NumberControllerBox(object, property, { min: arguments[2], max: arguments[3] });
+            return new NumberControllerBox(object, property, { min: arguments[2], max: arguments[3], step:arguments[4] });
 
           }
 

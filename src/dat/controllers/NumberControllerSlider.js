@@ -140,7 +140,6 @@ function(NumberController, dom, css, common, styleSheet) {
 		  this.__label.innerHTML = value;
 		
 		  if (this.enumeration) {
-			  console.log(this.enumeration);
 			  var chosenValue = null;
 			  var chosenIndex = null;
 			  var i = this.enumeration.length;

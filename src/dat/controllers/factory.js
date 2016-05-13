@@ -42,7 +42,7 @@ define([
 
           } else {
 
-            return new NumberControllerBox(object, property, { min: arguments[2], max: arguments[3] });
+            return new NumberControllerBox(object, property, { min: arguments[2], max: arguments[3], step:arguments[4] });
 
           }
 

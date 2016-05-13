@@ -487,6 +487,25 @@ define([
 			return this.__folders[name];
 	  }
 	  
+	  GUI.prototype.getAllControllers = function(recurse, myArray) {
+		if (recurse == undefined) recurse = true;
+		var i;
+		var arr = myArray!= null ? myArray : [];
+
+		var controllers = this.__controllers;
+		for (i in controllers) {
+			arr.push(controllers[i]);
+		}
+		
+		if (recurse) {
+			var folders = this.__folders;
+			for (i in folders) {
+				folders[i].getAllControllers(true, arr);
+			}
+		}
+		return arr;
+	  }
+	  
 	  /*
 	  *  Gets this current GUI (usually) and all sub-folder GUIs under this GUI as an array of {name/gui} pairs. The "this" current gui uses empty string.
 	  *  @param  recurse (optional) By default, it will recurse multiple levels deep. Set to false to only scan current level from current GUI.

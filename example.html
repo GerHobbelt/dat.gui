@@ -7,8 +7,7 @@
 	<script src="build/dat.gui.js"></script>
 </head>
 <body>
-	
-<script type="text/javascript" src="dat.gui.js"></script>
+
 <script type="text/javascript">
     
 var myFizzyText;
@@ -74,9 +73,17 @@ window.onload = function() {
   gui.add(text, 'Trace cont find!');
   
   var allComponents  = gui.getAllControllers();
-	//console.log("getAllGUIs::",  gui.getAllGUIs()  );
+  var allGUIs = gui.getAllGUIs();
+  var p;
 
+  for (p in allGUIs) {
+	g = allGUIs[p];  
+	g.onClosedChange(function(val) {
+		displayOutput(""+(this.name ) + " is closed? "+val);
+	});
 
+  }
+	
 };
 
     
@@ -95,6 +102,7 @@ Output:
 		<li>Removed implicit horizontal mouseDown+mouseDrag step handlers on NumberControllerBox to prevent conflict with text highlighting.</li>
 		<li>If you define explicit "step" value for your controller component, the input now uses the HTML5 input type="number", with a "step" attribute, which should provide native stepper UI functionality if available.</li>
 		<li>Added GUI instance utility methods: getFolderByName(name), getControllerByName(name,?recurse), getAllGUIs(?recurse, ?myArray), getAllControllers(?recurse, ?myArray)</li>
+		<li>Added 'onClosedChange' handler to detect opened/closed states</li>
 	</ul>
 </div>
 </body>

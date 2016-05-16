@@ -1765,6 +1765,7 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
     this.__folders = {};
 
     this.__controllers = [];
+	this.__onClosedChange = null;
 
     /**
      * List of objects I'm remembering for save, only used in top level GUI
@@ -1920,7 +1921,7 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
            */
           name: {
             get: function() {
-              return params.name;
+              return params.name || "";
             },
             set: function(v) {
               // TODO Check for collisions among sibling folders
@@ -2026,7 +2027,7 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
       dom.bind(this.__closeButton, 'click', function() {
 
         _this.closed = !_this.closed;
-
+		if (_this.__onClosedChange) _this.__onClosedChange.call(_this, _this.closed);
 
       });
 
@@ -2046,6 +2047,7 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
       var on_click_title = function(e) {
         e.preventDefault();
         _this.closed = !_this.closed;
+		if (_this.__onClosedChange) _this.__onClosedChange.call(_this, _this.closed);
         return false;
       };
 
@@ -2121,6 +2123,11 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
 
   };
   
+   GUI.prototype.onClosedChange = function(fnc) {
+	  this.__onClosedChange = fnc;
+	  return this;
+  }
+		  
   GUI.prototype.getControllerByName = function(name, recurse) {
 		  
 		var controllers = this.__controllers;
@@ -2173,20 +2180,17 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
 	  GUI.prototype.getAllGUIs = function(recurse, myArray) {
 		if (recurse == undefined) recurse = true;
 		var i;
-		var arr = myArray!= null ? myArray : [{name:'', gui:this}];
-		var obj;
+		var arr = myArray!= null ? myArray : [this];
 		var folders = this.__folders;
 		
 
 		for (i in folders) {
-			obj = {};
-			obj.name = i;
-			obj.gui = folders[i];
-			arr.push(obj);
+			arr.push(folders[i]);
 		}
 		
 		if (recurse) {
 			for (i in folders) {
+				
 				folders[i].getAllGUIs(true, arr);
 			}
 		}

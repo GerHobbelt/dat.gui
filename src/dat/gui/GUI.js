@@ -723,7 +723,7 @@ define([
             var h = 0;
 
             common.each(root.__ul.childNodes, function(node) {
-              if (! (root.autoPlace && node === root.__save_row))
+              if (! (root.autoPlace && node === root.__save_row) && node.nodeType===1 )
                 h += dom.getHeight(node);
             });
 

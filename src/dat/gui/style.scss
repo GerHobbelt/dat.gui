@@ -72,6 +72,21 @@ $input-color: lighten($background-color, 8.5%);
       border-radius: 5px;
       background: lighten($background-color, 30%);
     }
+	
+	>ul {  // repeat for above
+		 &::-webkit-scrollbar {
+		  width: 5px;
+		  background: $background-color;
+		}
+		&::-webkit-scrollbar-corner {
+		  height: 0;
+		  display: none;
+		}
+		&::-webkit-scrollbar-thumb {
+		  border-radius: 5px;
+		  background: lighten($background-color, 30%);
+		}
+	}
 
   }
 

@@ -46,7 +46,13 @@ $button-height: 20px;
         border-top: 1px solid $border-color;
 
       }
-
+	  
+	  > ul {
+		 overflow:auto;
+		 overflow-y: auto;
+		 overflow-x: hidden;
+	  }
+	
     }
 
     ul.closed .close-button {

@@ -51,7 +51,6 @@
       -moz-transition: opacity 0.1s linear;
       transition: opacity 0.1s linear;
       border: 0;
-      position: absolute;
       line-height: 19px;
       height: 20px;
       /* TODO, these are style notes */
@@ -286,7 +285,7 @@
 }
 
 .dg.main .close-button {
-    background-color: #ccc;
+    background-color: rgb(230, 230, 230);
 }
  
 .dg.main .close-button:hover {
@@ -316,8 +315,26 @@
 }
 
 .dg li.title {
-    background: #e8e8e8 url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlI+hKgFxoCgAOw==) 6px 10px no-repeat;
+  background: rgb(250, 250, 250);
 }
+.dg li.title::before {
+  font-family: "FontAwesome";
+  content: "\\f0d7";   /*note: have to escape the leading slash due to dat.gui build tools */
+  float: left;
+  width: 1.5em;
+}
+
+.dg .closed li.title {
+  background: rgb(250, 250, 250);
+}
+
+.dg .closed li.title::before {
+  font-family: "FontAwesome";
+  content: "\\f0da";   /*note: have to escape the leading slash due to dat.gui build tools */
+  float: left;
+  width: 1.5em;
+}
+
 
 .dg .cr.function:hover,.dg .cr.boolean:hover {
     background: #fff;

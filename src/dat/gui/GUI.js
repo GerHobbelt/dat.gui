@@ -26,6 +26,7 @@ define([
   'dat/controllers/NumberControllerSlider',
   'dat/controllers/OptionController',
   'dat/controllers/ColorController',
+  'dat/controllers/EasingFunctionController',
 
   'dat/utils/requestAnimationFrame',
 
@@ -34,7 +35,7 @@ define([
 
   'dat/utils/common'
 
-], function(css, saveDialogueContents, styleSheet, controllerFactory, Controller, BooleanController, FunctionController, NumberControllerBox, NumberControllerSlider, OptionController, ColorController, requestAnimationFrame, CenteredDiv, dom, common) {
+], function(css, saveDialogueContents, styleSheet, controllerFactory, Controller, BooleanController, FunctionController, NumberControllerBox, NumberControllerSlider, OptionController, ColorController, EasingFunctionController, requestAnimationFrame, CenteredDiv, dom, common) {
 
   css.inject(styleSheet);
 
@@ -537,6 +538,25 @@ define([
         },
 
         /**
+         * @param object
+         * @param property
+         * @returns {dat.controllers.EasingFunctionController} The new controller that was added.
+         * @instance
+         */
+        addEasingFunction: function(object, property) {
+
+          return add(
+            this,
+            object,
+            property,
+            {
+              easing: true
+            }
+          );
+
+        },
+
+        /**
          * @param controller
          * @instance
          */
@@ -808,6 +828,10 @@ define([
 
       controller = new ColorController(object, property);
 
+    } else if (params.easing) {
+
+      controller = new EasingFunctionController(object, property);
+
     } else {
 
       var factoryArgs = [object,property].concat(params.factoryArgs);
@@ -977,7 +1001,7 @@ define([
 
       dom.bind(controller.__checkbox, 'click', function(e) {
         e.stopPropagation(); // Prevents double-toggle
-      })
+      });
 
     }
     else if (controller instanceof FunctionController) {
@@ -1000,6 +1024,19 @@ define([
       dom.addClass(li, 'color');
       controller.updateDisplay = common.compose(function(r) {
         li.style.borderLeftColor = controller.__color.toString();
+        return r;
+      }, controller.updateDisplay);
+
+      controller.updateDisplay();
+
+    }
+    else if (controller instanceof EasingFunctionController) {
+
+      dom.addClass(li, 'easing');
+
+      controller.updateDisplay = common.compose(function(r) {
+        // [TODO]
+        // Let's adapt style!
         return r;
       }, controller.updateDisplay);
 

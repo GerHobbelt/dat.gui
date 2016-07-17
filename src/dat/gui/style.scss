@@ -9,9 +9,12 @@ $boolean-color: #806787;
 $string-color: #1ed36f;
 $function-color: #e61d5f;
 $save-row-color: #dad5cb;
+$easing-color: #ff8710;
 $button-color: darken($save-row-color, 10%);
 $border-color: lighten($background-color, $border-lighten);
 $input-color: lighten($background-color, 8.5%);
+
+$row-easing-height: 80px;
 
 @mixin transition($prop, $time, $curve) {
   -webkit-transition: $prop $time $curve;
@@ -153,6 +156,12 @@ $input-color: lighten($background-color, 8.5%);
       }
     }
 
+    &.easing {
+      border-left: 3px solid $easing-color;
+      height: $row-easing-height;
+      line-height: $row-easing-height;
+    }
+
     &.function:hover ,
     &.boolean:hover {
       background: #111;
@@ -163,8 +172,6 @@ $input-color: lighten($background-color, 8.5%);
 
   /** Controllers */
   .c {
-
-
 
     input[type=text] {
 
@@ -179,7 +186,6 @@ $input-color: lighten($background-color, 8.5%);
       }
 
     }
-
 
     .slider {
       background: $input-color;

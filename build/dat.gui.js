@@ -29,6 +29,9 @@ dat.dom = dat.dom || {};
 /** @namespace */
 dat.color = dat.color || {};
 
+/** @namespace */
+dat.easing = dat.easing || {};
+
 dat.utils.css = (function () {
   return {
     load: function (url, doc) {
@@ -51,7 +54,7 @@ dat.utils.css = (function () {
 
 
 dat.utils.common = (function () {
-  
+
   var ARR_EACH = Array.prototype.forEach;
   var ARR_SLICE = Array.prototype.slice;
 
@@ -61,38 +64,38 @@ dat.utils.common = (function () {
    * http://documentcloud.github.com/underscore/
    */
 
-  return { 
-    
+  return {
+
     BREAK: {},
-  
+
     extend: function(target) {
-      
+
       this.each(ARR_SLICE.call(arguments, 1), function(obj) {
-        
+
         for (var key in obj)
-          if (!this.isUndefined(obj[key])) 
+          if (!this.isUndefined(obj[key]))
             target[key] = obj[key];
-        
+
       }, this);
-      
+
       return target;
-      
+
     },
-    
+
     defaults: function(target) {
-      
+
       this.each(ARR_SLICE.call(arguments, 1), function(obj) {
-        
+
         for (var key in obj)
-          if (this.isUndefined(target[key])) 
+          if (this.isUndefined(target[key]))
             target[key] = obj[key];
-        
+
       }, this);
-      
+
       return target;
-    
+
     },
-    
+
     compose: function() {
       var toCall = ARR_SLICE.call(arguments);
             return function() {
@@ -103,35 +106,35 @@ dat.utils.common = (function () {
               return args[0];
             }
     },
-    
+
     each: function(obj, itr, scope) {
 
       if (!obj) return;
 
-      if (ARR_EACH && obj.forEach && obj.forEach === ARR_EACH) { 
-        
+      if (ARR_EACH && obj.forEach && obj.forEach === ARR_EACH) {
+
         obj.forEach(itr, scope);
-        
+
       } else if (obj.length === obj.length + 0) { // Is number but not NaN
-        
+
         for (var key = 0, l = obj.length; key < l; key++)
-          if (key in obj && itr.call(scope, obj[key], key) === this.BREAK) 
+          if (key in obj && itr.call(scope, obj[key], key) === this.BREAK)
             return;
-            
+
       } else {
 
-        for (var key in obj) 
+        for (var key in obj)
           if (itr.call(scope, obj[key], key) === this.BREAK)
             return;
-            
+
       }
-            
+
     },
-    
+
     defer: function(fnc) {
       setTimeout(fnc, 0);
     },
-    
+
     toArray: function(obj) {
       if (obj.toArray) return obj.toArray();
       return ARR_SLICE.call(obj);
@@ -140,41 +143,41 @@ dat.utils.common = (function () {
     isUndefined: function(obj) {
       return obj === undefined;
     },
-    
+
     isNull: function(obj) {
       return obj === null;
     },
-    
+
     isNaN: function(obj) {
       return obj !== obj;
     },
-    
+
     isArray: Array.isArray || function(obj) {
       return obj.constructor === Array;
     },
-    
+
     isObject: function(obj) {
       return obj === Object(obj);
     },
-    
+
     isNumber: function(obj) {
       return obj === obj+0;
     },
-    
+
     isString: function(obj) {
       return obj === obj+'';
     },
-    
+
     isBoolean: function(obj) {
       return obj === false || obj === true;
     },
-    
+
     isFunction: function(obj) {
       return Object.prototype.toString.call(obj) === '[object Function]';
     }
-  
+
   };
-    
+
 })();
 
 
@@ -1529,7 +1532,7 @@ dat.color.interpret = (function (toString, common) {
 dat.utils.common);
 
 
-dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, controllerFactory, Controller, BooleanController, FunctionController, NumberControllerBox, NumberControllerSlider, OptionController, ColorController, requestAnimationFrame, CenteredDiv, dom, common) {
+dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, controllerFactory, Controller, BooleanController, FunctionController, NumberControllerBox, NumberControllerSlider, OptionController, ColorController, EasingFunctionController, requestAnimationFrame, CenteredDiv, dom, common) {
 
   css.inject(styleSheet);
 
@@ -2032,6 +2035,25 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
         },
 
         /**
+         * @param object
+         * @param property
+         * @returns {dat.controllers.EasingFunctionController} The new controller that was added.
+         * @instance
+         */
+        addEasingFunction: function(object, property) {
+
+          return add(
+            this,
+            object,
+            property,
+            {
+              easing: true
+            }
+          );
+
+        },
+
+        /**
          * @param controller
          * @instance
          */
@@ -2303,6 +2325,10 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
 
       controller = new ColorController(object, property);
 
+    } else if (params.easing) {
+
+      controller = new EasingFunctionController(object, property);
+
     } else {
 
       var factoryArgs = [object,property].concat(params.factoryArgs);
@@ -2472,7 +2498,7 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
 
       dom.bind(controller.__checkbox, 'click', function(e) {
         e.stopPropagation(); // Prevents double-toggle
-      })
+      });
 
     }
     else if (controller instanceof FunctionController) {
@@ -2495,6 +2521,19 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
       dom.addClass(li, 'color');
       controller.updateDisplay = common.compose(function(r) {
         li.style.borderLeftColor = controller.__color.toString();
+        return r;
+      }, controller.updateDisplay);
+
+      controller.updateDisplay();
+
+    }
+    else if (controller instanceof EasingFunctionController) {
+
+      dom.addClass(li, 'easing');
+
+      controller.updateDisplay = common.compose(function(r) {
+        // [TODO]
+        // Let's adapt style!
         return r;
       }, controller.updateDisplay);
 
@@ -2854,7 +2893,7 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
 
 })(dat.utils.css,
 "<div id=\"dg-save\" class=\"dg dialogue\">\n\n  Here's the new load parameter for your <code>GUI</code>'s constructor:\n\n  <textarea id=\"dg-new-constructor\"></textarea>\n\n  <div id=\"dg-save-locally\">\n\n    <input id=\"dg-local-storage\" type=\"checkbox\"/> Automatically save\n    values to <code>localStorage</code> on exit.\n\n    <div id=\"dg-local-explain\">The values saved to <code>localStorage</code> will\n      override those passed to <code>dat.GUI</code>'s constructor. This makes it\n      easier to work incrementally, but <code>localStorage</code> is fragile,\n      and your friends may not see the same values you do.\n      \n    </div>\n    \n  </div>\n\n</div>",
-".dg {\n  /** Clear list styles */\n  /* Auto-place container */\n  /* Auto-placed GUI's */\n  /* Line items that don't contain folders. */\n  /** Folder names */\n  /** Hides closed items */\n  /** Controller row */\n  /** Name-half (left) */\n  /** Controller-half (right) */\n  /** Controller placement */\n  /** Shorter number boxes when slider is present. */\n  /** Ensure the entire boolean and function row shows a hand */ }\n  .dg ul {\n    list-style: none;\n    margin: 0;\n    padding: 0;\n    width: 100%;\n    clear: both; }\n  .dg.ac {\n    position: fixed;\n    top: 0;\n    left: 0;\n    right: 0;\n    height: 0;\n    z-index: 0; }\n  .dg:not(.ac) .main {\n    /** Exclude mains in ac so that we don't hide close button */\n    overflow: hidden; }\n  .dg.main {\n    -webkit-transition: opacity 0.1s linear;\n    -o-transition: opacity 0.1s linear;\n    -moz-transition: opacity 0.1s linear;\n    transition: opacity 0.1s linear; }\n    .dg.main.taller-than-window {\n      overflow-y: auto; }\n      .dg.main.taller-than-window .close-button {\n        opacity: 1;\n        /* TODO, these are style notes */\n        margin-top: -1px;\n        border-top: 1px solid #2c2c2c; }\n    .dg.main ul.closed .close-button {\n      opacity: 1 !important; }\n    .dg.main:hover .close-button,\n    .dg.main .close-button.drag {\n      opacity: 1; }\n    .dg.main .close-button {\n      /*opacity: 0;*/\n      -webkit-transition: opacity 0.1s linear;\n      -o-transition: opacity 0.1s linear;\n      -moz-transition: opacity 0.1s linear;\n      transition: opacity 0.1s linear;\n      border: 0;\n      position: absolute;\n      line-height: 19px;\n      height: 20px;\n      /* TODO, these are style notes */\n      cursor: pointer;\n      text-align: center;\n      background-color: #000; }\n      .dg.main .close-button:hover {\n        background-color: #111; }\n  .dg.a {\n    float: right;\n    margin-right: 15px;\n    overflow-x: hidden; }\n    .dg.a.has-save > ul {\n      margin-top: 27px; }\n      .dg.a.has-save > ul.closed {\n        margin-top: 0; }\n    .dg.a .save-row {\n      position: fixed;\n      top: 0;\n      z-index: 1002; }\n  .dg li {\n    -webkit-transition: height 0.1s ease-out;\n    -o-transition: height 0.1s ease-out;\n    -moz-transition: height 0.1s ease-out;\n    transition: height 0.1s ease-out; }\n  .dg li:not(.folder) {\n    cursor: auto;\n    height: 27px;\n    line-height: 27px;\n    overflow: hidden;\n    padding: 0 4px 0 5px; }\n  .dg li.folder {\n    padding: 0;\n    border-left: 4px solid rgba(0, 0, 0, 0); }\n  .dg li.title {\n    cursor: pointer;\n    margin-left: -4px; }\n  .dg .closed li:not(.title),\n  .dg .closed ul li,\n  .dg .closed ul li > * {\n    height: 0;\n    overflow: hidden;\n    border: 0; }\n  .dg .cr {\n    clear: both;\n    padding-left: 3px;\n    height: 27px; }\n  .dg .property-name {\n    cursor: default;\n    float: left;\n    clear: left;\n    width: 40%;\n    overflow: hidden;\n    text-overflow: ellipsis; }\n  .dg .c {\n    float: left;\n    width: 60%; }\n  .dg .c input[type=text] {\n    border: 0;\n    margin-top: 4px;\n    padding: 3px;\n    width: 100%;\n    float: right; }\n  .dg .has-slider input[type=text] {\n    width: 30%;\n    /*display: none;*/\n    margin-left: 0; }\n  .dg .slider {\n    float: left;\n    width: 66%;\n    margin-left: -5px;\n    margin-right: 0;\n    height: 19px;\n    margin-top: 4px; }\n  .dg .slider-fg {\n    height: 100%; }\n  .dg .c input[type=checkbox] {\n    margin-top: 9px; }\n  .dg .c select {\n    margin-top: 5px; }\n  .dg .cr.function,\n  .dg .cr.function .property-name,\n  .dg .cr.function *,\n  .dg .cr.boolean,\n  .dg .cr.boolean * {\n    cursor: pointer; }\n  .dg .selector {\n    display: none;\n    position: absolute;\n    margin-left: -9px;\n    margin-top: 23px;\n    z-index: 10; }\n  .dg .c:hover .selector,\n  .dg .selector.drag {\n    display: block; }\n  .dg li.save-row {\n    padding: 0; }\n    .dg li.save-row .button {\n      display: inline-block;\n      padding: 0px 6px; }\n  .dg.dialogue {\n    background-color: #222;\n    width: 460px;\n    padding: 15px;\n    font-size: 13px;\n    line-height: 15px; }\n\n/* TODO Separate style and structure */\n#dg-new-constructor {\n  padding: 10px;\n  color: #222;\n  font-family: Monaco, monospace;\n  font-size: 10px;\n  border: 0;\n  resize: none;\n  box-shadow: inset 1px 1px 1px #888;\n  word-wrap: break-word;\n  margin: 12px 0;\n  display: block;\n  width: 440px;\n  overflow-y: scroll;\n  height: 100px;\n  position: relative; }\n\n#dg-local-explain {\n  display: none;\n  font-size: 11px;\n  line-height: 17px;\n  border-radius: 3px;\n  background-color: #333;\n  padding: 8px;\n  margin-top: 10px; }\n  #dg-local-explain code {\n    font-size: 10px; }\n\n#dat-gui-save-locally {\n  display: none; }\n\n/** Main type */\n.dg {\n  color: #eee;\n  font: 11px 'Lucida Grande', sans-serif;\n  text-shadow: 0 -1px 0 #111;\n  /** Auto place */\n  /* Controller row, <li> */\n  /** Controllers */ }\n  .dg.main {\n    /** Scrollbar */ }\n    .dg.main::-webkit-scrollbar {\n      width: 5px;\n      background: #1a1a1a; }\n    .dg.main::-webkit-scrollbar-corner {\n      height: 0;\n      display: none; }\n    .dg.main::-webkit-scrollbar-thumb {\n      border-radius: 5px;\n      background: #676767; }\n  .dg li:not(.folder) {\n    background: #1a1a1a;\n    border-bottom: 1px solid #2c2c2c; }\n  .dg li.save-row {\n    line-height: 25px;\n    background: #dad5cb;\n    border: 0; }\n    .dg li.save-row select {\n      margin-left: 5px;\n      width: 108px; }\n    .dg li.save-row .button {\n      margin-left: 5px;\n      margin-top: 1px;\n      border-radius: 2px;\n      font-size: 9px;\n      line-height: 7px;\n      padding: 4px 4px 5px 4px;\n      background: #c5bdad;\n      color: #fff;\n      text-shadow: 0 1px 0 #b0a58f;\n      box-shadow: 0 -1px 0 #b0a58f;\n      cursor: pointer; }\n      .dg li.save-row .button.gears {\n        background: #c5bdad url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAANCAYAAAB/9ZQ7AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAQJJREFUeNpiYKAU/P//PwGIC/ApCABiBSAW+I8AClAcgKxQ4T9hoMAEUrxx2QSGN6+egDX+/vWT4e7N82AMYoPAx/evwWoYoSYbACX2s7KxCxzcsezDh3evFoDEBYTEEqycggWAzA9AuUSQQgeYPa9fPv6/YWm/Acx5IPb7ty/fw+QZblw67vDs8R0YHyQhgObx+yAJkBqmG5dPPDh1aPOGR/eugW0G4vlIoTIfyFcA+QekhhHJhPdQxbiAIguMBTQZrPD7108M6roWYDFQiIAAv6Aow/1bFwXgis+f2LUAynwoIaNcz8XNx3Dl7MEJUDGQpx9gtQ8YCueB+D26OECAAQDadt7e46D42QAAAABJRU5ErkJggg==) 2px 1px no-repeat;\n        height: 7px;\n        width: 8px; }\n      .dg li.save-row .button:hover {\n        background-color: #bab19e;\n        box-shadow: 0 -1px 0 #b0a58f; }\n  .dg li.folder {\n    border-bottom: 0; }\n  .dg li.title {\n    padding-left: 16px;\n    background: black url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlI+hKgFxoCgAOw==) 6px 10px no-repeat;\n    cursor: pointer;\n    border-bottom: 1px solid rgba(255, 255, 255, 0.2); }\n  .dg .closed li.title {\n    background-image: url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlGIWqMCbWAEAOw==); }\n  .dg .cr.boolean {\n    border-left: 3px solid #806787; }\n  .dg .cr.function {\n    border-left: 3px solid #e61d5f; }\n  .dg .cr.number {\n    border-left: 3px solid #2fa1d6; }\n    .dg .cr.number input[type=text] {\n      color: #2fa1d6; }\n  .dg .cr.string {\n    border-left: 3px solid #1ed36f; }\n    .dg .cr.string input[type=text] {\n      color: #1ed36f; }\n  .dg .cr.function:hover, .dg .cr.boolean:hover {\n    background: #111; }\n  .dg .c input[type=text] {\n    background: #303030;\n    outline: none; }\n    .dg .c input[type=text]:hover {\n      background: #3c3c3c; }\n    .dg .c input[type=text]:focus {\n      background: #494949;\n      color: #fff; }\n  .dg .c .slider {\n    background: #303030;\n    cursor: ew-resize; }\n  .dg .c .slider-fg {\n    background: #2fa1d6; }\n  .dg .c .slider:hover {\n    background: #3c3c3c; }\n    .dg .c .slider:hover .slider-fg {\n      background: #44abda; }\n",
+".dg {\n  /** Clear list styles */\n  /* Auto-place container */\n  /* Auto-placed GUI's */\n  /* Line items that don't contain folders. */\n  /** Folder names */\n  /** Hides closed items */\n  /** Controller row */\n  /** Name-half (left) */\n  /** Controller-half (right) */\n  /** Controller placement */\n  /** Controller placement */\n  /** Shorter number boxes when slider is present. */\n  /** Ensure the entire boolean and function row shows a hand */ }\n  .dg ul {\n    list-style: none;\n    margin: 0;\n    padding: 0;\n    width: 100%;\n    clear: both; }\n  .dg.ac {\n    position: fixed;\n    top: 0;\n    left: 0;\n    right: 0;\n    height: 0;\n    z-index: 0; }\n  .dg:not(.ac) .main {\n    /** Exclude mains in ac so that we don't hide close button */\n    overflow: hidden; }\n  .dg.main {\n    -webkit-transition: opacity 0.1s linear;\n    -o-transition: opacity 0.1s linear;\n    -moz-transition: opacity 0.1s linear;\n    transition: opacity 0.1s linear; }\n    .dg.main.taller-than-window {\n      overflow-y: auto; }\n      .dg.main.taller-than-window .close-button {\n        opacity: 1;\n        /* TODO, these are style notes */\n        margin-top: -1px;\n        border-top: 1px solid #2c2c2c; }\n    .dg.main ul.closed .close-button {\n      opacity: 1 !important; }\n    .dg.main:hover .close-button,\n    .dg.main .close-button.drag {\n      opacity: 1; }\n    .dg.main .close-button {\n      /*opacity: 0;*/\n      -webkit-transition: opacity 0.1s linear;\n      -o-transition: opacity 0.1s linear;\n      -moz-transition: opacity 0.1s linear;\n      transition: opacity 0.1s linear;\n      border: 0;\n      position: absolute;\n      line-height: 19px;\n      height: 20px;\n      /* TODO, these are style notes */\n      cursor: pointer;\n      text-align: center;\n      background-color: #000; }\n      .dg.main .close-button:hover {\n        background-color: #111; }\n  .dg.a {\n    float: right;\n    margin-right: 15px;\n    overflow-x: hidden; }\n    .dg.a.has-save > ul {\n      margin-top: 27px; }\n      .dg.a.has-save > ul.closed {\n        margin-top: 0; }\n    .dg.a .save-row {\n      position: fixed;\n      top: 0;\n      z-index: 1002; }\n  .dg li {\n    -webkit-transition: height 0.1s ease-out;\n    -o-transition: height 0.1s ease-out;\n    -moz-transition: height 0.1s ease-out;\n    transition: height 0.1s ease-out; }\n  .dg li:not(.folder) {\n    cursor: auto;\n    height: 27px;\n    line-height: 27px;\n    overflow: hidden;\n    padding: 0 4px 0 5px; }\n  .dg li.folder {\n    padding: 0;\n    border-left: 4px solid transparent; }\n  .dg li.title {\n    cursor: pointer;\n    margin-left: -4px; }\n  .dg .closed li:not(.title),\n  .dg .closed ul li,\n  .dg .closed ul li > * {\n    height: 0;\n    overflow: hidden;\n    border: 0; }\n  .dg .cr {\n    clear: both;\n    padding-left: 3px;\n    height: 27px; }\n  .dg .property-name {\n    cursor: default;\n    float: left;\n    clear: left;\n    width: 40%;\n    overflow: hidden;\n    text-overflow: ellipsis; }\n  .dg .c {\n    float: left;\n    width: 60%; }\n  .dg .c input[type=text] {\n    border: 0;\n    margin-top: 4px;\n    padding: 3px;\n    width: 100%;\n    float: right; }\n  .dg .c canvas {\n    border: 0;\n    margin-top: 0px;\n    outline: none;\n    border: 0;\n    width: 146px;\n    float: right; }\n  .dg .has-slider input[type=text] {\n    width: 30%;\n    /*display: none;*/\n    margin-left: 0; }\n  .dg .slider {\n    float: left;\n    width: 66%;\n    margin-left: -5px;\n    margin-right: 0;\n    height: 19px;\n    margin-top: 4px; }\n  .dg .slider-fg {\n    height: 100%; }\n  .dg .c input[type=checkbox] {\n    margin-top: 9px; }\n  .dg .c select {\n    margin-top: 5px; }\n  .dg .cr.function,\n  .dg .cr.function .property-name,\n  .dg .cr.function *,\n  .dg .cr.boolean,\n  .dg .cr.boolean * {\n    cursor: pointer; }\n  .dg .selector {\n    display: none;\n    position: absolute;\n    margin-left: -9px;\n    margin-top: 23px;\n    z-index: 10; }\n  .dg .c:hover .selector,\n  .dg .selector.drag {\n    display: block; }\n  .dg li.save-row {\n    padding: 0; }\n    .dg li.save-row .button {\n      display: inline-block;\n      padding: 0px 6px; }\n  .dg.dialogue {\n    background-color: #222;\n    width: 460px;\n    padding: 15px;\n    font-size: 13px;\n    line-height: 15px; }\n\n/* TODO Separate style and structure */\n#dg-new-constructor {\n  padding: 10px;\n  color: #222;\n  font-family: Monaco, monospace;\n  font-size: 10px;\n  border: 0;\n  resize: none;\n  box-shadow: inset 1px 1px 1px #888;\n  word-wrap: break-word;\n  margin: 12px 0;\n  display: block;\n  width: 440px;\n  overflow-y: scroll;\n  height: 100px;\n  position: relative; }\n\n#dg-local-explain {\n  display: none;\n  font-size: 11px;\n  line-height: 17px;\n  border-radius: 3px;\n  background-color: #333;\n  padding: 8px;\n  margin-top: 10px; }\n  #dg-local-explain code {\n    font-size: 10px; }\n\n#dat-gui-save-locally {\n  display: none; }\n\n/** Main type */\n.dg {\n  color: #eee;\n  font: 11px 'Lucida Grande', sans-serif;\n  text-shadow: 0 -1px 0 #111;\n  /** Auto place */\n  /* Controller row, <li> */\n  /** Controllers */ }\n  .dg.main {\n    /** Scrollbar */ }\n    .dg.main::-webkit-scrollbar {\n      width: 5px;\n      background: #1a1a1a; }\n    .dg.main::-webkit-scrollbar-corner {\n      height: 0;\n      display: none; }\n    .dg.main::-webkit-scrollbar-thumb {\n      border-radius: 5px;\n      background: #676767; }\n  .dg li:not(.folder) {\n    background: #1a1a1a;\n    border-bottom: 1px solid #2c2c2c; }\n  .dg li.save-row {\n    line-height: 25px;\n    background: #dad5cb;\n    border: 0; }\n    .dg li.save-row select {\n      margin-left: 5px;\n      width: 108px; }\n    .dg li.save-row .button {\n      margin-left: 5px;\n      margin-top: 1px;\n      border-radius: 2px;\n      font-size: 9px;\n      line-height: 7px;\n      padding: 4px 4px 5px 4px;\n      background: #c5bdad;\n      color: #fff;\n      text-shadow: 0 1px 0 #b0a58f;\n      box-shadow: 0 -1px 0 #b0a58f;\n      cursor: pointer; }\n      .dg li.save-row .button.gears {\n        background: #c5bdad url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAANCAYAAAB/9ZQ7AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAQJJREFUeNpiYKAU/P//PwGIC/ApCABiBSAW+I8AClAcgKxQ4T9hoMAEUrxx2QSGN6+egDX+/vWT4e7N82AMYoPAx/evwWoYoSYbACX2s7KxCxzcsezDh3evFoDEBYTEEqycggWAzA9AuUSQQgeYPa9fPv6/YWm/Acx5IPb7ty/fw+QZblw67vDs8R0YHyQhgObx+yAJkBqmG5dPPDh1aPOGR/eugW0G4vlIoTIfyFcA+QekhhHJhPdQxbiAIguMBTQZrPD7108M6roWYDFQiIAAv6Aow/1bFwXgis+f2LUAynwoIaNcz8XNx3Dl7MEJUDGQpx9gtQ8YCueB+D26OECAAQDadt7e46D42QAAAABJRU5ErkJggg==) 2px 1px no-repeat;\n        height: 7px;\n        width: 8px; }\n      .dg li.save-row .button:hover {\n        background-color: #bab19e;\n        box-shadow: 0 -1px 0 #b0a58f; }\n  .dg li.folder {\n    border-bottom: 0; }\n  .dg li.title {\n    padding-left: 16px;\n    background: #000 url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlI+hKgFxoCgAOw==) 6px 10px no-repeat;\n    cursor: pointer;\n    border-bottom: 1px solid rgba(255, 255, 255, 0.2); }\n  .dg .closed li.title {\n    background-image: url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlGIWqMCbWAEAOw==); }\n  .dg .cr.boolean {\n    border-left: 3px solid #806787; }\n  .dg .cr.function {\n    border-left: 3px solid #e61d5f; }\n  .dg .cr.number {\n    border-left: 3px solid #2FA1D6; }\n    .dg .cr.number input[type=text] {\n      color: #2FA1D6; }\n  .dg .cr.string {\n    border-left: 3px solid #1ed36f; }\n    .dg .cr.string input[type=text] {\n      color: #1ed36f; }\n  .dg .cr.easing {\n    border-left: 3px solid #ff8710;\n    height: 80px;\n    line-height: 80px; }\n  .dg .cr.function:hover, .dg .cr.boolean:hover {\n    background: #111; }\n  .dg .c input[type=text] {\n    background: #303030;\n    outline: none; }\n    .dg .c input[type=text]:hover {\n      background: #3c3c3c; }\n    .dg .c input[type=text]:focus {\n      background: #494949;\n      color: #fff; }\n  .dg .c .slider {\n    background: #303030;\n    cursor: ew-resize; }\n  .dg .c .slider-fg {\n    background: #2FA1D6; }\n  .dg .c .slider:hover {\n    background: #3c3c3c; }\n    .dg .c .slider:hover .slider-fg {\n      background: #44abda; }\n\n/*# sourceMappingURL=style.css.map */\n",
 dat.controllers.factory = (function (OptionController, NumberControllerBox, NumberControllerSlider, StringController, FunctionController, BooleanController, common) {
 
       return function(object, property) {
@@ -3548,6 +3587,623 @@ dat.color.math = (function () {
 dat.color.toString,
 dat.utils.common),
 dat.color.interpret,
+dat.utils.common),
+dat.controllers.EasingFunctionController = (function (Controller, dom, EasingFunction, common) {
+
+  var EasingFunctionController = function(object, property) {
+
+    EasingFunctionController.superclass.call(this, object, property);
+
+    var _this = this;
+    this.domElement = document.createElement('div');
+    dom.makeSelectable(this.domElement, false);
+
+    this.__func = new EasingFunction(object[property]);
+    this.__cursor = 0.0;   // 0.0-1.0
+
+    this.__mouse_over = false;
+    this.__point_over = null;
+    this.__point_selected = null;
+    this.__point_selected_type = null;
+    this.__point_moving = false;
+
+    var width = 146, height = 80;
+    var rectView = {top: 1, left: 3, width: width - 2, height: height - 16};
+    var rV = rectView;
+
+    this.__thumbnail = document.createElement('canvas');
+    this.__thumbnail.width = width * 2;
+    this.__thumbnail.height = height * 2;
+    this.__thumbnail.className = 'easing-thumbnail';
+    this.__ctx = this.__thumbnail.getContext('2d');
+    this.__ctx.scale(2, 2);
+
+    dom.bind(this.__thumbnail, 'contextmenu', function(e) { e.preventDefault(); });
+    dom.bind(this.__thumbnail, 'mouseover', onMouseOver);
+    dom.bind(this.__thumbnail, 'mouseout', onMouseOut);
+    dom.bind(this.__thumbnail, 'mousedown', onMouseDown);
+    dom.bind(this.__thumbnail, 'dblclick', onDoubleClick);
+    dom.bind(this.__thumbnail, 'mousemove', onMouseMove);
+    dom.bind(this.__thumbnail, 'mouseup', onMouseUp);
+    dom.bind(this.__thumbnail, 'mouseup', onMouseUp);
+
+    function toCoord(x, y) {
+      return [rV.top + x * rV.width, rV.left + (1 - y) * rV.height];
+    }
+    function toNorm(elem, e) {
+      var mouseX = e.pageX - elem.offsetLeft;
+      var mouseY = e.pageY - elem.offsetTop;
+      return [
+        0 + (mouseX - rV.left + 1) / (rV.width - 2),
+        1 - (mouseY - rV.top - 2)  / (rV.height)
+      ];
+    }
+    function moveTo(x, y) {
+      _this.__ctx.moveTo(rV.top + x * rV.width, rV.left + (1 - y) * rV.height);
+    }
+    function lineTo(x, y) {
+      _this.__ctx.lineTo(rV.top + x * rV.width, rV.left + (1 - y) * rV.height);
+    }
+    function curveTo(c1x, c1y, c2x, c2y, ax, ay) {
+      _this.__ctx.bezierCurveTo(
+        rV.top  + c1x       * rV.width,
+        rV.left + (1 - c1y) * rV.height,
+        rV.top  + c2x       * rV.width,
+        rV.left + (1 - c2y) * rV.height,
+        rV.top  + ax        * rV.width,
+        rV.left + (1 - ay)  * rV.height
+      );
+    }
+    function beginPath() { _this.__ctx.beginPath(); }
+    function closePath() { _this.__ctx.closePath(); }
+    function stroke()    { _this.__ctx.stroke(); }
+    function fill()      { _this.__ctx.fill(); }
+    function circle(x, y, r) {
+      var p = toCoord(x, y);
+      _this.__ctx.arc(p[0], p[1], r, 0, Math.PI * 2);
+    }
+    function square(x, y, r) {
+      var p = toCoord(x, y);
+      _this.__ctx.rect(p[0] - r, p[1] - r, r * 2, r * 2);
+    }
+
+    // --- main ---
+    this.clear = function() { _this.__ctx.clearRect(0, 0, width, height); };
+    this.drawRuler = function() {
+      var ctx = _this.__ctx;
+
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = "#930";
+      beginPath();
+      moveTo(0, 0); lineTo(1, 0);
+      moveTo(0, 1); lineTo(1, 1);
+      stroke();
+
+      for (var i = 0; i <= 4; i++) {
+        var x = i / 4.01;   // dirty hack
+        ctx.strokeStyle = "#c97";
+        beginPath(); moveTo(x, 0); lineTo(x, -0.04); stroke();
+        ctx.strokeStyle = "#333";
+        beginPath(); moveTo(x, 0.01); lineTo(x, 0.99); stroke();
+      }
+
+      ctx.font = "10px";
+      ctx.fillStyle = "#977";
+      p = toCoord(0,    -0.17); ctx.fillText("0.0",  p[0],     p[1]);
+      p = toCoord(0.25, -0.17); ctx.fillText(".25",  p[0] - 8, p[1]);
+      p = toCoord(0.50, -0.17); ctx.fillText(".50",  p[0] - 8, p[1]);
+      p = toCoord(0.75, -0.17); ctx.fillText(".75",  p[0] - 8, p[1]);
+      p = toCoord(1,    -0.17); ctx.fillText("1.0",  p[0] -14, p[1]);
+    };
+
+    this.drawEasingFunction = function(easing_func) {
+      var ctx = _this.__ctx;
+      ctx.strokeStyle = "#fff";
+      ctx.lineWidth = 1;
+
+      beginPath();
+      easing_func.getSegments().forEach(function(s, i) {
+        moveTo.apply(null, s.slice(0, 2));
+        curveTo.apply(null, s.slice(2));
+      });
+      stroke();
+
+      // Display points and handles
+      if (!_this.__mouse_over) {
+        return;
+      }
+
+      ctx.fillStyle = "#fff";
+      ctx.strokeStyle = "#f90";
+      ctx.lineWidth = 2;
+      easing_func.points.forEach(function(p, i) {
+        if (_this.__mouseo_over && i == _this.__point_over) { return; }
+        if (i == _this.__point_selected  ) { return; }
+        beginPath();
+        circle(p.x, p.y, 3);
+        closePath();
+        fill(); stroke();
+      });
+
+      var p;
+      if (Number.isInteger(_this.__point_over)) {
+        p = easing_func.points[_this.__point_over];
+        ctx.strokeStyle = "#f3d";
+        beginPath();
+        circle(p.x, p.y, 3);
+        closePath();
+        fill(); stroke();
+
+      }
+      if (Number.isInteger(_this.__point_selected)) {
+        p = easing_func.points[_this.__point_selected];
+        ctx.strokeStyle = "#f3d";
+        ctx.fillStyle   = "#fff";
+
+        // handle
+        beginPath();
+        moveTo(p.x + p.l + 0.01, p.y); lineTo(p.x + p.r - 0.01, p.y);
+        stroke();
+
+        // knobs
+        ["l", "r"].forEach(function(dir) {
+          beginPath();
+          circle(p.x + p[dir], p.y, 2);
+          fill(); stroke();
+        });
+
+        // anchor
+        beginPath();
+        square(p.x, p.y, 3);
+        fill(); stroke();
+      }
+
+    };
+
+    this.setCursor = function(x) {
+      var y = _this.__func.calculateY(x);
+
+      _this.__ctx.fillStyle = "#ff0";
+      _this.__ctx.strokeStyle = "#ff0";
+      _this.__ctx.lineWidth = 1;
+      beginPath();
+      circle(x, y, 3);
+      closePath();
+      fill();
+      beginPath();
+      moveTo(x, 0); lineTo(x, 1);
+      closePath();
+      stroke();
+
+      return y;
+    };
+
+    function onMouseDown(e) {
+      e.preventDefault();
+
+      var coord = toNorm(this, e);
+      var point, index, type;
+
+      if (Number.isInteger(_this.__point_selected)) {
+        point = _this.__func.findPointWithHandle(coord[0], coord[1]);
+      } else {
+        point = _this.__func.findPoint(coord[0], coord[1]);
+      }
+      //console.log(point);
+      index = point.index, type = point.type;
+
+      if (index !== undefined) {
+        if (e.button == 2 && type == "ANCHOR") {   // right click
+          var delete_successful = _this.__func.deletePoint(index);
+          if (delete_successful) {
+            index = undefined;
+          }
+        }
+      }
+
+      if (index !== undefined) {
+        if (_this.__point_selected == index) {
+          _this.__point_selected_type = type;   // we can select handle points
+        } else {
+          _this.__point_selected = index;
+          _this.__point_selected_type = "ANCHOR";   // force the anchor point
+        }
+
+        _this.__point_moving = true;
+
+      } else {
+
+        _this.__point_selected = null;
+        _this.__point_selected_type = null;
+        _this.__point_moving = false;
+      }
+
+      _this.updateDisplay();
+    }
+
+    function onDoubleClick(e) {
+      e.preventDefault();
+
+      var coord = toNorm(this, e);
+      var point = _this.__func.addPoint(coord[0], coord[1]);
+      _this.__point_selected = point.index;
+      _this.__point_selected_type = point.type;
+      _this.__point_moving = true;
+
+      _this.updateDisplay();
+    }
+
+    function onMouseOver(e) {
+      _this.__mouse_over = true;
+      _this.updateDisplay();
+    }
+    function onMouseOut(e) {
+      _this.__mouse_over = false;
+      _this.__point_moving = false;
+      _this.updateDisplay();
+    }
+    function onMouseMove(e) {
+      e.preventDefault();
+      var coord = toNorm(this, e);
+
+      if (Number.isInteger(_this.__point_selected) && _this.__point_moving) {
+        _this.__func.movePoint(_this.__point_selected, _this.__point_selected_type, coord[0], coord[1]);
+
+      } else {
+        var index = _this.__func.findPoint(coord[0], coord[1]).index;
+        if (index !== undefined) {
+          _this.__point_over = index;
+        } else {
+          _this.__point_over = null;
+        }
+      }
+
+      _this.updateDisplay();
+
+      //setCursor(coord[0]);   // [DEBUG]
+    }
+
+    function onMouseUp(e) {
+      e.preventDefault();
+      _this.__point_moving = false;
+      _this.updateDisplay();
+    }
+
+    common.extend(this.__thumbnail.style, {
+      width: width + 'px',
+      height: height + 'px',
+      cursor: 'crosshair'
+      //cursor: 'ew-resize'
+      //cursor: 'move'
+    });
+
+    // Acknowledge original value
+    this.updateDisplay();
+
+    this.domElement.appendChild(this.__thumbnail);
+  };
+
+  EasingFunctionController.superclass = Controller;
+
+  common.extend(
+
+      EasingFunctionController.prototype,
+      Controller.prototype,
+
+      {
+
+        setValue: function(v) {
+          var toReturn = EasingFunctionController.superclass.prototype.setValue.call(this, v);
+          if (this.__onFinishChange) {
+            this.__onFinishChange.call(this, this.getValue());
+          }
+          return toReturn;
+        },
+
+        updateDisplay: function() {
+          //this.__select.value = this.getValue();
+          this.clear();
+          this.drawRuler();
+          this.drawEasingFunction(this.__func);
+        }
+
+      }
+  );
+
+  return EasingFunctionController;
+
+})(dat.controllers.Controller,
+dat.dom.dom,
+dat.easing.Easing = (function () {
+
+  function clipFunc(min, max) {
+    return function(v) {
+      if      (v < min) { return min; }
+      else if (v > max) { return max; }
+      else              { return   v; }
+    };
+  }
+  var clip01 = clipFunc(0.0, 1.0);
+
+  // See http://pomax.github.io/bezierinfo/#explanation
+  function cubicFunc(a, b, c, d) {
+    return function(t) {
+      var t2  = t  *  t,
+          t3  = t2 *  t,
+          mt  = 1  -  t,
+          mt2 = mt * mt,
+          mt3 = mt * mt2;
+      return a * mt3 + 3 * b * mt2 * t + 3 * c * mt * t2 + d * t3;
+    };
+  }
+  function cubicFuncDeriv(a, b, c, d) {
+    return function(t) {
+      var t2  = t  *  t,
+          mt  = 1  -  t,
+          mt2 = mt * mt;
+      return a * mt2 + 2 * b * mt * t + c * t2;
+    };
+  }
+
+  function sign(n) {
+    return (n >= 0.0) ? 1: -1;
+  }
+
+  var EPSILON = 0.0001;
+
+  /**
+   * EasingFunctionPoint constructor. The constructor argument can be:
+   *
+   * 1. numerical array/4 ordered x,y,l,r
+   * 2. {x:..., y:..., l:..., r:...}
+   *
+   */
+  var EasingFunctionPoint = function(coord) {
+    var _this = this;
+
+    if (Array.isArray(coord) && coord.length == 4) {
+      ['x', 'y', 'l', 'r'].forEach(function(d, i) {
+        _this[d] = coord[i];
+      });
+    } else if (typeof coord === "object") {
+      ['x', 'y', 'l', 'r'].forEach(function(d) {
+        _this[d] = coord[d];
+      });
+    } else {
+      throw new Error("Couldn't parse point arguments");
+    }
+  };
+
+  /**
+   * EasingFunction constructor.
+   *
+   * The constructor argument is array of EasingFunctionPoint or undefined.
+   */
+  var EasingFunction = function(_points) {
+    var rawPoints = _points || [{x:0, y:0, l:0, r:0.5}, {x:1, y:1, l:0.5, r:0}];
+    var points = [];
+    rawPoints.forEach(function(p) {
+      points.push(new EasingFunctionPoint(p));
+    });
+    this.points = points;
+  };
+
+  EasingFunction.Point = EasingFunctionPoint;
+
+  EasingFunction.prototype = {
+    toString: function() {
+      return "something";
+    },
+
+    movePoint: function(index, type, x, y) {
+      var p = this.points[index];
+
+      if (type == 'LEFT') {
+        p.l = x - p.x;
+
+      } else if (type == 'RIGHT') {
+        p.r = x - p.x;
+
+      } else {   // ANCHOR
+        p.x = x;
+        p.y = y;
+      }
+
+      this.constrainPoints();
+    },
+    constrainPoints: function() {
+      var pl, p, pr;
+      var _this = this;
+      var last = function(i) { return i == _this.points.length - 1; };
+
+      for (var i = 0; i < this.points.length; i++) {
+        p  = this.points[i];
+        pl = (0 < i)    ? this.points[i - 1]: undefined;
+        pr = (!last(i)) ? this.points[i + 1]: undefined;
+
+        // anchor
+        p.x = clip01(p.x);
+        p.y = clip01(p.y);
+
+        if (i == 0)  { p.x = 0.0; }
+        if (last(i)) { p.x = 1.0; }
+
+        if (pr !== undefined && p.x > pr.x) {
+          p.x = pr.x;
+        }
+
+        // left
+        if (pl !== undefined) {
+          p.l = clipFunc(pl.x - p.x, 0)(p.l);
+        } else {
+          p.l = 0;
+        }
+
+        // right
+        if (pr !== undefined) {
+          p.r = clipFunc(0, pr.x - p.x)(p.r);
+        } else {
+          p.r = 0;
+        }
+      }
+
+    },
+    findPoint: function(x, y, r) {
+      r = r || 0.035;   // [FIXME] magic number
+      var dx, dy, h;
+      var minD = Infinity, minIndex, type;
+
+      this.points.forEach(function(p, i) {
+        dx = x - p.x, dy = y - p.y;
+        h = dx * dx + dy * dy;
+        if (h < (r * r) && minD > h) {
+          minD = h;
+          minIndex = i;
+        }
+      });
+      return {
+        index: minIndex,
+        type: Number.isInteger(minIndex) ? "ANCHOR": undefined
+      };
+    },
+    findPointWithHandle: function(x, y, r) {
+      r = r || 0.035;   // [FIXME] magic number
+      var dx, dy, h;
+      var minD = Infinity, minIndex, minType;
+      var candidates, d, type;
+      var _this = this;
+
+      this.points.forEach(function(p, i) {
+
+        if (i == 0) {
+          candidates = [[p.r, "RIGHT"], [0.0, "ANCHOR"]];
+        } else if (i == _this.points.length - 1) {
+          candidates = [[p.l, "LEFT"], [0.0, "ANCHOR"]];
+        } else {
+          candidates = [[p.r, "RIGHT"], [p.l, "LEFT"], [0.0, "ANCHOR"]];
+        }
+
+        candidates.forEach(function(cand) {
+          d = cand[0], type = cand[1];
+
+          dx = x - p.x - d, dy = y - p.y;
+          h = dx * dx + dy * dy;
+          if (h < (r * r) && minD > h) {
+            minD = h;
+            minIndex = i;
+            minType = type;
+          }
+        });
+      });
+
+      return {index: minIndex, type: minType};
+    },
+    addPoint: function(x, y) {
+      for (var i = 1; i < this.points.length - 1; i++) {
+        if (x <= this.points[i].x) {
+          break;
+        }
+      }
+      var point = new EasingFunctionPoint({x: x, y: y, l: 0.0, r: 0.0});
+      this.points.splice(i, 0, point);
+      this.constrainPoints();
+      return point;
+    },
+    deletePoint: function(i) {
+      if (i == 0 || i == this.points.length - 1) {
+        return false;
+      } else {
+        this.points.splice(i, 1);
+        return true;
+      }
+    },
+
+    getSegments: function() {
+      var segments = [];
+      var p1, p2;
+      for (var i = 0; i < this.points.length - 1; i++) {
+        p1 = this.points[i];
+        p2 = this.points[i + 1];
+
+        segments.push([
+          p1.x, p1.y,          // anchor point 1
+          p1.x + p1.r, p1.y,   // control point 1
+          p2.x + p2.l, p2.y,   // control point 2
+          p2.x, p2.y,          // anchor point 2
+        ]);
+      }
+      return segments;
+    },
+    getSegmentByX: function(x) {
+      var p1, p2;
+      for (var i = 1; i < this.points.length - 1; i++) {
+        if (x <= this.points[i].x) {
+          break;
+        }
+      }
+      p1 = this.points[i - 1];
+      p2 = this.points[i];
+      return [
+        p1.x,        p1.y,
+        p1.x + p1.r, p1.y,
+        p2.x + p2.l, p2.y,
+        p2.x,        p2.y
+      ];
+    },
+
+    calculateY: function(x) {
+      x = clip01(x);
+      if (x < EPSILON) {
+        x = EPSILON;
+      }
+
+      var segment = this.getSegmentByX(x);
+      var funcX  = cubicFunc(segment[0], segment[2], segment[4], segment[6]);
+      var funcY  = cubicFunc(segment[1], segment[3], segment[5], segment[7]);
+      var derivX = cubicFuncDeriv(segment[0], segment[2], segment[4], segment[6]);
+
+      // Newton's method
+      var t = 0.5;   // initial
+      var dt, slope;
+      for (var i = 0; i < 20; i++) {
+        dt = funcX(t) - x;
+        if (Math.abs(dt) < EPSILON) {
+          return funcY(clip01(t));
+        }
+        slope = derivX(t);
+        t = t - dt / slope;
+      }
+
+      // Newton's method failed. Then we use bisection method instead
+      var funcXd = function(t) { return funcX(t) - x; };
+      var t1 = 0.0, t2 = 1.0;
+      var st1 = sign(funcXd(t1)),
+          st2 = sign(funcXd(t2)),
+          st;
+      var diff;
+
+      for (var i = 0; i < 30; i++) {
+        t = (t1 + t2) / 2;
+        diff = funcXd(t);
+        if (Math.abs(diff) < EPSILON) {
+          return funcY(t);
+        }
+
+        st = sign(diff);
+        if (st == st1) {
+          t1 = t;
+        } else if (st == st2) {
+          t2 = t;
+        }
+      }
+      return funcY(t);
+    }
+
+  };
+
+  return EasingFunction;
+
+})(),
 dat.utils.common),
 dat.utils.requestAnimationFrame = (function () {
 

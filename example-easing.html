@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+
+  <canvas id="canvas"></canvas>
+
+  <!-- <script type="text/javascript" src="build/dat.gui.min.js"></script> -->
+  <script type="text/javascript" src="build/dat.gui.js"></script>
+  <script type="text/javascript">
+    var TestEasing = function() {
+      this.status = "playing"
+      this.duration = 1.0;
+      this.keyframe = [
+        {x:0,    y:0,   l:0,    r:0.4},
+        {x:0.40, y:0,   l:-0.1, r:0.2},
+        {x:0.6,  y:1.0, l:-0.1, r:0.1},
+        {x:0.75, y:0,   l:-0.1, r:0.1},
+        {x:1.0,  y:0,   l:-0.25, r:0},
+      ];
+      this.color = "#999dd9";
+      this.flag = true;
+
+      this.playing = true;
+      this.onoff = function () {
+        this.playing = !this.playing;
+        this.status = (this.playing) ? "playing": "stop";
+        update();
+
+        if (this.playing) {
+          window.requestAnimationFrame(animation);
+        }
+      };
+    };
+
+    var start = null;
+
+    var obj = new TestEasing();
+    var gui = new dat.GUI();
+    var durationController = gui.add(obj, 'duration', 0.1, 10.0);
+    gui.addColor(obj, 'color');
+    var keyframe = gui.addEasingFunction(obj, 'keyframe');
+    gui.add(obj, 'onoff');
+    gui.add(obj, 'status');
+
+    durationController.onChange(function(v) {
+      start = null;   // reset
+    });
+
+    var width = 400, height = 400;
+
+    var path1 = [100, 100, 150, 200, 150, 200, 200, 100];
+    var path2 = [ 30,  30,  40,  50,  40,  80,  90, 100];
+
+    function interpolate(ratio) {
+      var result = [];
+      for (var i = 0; i < path1.length; i++) {
+        result.push(path1[i] * ratio + path2[i] * (1 - ratio));
+      }
+      return result;
+    }
+
+    var canvas = document.getElementById('canvas');
+    canvas.width = width * 2;
+    canvas.height = height * 2;
+    canvas.style.width = width + "px";
+    canvas.style.height = height + "px";
+    var ctx = canvas.getContext('2d');
+    ctx.scale(2, 2);
+
+    function drawCanvas(ratio) {
+
+      var p = interpolate(ratio);
+      ctx.clearRect(0, 0, width, height);
+      ctx.beginPath();
+      ctx.fillStyle = obj.color;
+      ctx.strokeStyle = obj.color;
+      ctx.lineWidth = 2;
+      ctx.moveTo(p[0], p[1]);
+      ctx.bezierCurveTo(p[2], p[3], p[4], p[5], p[6], p[7]);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+    }
+
+    function update() {
+      // Iterate over all controllers
+      for (var i in gui.__controllers) {
+        gui.__controllers[i].updateDisplay();
+      }
+    }
+    gui.remember(obj);
+
+    function animation(timestamp) {
+      if (!start) start = timestamp;
+      var cursor = (timestamp - start) % (obj.duration * 1000);
+      update();
+      var ratio = keyframe.setCursor(cursor / (obj.duration * 1000));
+      drawCanvas(ratio);
+      if (obj.playing) {
+        window.requestAnimationFrame(animation);
+      }
+    }
+    window.requestAnimationFrame(animation);
+
+  </script>
+</body>
+</html>

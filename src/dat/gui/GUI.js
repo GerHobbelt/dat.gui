@@ -500,7 +500,10 @@ common.extend(
      * @instance
      */
     remove: function(controller) {
-      // TODO listening?
+      var lIndex = this.__listening.indexOf(controller);
+      if (lIndex != -1) {
+        this.__listening.splice(lIndex, 1);
+      }
       this.__ul.removeChild(controller.__li);
       this.__controllers.splice(this.__controllers.indexOf(controller), 1);
       const _this = this;
@@ -519,6 +522,10 @@ common.extend(
 
       if (this.saveToLocalStorageIfPossible) {
         dom.unbind(window, 'unload', this.saveToLocalStorageIfPossible);
+      }
+
+      for (var i = this.__listening.length - 1; i >= 0 ; i--) {
+        this.__listening.splice(i, 1);
       }
     },
 

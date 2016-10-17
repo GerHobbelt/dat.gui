@@ -446,8 +446,8 @@ GUI.CLASS_CLOSE_BUTTON = 'close-button';
 GUI.CLASS_DRAG = 'drag';
 
 GUI.DEFAULT_WIDTH = 245;
-GUI.TEXT_CLOSED = 'Close Controls';
-GUI.TEXT_OPEN = 'Open Controls';
+GUI.TEXT_CLOSED = '隐藏面板';
+GUI.TEXT_OPEN = '打开面板';
 
 GUI._keydownHandler = function(e) {
   if (document.activeElement.type !== 'text' &&

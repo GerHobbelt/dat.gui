@@ -28,7 +28,11 @@
         color3: { h: 350, s: 0.9, v: 0.3 } // Hue, saturation, value
     };
 
-    var gui = new dat.gui.GUI();
+    var gui = new dat.gui.GUI({
+        nameMaper: {
+            maxSize: '最大值'
+        } 
+    });
 
     gui.remember(obj);
 

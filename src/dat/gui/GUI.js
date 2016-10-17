@@ -81,6 +81,8 @@ const GUI = function(pars) {
 
   let params = pars || {};
 
+  this.nameMaper = params.nameMaper || {};
+
   /**
    * Outermost DOM Element
    * @type DOMElement
@@ -997,7 +999,7 @@ function add(gui, object, property, params) {
 
   const name = document.createElement('span');
   dom.addClass(name, 'property-name');
-  name.innerHTML = controller.property;
+  name.innerHTML = gui.nameMaper[controller.property] || controller.property;
 
   const container = document.createElement('div');
   container.appendChild(name);

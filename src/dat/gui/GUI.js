@@ -81,7 +81,7 @@ const GUI = function(pars) {
 
   let params = pars || {};
 
-  this.nameMaper = params.nameMaper || {};
+  this.nameMap = params.nameMap || {};
 
   /**
    * Outermost DOM Element
@@ -999,7 +999,7 @@ function add(gui, object, property, params) {
 
   const name = document.createElement('span');
   dom.addClass(name, 'property-name');
-  name.innerHTML = gui.nameMaper[controller.property] || controller.property;
+  name.innerHTML = gui.nameMap[controller.property] || controller.property;
 
   const container = document.createElement('div');
   container.appendChild(name);

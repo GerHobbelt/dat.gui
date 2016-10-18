@@ -3054,8 +3054,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	GUI.CLASS_DRAG = 'drag';
 	
 	GUI.DEFAULT_WIDTH = 245;
-	GUI.TEXT_CLOSED = 'Close Controls';
-	GUI.TEXT_OPEN = 'Open Controls';
+	GUI.TEXT_CLOSED = '隐藏面板';
+	GUI.TEXT_OPEN = '打开面板';
 	
 	GUI._keydownHandler = function (e) {
 	  if (document.activeElement.type !== 'text' && (e.which === HIDE_KEY_CODE || e.keyCode === HIDE_KEY_CODE)) {

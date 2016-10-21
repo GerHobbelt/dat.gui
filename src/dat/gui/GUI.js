@@ -930,7 +930,7 @@ function augmentController(gui, li, controller) {
 
     controller.updateDisplay();
   } else if (controller instanceof GradientController) {
-    dom.addClass(li, 'has-slider');
+    li.style.borderLeft = "3px solid #2FA1D6";
   }
 
   controller.setValue = common.compose(function(val) {

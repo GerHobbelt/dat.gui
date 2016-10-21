@@ -20,6 +20,7 @@ import FunctionController from '../controllers/FunctionController';
 import NumberControllerBox from '../controllers/NumberControllerBox';
 import NumberControllerSlider from '../controllers/NumberControllerSlider';
 import ColorController from '../controllers/ColorController';
+import GradientController from '../controllers/GradientController';
 import requestAnimationFrame from '../utils/requestAnimationFrame';
 import CenteredDiv from '../dom/CenteredDiv';
 import dom from '../dom/dom';
@@ -493,6 +494,24 @@ common.extend(
         property,
         {
           color: true
+        }
+      );
+    },
+
+    /**
+     * @param object
+     * @param property
+     * @returns {dat.controllers.ColorController} The new controller that was added.
+     * @instance
+     */
+    addGradient: function(object, property) {
+      return add(
+        this,
+        object,
+        property,
+        {
+          gradient: true,
+          factoryArgs: Array.prototype.slice.call(arguments, 2)
         }
       );
     },
@@ -984,6 +1003,8 @@ function add(gui, object, property, params) {
 
   if (params.color) {
     controller = new ColorController(object, property);
+  } else if (params.gradient) {
+    controller = new GradientController(object, property, params.factoryArgs[0]);
   } else {
     const factoryArgs = [object, property].concat(params.factoryArgs);
     controller = ControllerFactory.apply(gui, factoryArgs);

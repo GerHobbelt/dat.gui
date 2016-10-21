@@ -25,7 +25,8 @@
         color0: "#ffae23", // CSS string
         color1: [ 0, 128, 255 ], // RGB array
         color2: [ 0, 128, 255, 0.3 ], // RGB with alpha
-        color3: { h: 350, s: 0.9, v: 0.3 } // Hue, saturation, value
+        color3: { h: 350, s: 0.9, v: 0.3 }, // Hue, saturation, value
+        gradient: { 0.25: "rgb(0,0,255)", 0.55: "rgb(0,255,0)", 0.85: "yellow", 1.0: "rgb(255,0,0)"}
     };
 
     var gui = new dat.gui.GUI({
@@ -60,6 +61,13 @@
 
     var f3 = f2.addFolder('Nested Folder');
     f3.add(obj, 'growthSpeed');
+
+    gui.addGradient(obj, 'gradient', [
+        { 0.25: "rgb(0,0,255)", 0.55: "rgb(0,255,0)", 0.85: "yellow", 1.0: "rgb(255,0,0)"},
+        { 0: "rgb(255,0,0)", 1.0: "rgb(0,0,255)"}
+    ]).onFinishChange(function () {
+        console.log(obj.gradient);
+    })
 
   </script>
 </body>

@@ -929,6 +929,8 @@ function augmentController(gui, li, controller) {
     }, controller.updateDisplay);
 
     controller.updateDisplay();
+  } else if (controller instanceof GradientController) {
+    dom.addClass(li, 'has-slider');
   }
 
   controller.setValue = common.compose(function(val) {

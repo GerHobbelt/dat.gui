@@ -3509,6 +3509,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, controller.updateDisplay);
 	
 	    controller.updateDisplay();
+	  } else if (controller instanceof _GradientController2.default) {
+	    _dom2.default.addClass(li, 'has-slider');
 	  }
 	
 	  controller.setValue = _common2.default.compose(function (val) {

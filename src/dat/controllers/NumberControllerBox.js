@@ -53,7 +53,7 @@ class NumberControllerBox extends NumberController {
 
     function onChange() {
       var value = _this.__input.value;
-      if(params.suffix){
+      if(params && params.suffix){
         value = value.replace(params.suffix, "");
       }
       const attempted = parseFloat(value);
@@ -113,7 +113,7 @@ class NumberControllerBox extends NumberController {
 
   updateDisplay() {
     if (dom.isActive(this.__input)) return this; // prevent number from updating if user is trying to manually update
-    var suffix = params.suffix ? params.suffix : "";
+    var suffix = params && params.suffix ? params.suffix : "";
     this.__input.value = this.__truncationSuspended ? this.getValue() : roundToDecimal(this.getValue(), this.__precision) + suffix;
     return super.updateDisplay();
   }

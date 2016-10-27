@@ -33,6 +33,7 @@ function roundToDecimal(value, decimals) {
  * @param {Number} [params.min] Minimum allowed value
  * @param {Number} [params.max] Maximum allowed value
  * @param {Number} [params.step] Increment by which to change value
+ * @param {string} [params.suffix] Suffix for the value
  *
  * @member dat.controllers
  */
@@ -51,7 +52,11 @@ class NumberControllerBox extends NumberController {
     let prevY;
 
     function onChange() {
-      const attempted = parseFloat(_this.__input.value);
+      var value = _this.__input.value;
+      if(params.suffix){
+        value = value.replace(params.suffix, "");
+      }
+      const attempted = parseFloat(value);
       if (!common.isNaN(attempted)) {
         _this.setValue(attempted);
       }
@@ -108,7 +113,8 @@ class NumberControllerBox extends NumberController {
 
   updateDisplay() {
     if (dom.isActive(this.__input)) return this; // prevent number from updating if user is trying to manually update
-    this.__input.value = this.__truncationSuspended ? this.getValue() : roundToDecimal(this.getValue(), this.__precision);
+    var suffix = params.suffix ? params.suffix : "";
+    this.__input.value = this.__truncationSuspended ? this.getValue() : roundToDecimal(this.getValue(), this.__precision) + suffix;
     return super.updateDisplay();
   }
 }

@@ -4084,8 +4084,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var valueField = document.createElement('div');
 	
 	    _common2.default.extend(_this2.__selector.style, {
-	      width: '122px',
-	      padding: '3px',
+	      width: '150px',
+	      padding: '0px',
 	      lineHeight: '18px',
 	      backgroundColor: '#222',
 	      boxShadow: '0px 1px 3px rgba(0,0,0,0.3)'

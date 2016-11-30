@@ -4094,11 +4094,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    for (var i = 0; i < params.length; i++) {
 	      var item = document.createElement('canvas');
 	      item.value = params[i];
-	      item.width = 122;
+	      item.width = 150;
 	      item.height = 18;
 	      var context = item.getContext('2d');
 	
-	      var grd = context.createLinearGradient(0, 0, 122, 0);
+	      var grd = context.createLinearGradient(0, 0, 150, 0);
 	      for (var key in params[i]) {
 	        grd.addColorStop(key, params[i][key]);
 	      }
@@ -4112,7 +4112,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      context.fillStyle = grd;
 	      context.fillRect(0, 0, item.width, item.height);
 	      _common2.default.extend(item.style, {
-	        width: '122px'
+	        width: '150px'
 	      });
 	      _this2.__saturation_field.appendChild(item);
 	    }

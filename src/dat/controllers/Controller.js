@@ -92,7 +92,6 @@ class Controller {
     const oldValue = this.object[this.property];
     this.object[this.property] = newValue;
     if (this.__onChange && !disableOnChange) {
-      console.log("calling onchange for controller")
       this.__onChange.call(this, newValue, oldValue);
     }
 

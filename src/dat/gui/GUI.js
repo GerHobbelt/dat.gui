@@ -724,7 +724,6 @@ common.extend(
 
         // fire onFinishChange callback
         if (!_this.__onFinishRevert && controller.__onFinishChange) {
-          console.log("fire finish while revert")
           controller.__onFinishChange.call(controller, controller.getValue());
         }
       }, this);
@@ -1104,8 +1103,6 @@ function addSaveMenu(gui) {
     for (let index = 0; index < gui.__preset_select.length; index++) {
       gui.__preset_select[index].innerHTML = gui.__preset_select[index].value;
     }
-
-    console.log("selecting")
 
     gui.preset = this.value;
   });

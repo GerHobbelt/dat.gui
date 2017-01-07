@@ -131,28 +131,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _ColorController2 = _interopRequireDefault(_ColorController);
 	
+	var _ArrayController = __webpack_require__(17);
+	
+	var _ArrayController2 = _interopRequireDefault(_ArrayController);
+	
 	var _dom = __webpack_require__(9);
 	
 	var _dom2 = _interopRequireDefault(_dom);
 	
-	var _GUI = __webpack_require__(17);
+	var _GUI = __webpack_require__(18);
 	
 	var _GUI2 = _interopRequireDefault(_GUI);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	/**
-	 * dat-gui JavaScript Controller Library
-	 * http://code.google.com/p/dat-gui
-	 *
-	 * Copyright 2011 Data Arts Team, Google Creative Lab
-	 *
-	 * Licensed under the Apache License, Version 2.0 (the "License");
-	 * you may not use this file except in compliance with the License.
-	 * You may obtain a copy of the License at
-	 *
-	 * http://www.apache.org/licenses/LICENSE-2.0
-	 */
 	
 	exports.default = {
 	  color: {
@@ -170,7 +161,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    NumberControllerBox: _NumberControllerBox2.default,
 	    NumberControllerSlider: _NumberControllerSlider2.default,
 	    FunctionController: _FunctionController2.default,
-	    ColorController: _ColorController2.default
+	    ColorController: _ColorController2.default,
+	    ArrayController: _ArrayController2.default
 	  },
 	
 	  dom: {
@@ -182,7 +174,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	  },
 	
 	  GUI: _GUI2.default
-	};
+	}; /**
+	    * dat-gui JavaScript Controller Library
+	    * http://code.google.com/p/dat-gui
+	    *
+	    * Copyright 2011 Data Arts Team, Google Creative Lab
+	    *
+	    * Licensed under the Apache License, Version 2.0 (the "License");
+	    * you may not use this file except in compliance with the License.
+	    * You may obtain a copy of the License at
+	    *
+	    * http://www.apache.org/licenses/LICENSE-2.0
+	    */
 
 /***/ },
 /* 2 */
@@ -981,7 +984,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 7 */
 /***/ function(module, exports) {
 
-	'use strict';
+	"use strict";
 	
 	exports.__esModule = true;
 	
@@ -1085,10 +1088,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	
 	
-	  Controller.prototype.setValue = function setValue(newValue) {
+	  Controller.prototype.setValue = function setValue(newValue, disableOnChange) {
+	    console.log(disableOnChange);
+	    var disable = disableOnChange || false;
+	    var oldValue = this.object[this.property];
 	    this.object[this.property] = newValue;
-	    if (this.__onChange) {
-	      this.__onChange.call(this, newValue);
+	    if (this.__onChange && !disable) {
+	      console.log("calling onchange for controller");
+	      this.__onChange.call(this, newValue, oldValue);
 	    }
 	
 	    this.updateDisplay();
@@ -1203,8 +1210,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	
 	  BooleanController.prototype.setValue = function setValue(v) {
-	    var toReturn = _Controller.prototype.setValue.call(this, v);
-	    if (this.__onFinishChange) {
+	    var disableOnChange = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+	
+	    var toReturn = _Controller.prototype.setValue.call(this, v, disableOnChange);
+	    if (this.__onFinishChange && !disableOnChange) {
 	      this.__onFinishChange.call(this, this.getValue());
 	    }
 	    this.__prev = this.getValue();
@@ -1615,9 +1624,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	
 	  OptionController.prototype.setValue = function setValue(v) {
-	    var toReturn = _Controller.prototype.setValue.call(this, v);
+	    var disableOnChange = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 	
-	    if (this.__onFinishChange) {
+	    var toReturn = _Controller.prototype.setValue.call(this, v, disableOnChange);
+	
+	    if (this.__onFinishChange && !disableOnChange) {
 	      this.__onFinishChange.call(this, this.getValue());
 	    }
 	    return toReturn;
@@ -1820,6 +1831,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	
 	  NumberController.prototype.setValue = function setValue(v) {
+	    var disableOnChange = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+	
 	    var _v = v;
 	
 	    if (this.__min !== undefined && _v < this.__min) {
@@ -1832,7 +1845,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      _v = Math.round(_v / this.__step) * this.__step;
 	    }
 	
-	    return _Controller.prototype.setValue.call(this, _v);
+	    return _Controller.prototype.setValue.call(this, _v, disableOnChange);
 	  };
 	
 	  /**
@@ -2595,6 +2608,178 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 	
+	exports.__esModule = true;
+	
+	var _Controller2 = __webpack_require__(7);
+	
+	var _Controller3 = _interopRequireDefault(_Controller2);
+	
+	var _dom = __webpack_require__(9);
+	
+	var _dom2 = _interopRequireDefault(_dom);
+	
+	var _common = __webpack_require__(5);
+	
+	var _common2 = _interopRequireDefault(_common);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * dat-gui JavaScript Controller Library
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * http://code.google.com/p/dat-gui
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Copyright 2011 Data Arts Team, Google Creative Lab
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * ArrayController is based on StringController and was created by Ulysses Popple
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Licensed under the Apache License, Version 2.0 (the "License");
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * you may not use this file except in compliance with the License.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * You may obtain a copy of the License at
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * http://www.apache.org/licenses/LICENSE-2.0
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
+	
+	/**
+	 * @class Provides a text input to alter the array property of an object.
+	 *        Automatically converts strings to numbers and boolean values if appropriate.
+	 *
+	 * @extends dat.controllers.Controller
+	 *
+	 * @param {Object} object The object to be manipulated
+	 * @param {string} property The name of the property to be manipulated
+	 *
+	 * @member dat.controllers
+	 */
+	var ArrayController = function (_Controller) {
+	  _inherits(ArrayController, _Controller);
+	
+	  function ArrayController(object, property) {
+	    _classCallCheck(this, ArrayController);
+	
+	    var _this2 = _possibleConstructorReturn(this, _Controller.call(this, object, property));
+	
+	    var _this = _this2;
+	
+	    _this2.__div = document.createElement('div');
+	    _this2.__inputs = [];
+	
+	    _this2.__new = document.createElement('input');
+	    _this2.__new.setAttribute('type', 'text');
+	    _dom2.default.bind(_this2.__new, 'keydown', function (e) {
+	      if (e.keyCode === 13) {
+	        var values = _this.getValue();
+	        values.push(_this.__new.value);
+	        _this.__new.value = '';
+	
+	        _this.updateDisplay();
+	      }
+	    });
+	
+	    _this2.__div.appendChild(_this2.__new);
+	
+	    _this2.updateDisplay();
+	
+	    _this2.domElement.appendChild(_this2.__div);
+	    return _this2;
+	  }
+	
+	  ArrayController.prototype.updateDisplay = function updateDisplay() {
+	    for (var i = 0; i < this.__inputs.length; i++) {
+	      if (_dom2.default.isActive(this.__inputs[i])) {
+	        return;
+	      }
+	    }
+	
+	    var _this = this;
+	
+	    this.__inputs.forEach(function (i) {
+	      _this.__div.removeChild(i.parentElement);
+	    });
+	
+	    this.__inputs = [];
+	
+	    this.getValue().forEach(function (v) {
+	      var group = document.createElement('div');
+	      _dom2.default.addClass(group, 'array-input');
+	      var input = document.createElement('input');
+	      group.appendChild(input);
+	      input.setAttribute('type', 'text');
+	      input.value = v;
+	
+	      var remove = document.createElement('span');
+	      remove.innerHTML = '&nbsp;';
+	      _dom2.default.addClass(remove, 'remove-icon');
+	      group.appendChild(remove);
+	
+	      _dom2.default.bind(remove, 'click', onRemove);
+	
+	      _dom2.default.bind(input, 'keyup', onChange);
+	      _dom2.default.bind(input, 'change', onChange);
+	      _dom2.default.bind(input, 'blur', onBlur);
+	      _dom2.default.bind(input, 'keydown', function (e) {
+	        if (e.keyCode === 13) {
+	          this.blur();
+	        }
+	      });
+	
+	      _this.__div.insertBefore(group, _this.__new);
+	      _this.__inputs.push(input);
+	    });
+	
+	    function onRemove(e) {
+	      var _loop = function _loop(_i) {
+	        if (_this.__inputs[_i].parentElement === e.target.parentElement) {
+	          var values = _this.getValue().filter(function (v) {
+	            return v !== _this.__inputs[_i].value;
+	          });
+	          _this.setValue(values);
+	        }
+	      };
+	
+	      for (var _i = 0; _i < _this.__inputs.length; _i++) {
+	        _loop(_i);
+	      }
+	    }
+	
+	    function onChange() {
+	
+	      if (_this.__changing) {
+	        return;
+	      }
+	
+	      _this.__changing = true;
+	
+	      var values = _this.__inputs.map(function (i) {
+	        return i.value;
+	      });
+	
+	      _this.setValue(values);
+	
+	      _this.__changing = false;
+	    }
+	
+	    function onBlur() {
+	      if (_this.__onFinishChange) {
+	        _this.__onFinishChange.call(_this, _this.getValue());
+	      }
+	    }
+	  };
+	
+	  return ArrayController;
+	}(_Controller3.default);
+	
+	exports.default = ArrayController;
+
+/***/ },
+/* 18 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
 	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; /**
 	                                                                                                                                                                                                                                                                               * dat-gui JavaScript Controller Library
 	                                                                                                                                                                                                                                                                               * http://code.google.com/p/dat-gui
@@ -2608,15 +2793,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                                                                                                                                                                                                                                                               * http://www.apache.org/licenses/LICENSE-2.0
 	                                                                                                                                                                                                                                                                               */
 	
-	var _css = __webpack_require__(18);
+	var _css = __webpack_require__(19);
 	
 	var _css2 = _interopRequireDefault(_css);
 	
-	var _saveDialogue = __webpack_require__(19);
+	var _saveDialogue = __webpack_require__(20);
 	
 	var _saveDialogue2 = _interopRequireDefault(_saveDialogue);
 	
-	var _ControllerFactory = __webpack_require__(20);
+	var _ControllerFactory = __webpack_require__(21);
 	
 	var _ControllerFactory2 = _interopRequireDefault(_ControllerFactory);
 	
@@ -2644,7 +2829,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _ColorController2 = _interopRequireDefault(_ColorController);
 	
-	var _ArrayController = __webpack_require__(21);
+	var _ArrayController = __webpack_require__(17);
 	
 	var _ArrayController2 = _interopRequireDefault(_ArrayController);
 	
@@ -3201,6 +3386,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.closed = true;
 	  },
 	
+	  onFinishRevert: function onFinishRevert(fn) {
+	    this.__onFinishRevert = fn;
+	    return this;
+	  },
+	
 	  onResize: function onResize() {
 	    // we debounce this function to prevent performance issues when rotating on tablet/mobile
 	    var root = this.getRoot();
@@ -3338,10 +3528,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  },
 	
 	  revert: function revert(gui) {
+	    var _this = this;
+	
 	    _common2.default.each(this.__controllers, function (controller) {
 	      // Make revert work on Default.
 	      if (!this.getRoot().load.remembered) {
-	        controller.setValue(controller.initialValue);
+	        controller.setValue(controller.initialValue, true);
 	      } else {
 	        recallSavedValue(gui || this.getRoot(), controller);
 	      }
@@ -3358,6 +3550,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    if (!gui) {
 	      markPresetModified(this.getRoot(), false);
+	    }
+	
+	    if (_this.__onFinishRevert) {
+	      _this.__onFinishRevert.call(_this);
 	    }
 	  },
 	
@@ -3594,7 +3790,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        // And that's what it is.
 	        controller.initialValue = value;
-	        controller.setValue(value);
+	        controller.setValue(value, true);
 	      }
 	    }
 	  }
@@ -3708,6 +3904,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    for (var index = 0; index < gui.__preset_select.length; index++) {
 	      gui.__preset_select[index].innerHTML = gui.__preset_select[index].value;
 	    }
+	
+	    console.log("selecting");
 	
 	    gui.preset = this.value;
 	  });
@@ -3880,7 +4078,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = GUI;
 
 /***/ },
-/* 18 */
+/* 19 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -3922,13 +4120,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 19 */
+/* 20 */
 /***/ function(module, exports) {
 
 	module.exports = "<div id=\"dg-save\" class=\"dg dialogue\">\r\n\r\n  Here's the new load parameter for your <code>GUI</code>'s constructor:\r\n\r\n  <textarea id=\"dg-new-constructor\"></textarea>\r\n\r\n  <div id=\"dg-save-locally\">\r\n\r\n    <input id=\"dg-local-storage\" type=\"checkbox\"/> Automatically save\r\n    values to <code>localStorage</code> on exit.\r\n\r\n    <div id=\"dg-local-explain\">The values saved to <code>localStorage</code> will\r\n      override those passed to <code>dat.GUI</code>'s constructor. This makes it\r\n      easier to work incrementally, but <code>localStorage</code> is fragile,\r\n      and your friends may not see the same values you do.\r\n\r\n    </div>\r\n\r\n  </div>\r\n\r\n</div>";
 
 /***/ },
-/* 20 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3959,7 +4157,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _BooleanController2 = _interopRequireDefault(_BooleanController);
 	
-	var _ArrayController = __webpack_require__(21);
+	var _ArrayController = __webpack_require__(17);
 	
 	var _ArrayController2 = _interopRequireDefault(_ArrayController);
 	
@@ -4030,178 +4228,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	
 	exports.default = ControllerFactory;
-
-/***/ },
-/* 21 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	exports.__esModule = true;
-	
-	var _Controller2 = __webpack_require__(7);
-	
-	var _Controller3 = _interopRequireDefault(_Controller2);
-	
-	var _dom = __webpack_require__(9);
-	
-	var _dom2 = _interopRequireDefault(_dom);
-	
-	var _common = __webpack_require__(5);
-	
-	var _common2 = _interopRequireDefault(_common);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * dat-gui JavaScript Controller Library
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * http://code.google.com/p/dat-gui
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Copyright 2011 Data Arts Team, Google Creative Lab
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * ArrayController is based on StringController and was created by Ulysses Popple
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Licensed under the Apache License, Version 2.0 (the "License");
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * you may not use this file except in compliance with the License.
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * You may obtain a copy of the License at
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * http://www.apache.org/licenses/LICENSE-2.0
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
-	
-	/**
-	 * @class Provides a text input to alter the array property of an object.
-	 *        Automatically converts strings to numbers and boolean values if appropriate.
-	 *
-	 * @extends dat.controllers.Controller
-	 *
-	 * @param {Object} object The object to be manipulated
-	 * @param {string} property The name of the property to be manipulated
-	 *
-	 * @member dat.controllers
-	 */
-	var ArrayController = function (_Controller) {
-	  _inherits(ArrayController, _Controller);
-	
-	  function ArrayController(object, property) {
-	    _classCallCheck(this, ArrayController);
-	
-	    var _this2 = _possibleConstructorReturn(this, _Controller.call(this, object, property));
-	
-	    var _this = _this2;
-	
-	    _this2.__div = document.createElement('div');
-	    _this2.__inputs = [];
-	
-	    _this2.__new = document.createElement('input');
-	    _this2.__new.setAttribute('type', 'text');
-	    _dom2.default.bind(_this2.__new, 'keydown', function (e) {
-	      if (e.keyCode === 13) {
-	        var values = _this.getValue();
-	        values.push(_this.__new.value);
-	        _this.__new.value = '';
-	
-	        _this.updateDisplay();
-	      }
-	    });
-	
-	    _this2.__div.appendChild(_this2.__new);
-	
-	    _this2.updateDisplay();
-	
-	    _this2.domElement.appendChild(_this2.__div);
-	    return _this2;
-	  }
-	
-	  ArrayController.prototype.updateDisplay = function updateDisplay() {
-	    for (var i = 0; i < this.__inputs.length; i++) {
-	      if (_dom2.default.isActive(this.__inputs[i])) {
-	        return;
-	      }
-	    }
-	
-	    var _this = this;
-	
-	    this.__inputs.forEach(function (i) {
-	      _this.__div.removeChild(i.parentElement);
-	    });
-	
-	    this.__inputs = [];
-	
-	    this.getValue().forEach(function (v) {
-	      var group = document.createElement('div');
-	      _dom2.default.addClass(group, 'array-input');
-	      var input = document.createElement('input');
-	      group.appendChild(input);
-	      input.setAttribute('type', 'text');
-	      input.value = v;
-	
-	      var remove = document.createElement('span');
-	      remove.innerHTML = '&nbsp;';
-	      _dom2.default.addClass(remove, 'remove-icon');
-	      group.appendChild(remove);
-	
-	      _dom2.default.bind(remove, 'click', onRemove);
-	
-	      _dom2.default.bind(input, 'keyup', onChange);
-	      _dom2.default.bind(input, 'change', onChange);
-	      _dom2.default.bind(input, 'blur', onBlur);
-	      _dom2.default.bind(input, 'keydown', function (e) {
-	        if (e.keyCode === 13) {
-	          this.blur();
-	        }
-	      });
-	
-	      _this.__div.insertBefore(group, _this.__new);
-	      _this.__inputs.push(input);
-	    });
-	
-	    function onRemove(e) {
-	      var _loop = function _loop(_i) {
-	        if (_this.__inputs[_i].parentElement === e.target.parentElement) {
-	          var values = _this.getValue().filter(function (v) {
-	            return v !== _this.__inputs[_i].value;
-	          });
-	          _this.setValue(values);
-	        }
-	      };
-	
-	      for (var _i = 0; _i < _this.__inputs.length; _i++) {
-	        _loop(_i);
-	      }
-	    }
-	
-	    function onChange() {
-	
-	      if (_this.__changing) {
-	        return;
-	      }
-	
-	      _this.__changing = true;
-	
-	      var values = _this.__inputs.map(function (i) {
-	        return i.value;
-	      });
-	
-	      _this.setValue(values);
-	
-	      _this.__changing = false;
-	    }
-	
-	    function onBlur() {
-	      if (_this.__onFinishChange) {
-	        _this.__onFinishChange.call(_this, _this.getValue());
-	      }
-	    }
-	  };
-	
-	  return ArrayController;
-	}(_Controller3.default);
-	
-	exports.default = ArrayController;
 
 /***/ },
 /* 22 */

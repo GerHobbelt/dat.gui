@@ -34,8 +34,16 @@
 
     gui.remember(obj);
 
+    gui.onFinishRevert(function() {
+      console.log("finished reverting");
+    });
+
     gui.add(obj, 'message');
-    gui.add(obj, 'displayOutline');
+    var control = gui.add(obj, 'displayOutline');
+    control.onChange(function(newValue, oldValue) {
+      console.log(newValue, oldValue);
+    });
+
     gui.add(obj, 'explode');
 
     gui.add(obj, 'maxSize').min(-10).max(10).step(0.25);

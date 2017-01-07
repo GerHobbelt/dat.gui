@@ -572,6 +572,10 @@ common.extend(
       this.closed = true;
     },
 
+    onFinishRevert: function(fn) {
+      this.__onFinishRevert = fn;
+      return this;
+    },
 
     onResize: function() {
       // we debounce this function to prevent performance issues when rotating on tablet/mobile
@@ -708,10 +712,12 @@ common.extend(
     },
 
     revert: function(gui) {
+      const _this = this;
+
       common.each(this.__controllers, function(controller) {
         // Make revert work on Default.
         if (!this.getRoot().load.remembered) {
-          controller.setValue(controller.initialValue);
+          controller.setValue(controller.initialValue, true);
         } else {
           recallSavedValue(gui || this.getRoot(), controller);
         }
@@ -728,6 +734,10 @@ common.extend(
 
       if (!gui) {
         markPresetModified(this.getRoot(), false);
+      }
+
+      if (_this.__onFinishRevert) {
+        _this.__onFinishRevert.call(_this);
       }
     },
 
@@ -979,7 +989,7 @@ function recallSavedValue(gui, controller) {
 
         // And that's what it is.
         controller.initialValue = value;
-        controller.setValue(value);
+        controller.setValue(value, true);
       }
     }
   }
@@ -1093,6 +1103,8 @@ function addSaveMenu(gui) {
     for (let index = 0; index < gui.__preset_select.length; index++) {
       gui.__preset_select[index].innerHTML = gui.__preset_select[index].value;
     }
+
+    console.log("selecting")
 
     gui.preset = this.value;
   });

@@ -34,36 +34,95 @@ class ArrayController extends Controller {
 
     const _this = this;
 
-    this.__input = document.createElement('input');
-    this.__input.setAttribute('type', 'text');
+    this.__div = document.createElement('div');
+    this.__inputs = [];
 
-    dom.bind(this.__input, 'keyup', onChange);
-    dom.bind(this.__input, 'change', onChange);
-    dom.bind(this.__input, 'blur', onBlur);
-    dom.bind(this.__input, 'keydown', function(e) {
+    this.__new = document.createElement('input');
+    this.__new.setAttribute('type', 'text');
+    dom.bind(this.__new, 'keydown', function(e) {
       if (e.keyCode === 13) {
-        this.blur();
+        const values = _this.getValue();
+        values.push(_this.__new.value);
+        _this.__new.value = '';
+
+        _this.updateDisplay();
       }
     });
 
-    function onChange() {
-      const arr = _this.__input.value.replace(/^\s*|\s*$/g, '').split(/\s*,\s*/)
+    this.__div.appendChild(this.__new);
 
-      // The resulting values will all be strings, so convert them here to actual data types
-      for (var i = 0; i < arr.length; i++) {
-        var value = arr[i];
-        if (!isNaN(value)) {
-          arr[i] = +value;
-          continue;
+    this.updateDisplay();
+
+    this.domElement.appendChild(this.__div);
+  }
+
+  updateDisplay() {
+    for (let i = 0; i < this.__inputs.length; i++) {
+      if (dom.isActive(this.__inputs[i])) {
+        return;
+      }
+    }
+
+    const _this = this;
+
+    this.__inputs.forEach(function(i) {
+      _this.__div.removeChild(i.parentElement);
+    });
+
+    this.__inputs = [];
+
+    this.getValue().forEach(function (v) {
+      const group = document.createElement('div');
+      dom.addClass(group, 'array-input');
+      const input = document.createElement('input');
+      group.appendChild(input);
+      input.setAttribute('type', 'text');
+      input.value = v;
+
+      const remove = document.createElement('span');
+      remove.innerHTML = '&nbsp;';
+      dom.addClass(remove, 'remove-icon');
+      group.appendChild(remove);
+
+      dom.bind(remove, 'click', onRemove);
+
+      dom.bind(input, 'keyup', onChange);
+      dom.bind(input, 'change', onChange);
+      dom.bind(input, 'blur', onBlur);
+      dom.bind(input, 'keydown', function(e) {
+        if (e.keyCode === 13) {
+          this.blur();
         }
-        else if (value === 'true') {
-          arr[i] = true;
-        }
-        else if (value === 'false') {
-          arr[i] = false;
+      });
+
+      _this.__div.insertBefore(group, _this.__new);
+      _this.__inputs.push(input);
+    });
+
+    function onRemove(e) {
+      for (let i = 0; i < _this.__inputs.length; i++) {
+        if (_this.__inputs[i].parentElement === e.target.parentElement) {
+          const values = _this.getValue().filter(v => v !== _this.__inputs[i].value)
+          _this.setValue(values)
         }
       }
-      _this.setValue(arr);
+    }
+
+    function onChange() {
+
+      if (_this.__changing) {
+        return;
+      }
+
+      _this.__changing = true;
+
+      const values = _this.__inputs.map(function (i) {
+        return i.value;
+      });
+
+      _this.setValue(values);
+
+      _this.__changing = false;
     }
 
     function onBlur() {
@@ -71,10 +130,6 @@ class ArrayController extends Controller {
         _this.__onFinishChange.call(_this, _this.getValue());
       }
     }
-
-    this.updateDisplay();
-
-    this.domElement.appendChild(this.__input);
   }
 }
 

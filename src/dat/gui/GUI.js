@@ -20,6 +20,7 @@ import FunctionController from '../controllers/FunctionController';
 import NumberControllerBox from '../controllers/NumberControllerBox';
 import NumberControllerSlider from '../controllers/NumberControllerSlider';
 import ColorController from '../controllers/ColorController';
+import ArrayController from '../controllers/ArrayController';
 import requestAnimationFrame from '../utils/requestAnimationFrame';
 import CenteredDiv from '../dom/CenteredDiv';
 import dom from '../dom/dom';
@@ -908,6 +909,14 @@ function augmentController(gui, li, controller) {
     controller.updateDisplay = common.compose(function(val) {
       li.style.borderLeftColor = controller.__color.toString();
       return val;
+    }, controller.updateDisplay);
+
+    controller.updateDisplay();
+  } else if (controller instanceof ArrayController) {
+    dom.addClass(li, 'array');
+
+    controller.updateDisplay = common.compose(function(val) {
+      li.style.height = `${(controller.__inputs.length + 1) * 26}px`;
     }, controller.updateDisplay);
 
     controller.updateDisplay();

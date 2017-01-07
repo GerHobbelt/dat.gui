@@ -25,7 +25,9 @@
         color0: "#ffae23", // CSS string
         color1: [ 0, 128, 255 ], // RGB array
         color2: [ 0, 128, 255, 0.3 ], // RGB with alpha
-        color3: { h: 350, s: 0.9, v: 0.3 } // Hue, saturation, value
+        color3: { h: 350, s: 0.9, v: 0.3 }, // Hue, saturation, value
+
+        array: ['one', 'two']
     };
 
     var gui = new dat.gui.GUI();
@@ -44,6 +46,8 @@
 
     // Choose from named values
     gui.add(obj, 'speed', { Stopped: 0, Slow: 0.1, Fast: 5 } );
+
+    gui.add(obj, 'array')
 
     var f1 = gui.addFolder('Colors');
     f1.addColor(obj, 'color0');

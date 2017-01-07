@@ -88,12 +88,10 @@ class Controller {
    *
    * @param {Object} newValue The new value of <code>object[property]</code>
    */
-  setValue(newValue, disableOnChange) {
-    console.log(disableOnChange)
-    const disable = disableOnChange || false;
+  setValue(newValue, disableOnChange = false) {
     const oldValue = this.object[this.property];
     this.object[this.property] = newValue;
-    if (this.__onChange && !disable) {
+    if (this.__onChange && !disableOnChange) {
       console.log("calling onchange for controller")
       this.__onChange.call(this, newValue, oldValue);
     }

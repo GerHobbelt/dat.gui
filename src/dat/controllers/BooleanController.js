@@ -46,8 +46,11 @@ class BooleanController extends Controller {
   }
 
   setValue(v, disableOnChange = false) {
+    console.log("ASDASD")
+    console.log("bool = " + disableOnChange)
     const toReturn = super.setValue(v, disableOnChange);
     if (this.__onFinishChange && !disableOnChange) {
+      console.log("zxc");
       this.__onFinishChange.call(this, this.getValue());
     }
     this.__prev = this.getValue();

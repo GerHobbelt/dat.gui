@@ -712,7 +712,7 @@ common.extend(
     },
 
     revert: function(gui) {
-      const _this = this;
+      const _this = this.getRoot();
 
       common.each(this.__controllers, function(controller) {
         // Make revert work on Default.
@@ -723,7 +723,8 @@ common.extend(
         }
 
         // fire onFinishChange callback
-        if (controller.__onFinishChange) {
+        if (!_this.__onFinishRevert && controller.__onFinishChange) {
+          console.log("fire finish while revert")
           controller.__onFinishChange.call(controller, controller.getValue());
         }
       }, this);
@@ -736,7 +737,7 @@ common.extend(
         markPresetModified(this.getRoot(), false);
       }
 
-      if (_this.__onFinishRevert) {
+      if (_this === this && _this.__onFinishRevert) {
         _this.__onFinishRevert.call(_this);
       }
     },

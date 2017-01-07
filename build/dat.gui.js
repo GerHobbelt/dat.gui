@@ -1088,12 +1088,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	
 	
-	  Controller.prototype.setValue = function setValue(newValue, disableOnChange) {
-	    console.log(disableOnChange);
-	    var disable = disableOnChange || false;
+	  Controller.prototype.setValue = function setValue(newValue) {
+	    var disableOnChange = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+	
 	    var oldValue = this.object[this.property];
 	    this.object[this.property] = newValue;
-	    if (this.__onChange && !disable) {
+	    if (this.__onChange && !disableOnChange) {
 	      console.log("calling onchange for controller");
 	      this.__onChange.call(this, newValue, oldValue);
 	    }
@@ -1212,8 +1212,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  BooleanController.prototype.setValue = function setValue(v) {
 	    var disableOnChange = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 	
+	    console.log("ASDASD");
+	    console.log("bool = " + disableOnChange);
 	    var toReturn = _Controller.prototype.setValue.call(this, v, disableOnChange);
 	    if (this.__onFinishChange && !disableOnChange) {
+	      console.log("zxc");
 	      this.__onFinishChange.call(this, this.getValue());
 	    }
 	    this.__prev = this.getValue();
@@ -3528,7 +3531,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  },
 	
 	  revert: function revert(gui) {
-	    var _this = this;
+	    var _this = this.getRoot();
 	
 	    _common2.default.each(this.__controllers, function (controller) {
 	      // Make revert work on Default.
@@ -3539,7 +3542,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	
 	      // fire onFinishChange callback
-	      if (controller.__onFinishChange) {
+	      if (!_this.__onFinishRevert && controller.__onFinishChange) {
+	        console.log("fire finish while revert");
 	        controller.__onFinishChange.call(controller, controller.getValue());
 	      }
 	    }, this);
@@ -3552,7 +3556,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      markPresetModified(this.getRoot(), false);
 	    }
 	
-	    if (_this.__onFinishRevert) {
+	    if (_this === this && _this.__onFinishRevert) {
 	      _this.__onFinishRevert.call(_this);
 	    }
 	  },

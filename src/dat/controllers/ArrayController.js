@@ -28,7 +28,7 @@ import common from '../utils/common';
  *
  * @member dat.controllers
  */
-class BooleanController extends Controller {
+class ArrayController extends Controller {
   constructor(object, property) {
     super(object, property);
 

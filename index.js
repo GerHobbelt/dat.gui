@@ -10,3 +10,7 @@
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  */
+
+import dat from './src/dat/index';
+
+module.exports = dat;

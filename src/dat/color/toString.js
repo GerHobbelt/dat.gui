@@ -11,27 +11,42 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define([
-  'dat/utils/common'
-], function(common) {
+export default function(color, forceCSSHex) {
+  const colorFormat = color.__state.conversionName.toString();
 
-  return function(color) {
+  const r = Math.round(color.r);
+  const g = Math.round(color.g);
+  const b = Math.round(color.b);
+  const a = color.a;
+  const h = Math.round(color.h);
+  const s = color.s.toFixed(1);
+  const v = color.v.toFixed(1);
 
-    if (color.a == 1 || common.isUndefined(color.a)) {
-
-      var s = color.hex.toString(16);
-      while (s.length < 6) {
-        s = '0' + s;
-      }
-
-      return '#' + s;
-
-    } else {
-
-      return 'rgba(' + Math.round(color.r) + ',' + Math.round(color.g) + ',' + Math.round(color.b) + ',' + color.a + ')';
-
+  if (forceCSSHex || (colorFormat === 'THREE_CHAR_HEX') || (colorFormat === 'SIX_CHAR_HEX')) {
+    let str = color.hex.toString(16);
+    while (str.length < 6) {
+      str = '0' + str;
     }
-
+    return '#' + str;
+  } else if (colorFormat === 'CSS_RGB') {
+    return 'rgb(' + r + ',' + g + ',' + b + ')';
+  } else if (colorFormat === 'CSS_RGBA') {
+    return 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';
+  } else if (colorFormat === 'HEX') {
+    return '0x' + color.hex.toString(16);
+  } else if (colorFormat === 'RGB_ARRAY') {
+    return '[' + r + ',' + g + ',' + b + ']';
+  } else if (colorFormat === 'RGBA_ARRAY') {
+    return '[' + r + ',' + g + ',' + b + ',' + a + ']';
+  } else if (colorFormat === 'RGB_OBJ') {
+    return '{r:' + r + ',g:' + g + ',b:' + b + '}';
+  } else if (colorFormat === 'RGBA_OBJ') {
+    return '{r:' + r + ',g:' + g + ',b:' + b + ',a:' + a + '}';
+  } else if (colorFormat === 'HSV_OBJ') {
+    return '{h:' + h + ',s:' + s + ',v:' + v + '}';
+  } else if (colorFormat === 'HSVA_OBJ') {
+    return '{h:' + h + ',s:' + s + ',v:' + v + ',a:' + a + '}';
   }
 
-});
+  return 'unknown format';
+}

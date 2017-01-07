@@ -85,7 +85,7 @@
     padding: 0 4px 0 5px; }
   .dg li.folder {
     padding: 0;
-    border-left: 4px solid rgba(0, 0, 0, 0); }
+    border-left: 4px solid transparent; }
   .dg li.title {
     cursor: pointer;
     margin-left: -4px; }
@@ -242,19 +242,21 @@
     border-bottom: 0; }
   .dg li.title {
     padding-left: 16px;
-    background: black url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlI+hKgFxoCgAOw==) 6px 10px no-repeat;
+    background: #000 url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlI+hKgFxoCgAOw==) 6px 10px no-repeat;
     cursor: pointer;
     border-bottom: 1px solid rgba(255, 255, 255, 0.2); }
   .dg .closed li.title {
     background-image: url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlGIWqMCbWAEAOw==); }
   .dg .cr.boolean {
     border-left: 3px solid #806787; }
+  .dg .cr.color {
+    border-left: 3px solid; }
   .dg .cr.function {
     border-left: 3px solid #e61d5f; }
   .dg .cr.number {
-    border-left: 3px solid #2fa1d6; }
+    border-left: 3px solid #2FA1D6; }
     .dg .cr.number input[type=text] {
-      color: #2fa1d6; }
+      color: #2FA1D6; }
   .dg .cr.string {
     border-left: 3px solid #1ed36f; }
     .dg .cr.string input[type=text] {
@@ -273,7 +275,8 @@
     background: #303030;
     cursor: ew-resize; }
   .dg .c .slider-fg {
-    background: #2fa1d6; }
+    background: #2FA1D6;
+    max-width: 100%; }
   .dg .c .slider:hover {
     background: #3c3c3c; }
     .dg .c .slider:hover .slider-fg {

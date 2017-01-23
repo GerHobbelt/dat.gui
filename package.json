@@ -2,7 +2,7 @@
   "name": "dat.gui",
   "version": "0.6.1",
   "description": "A lightweight graphical user interface for changing variables in JavaScript.",
-  "main": "index.js",
+  "main": "./build/dat.gui.js",
   "directories": {
     "test": "tests"
   },

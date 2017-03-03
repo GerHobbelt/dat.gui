@@ -444,8 +444,8 @@ GUI.CLASS_CLOSE_BUTTON = 'close-button';
 GUI.CLASS_DRAG = 'drag';
 
 GUI.DEFAULT_WIDTH = 245;
-GUI.TEXT_CLOSED = 'Close Controls';
-GUI.TEXT_OPEN = 'Open Controls';
+GUI.TEXT_CLOSED = '<img src="https://icon.now.sh/x/FFFFFF/10" />';
+GUI.TEXT_OPEN = '<img src="https://icon.now.sh/settings/FFFFFF/18" />';
 
 GUI._keydownHandler = function(e) {
   if (document.activeElement.type !== 'text' &&

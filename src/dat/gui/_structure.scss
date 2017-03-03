@@ -1,7 +1,8 @@
 $nest-margin: 4px;
-$row-height: 27px;
+$row-height: 32px;
 
-$button-height: 20px;
+$button-height: 28px;
+$shadow: 0 2px 10px rgba(0,0,0,0.25);
 
 .dg {
 
@@ -32,6 +33,7 @@ $button-height: 20px;
   &.main {
 
     @include transition(opacity, 0.1s, linear);
+    box-shadow: $shadow;
 
     &.taller-than-window {
 
@@ -62,6 +64,7 @@ $button-height: 20px;
       /*opacity: 0;*/
       @include transition(opacity, 0.1s, linear);
       border: 0;
+      box-shadow: $shadow;
       position: absolute;
 
       line-height: $button-height - 1;
@@ -73,6 +76,12 @@ $button-height: 20px;
       background-color: #000;
       &:hover {
         background-color: #111;
+      }
+
+      img {
+        display: inline-block;
+        margin: 2px;
+        vertical-align: middle;
       }
 
     }

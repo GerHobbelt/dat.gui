@@ -7,29 +7,6 @@
   "directories": {
     "test": "tests"
   },
-  "browserify": {
-    "transform": [
-      [
-        "babelify",
-        {
-          "presets": [
-            "es2015"
-          ]
-        }
-      ],
-      [
-        "stringify",
-        {
-          "extensions": [
-            ".html"
-          ]
-        }
-      ],
-      [
-        "sassify"
-      ]
-    ]
-  },
   "scripts": {
     "dev": "webpack --progress --colors --watch --config webpack/webpack.config.js --devtool sourcemap",
     "build": "npm run build-js && npm run build-css",

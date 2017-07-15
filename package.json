@@ -1,6 +1,6 @@
 {
   "name": "dat.gui-mirror",
-  "version": "0.7.2",
+  "version": "0.7.3",
   "description": "A lightweight graphical user interface for changing variables in JavaScript.",
   "main": "build/dat.gui.js",
   "jsnext:main": "index.js",

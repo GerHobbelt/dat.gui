@@ -11,7 +11,6 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import css from '../utils/css';
 import saveDialogueContents from './saveDialogue.html';
 import ControllerFactory from '../controllers/ControllerFactory';
 import Controller from '../controllers/Controller';
@@ -25,9 +24,7 @@ import CenteredDiv from '../dom/CenteredDiv';
 import dom from '../dom/dom';
 import common from '../utils/common';
 
-import styleSheet from './style.scss'; // CSS to embed in build
-
-css.inject(styleSheet);
+import './style.scss'; // CSS to embed in build
 
 /** Outer-most className for GUI's */
 const CSS_NAMESPACE = 'dg';

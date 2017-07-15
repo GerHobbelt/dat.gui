@@ -2643,15 +2643,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                                                                                                                                                                                                                                                               * http://www.apache.org/licenses/LICENSE-2.0
 	                                                                                                                                                                                                                                                                               */
 	
-	var _css = __webpack_require__(18);
-	
-	var _css2 = _interopRequireDefault(_css);
-	
-	var _saveDialogue = __webpack_require__(19);
+	var _saveDialogue = __webpack_require__(18);
 	
 	var _saveDialogue2 = _interopRequireDefault(_saveDialogue);
 	
-	var _ControllerFactory = __webpack_require__(20);
+	var _ControllerFactory = __webpack_require__(19);
 	
 	var _ControllerFactory2 = _interopRequireDefault(_ControllerFactory);
 	
@@ -2679,11 +2675,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _ColorController2 = _interopRequireDefault(_ColorController);
 	
-	var _requestAnimationFrame = __webpack_require__(21);
+	var _requestAnimationFrame = __webpack_require__(20);
 	
 	var _requestAnimationFrame2 = _interopRequireDefault(_requestAnimationFrame);
 	
-	var _CenteredDiv = __webpack_require__(22);
+	var _CenteredDiv = __webpack_require__(21);
 	
 	var _CenteredDiv2 = _interopRequireDefault(_CenteredDiv);
 	
@@ -2695,15 +2691,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _common2 = _interopRequireDefault(_common);
 	
-	var _style = __webpack_require__(23);
-	
-	var _style2 = _interopRequireDefault(_style);
+	__webpack_require__(22);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	// CSS to embed in build
-	
-	_css2.default.inject(_style2.default);
 	
 	/** Outer-most className for GUI's */
 	var CSS_NAMESPACE = 'dg';
@@ -3923,52 +3915,10 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 18 */
 /***/ function(module, exports) {
 
-	'use strict';
-	
-	/**
-	 * dat-gui JavaScript Controller Library
-	 * http://code.google.com/p/dat-gui
-	 *
-	 * Copyright 2011 Data Arts Team, Google Creative Lab
-	 *
-	 * Licensed under the Apache License, Version 2.0 (the "License");
-	 * you may not use this file except in compliance with the License.
-	 * You may obtain a copy of the License at
-	 *
-	 * http://www.apache.org/licenses/LICENSE-2.0
-	 */
-	
-	module.exports = {
-	  load: function load(url, indoc) {
-	    var doc = indoc || document;
-	    var link = doc.createElement('link');
-	    link.type = 'text/css';
-	    link.rel = 'stylesheet';
-	    link.href = url;
-	    doc.getElementsByTagName('head')[0].appendChild(link);
-	  },
-	
-	  inject: function inject(css, indoc) {
-	    var doc = indoc || document;
-	    var injected = document.createElement('style');
-	    injected.type = 'text/css';
-	    injected.innerHTML = css;
-	    var head = doc.getElementsByTagName('head')[0];
-	    try {
-	      head.appendChild(injected);
-	    } catch (e) {// Unable to inject CSS, probably because of a Content Security Policy
-	    }
-	  }
-	};
-
-/***/ },
-/* 19 */
-/***/ function(module, exports) {
-
 	module.exports = "<div id=\"dg-save\" class=\"dg dialogue\">\n\n  Here's the new load parameter for your <code>GUI</code>'s constructor:\n\n  <textarea id=\"dg-new-constructor\"></textarea>\n\n  <div id=\"dg-save-locally\">\n\n    <input id=\"dg-local-storage\" type=\"checkbox\"/> Automatically save\n    values to <code>localStorage</code> on exit.\n\n    <div id=\"dg-local-explain\">The values saved to <code>localStorage</code> will\n      override those passed to <code>dat.GUI</code>'s constructor. This makes it\n      easier to work incrementally, but <code>localStorage</code> is fragile,\n      and your friends may not see the same values you do.\n\n    </div>\n\n  </div>\n\n</div>";
 
 /***/ },
-/* 20 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4063,7 +4013,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 21 */
+/* 20 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -4090,7 +4040,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports["default"];
 
 /***/ },
-/* 22 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4216,10 +4166,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 23 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(24)();
+	exports = module.exports = __webpack_require__(23)();
 	// imports
 	
 	
@@ -4230,7 +4180,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 24 */
+/* 23 */
 /***/ function(module, exports) {
 
 	/*

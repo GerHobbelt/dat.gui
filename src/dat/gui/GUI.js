@@ -641,6 +641,7 @@ common.extend(
     removeFolder: function(name) {
       var folder = this.__folders[name];
       if (!folder) {
+        console.error('There is no folder in this GUI by the name "' + name + '"'); // eslint-disable-line no-console
         return;
       }
       folder.close();

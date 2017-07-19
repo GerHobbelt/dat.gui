@@ -36,7 +36,7 @@ const CLOSE_BUTTON_HEIGHT = 20;
 
 const DEFAULT_DEFAULT_PRESET_NAME = 'Default';
 
-const SUPPORTS_LOCAL_STORAGE = (function() {
+const SUPPORTS_LOCAL_STORAGE = (function () {
   try {
     return 'localStorage' in window && window.localStorage !== null;
   } catch (e) {
@@ -74,7 +74,7 @@ const hideableGuis = [];
  * @param {Boolean} [params.closed] If true, starts closed
  * @param {Boolean} [params.closeOnTop] If true, close/open button shows on top of the GUI
  */
-const GUI = function(pars) {
+const GUI = function (pars) {
   const _this = this;
 
   let params = pars || {};
@@ -143,7 +143,7 @@ const GUI = function(pars) {
       params.load.preset = params.preset;
     }
   } else {
-    params.load = { preset: DEFAULT_DEFAULT_PRESET_NAME };
+    params.load = {preset: DEFAULT_DEFAULT_PRESET_NAME};
   }
 
   if (common.isUndefined(params.parent) && params.hideable) {
@@ -174,13 +174,13 @@ const GUI = function(pars) {
        * @type dat.gui.GUI
        */
       parent: {
-        get: function() {
+        get: function () {
           return params.parent;
         }
       },
 
       scrollable: {
-        get: function() {
+        get: function () {
           return params.scrollable;
         }
       },
@@ -190,7 +190,7 @@ const GUI = function(pars) {
        * @type Boolean
        */
       autoPlace: {
-        get: function() {
+        get: function () {
           return params.autoPlace;
         }
       },
@@ -200,7 +200,7 @@ const GUI = function(pars) {
        * @type Boolean
        */
       closeOnTop: {
-        get: function() {
+        get: function () {
           return params.closeOnTop;
         }
       },
@@ -210,7 +210,7 @@ const GUI = function(pars) {
        * @type String
        */
       preset: {
-        get: function() {
+        get: function () {
           if (_this.parent) {
             return _this.getRoot().preset;
           }
@@ -218,7 +218,7 @@ const GUI = function(pars) {
           return params.load.preset;
         },
 
-        set: function(v) {
+        set: function (v) {
           if (_this.parent) {
             _this.getRoot().preset = v;
           } else {
@@ -234,10 +234,10 @@ const GUI = function(pars) {
        * @type Number
        */
       width: {
-        get: function() {
+        get: function () {
           return params.width;
         },
-        set: function(v) {
+        set: function (v) {
           params.width = v;
           setWidth(_this, v);
         }
@@ -249,10 +249,10 @@ const GUI = function(pars) {
        * @type String
        */
       name: {
-        get: function() {
+        get: function () {
           return params.name;
         },
-        set: function(v) {
+        set: function (v) {
           // TODO Check for collisions among sibling folders
           params.name = v;
           if (titleRowName) {
@@ -266,10 +266,10 @@ const GUI = function(pars) {
        * @type Boolean
        */
       closed: {
-        get: function() {
+        get: function () {
           return params.closed;
         },
-        set: function(v) {
+        set: function (v) {
           params.closed = v;
           if (params.closed) {
             dom.addClass(_this.__ul, GUI.CLASS_CLOSED);
@@ -292,7 +292,7 @@ const GUI = function(pars) {
        * @type Object
        */
       load: {
-        get: function() {
+        get: function () {
           return params.load;
         }
       },
@@ -304,10 +304,10 @@ const GUI = function(pars) {
        */
       useLocalStorage: {
 
-        get: function() {
+        get: function () {
           return useLocalStorage;
         },
-        set: function(bool) {
+        set: function (bool) {
           if (SUPPORTS_LOCAL_STORAGE) {
             useLocalStorage = bool;
             if (bool) {
@@ -352,7 +352,7 @@ const GUI = function(pars) {
       this.domElement.appendChild(this.__closeButton);
     }
 
-    dom.bind(this.__closeButton, 'click', function() {
+    dom.bind(this.__closeButton, 'click', function () {
       _this.closed = !_this.closed;
     });
     // Oh, you're a nested GUI!
@@ -366,7 +366,7 @@ const GUI = function(pars) {
 
     const titleRow = addRow(_this, titleRowName);
 
-    const onClickTitle = function(e) {
+    const onClickTitle = function (e) {
       e.preventDefault();
       _this.closed = !_this.closed;
       return false;
@@ -406,7 +406,7 @@ const GUI = function(pars) {
     }
   }
 
-  this.__resizeHandler = function() {
+  this.__resizeHandler = function () {
     _this.onResizeDebounced();
   };
 
@@ -420,7 +420,7 @@ const GUI = function(pars) {
     addResizeHandle(this);
   }
 
-  saveToLocalStorage = function() {
+  saveToLocalStorage = function () {
     if (SUPPORTS_LOCAL_STORAGE && localStorage.getItem(getLocalStorageHash(_this, 'isLocal')) === 'true') {
       localStorage.setItem(getLocalStorageHash(_this, 'gui'), JSON.stringify(_this.getSaveObject()));
     }
@@ -432,7 +432,7 @@ const GUI = function(pars) {
   function resetWidth() {
     const root = _this.getRoot();
     root.width += 1;
-    common.defer(function() {
+    common.defer(function () {
       root.width -= 1;
     });
   }
@@ -442,9 +442,9 @@ const GUI = function(pars) {
   }
 };
 
-GUI.toggleHide = function() {
+GUI.toggleHide = function () {
   hide = !hide;
-  common.each(hideableGuis, function(gui) {
+  common.each(hideableGuis, function (gui) {
     gui.domElement.style.display = hide ? 'none' : '';
   });
 };
@@ -464,7 +464,7 @@ GUI.DEFAULT_WIDTH = 245;
 GUI.TEXT_CLOSED = 'Close Controls';
 GUI.TEXT_OPEN = 'Open Controls';
 
-GUI._keydownHandler = function(e) {
+GUI._keydownHandler = function (e) {
   if (document.activeElement.type !== 'text' &&
     (e.which === HIDE_KEY_CODE || e.keyCode === HIDE_KEY_CODE)) {
     GUI.toggleHide();
@@ -484,7 +484,7 @@ common.extend(
      * @returns {dat.controllers.Controller} The new controller that was added.
      * @instance
      */
-    add: function(object, property) {
+    add: function (object, property) {
       return add(
         this,
         object,
@@ -501,7 +501,7 @@ common.extend(
      * @returns {dat.controllers.ColorController} The new controller that was added.
      * @instance
      */
-    addColor: function(object, property) {
+    addColor: function (object, property) {
       return add(
         this,
         object,
@@ -516,17 +516,17 @@ common.extend(
      * @param controller
      * @instance
      */
-    remove: function(controller) {
+    remove: function (controller) {
       // TODO listening?
       this.__ul.removeChild(controller.__li);
       this.__controllers.splice(this.__controllers.indexOf(controller), 1);
       const _this = this;
-      common.defer(function() {
+      common.defer(function () {
         _this.onResize();
       });
     },
 
-    destroy: function() {
+    destroy: function () {
       if (this.autoPlace) {
         autoPlaceContainer.removeChild(this.domElement);
       }
@@ -546,7 +546,7 @@ common.extend(
      * name
      * @instance
      */
-    addFolder: function(name) {
+    addFolder: function (name) {
       // We have to prevent collisions on names in order to have a key
       // by which to remember saved values
       if (this.__folders[name] !== undefined) {
@@ -554,7 +554,7 @@ common.extend(
           ' name "' + name + '"');
       }
 
-      const newGuiParams = { name: name, parent: this };
+      const newGuiParams = {name: name, parent: this};
 
       // We need to pass down the autoPlace trait so that we can
       // attach event listeners to open/close folder actions to
@@ -580,23 +580,50 @@ common.extend(
       return gui;
     },
 
-    open: function() {
+    /**
+     * @param name
+     */
+    removeFolder: function (name) {
+      const gui = this.__folders[name];
+      if (!gui) {
+        console.error('There is no folder in this GUI by the name "' + name + '"'); // eslint-disable-line no-console
+        return;
+      }
+
+      this.__ul.removeChild(gui.domElement.parentElement);
+
+      delete this.__folders[name];
+
+      // Do we have saved appearance data for this folder?
+      if (this.load && // Anything loaded?
+        this.load.folders && // Was my parent a dead-end?
+        this.load.folders[name]) {
+        delete this.load.folders[name];
+      }
+
+      const _this = this;
+      common.defer(function () {
+        _this.onResize();
+      });
+    },
+
+    open: function () {
       this.closed = false;
     },
 
-    close: function() {
+    close: function () {
       this.closed = true;
     },
 
 
-    onResize: function() {
+    onResize: function () {
       // we debounce this function to prevent performance issues when rotating on tablet/mobile
       const root = this.getRoot();
       if (root.scrollable) {
         const top = dom.getOffset(root.__ul).top;
         let h = 0;
 
-        common.each(root.__ul.childNodes, function(node) {
+        common.each(root.__ul.childNodes, function (node) {
           if (!(root.autoPlace && node === root.__save_row)) {
             h += dom.getHeight(node);
           }
@@ -612,7 +639,7 @@ common.extend(
       }
 
       if (root.__resize_handle) {
-        common.defer(function() {
+        common.defer(function () {
           root.__resize_handle.style.height = root.__ul.offsetHeight + 'px';
         });
       }
@@ -622,7 +649,9 @@ common.extend(
       }
     },
 
-    onResizeDebounced: common.debounce(function() { this.onResize(); }, 50),
+    onResizeDebounced: common.debounce(function () {
+      this.onResize();
+    }, 50),
 
     /**
      * Mark objects for saving. The order of these objects cannot change as
@@ -633,7 +662,7 @@ common.extend(
      * @throws {Error} if not called on a top level GUI.
      * @instance
      */
-    remember: function() {
+    remember: function () {
       if (common.isUndefined(SAVE_DIALOGUE)) {
         SAVE_DIALOGUE = new CenteredDiv();
         SAVE_DIALOGUE.domElement.innerHTML = saveDialogueContents;
@@ -645,7 +674,7 @@ common.extend(
 
       const _this = this;
 
-      common.each(Array.prototype.slice.call(arguments), function(object) {
+      common.each(Array.prototype.slice.call(arguments), function (object) {
         if (_this.__rememberedObjects.length === 0) {
           addSaveMenu(_this);
         }
@@ -664,7 +693,7 @@ common.extend(
      * @returns {dat.gui.GUI} the topmost parent GUI of a nested GUI.
      * @instance
      */
-    getRoot: function() {
+    getRoot: function () {
       let gui = this;
       while (gui.parent) {
         gui = gui.parent;
@@ -677,7 +706,7 @@ common.extend(
      * this GUI as well as its remembered properties.
      * @instance
      */
-    getSaveObject: function() {
+    getSaveObject: function () {
       const toReturn = this.load;
       toReturn.closed = this.closed;
 
@@ -693,14 +722,14 @@ common.extend(
       }
 
       toReturn.folders = {};
-      common.each(this.__folders, function(element, key) {
+      common.each(this.__folders, function (element, key) {
         toReturn.folders[key] = element.getSaveObject();
       });
 
       return toReturn;
     },
 
-    save: function() {
+    save: function () {
       if (!this.load.remembered) {
         this.load.remembered = {};
       }
@@ -710,7 +739,7 @@ common.extend(
       this.saveToLocalStorageIfPossible();
     },
 
-    saveAs: function(presetName) {
+    saveAs: function (presetName) {
       if (!this.load.remembered) {
         // Retain default values upon first save
         this.load.remembered = {};
@@ -723,8 +752,8 @@ common.extend(
       this.saveToLocalStorageIfPossible();
     },
 
-    revert: function(gui) {
-      common.each(this.__controllers, function(controller) {
+    revert: function (gui) {
+      common.each(this.__controllers, function (controller) {
         // Make revert work on Default.
         if (!this.getRoot().load.remembered) {
           controller.setValue(controller.initialValue);
@@ -738,7 +767,7 @@ common.extend(
         }
       }, this);
 
-      common.each(this.__folders, function(folder) {
+      common.each(this.__folders, function (folder) {
         folder.revert(folder);
       });
 
@@ -747,7 +776,7 @@ common.extend(
       }
     },
 
-    listen: function(controller) {
+    listen: function (controller) {
       const init = this.__listening.length === 0;
       this.__listening.push(controller);
       if (init) {
@@ -755,11 +784,11 @@ common.extend(
       }
     },
 
-    updateDisplay: function() {
-      common.each(this.__controllers, function(controller) {
+    updateDisplay: function () {
+      common.each(this.__controllers, function (controller) {
         controller.updateDisplay();
       });
-      common.each(this.__folders, function(folder) {
+      common.each(this.__folders, function (folder) {
         folder.updateDisplay();
       });
     }
@@ -804,7 +833,7 @@ function augmentController(gui, li, controller) {
   controller.__gui = gui;
 
   common.extend(controller, {
-    options: function(options) {
+    options: function (options) {
       if (arguments.length > 1) {
         const nextSibling = controller.__li.nextElementSibling;
         controller.remove();
@@ -836,17 +865,17 @@ function augmentController(gui, li, controller) {
       }
     },
 
-    name: function(v) {
+    name: function (v) {
       controller.__li.firstElementChild.firstElementChild.innerHTML = v;
       return controller;
     },
 
-    listen: function() {
+    listen: function () {
       controller.__gui.listen(controller);
       return controller;
     },
 
-    remove: function() {
+    remove: function () {
       controller.__gui.remove(controller);
       return controller;
     }
@@ -855,12 +884,12 @@ function augmentController(gui, li, controller) {
   // All sliders should be accompanied by a box.
   if (controller instanceof NumberControllerSlider) {
     const box = new NumberControllerBox(controller.object, controller.property,
-      { min: controller.__min, max: controller.__max, step: controller.__step });
+      {min: controller.__min, max: controller.__max, step: controller.__step});
 
-    common.each(['updateDisplay', 'onChange', 'onFinishChange', 'step'], function(method) {
+    common.each(['updateDisplay', 'onChange', 'onFinishChange', 'step'], function (method) {
       const pc = controller[method];
       const pb = box[method];
-      controller[method] = box[method] = function() {
+      controller[method] = box[method] = function () {
         const args = Array.prototype.slice.call(arguments);
         pb.apply(box, args);
         return pc.apply(controller, args);
@@ -870,7 +899,7 @@ function augmentController(gui, li, controller) {
     dom.addClass(li, 'has-slider');
     controller.domElement.insertBefore(box.domElement, controller.domElement.firstElementChild);
   } else if (controller instanceof NumberControllerBox) {
-    const r = function(returned) {
+    const r = function (returned) {
       // Have we defined both boundaries?
       if (common.isNumber(controller.__min) && common.isNumber(controller.__max)) {
         // Well, then lets just replace this with a slider.
@@ -901,28 +930,28 @@ function augmentController(gui, li, controller) {
     controller.min = common.compose(r, controller.min);
     controller.max = common.compose(r, controller.max);
   } else if (controller instanceof BooleanController) {
-    dom.bind(li, 'click', function() {
+    dom.bind(li, 'click', function () {
       dom.fakeEvent(controller.__checkbox, 'click');
     });
 
-    dom.bind(controller.__checkbox, 'click', function(e) {
+    dom.bind(controller.__checkbox, 'click', function (e) {
       e.stopPropagation(); // Prevents double-toggle
     });
   } else if (controller instanceof FunctionController) {
-    dom.bind(li, 'click', function() {
+    dom.bind(li, 'click', function () {
       dom.fakeEvent(controller.__button, 'click');
     });
 
-    dom.bind(li, 'mouseover', function() {
+    dom.bind(li, 'mouseover', function () {
       dom.addClass(controller.__button, 'hover');
     });
 
-    dom.bind(li, 'mouseout', function() {
+    dom.bind(li, 'mouseout', function () {
       dom.removeClass(controller.__button, 'hover');
     });
   } else if (controller instanceof ColorController) {
     dom.addClass(li, 'color');
-    controller.updateDisplay = common.compose(function(val) {
+    controller.updateDisplay = common.compose(function (val) {
       li.style.borderLeftColor = controller.__color.toString();
       return val;
     }, controller.updateDisplay);
@@ -930,7 +959,7 @@ function augmentController(gui, li, controller) {
     controller.updateDisplay();
   }
 
-  controller.setValue = common.compose(function(val) {
+  controller.setValue = common.compose(function (val) {
     if (gui.getRoot().__preset_select && controller.isModified()) {
       markPresetModified(gui.getRoot(), true);
     }
@@ -1090,14 +1119,14 @@ function addSaveMenu(gui) {
   const select = gui.__preset_select = document.createElement('select');
 
   if (gui.load && gui.load.remembered) {
-    common.each(gui.load.remembered, function(value, key) {
+    common.each(gui.load.remembered, function (value, key) {
       addPresetOption(gui, key, key === gui.preset);
     });
   } else {
     addPresetOption(gui, DEFAULT_DEFAULT_PRESET_NAME, false);
   }
 
-  dom.bind(select, 'change', function() {
+  dom.bind(select, 'change', function () {
     for (let index = 0; index < gui.__preset_select.length; index++) {
       gui.__preset_select[index].innerHTML = gui.__preset_select[index].value;
     }
@@ -1125,7 +1154,7 @@ function addSaveMenu(gui) {
     showHideExplain(gui, explain);
 
     // TODO: Use a boolean controller, fool!
-    dom.bind(localStorageCheckBox, 'change', function() {
+    dom.bind(localStorageCheckBox, 'change', function () {
       gui.useLocalStorage = !gui.useLocalStorage;
       showHideExplain(gui, explain);
     });
@@ -1133,31 +1162,31 @@ function addSaveMenu(gui) {
 
   const newConstructorTextArea = document.getElementById('dg-new-constructor');
 
-  dom.bind(newConstructorTextArea, 'keydown', function(e) {
+  dom.bind(newConstructorTextArea, 'keydown', function (e) {
     if (e.metaKey && (e.which === 67 || e.keyCode === 67)) {
       SAVE_DIALOGUE.hide();
     }
   });
 
-  dom.bind(gears, 'click', function() {
+  dom.bind(gears, 'click', function () {
     newConstructorTextArea.innerHTML = JSON.stringify(gui.getSaveObject(), undefined, 2);
     SAVE_DIALOGUE.show();
     newConstructorTextArea.focus();
     newConstructorTextArea.select();
   });
 
-  dom.bind(button, 'click', function() {
+  dom.bind(button, 'click', function () {
     gui.save();
   });
 
-  dom.bind(button2, 'click', function() {
+  dom.bind(button2, 'click', function () {
     const presetName = prompt('Enter a new preset name.');
     if (presetName) {
       gui.saveAs(presetName);
     }
   });
 
-  dom.bind(button3, 'click', function() {
+  dom.bind(button3, 'click', function () {
     gui.revert();
   });
 
@@ -1230,7 +1259,7 @@ function getCurrentPreset(gui, useInitialValues) {
   const toReturn = {};
 
   // For each object I'm remembering
-  common.each(gui.__rememberedObjects, function(val, index) {
+  common.each(gui.__rememberedObjects, function (val, index) {
     const savedValues = {};
 
     // The controllers I've made for thcommon.isObject by property
@@ -1238,7 +1267,7 @@ function getCurrentPreset(gui, useInitialValues) {
       gui.__rememberedObjectIndecesToControllers[index];
 
     // Remember each value for each property
-    common.each(controllerMap, function(controller, property) {
+    common.each(controllerMap, function (controller, property) {
       savedValues[property] = useInitialValues ? controller.initialValue : controller.getValue();
     });
 
@@ -1259,12 +1288,12 @@ function setPresetSelectIndex(gui) {
 
 function updateDisplays(controllerArray) {
   if (controllerArray.length !== 0) {
-    requestAnimationFrame.call(window, function() {
+    requestAnimationFrame.call(window, function () {
       updateDisplays(controllerArray);
     });
   }
 
-  common.each(controllerArray, function(c) {
+  common.each(controllerArray, function (c) {
     c.updateDisplay();
   });
 }

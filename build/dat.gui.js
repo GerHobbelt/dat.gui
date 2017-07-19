@@ -3236,6 +3236,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return gui;
 	  },
 	
+	  /**
+	   * @param name
+	   */
+	  removeFolder: function removeFolder(name) {
+	    var gui = this.__folders[name];
+	    if (!gui) {
+	      console.error('There is no folder in this GUI by the name "' + name + '"'); // eslint-disable-line no-console
+	      return;
+	    }
+	
+	    this.__ul.removeChild(gui.domElement.parentElement);
+	
+	    delete this.__folders[name];
+	
+	    // Do we have saved appearance data for this folder?
+	    if (this.load && // Anything loaded?
+	    this.load.folders && // Was my parent a dead-end?
+	    this.load.folders[name]) {
+	      delete this.load.folders[name];
+	    }
+	
+	    var _this = this;
+	    _common2.default.defer(function () {
+	      _this.onResize();
+	    });
+	  },
+	
 	  open: function open() {
 	    this.closed = false;
 	  },

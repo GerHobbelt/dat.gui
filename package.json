@@ -10,6 +10,7 @@
   },
   "scripts": {
     "dev": "webpack --progress --colors --watch --config webpack/webpack.config.js --devtool sourcemap",
+    "lintfix": "eslint --fix --ext '.js' ./src/",
     "build": "npm run build-js && npm run build-css",
     "build-js": "webpack --config ./webpack/webpack.config.js --devtool sourcemap && webpack --config ./webpack/webpack.config.min.js",
     "build-css": "node-sass src/dat/gui/style.scss build/dat.gui.css"

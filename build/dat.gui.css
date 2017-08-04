@@ -111,16 +111,14 @@
     clear: both;
     padding-left: 3px;
     height: 27px;
-    overflow: hidden;
- }
+    overflow: hidden; }
   .dg .property-name {
     cursor: default;
     float: left;
     clear: left;
     width: 40%;
-    /*overflow: hidden;*/
-    text-overflow: ellipsis;
- }
+    overflow: hidden;
+    text-overflow: ellipsis; }
   .dg .c {
     float: left;
     width: 60%;
@@ -189,7 +187,7 @@
   word-wrap: break-word;
   margin: 12px 0;
   display: block;
-  width: 100%;
+  width: 440px;
   overflow-y: scroll;
   height: 100px;
   position: relative; }

@@ -3136,6 +3136,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  },
 	
 	  destroy: function destroy() {
+
+	  	var _this = this;
+	  	
+	  	_common2.default.each(this.__folders, function (folder) {
+	  	  _this.removeFolder(folder);
+	  	});
 	    if (this.autoPlace) {
 	      autoPlaceContainer.removeChild(this.domElement);
 	    }

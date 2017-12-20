@@ -1028,8 +1028,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *
 	 * @param {Object} object The object to be manipulated
 	 * @param {string} property The name of the property to be manipulated
-	 *
-	 * @member dat.controllers
 	 */
 	var Controller = function () {
 	  function Controller(object, property) {
@@ -1109,9 +1107,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	  Controller.prototype.setValue = function setValue(newValue) {
+	    var oldValue = this.object[this.property];
 	    this.object[this.property] = newValue;
 	    if (this.__onChange) {
-	      this.__onChange.call(this, newValue);
+	      this.__onChange.call(this, newValue, oldValue);
 	    }
 	
 	    this.updateDisplay();
@@ -1192,12 +1191,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	/**
 	 * @class Provides a checkbox input to alter the boolean property of an object.
+	 *
 	 * @extends dat.controllers.Controller
 	 *
 	 * @param {Object} object The object to be manipulated
 	 * @param {string} property The name of the property to be manipulated
-	 *
-	 * @member dat.controllers
 	 */
 	var BooleanController = function (_Controller) {
 	  _inherits(BooleanController, _Controller);
@@ -1592,8 +1590,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {string} property The name of the property to be manipulated
 	 * @param {Object|string[]} options A map of labels to acceptable values, or
 	 * a list of acceptable string values.
-	 *
-	 * @member dat.controllers
 	 */
 	var OptionController = function (_Controller) {
 	  _inherits(OptionController, _Controller);
@@ -1703,8 +1699,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *
 	 * @param {Object} object The object to be manipulated
 	 * @param {string} property The name of the property to be manipulated
-	 *
-	 * @member dat.controllers
 	 */
 	var StringController = function (_Controller) {
 	  _inherits(StringController, _Controller);
@@ -1814,8 +1808,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {Number} [params.min] Minimum allowed value
 	 * @param {Number} [params.max] Maximum allowed value
 	 * @param {Number} [params.step] Increment by which to change value
-	 *
-	 * @member dat.controllers
 	 */
 	
 	var NumberController = function (_Controller) {
@@ -1872,8 +1864,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	
 	
-	  NumberController.prototype.min = function min(v) {
-	    this.__min = v;
+	  NumberController.prototype.min = function min(minValue) {
+	    this.__min = minValue;
 	    return this;
 	  };
 	
@@ -1886,8 +1878,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	
 	
-	  NumberController.prototype.max = function max(v) {
-	    this.__max = v;
+	  NumberController.prototype.max = function max(maxValue) {
+	    this.__max = maxValue;
 	    return this;
 	  };
 	
@@ -1903,10 +1895,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	
 	
-	  NumberController.prototype.step = function step(v) {
-	    this.__step = v;
-	    this.__impliedStep = v;
-	    this.__precision = numDecimals(v);
+	  NumberController.prototype.step = function step(stepValue) {
+	    this.__step = stepValue;
+	    this.__impliedStep = stepValue;
+	    this.__precision = numDecimals(stepValue);
 	    return this;
 	  };
 	
@@ -1973,8 +1965,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {Number} [params.min] Minimum allowed value
 	 * @param {Number} [params.max] Maximum allowed value
 	 * @param {Number} [params.step] Increment by which to change value
-	 *
-	 * @member dat.controllers
 	 */
 	
 	var NumberControllerBox = function (_NumberController) {
@@ -2120,8 +2110,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {Number} minValue Minimum allowed value
 	 * @param {Number} maxValue Maximum allowed value
 	 * @param {Number} stepValue Increment by which to change value
-	 *
-	 * @member dat.controllers
 	 */
 	
 	var NumberControllerSlider = function (_NumberController) {
@@ -2230,8 +2218,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *
 	 * @param {Object} object The object to be manipulated
 	 * @param {string} property The name of the property to be manipulated
-	 *
-	 * @member dat.controllers
 	 */
 	var FunctionController = function (_Controller) {
 	  _inherits(FunctionController, _Controller);
@@ -2321,6 +2307,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * http://www.apache.org/licenses/LICENSE-2.0
 	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
 	
+	/**
+	 * @class Represents a given property of an object that is a color.
+	 * @param {Object} object
+	 * @param {string} property
+	 */
 	var ColorController = function (_Controller) {
 	  _inherits(ColorController, _Controller);
 	
@@ -2705,12 +2696,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	_css2.default.inject(_style2.default);
 	
-	/** Outer-most className for GUI's */
+	/** @ignore Outer-most className for GUI's */
 	var CSS_NAMESPACE = 'dg';
 	
 	var HIDE_KEY_CODE = 72;
 	
-	/** The only value shared between the JS and SCSS. Use caution. */
+	/** @ignore The only value shared between the JS and SCSS. Use caution. */
 	var CLOSE_BUTTON_HEIGHT = 20;
 	
 	var DEFAULT_DEFAULT_PRESET_NAME = 'Default';
@@ -2725,24 +2716,32 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var SAVE_DIALOGUE = void 0;
 	
-	/** Have we yet to create an autoPlace GUI? */
+	/** @ignore Have we yet to create an autoPlace GUI? */
 	var autoPlaceVirgin = true;
 	
-	/** Fixed position div that auto place GUI's go inside */
+	/** @ignore Fixed position div that auto place GUI's go inside */
 	var autoPlaceContainer = void 0;
 	
-	/** Are we hiding the GUI's ? */
+	/** @ignore Are we hiding the GUI's ? */
 	var hide = false;
 	
-	/** GUI's which should be hidden */
+	/** @private GUI's which should be hidden */
 	var hideableGuis = [];
 	
 	/**
-	 * A lightweight controller library for JavaScript. It allows you to easily
+	 * @class A lightweight controller library for JavaScript. It allows you to easily
 	 * manipulate variables and fire functions on the fly.
-	 * @class
 	 *
-	 * @member dat.gui
+	 * @typicalname gui
+	 *
+	 * @example
+	 * // Creating a GUI with options.
+	 * var gui = new dat.GUI({name: 'My GUI'});
+	 *
+	 * @example
+	 * // Creating a GUI and a subfolder.
+	 * var gui = new dat.GUI();
+	 * var folder1 = gui.addFolder('Flow Field');
 	 *
 	 * @param {Object} [params]
 	 * @param {String} [params.name] The name of this GUI.
@@ -2760,7 +2759,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  /**
 	   * Outermost DOM Element
-	   * @type DOMElement
+	   * @type {DOMElement}
 	   */
 	  this.domElement = document.createElement('div');
 	  this.__ul = document.createElement('ul');
@@ -2844,7 +2843,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var saveToLocalStorage = void 0;
 	
 	  Object.defineProperties(this,
-	  /** @lends dat.gui.GUI.prototype */
+	  /** @lends GUI.prototype */
 	  {
 	    /**
 	     * The parent <code>GUI</code>
@@ -3149,14 +3148,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	_common2.default.extend(GUI.prototype,
 	
-	/** @lends dat.gui.GUI */
+	/** @lends GUI.prototype */
 	{
 	
 	  /**
-	   * @param object
-	   * @param property
-	   * @returns {dat.controllers.Controller} The new controller that was added.
+	   * Adds a new {@link Controller} to the GUI. The type of controller created
+	   * is inferred from the initial value of <code>object[property]</code>. For
+	   * color properties, see {@link addColor}.
+	   *
+	   * @param {Object} object The object to be manipulated
+	   * @param {String} property The name of the property to be manipulated
+	   * @param {Number} [min] Minimum allowed value
+	   * @param {Number} [max] Maximum allowed value
+	   * @param {Number} [step] Increment by which to change value
+	   * @returns {Controller} The controller that was added to the GUI.
 	   * @instance
+	   *
+	   * @example
+	   * // Add a string controller.
+	   * var person = {name: 'Sam'};
+	   * gui.add(person, 'name');
+	   *
+	   * @example
+	   * // Add a number controller slider.
+	   * var person = {age: 45};
+	   * gui.add(person, 'age', 0, 100);
 	   */
 	  add: function add(object, property) {
 	    return _add(this, object, property, {
@@ -3165,10 +3181,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	  },
 	
 	  /**
+	   * Adds a new color controller to the GUI.
+	   *
 	   * @param object
 	   * @param property
-	   * @returns {dat.controllers.ColorController} The new controller that was added.
+	   * @returns {Controller} The controller that was added to the GUI.
 	   * @instance
+	   *
+	   * @example
+	   * var palette = {
+	   *   color1: '#FF0000', // CSS string
+	   *   color2: [ 0, 128, 255 ], // RGB array
+	   *   color3: [ 0, 128, 255, 0.3 ], // RGB with alpha
+	   *   color4: { h: 350, s: 0.9, v: 0.3 } // Hue, saturation, value
+	   * };
+	   * gui.addColor(palette, 'color1');
+	   * gui.addColor(palette, 'color2');
+	   * gui.addColor(palette, 'color3');
+	   * gui.addColor(palette, 'color4');
 	   */
 	  addColor: function addColor(object, property) {
 	    return _add(this, object, property, {
@@ -3177,7 +3207,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  },
 	
 	  /**
-	   * @param controller
+	   * Removes the given controller from the GUI.
+	   * @param {Controller} controller
 	   * @instance
 	   */
 	  remove: function remove(controller) {
@@ -3190,6 +3221,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	  },
 	
+	  /**
+	   * Removes the GUI from the document and unbinds all event listeners.
+	   * @instance
+	   */
 	  destroy: function destroy() {
 	    if (this.autoPlace) {
 	      autoPlaceContainer.removeChild(this.domElement);
@@ -3204,6 +3239,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  },
 	
 	  /**
+	   * Creates a new subfolder GUI instance.
 	   * @param name
 	   * @returns {dat.gui.GUI} The new folder.
 	   * @throws {Error} if this GUI already has a folder by the specified
@@ -3244,10 +3280,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return gui;
 	  },
 	
+	  /**
+	   * Opens the GUI.
+	   */
 	  open: function open() {
 	    this.closed = false;
 	  },
 	
+	  /**
+	   * Closes the GUI.
+	   */
 	  close: function close() {
 	    this.closed = true;
 	  },
@@ -3294,9 +3336,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * the GUI grows. When remembering new objects, append them to the end
 	   * of the list.
 	   *
-	   * @param {Object...} objects
+	   * @param {...Object} objects
 	   * @throws {Error} if not called on a top level GUI.
 	   * @instance
+	   * @ignore
 	   */
 	  remember: function remember() {
 	    if (_common2.default.isUndefined(SAVE_DIALOGUE)) {
@@ -3436,6 +3479,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param gui
 	 * @param [newDom] If specified, inserts the dom content in the new row
 	 * @param [liBefore] If specified, places the new row before another row
+	 *
+	 * @ignore
 	 */
 	function addRow(gui, newDom, liBefore) {
 	  var li = document.createElement('li');

@@ -1933,9 +1933,9 @@ GUI._keydownHandler = function (e) {
 dom.bind(window, 'keydown', GUI._keydownHandler, false);
 Common.extend(GUI.prototype,
 {
-  add: function add(object, property) {
-    return _add(this, object, property, {
-      factoryArgs: Array.prototype.slice.call(arguments, 2)
+  add: function add(object, property, label) {
+    return _add(this, object, property, label, {
+      factoryArgs: Array.prototype.slice.call(arguments, 3)
     });
   },
   addColor: function addColor(object, property) {
@@ -2285,7 +2285,7 @@ function recallSavedValue(gui, controller) {
     }
   }
 }
-function _add(gui, object, property, params) {
+function _add(gui, object, property, label, params) {
   if (object[property] === undefined) {
     throw new Error('Object "' + object + '" has no property "' + property + '"');
   }
@@ -2303,7 +2303,11 @@ function _add(gui, object, property, params) {
   dom.addClass(controller.domElement, 'c');
   var name = document.createElement('span');
   dom.addClass(name, 'property-name');
-  name.innerHTML = controller.property;
+  if (label !== null) {
+    name.innerHTML = label;
+  } else {
+    name.innerHTML = controller.property;
+  }
   var container = document.createElement('div');
   container.appendChild(name);
   container.appendChild(controller.domElement);

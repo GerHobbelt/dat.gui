@@ -183,6 +183,26 @@ const GUI = function(pars) {
     /** @lends GUI.prototype */
     {
 
+      /**
+       * Toggles light theme
+       * @type Boolean
+       */
+      lightTheme: {
+        set: function(v) {
+          params.lightTheme = v;
+          if (v) dom.addClass(_this.domElement, GUI.CLASS_LIGHT_THEME);
+          else dom.removeClass(_this.domElement, GUI.CLASS_LIGHT_THEME);
+        },
+
+        get: function() {
+          return params.lightTheme;
+        }
+      },
+
+      /**
+       * Toggles open/close button
+       * @type Boolean
+       */
       showCloseButton: {
         set: function(v) {
           params.showCloseButton = v;
@@ -354,6 +374,11 @@ const GUI = function(pars) {
     dom.addClass(this.domElement, GUI.CLASS_MAIN);
     dom.makeSelectable(this.domElement, false);
 
+    if (params.lightTheme) {
+      dom.addClass(this.domElement, GUI.CLASS_LIGHT_THEME);
+      this.__folders
+    }
+
     // Are we supposed to be loading locally?
     if (SUPPORTS_LOCAL_STORAGE) {
       if (useLocalStorage) {
@@ -489,6 +514,7 @@ GUI.CLASS_CLOSE_TOP = 'close-top';
 GUI.CLASS_CLOSE_BOTTOM = 'close-bottom';
 GUI.CLASS_DRAG = 'drag';
 GUI.CLASS_DISPLAY_NONE = 'display-none';
+GUI.CLASS_LIGHT_THEME = 'light-theme';
 
 GUI.DEFAULT_WIDTH = 245;
 GUI.TEXT_CLOSED = 'Close Controls';

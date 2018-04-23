@@ -4,6 +4,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 </head>
 <body>
+  <center>
+    <h1>Example Page</h1>
+    <div id="example"></div>
+  </center>
   <script type="text/javascript" src="build/dat.gui.js"></script>
   <script type="text/javascript">
     var obj = {
@@ -29,7 +33,11 @@
         color3: { h: 350, s: 0.9, v: 0.3 } // Hue, saturation, value
     };
 
-    var gui = new dat.gui.GUI();
+    var gui = new dat.gui.GUI({
+      autoPlace: false,
+      showCloseButton: false,
+    });
+    document.getElementById('example').appendChild(gui.domElement);
 
     gui.remember(obj);
 

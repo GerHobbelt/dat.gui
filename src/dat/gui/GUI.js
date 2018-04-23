@@ -141,7 +141,8 @@ const GUI = function(pars) {
   params = common.defaults(params, {
     closeOnTop: false,
     autoPlace: true,
-    width: GUI.DEFAULT_WIDTH
+    width: GUI.DEFAULT_WIDTH,
+    showCloseButton: true,
   });
 
   params = common.defaults(params, {
@@ -181,6 +182,19 @@ const GUI = function(pars) {
   Object.defineProperties(this,
     /** @lends GUI.prototype */
     {
+
+      showCloseButton: {
+        set: function(v) {
+          params.showCloseButton = v;
+          if (v) dom.removeClass(_this.__closeButton, GUI.CLASS_DISPLAY_NONE);
+          else dom.addClass(_this.__closeButton, GUI.CLASS_DISPLAY_NONE);
+        },
+
+        get: function() {
+          return params.showCloseButton;
+        }
+      },
+
       /**
        * The parent <code>GUI</code>
        * @type dat.gui.GUI
@@ -363,6 +377,9 @@ const GUI = function(pars) {
       dom.addClass(this.__closeButton, GUI.CLASS_CLOSE_BOTTOM);
       this.domElement.appendChild(this.__closeButton);
     }
+    if (!params.showCloseButton) {
+      dom.addClass(this.__closeButton, GUI.CLASS_DISPLAY_NONE);
+    }
 
     dom.bind(this.__closeButton, 'click', function() {
       _this.closed = !_this.closed;
@@ -471,6 +488,7 @@ GUI.CLASS_CLOSE_BUTTON = 'close-button';
 GUI.CLASS_CLOSE_TOP = 'close-top';
 GUI.CLASS_CLOSE_BOTTOM = 'close-bottom';
 GUI.CLASS_DRAG = 'drag';
+GUI.CLASS_DISPLAY_NONE = 'display-none';
 
 GUI.DEFAULT_WIDTH = 245;
 GUI.TEXT_CLOSED = 'Close Controls';

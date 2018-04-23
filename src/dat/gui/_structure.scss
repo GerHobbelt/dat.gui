@@ -79,6 +79,9 @@ $button-height: 20px;
       &:hover {
         background-color: #111;
       }
+      &.display-none {
+        display: none;
+      }
 
     }
 

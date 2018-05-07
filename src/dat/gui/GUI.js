@@ -473,8 +473,8 @@ GUI.CLASS_CLOSE_BOTTOM = 'close-bottom';
 GUI.CLASS_DRAG = 'drag';
 
 GUI.DEFAULT_WIDTH = 245;
-GUI.TEXT_CLOSED = 'Close Controls';
-GUI.TEXT_OPEN = 'Open Controls';
+GUI.TEXT_CLOSED = 'Close View Controls';
+GUI.TEXT_OPEN = 'Open View Controls';
 
 GUI._keydownHandler = function(e) {
   if (document.activeElement.type !== 'text' &&

@@ -108,10 +108,6 @@ class NumberControllerBox extends NumberController {
   }
 
   updateDisplay() {
-    if(this.__input === document.activeElement) {
-      return;
-    }
-
     this.__input.value = this.__truncationSuspended ? this.getValue() : roundToDecimal(this.getValue(), this.__precision);
     return super.updateDisplay();
   }

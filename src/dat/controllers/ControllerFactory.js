@@ -16,7 +16,6 @@ import NumberControllerBox from './NumberControllerBox';
 import NumberControllerSlider from './NumberControllerSlider';
 import StringController from './StringController';
 import FunctionController from './FunctionController';
-import TabbedController from './TabbedController';
 import BooleanController from './BooleanController';
 import common from '../utils/common';
 

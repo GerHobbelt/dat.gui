@@ -23,12 +23,14 @@ import dom from '../dom/dom';
  * @param {string} property The name of the property to be manipulated
  */
 class FunctionController extends Controller {
-  constructor(object, property, text) {
+  constructor(object, property, text, tabs) {
     super(object, property);
 
     const _this = this;
+    let tabSize = tabs*4;//4em = 1 tab
 
     this.__button = document.createElement('div');
+    this.__button.style.paddingLeft = tabSize.toString()+`em`;
     this.__button.innerHTML = text === undefined ? 'Fire' : text;
 
     dom.bind(this.__button, 'click', function(e) {

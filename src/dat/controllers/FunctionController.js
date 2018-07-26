@@ -31,7 +31,6 @@ class FunctionController extends Controller {
     let tabSize = tabs*4;//4em = 1 tab
 
     this.__button = document.createElement('div');
-    this.__button.style.paddingLeft = tabSize.toString()+`em`;
     this.__button.innerHTML = text === undefined ? 'Fire' : text;
 
     dom.bind(this.__button, 'click', function(e) {
@@ -41,6 +40,8 @@ class FunctionController extends Controller {
     });
 
     dom.addClass(this.__button, 'button');
+    
+    this.__button.style.paddingLeft = tabSize.toString()+`em`;
 
     this.domElement.appendChild(this.__button);
   }

@@ -1284,256 +1284,268 @@ var FunctionController = function (_Controller) {
   return FunctionController;
 }(Controller);
 
-var ColorController = function (_Controller) {
-  inherits(ColorController, _Controller);
-  function ColorController(object, property) {
-    classCallCheck(this, ColorController);
-    var _this2 = possibleConstructorReturn(this, (ColorController.__proto__ || Object.getPrototypeOf(ColorController)).call(this, object, property));
-    _this2.__color = new Color(_this2.getValue());
-    _this2.__temp = new Color(0);
-    var _this = _this2;
-    _this2.domElement = document.createElement('div');
-    dom.makeSelectable(_this2.domElement, false);
-    _this2.__selector = document.createElement('div');
-    _this2.__selector.className = 'selector';
-    _this2.__saturation_field = document.createElement('div');
-    _this2.__saturation_field.className = 'saturation-field';
-    _this2.__field_knob = document.createElement('div');
-    _this2.__field_knob.className = 'field-knob';
-    _this2.__field_knob_border = '2px solid ';
-    _this2.__hue_knob = document.createElement('div');
-    _this2.__hue_knob.className = 'hue-knob';
-    _this2.__hue_field = document.createElement('div');
-    _this2.__hue_field.className = 'hue-field';
-    _this2.__input = document.createElement('input');
-    _this2.__input.type = 'text';
-    _this2.__input_textShadow = '0 1px 1px ';
-    dom.bind(_this2.__input, 'keydown', function (e) {
-      if (e.keyCode === 13) {
-        onBlur.call(this);
-      }
-    });
-    dom.bind(_this2.__input, 'blur', onBlur);
-    dom.bind(_this2.__selector, 'mousedown', function ()        {
-      dom.addClass(this, 'drag').bind(window, 'mouseup', function ()        {
-        dom.removeClass(_this.__selector, 'drag');
-      });
-    });
-    dom.bind(_this2.__selector, 'touchstart', function ()        {
-      dom.addClass(this, 'drag').bind(window, 'touchend', function ()        {
-        dom.removeClass(_this.__selector, 'drag');
-      });
-    });
-    var valueField = document.createElement('div');
-    Common.extend(_this2.__selector.style, {
-      width: '122px',
-      height: '102px',
-      padding: '3px',
-      backgroundColor: '#222',
-      boxShadow: '0px 1px 3px rgba(0,0,0,0.3)'
-    });
-    Common.extend(_this2.__field_knob.style, {
-      position: 'absolute',
-      width: '12px',
-      height: '12px',
-      border: _this2.__field_knob_border + (_this2.__color.v < 0.5 ? '#fff' : '#000'),
-      boxShadow: '0px 1px 3px rgba(0,0,0,0.5)',
-      borderRadius: '12px',
-      zIndex: 1
-    });
-    Common.extend(_this2.__hue_knob.style, {
-      position: 'absolute',
-      width: '15px',
-      height: '2px',
-      borderRight: '4px solid #fff',
-      zIndex: 1
-    });
-    Common.extend(_this2.__saturation_field.style, {
-      width: '100px',
-      height: '100px',
-      border: '1px solid #555',
-      marginRight: '3px',
-      display: 'inline-block',
-      cursor: 'pointer'
-    });
-    Common.extend(valueField.style, {
-      width: '100%',
-      height: '100%',
-      background: 'none'
-    });
-    linearGradient(valueField, 'top', 'rgba(0,0,0,0)', '#000');
-    Common.extend(_this2.__hue_field.style, {
-      width: '15px',
-      height: '100px',
-      border: '1px solid #555',
-      cursor: 'ns-resize',
-      position: 'absolute',
-      top: '3px',
-      right: '3px'
-    });
-    hueGradient(_this2.__hue_field);
-    Common.extend(_this2.__input.style, {
-      outline: 'none',
-      textAlign: 'center',
-      color: '#fff',
-      border: 0,
-      fontWeight: 'bold',
-      textShadow: _this2.__input_textShadow + 'rgba(0,0,0,0.7)'
-    });
-    dom.bind(_this2.__saturation_field, 'mousedown', fieldDown);
-    dom.bind(_this2.__saturation_field, 'touchstart', fieldDown);
-    dom.bind(_this2.__field_knob, 'mousedown', fieldDown);
-    dom.bind(_this2.__field_knob, 'touchstart', fieldDown);
-    dom.bind(_this2.__hue_field, 'mousedown', fieldDownH);
-    dom.bind(_this2.__hue_field, 'touchstart', fieldDownH);
-    function fieldDown(e) {
-      setSV(e);
-      dom.bind(window, 'mousemove', setSV);
-      dom.bind(window, 'touchmove', setSV);
-      dom.bind(window, 'mouseup', fieldUpSV);
-      dom.bind(window, 'touchend', fieldUpSV);
-    }
-    function fieldDownH(e) {
-      setH(e);
-      dom.bind(window, 'mousemove', setH);
-      dom.bind(window, 'touchmove', setH);
-      dom.bind(window, 'mouseup', fieldUpH);
-      dom.bind(window, 'touchend', fieldUpH);
-    }
-    function fieldUpSV() {
-      dom.unbind(window, 'mousemove', setSV);
-      dom.unbind(window, 'touchmove', setSV);
-      dom.unbind(window, 'mouseup', fieldUpSV);
-      dom.unbind(window, 'touchend', fieldUpSV);
-      onFinish();
-    }
-    function fieldUpH() {
-      dom.unbind(window, 'mousemove', setH);
-      dom.unbind(window, 'touchmove', setH);
-      dom.unbind(window, 'mouseup', fieldUpH);
-      dom.unbind(window, 'touchend', fieldUpH);
-      onFinish();
-    }
-    function onBlur() {
-      var i = interpret(this.value);
-      if (i !== false) {
-        _this.__color.__state = i;
-        _this.setValue(_this.__color.toOriginal());
-      } else {
-        this.value = _this.__color.toString();
-      }
-    }
-    function onFinish() {
-      if (_this.__onFinishChange) {
-        _this.__onFinishChange.call(_this, _this.__color.toOriginal());
-      }
-    }
-    _this2.__saturation_field.appendChild(valueField);
-    _this2.__selector.appendChild(_this2.__field_knob);
-    _this2.__selector.appendChild(_this2.__saturation_field);
-    _this2.__selector.appendChild(_this2.__hue_field);
-    _this2.__hue_field.appendChild(_this2.__hue_knob);
-    _this2.domElement.appendChild(_this2.__input);
-    _this2.domElement.appendChild(_this2.__selector);
-    _this2.updateDisplay();
-    function setSV(e) {
-      if (e.type.indexOf('touch') === -1) {
-        e.preventDefault();
-      }
-      var fieldRect = _this.__saturation_field.getBoundingClientRect();
-      var _ref = e.touches && e.touches[0] || e,
-          clientX = _ref.clientX,
-          clientY = _ref.clientY;
-      var s = (clientX - fieldRect.left) / (fieldRect.right - fieldRect.left);
-      var v = 1 - (clientY - fieldRect.top) / (fieldRect.bottom - fieldRect.top);
-      if (v > 1) {
-        v = 1;
-      } else if (v < 0) {
-        v = 0;
-      }
-      if (s > 1) {
-        s = 1;
-      } else if (s < 0) {
-        s = 0;
-      }
-      _this.__color.v = v;
-      _this.__color.s = s;
-      _this.setValue(_this.__color.toOriginal());
-      return false;
-    }
-    function setH(e) {
-      if (e.type.indexOf('touch') === -1) {
-        e.preventDefault();
-      }
-      var fieldRect = _this.__hue_field.getBoundingClientRect();
-      var _ref2 = e.touches && e.touches[0] || e,
-          clientY = _ref2.clientY;
-      var h = 1 - (clientY - fieldRect.top) / (fieldRect.bottom - fieldRect.top);
-      if (h > 1) {
-        h = 1;
-      } else if (h < 0) {
-        h = 0;
-      }
-      _this.__color.h = h * 360;
-      _this.setValue(_this.__color.toOriginal());
-      return false;
-    }
-    return _this2;
+var TabbedController = function (_FunctionController) {
+  inherits(TabbedController, _FunctionController);
+  function TabbedController(object, property, text, tabs) {
+    classCallCheck(this, TabbedController);
+    var _this = possibleConstructorReturn(this, (TabbedController.__proto__ || Object.getPrototypeOf(TabbedController)).call(this, object, property, text));
+    var tabSize = tabs * 2;
+    _this.__button.style.marginLeft = tabSize.toString() + 'em';
+    return _this;
   }
-  createClass(ColorController, [{
-    key: 'updateDisplay',
-    value: function updateDisplay() {
-      var i = interpret(this.getValue());
-      if (i !== false) {
-        var mismatch = false;
-        Common.each(Color.COMPONENTS, function (component) {
-          if (!Common.isUndefined(i[component]) && !Common.isUndefined(this.__color.__state[component]) && i[component] !== this.__color.__state[component]) {
-            mismatch = true;
-            return {};
-          }
-        }, this);
-        if (mismatch) {
-          Common.extend(this.__color.__state, i);
+  return TabbedController;
+}(Controller);
+
+var ColorController = function (_Controller) {
+    inherits(ColorController, _Controller);
+    function ColorController(object, property) {
+        classCallCheck(this, ColorController);
+        var _this2 = possibleConstructorReturn(this, (ColorController.__proto__ || Object.getPrototypeOf(ColorController)).call(this, object, property));
+        _this2.__color = new Color(_this2.getValue());
+        _this2.__temp = new Color(0);
+        var _this = _this2;
+        _this2.domElement = document.createElement('div');
+        dom.makeSelectable(_this2.domElement, false);
+        _this2.__selector = document.createElement('div');
+        _this2.__selector.className = 'selector';
+        _this2.__saturation_field = document.createElement('div');
+        _this2.__saturation_field.className = 'saturation-field';
+        _this2.__field_knob = document.createElement('div');
+        _this2.__field_knob.className = 'field-knob';
+        _this2.__field_knob_border = '2px solid ';
+        _this2.__hue_knob = document.createElement('div');
+        _this2.__hue_knob.className = 'hue-knob';
+        _this2.__hue_field = document.createElement('div');
+        _this2.__hue_field.className = 'hue-field';
+        _this2.__input = document.createElement('input');
+        _this2.__input.type = 'text';
+        _this2.__input_textShadow = '0 1px 1px ';
+        dom.bind(_this2.__input, 'keydown', function (e) {
+            if (e.keyCode === 13) {
+                onBlur.call(this);
+            }
+        });
+        dom.bind(_this2.__input, 'blur', onBlur);
+        dom.bind(_this2.__selector, 'mousedown', function ()        {
+            dom.addClass(this, 'drag').bind(window, 'mouseup', function ()        {
+                dom.removeClass(_this.__selector, 'drag');
+            });
+        });
+        dom.bind(_this2.__selector, 'touchstart', function ()        {
+            dom.addClass(this, 'drag').bind(window, 'touchend', function ()        {
+                dom.removeClass(_this.__selector, 'drag');
+            });
+        });
+        var valueField = document.createElement('div');
+        Common.extend(_this2.__selector.style, {
+            width: '122px',
+            height: '102px',
+            padding: '3px',
+            backgroundColor: '#222',
+            boxShadow: '0px 1px 3px rgba(0,0,0,0.3)'
+        });
+        Common.extend(_this2.__field_knob.style, {
+            position: 'absolute',
+            width: '12px',
+            height: '12px',
+            border: _this2.__field_knob_border + (_this2.__color.v < 0.5 ? '#fff' : '#000'),
+            boxShadow: '0px 1px 3px rgba(0,0,0,0.5)',
+            borderRadius: '12px',
+            zIndex: 1
+        });
+        Common.extend(_this2.__hue_knob.style, {
+            position: 'absolute',
+            width: '15px',
+            height: '2px',
+            borderRight: '4px solid #fff',
+            zIndex: 1
+        });
+        Common.extend(_this2.__saturation_field.style, {
+            width: '100px',
+            height: '100px',
+            border: '1px solid #555',
+            marginRight: '3px',
+            display: 'inline-block',
+            cursor: 'pointer'
+        });
+        Common.extend(valueField.style, {
+            width: '100%',
+            height: '100%',
+            background: 'none'
+        });
+        linearGradient(valueField, 'top', 'rgba(0,0,0,0)', '#000');
+        Common.extend(_this2.__hue_field.style, {
+            width: '15px',
+            height: '100px',
+            border: '1px solid #555',
+            cursor: 'ns-resize',
+            position: 'absolute',
+            top: '3px',
+            right: '3px'
+        });
+        hueGradient(_this2.__hue_field);
+        Common.extend(_this2.__input.style, {
+            outline: 'none',
+            textAlign: 'center',
+            color: '#fff',
+            border: 0,
+            fontWeight: 'bold',
+            textShadow: _this2.__input_textShadow + 'rgba(0,0,0,0.7)'
+        });
+        dom.bind(_this2.__saturation_field, 'mousedown', fieldDown);
+        dom.bind(_this2.__saturation_field, 'touchstart', fieldDown);
+        dom.bind(_this2.__field_knob, 'mousedown', fieldDown);
+        dom.bind(_this2.__field_knob, 'touchstart', fieldDown);
+        dom.bind(_this2.__hue_field, 'mousedown', fieldDownH);
+        dom.bind(_this2.__hue_field, 'touchstart', fieldDownH);
+        function fieldDown(e) {
+            setSV(e);
+            dom.bind(window, 'mousemove', setSV);
+            dom.bind(window, 'touchmove', setSV);
+            dom.bind(window, 'mouseup', fieldUpSV);
+            dom.bind(window, 'touchend', fieldUpSV);
         }
-      }
-      Common.extend(this.__temp.__state, this.__color.__state);
-      this.__temp.a = 1;
-      var flip = this.__color.v < 0.5 || this.__color.s > 0.5 ? 255 : 0;
-      var _flip = 255 - flip;
-      Common.extend(this.__field_knob.style, {
-        marginLeft: 100 * this.__color.s - 7 + 'px',
-        marginTop: 100 * (1 - this.__color.v) - 7 + 'px',
-        backgroundColor: this.__temp.toHexString(),
-        border: this.__field_knob_border + 'rgb(' + flip + ',' + flip + ',' + flip + ')'
-      });
-      this.__hue_knob.style.marginTop = (1 - this.__color.h / 360) * 100 + 'px';
-      this.__temp.s = 1;
-      this.__temp.v = 1;
-      linearGradient(this.__saturation_field, 'left', '#fff', this.__temp.toHexString());
-      this.__input.value = this.__color.toString();
-      Common.extend(this.__input.style, {
-        backgroundColor: this.__color.toHexString(),
-        color: 'rgb(' + flip + ',' + flip + ',' + flip + ')',
-        textShadow: this.__input_textShadow + 'rgba(' + _flip + ',' + _flip + ',' + _flip + ',.7)'
-      });
+        function fieldDownH(e) {
+            setH(e);
+            dom.bind(window, 'mousemove', setH);
+            dom.bind(window, 'touchmove', setH);
+            dom.bind(window, 'mouseup', fieldUpH);
+            dom.bind(window, 'touchend', fieldUpH);
+        }
+        function fieldUpSV() {
+            dom.unbind(window, 'mousemove', setSV);
+            dom.unbind(window, 'touchmove', setSV);
+            dom.unbind(window, 'mouseup', fieldUpSV);
+            dom.unbind(window, 'touchend', fieldUpSV);
+            onFinish();
+        }
+        function fieldUpH() {
+            dom.unbind(window, 'mousemove', setH);
+            dom.unbind(window, 'touchmove', setH);
+            dom.unbind(window, 'mouseup', fieldUpH);
+            dom.unbind(window, 'touchend', fieldUpH);
+            onFinish();
+        }
+        function onBlur() {
+            var i = interpret(this.value);
+            if (i !== false) {
+                _this.__color.__state = i;
+                _this.setValue(_this.__color.toOriginal());
+            } else {
+                this.value = _this.__color.toString();
+            }
+        }
+        function onFinish() {
+            if (_this.__onFinishChange) {
+                _this.__onFinishChange.call(_this, _this.__color.toOriginal());
+            }
+        }
+        _this2.__saturation_field.appendChild(valueField);
+        _this2.__selector.appendChild(_this2.__field_knob);
+        _this2.__selector.appendChild(_this2.__saturation_field);
+        _this2.__selector.appendChild(_this2.__hue_field);
+        _this2.__hue_field.appendChild(_this2.__hue_knob);
+        _this2.domElement.appendChild(_this2.__input);
+        _this2.domElement.appendChild(_this2.__selector);
+        _this2.updateDisplay();
+        function setSV(e) {
+            if (e.type.indexOf('touch') === -1) {
+                e.preventDefault();
+            }
+            var fieldRect = _this.__saturation_field.getBoundingClientRect();
+            var _ref = e.touches && e.touches[0] || e,
+                clientX = _ref.clientX,
+                clientY = _ref.clientY;
+            var s = (clientX - fieldRect.left) / (fieldRect.right - fieldRect.left);
+            var v = 1 - (clientY - fieldRect.top) / (fieldRect.bottom - fieldRect.top);
+            if (v > 1) {
+                v = 1;
+            } else if (v < 0) {
+                v = 0;
+            }
+            if (s > 1) {
+                s = 1;
+            } else if (s < 0) {
+                s = 0;
+            }
+            _this.__color.v = v;
+            _this.__color.s = s;
+            _this.setValue(_this.__color.toOriginal());
+            return false;
+        }
+        function setH(e) {
+            if (e.type.indexOf('touch') === -1) {
+                e.preventDefault();
+            }
+            var fieldRect = _this.__hue_field.getBoundingClientRect();
+            var _ref2 = e.touches && e.touches[0] || e,
+                clientY = _ref2.clientY;
+            var h = 1 - (clientY - fieldRect.top) / (fieldRect.bottom - fieldRect.top);
+            if (h > 1) {
+                h = 1;
+            } else if (h < 0) {
+                h = 0;
+            }
+            _this.__color.h = h * 360;
+            _this.setValue(_this.__color.toOriginal());
+            return false;
+        }
+        return _this2;
     }
-  }]);
-  return ColorController;
+    createClass(ColorController, [{
+        key: 'updateDisplay',
+        value: function updateDisplay() {
+            var i = interpret(this.getValue());
+            if (i !== false) {
+                var mismatch = false;
+                Common.each(Color.COMPONENTS, function (component) {
+                    if (!Common.isUndefined(i[component]) && !Common.isUndefined(this.__color.__state[component]) && i[component] !== this.__color.__state[component]) {
+                        mismatch = true;
+                        return {};
+                    }
+                }, this);
+                if (mismatch) {
+                    Common.extend(this.__color.__state, i);
+                }
+            }
+            Common.extend(this.__temp.__state, this.__color.__state);
+            this.__temp.a = 1;
+            var flip = this.__color.v < 0.5 || this.__color.s > 0.5 ? 255 : 0;
+            var _flip = 255 - flip;
+            Common.extend(this.__field_knob.style, {
+                marginLeft: 100 * this.__color.s - 7 + 'px',
+                marginTop: 100 * (1 - this.__color.v) - 7 + 'px',
+                backgroundColor: this.__temp.toHexString(),
+                border: this.__field_knob_border + 'rgb(' + flip + ',' + flip + ',' + flip + ')'
+            });
+            this.__hue_knob.style.marginTop = (1 - this.__color.h / 360) * 100 + 'px';
+            this.__temp.s = 1;
+            this.__temp.v = 1;
+            linearGradient(this.__saturation_field, 'left', '#fff', this.__temp.toHexString());
+            this.__input.value = this.__color.toString();
+            Common.extend(this.__input.style, {
+                backgroundColor: this.__color.toHexString(),
+                color: 'rgb(' + flip + ',' + flip + ',' + flip + ')',
+                textShadow: this.__input_textShadow + 'rgba(' + _flip + ',' + _flip + ',' + _flip + ',.7)'
+            });
+        }
+    }]);
+    return ColorController;
 }(Controller);
 var vendors = ['-moz-', '-o-', '-webkit-', '-ms-', ''];
 function linearGradient(elem, x, a, b) {
-  elem.style.background = '';
-  Common.each(vendors, function (vendor) {
-    elem.style.cssText += 'background: ' + vendor + 'linear-gradient(' + x + ', ' + a + ' 0%, ' + b + ' 100%); ';
-  });
+    elem.style.background = '';
+    Common.each(vendors, function (vendor) {
+        elem.style.cssText += 'background: ' + vendor + 'linear-gradient(' + x + ', ' + a + ' 0%, ' + b + ' 100%); ';
+    });
 }
 function hueGradient(elem) {
-  elem.style.background = '';
-  elem.style.cssText += 'background: -moz-linear-gradient(top,  #ff0000 0%, #ff00ff 17%, #0000ff 34%, #00ffff 50%, #00ff00 67%, #ffff00 84%, #ff0000 100%);';
-  elem.style.cssText += 'background: -webkit-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);';
-  elem.style.cssText += 'background: -o-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);';
-  elem.style.cssText += 'background: -ms-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);';
-  elem.style.cssText += 'background: linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);';
+    elem.style.background = '';
+    elem.style.cssText += 'background: -moz-linear-gradient(top,  #ff0000 0%, #ff00ff 17%, #0000ff 34%, #00ffff 50%, #00ff00 67%, #ffff00 84%, #ff0000 100%);';
+    elem.style.cssText += 'background: -webkit-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);';
+    elem.style.cssText += 'background: -o-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);';
+    elem.style.cssText += 'background: -ms-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);';
+    elem.style.cssText += 'background: linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);';
 }
 
 var css = {
@@ -1579,6 +1591,9 @@ var ControllerFactory = function ControllerFactory(object, property) {
   }
   if (Common.isString(initialValue)) {
     return new StringController(object, property);
+  }
+  if (Common.isFunction(initialValue) && arguments[2] !== undefined) {
+    return new TabbedController(object, property, '', arguments[2] || 0);
   }
   if (Common.isFunction(initialValue)) {
     return new FunctionController(object, property, '');
@@ -2238,7 +2253,7 @@ function augmentController(gui, li, controller) {
     dom.bind(controller.__checkbox, 'click', function (e) {
       e.stopPropagation();
     });
-  } else if (controller instanceof FunctionController) {
+  } else if (controller instanceof FunctionController || controller instanceof TabbedController) {
     dom.bind(li, 'click', function () {
       dom.fakeEvent(controller.__button, 'click');
     });
@@ -2504,6 +2519,7 @@ var controllers = {
   NumberControllerBox: NumberControllerBox,
   NumberControllerSlider: NumberControllerSlider,
   FunctionController: FunctionController,
+  TabbedController: TabbedController,
   ColorController: ColorController
 };
 var dom$1 = { dom: dom };

@@ -23,12 +23,10 @@ import dom from '../dom/dom';
  * @param {string} property The name of the property to be manipulated
  */
 class FunctionController extends Controller {
-  constructor(object, property, text, tabs) {
+  constructor(object, property, text) {
     super(object, property);
 
     const _this = this;
-    tabs = tabs || 0;
-    let tabSize = tabs*4;//4em = 1 tab
 
     this.__button = document.createElement('div');
     this.__button.innerHTML = text === undefined ? 'Fire' : text;
@@ -40,8 +38,6 @@ class FunctionController extends Controller {
     });
 
     dom.addClass(this.__button, 'button');
-    
-    this.__button.style.paddingLeft = tabSize.toString()+`em`;
 
     this.domElement.appendChild(this.__button);
   }

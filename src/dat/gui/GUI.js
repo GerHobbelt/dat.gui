@@ -17,6 +17,7 @@ import ControllerFactory from '../controllers/ControllerFactory';
 import Controller from '../controllers/Controller';
 import BooleanController from '../controllers/BooleanController';
 import FunctionController from '../controllers/FunctionController';
+import TabbedController from '../controllers/TabbedController';
 import NumberControllerBox from '../controllers/NumberControllerBox';
 import NumberControllerSlider from '../controllers/NumberControllerSlider';
 import ColorController from '../controllers/ColorController';
@@ -1030,7 +1031,7 @@ function augmentController(gui, li, controller) {
     dom.bind(controller.__checkbox, 'click', function(e) {
       e.stopPropagation(); // Prevents double-toggle
     });
-  } else if (controller instanceof FunctionController) {
+  } else if (controller instanceof FunctionController || controller instanceof TabbedController) {
     dom.bind(li, 'click', function() {
       dom.fakeEvent(controller.__button, 'click');
     });

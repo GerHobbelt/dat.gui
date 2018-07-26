@@ -27,6 +27,7 @@ class FunctionController extends Controller {
     super(object, property);
 
     const _this = this;
+    tabs = tabs || 0;
     let tabSize = tabs*4;//4em = 1 tab
 
     this.__button = document.createElement('div');

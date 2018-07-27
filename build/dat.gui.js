@@ -1287,10 +1287,11 @@ var FunctionController = function (_Controller) {
 var TabbedController = function (_FunctionController) {
   inherits(TabbedController, _FunctionController);
   function TabbedController(object, property, text, tabs) {
+    var _this;
     classCallCheck(this, TabbedController);
     var _this = possibleConstructorReturn(this, (TabbedController.__proto__ || Object.getPrototypeOf(TabbedController)).call(this, object, property, text));
     var tabSize = tabs * 2;
-    _this.__button.style.marginLeft = tabSize.toString() + 'em';
+    (_this = possibleConstructorReturn(this, (TabbedController.__proto__ || Object.getPrototypeOf(TabbedController)).call(this)), _this).__button.style.marginLeft = tabSize.toString() + 'em';
     return _this;
   }
   return TabbedController;

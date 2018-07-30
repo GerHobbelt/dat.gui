@@ -53,8 +53,9 @@ const ControllerFactory = function(object, property) {
     return new StringController(object, property);
   }
 
+  //arguments[2] is tabs. arguments[3] is the name of the object
   if (common.isFunction(initialValue) && arguments[2] !== undefined) {
-    return new TabbedController(object, property, '', arguments[2] || 0);
+    return new TabbedController(object, property, '', arguments[2] || 0, arguments[3] || "Object");
   }
 
   if (common.isFunction(initialValue)) {

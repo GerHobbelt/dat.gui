@@ -22,13 +22,37 @@ import dom from '../dom/dom';
  * @param {Object} object The object to be manipulated
  * @param {string} property The name of the property to be manipulated
  */
-class TabbedController extends FunctionController {
-  constructor(object, property, text, tabs) {
-    super(object, property, text);
+class TabbedController extends Controller {
+  constructor(object, property, text, tabs, displayName) {
+    super(object, property);
+
+    const _this = this;
+
+    this.__button = document.createElement('div');
+    this.__button.innerHTML = text === undefined ? 'Fire' : text;
+
+    dom.bind(this.__button, 'click', function(e) {
+      e.preventDefault();
+      _this.fire();
+      return false;
+    });
+
+    dom.addClass(this.__button, 'button');
 
     let tabSize = tabs*2;//2em = 1 tab
+    this.__button.style.paddingLeft = tabSize.toString()+`em`;
+    this.property = displayName;
+    this.domElement.appendChild(this.__button);
+  }
 
-    this.__button.style.marginLeft = tabSize.toString()+`em`;    
+  fire() {
+    if (this.__onChange) {
+      this.__onChange.call(this);
+    }
+    this.getValue().call(this.object);
+    if (this.__onFinishChange) {
+      this.__onFinishChange.call(this, this.getValue());
+    }
   }
 }
 

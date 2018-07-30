@@ -695,7 +695,7 @@ Object.defineProperty(Color.prototype, 'hex', {
   }
 });
 
-var Controller$1 = function () {
+var Controller = function () {
   function Controller(object, property) {
     classCallCheck(this, Controller);
     this.initialValue = object[property];
@@ -957,7 +957,7 @@ var BooleanController = function (_Controller) {
     }
   }]);
   return BooleanController;
-}(Controller$1);
+}(Controller);
 
 var OptionController = function (_Controller) {
   inherits(OptionController, _Controller);
@@ -1006,7 +1006,7 @@ var OptionController = function (_Controller) {
     }
   }]);
   return OptionController;
-}(Controller$1);
+}(Controller);
 
 var StringController = function (_Controller) {
   inherits(StringController, _Controller);
@@ -1046,7 +1046,7 @@ var StringController = function (_Controller) {
     }
   }]);
   return StringController;
-}(Controller$1);
+}(Controller);
 
 function numDecimals(x) {
   var _x = x.toString();
@@ -1112,7 +1112,7 @@ var NumberController = function (_Controller) {
     }
   }]);
   return NumberController;
-}(Controller$1);
+}(Controller);
 
 function roundToDecimal(value, decimals) {
   var tenTo = Math.pow(10, decimals);
@@ -1282,7 +1282,7 @@ var FunctionController = function (_Controller) {
     }
   }]);
   return FunctionController;
-}(Controller$1);
+}(Controller);
 
 var TabbedController = function (_Controller) {
   inherits(TabbedController, _Controller);
@@ -1554,7 +1554,7 @@ var ColorController = function (_Controller) {
         }
     }]);
     return ColorController;
-}(Controller$1);
+}(Controller);
 var vendors = ['-moz-', '-o-', '-webkit-', '-ms-', ''];
 function linearGradient(elem, x, a, b) {
     elem.style.background = '';
@@ -2340,7 +2340,7 @@ function _add(gui, object, property, params) {
     var factoryArgs = [object, property].concat(params.factoryArgs);
     controller = ControllerFactory.apply(gui, factoryArgs);
   }
-  if (params.before instanceof Controller$1) {
+  if (params.before instanceof Controller) {
     params.before = params.before.__li;
   }
   recallSavedValue(gui, controller);
@@ -2534,7 +2534,7 @@ var color = {
   interpret: interpret
 };
 var controllers = {
-  Controller: Controller$1,
+  Controller: Controller,
   BooleanController: BooleanController,
   OptionController: OptionController,
   StringController: StringController,

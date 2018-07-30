@@ -1286,7 +1286,7 @@ var FunctionController = function (_Controller) {
 
 var TabbedController = function (_Controller) {
   inherits(TabbedController, _Controller);
-  function TabbedController(object, property, text, tabs) {
+  function TabbedController(object, property, text, tabs, displayName) {
     classCallCheck(this, TabbedController);
     var _this2 = possibleConstructorReturn(this, (TabbedController.__proto__ || Object.getPrototypeOf(TabbedController)).call(this, object, property));
     var _this = _this2;
@@ -1300,6 +1300,7 @@ var TabbedController = function (_Controller) {
     dom.addClass(_this2.__button, 'button');
     var tabSize = tabs * 2;
     _this2.__button.style.paddingLeft = tabSize.toString() + 'em';
+    _this2.property = displayName;
     _this2.domElement.appendChild(_this2.__button);
     return _this2;
   }
@@ -1615,7 +1616,7 @@ var ControllerFactory = function ControllerFactory(object, property) {
     return new StringController(object, property);
   }
   if (Common.isFunction(initialValue) && arguments[2] !== undefined) {
-    return new TabbedController(object, property, '', arguments[2] || 0);
+    return new TabbedController(object, property, '', arguments[2] || 0, arguments[3] || "Object");
   }
   if (Common.isFunction(initialValue)) {
     return new FunctionController(object, property, '');

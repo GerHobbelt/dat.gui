@@ -689,7 +689,7 @@ Object.defineProperty(Color.prototype, 'hex', {
   }
 });
 
-var Controller = function () {
+var Controller$1 = function () {
   function Controller(object, property) {
     classCallCheck(this, Controller);
     this.initialValue = object[property];
@@ -951,7 +951,7 @@ var BooleanController = function (_Controller) {
     }
   }]);
   return BooleanController;
-}(Controller);
+}(Controller$1);
 
 var OptionController = function (_Controller) {
   inherits(OptionController, _Controller);
@@ -1000,7 +1000,7 @@ var OptionController = function (_Controller) {
     }
   }]);
   return OptionController;
-}(Controller);
+}(Controller$1);
 
 var StringController = function (_Controller) {
   inherits(StringController, _Controller);
@@ -1040,7 +1040,7 @@ var StringController = function (_Controller) {
     }
   }]);
   return StringController;
-}(Controller);
+}(Controller$1);
 
 function numDecimals(x) {
   var _x = x.toString();
@@ -1106,7 +1106,7 @@ var NumberController = function (_Controller) {
     }
   }]);
   return NumberController;
-}(Controller);
+}(Controller$1);
 
 function roundToDecimal(value, decimals) {
   var tenTo = Math.pow(10, decimals);
@@ -1276,17 +1276,40 @@ var FunctionController = function (_Controller) {
     }
   }]);
   return FunctionController;
-}(Controller);
+}(Controller$1);
 
-var TabbedController = function (_FunctionController) {
-  inherits(TabbedController, _FunctionController);
-  function TabbedController(object, property, text, tabs) {
+var TabbedController = function (_Controller) {
+  inherits(TabbedController, _Controller);
+  function TabbedController(object, property, text, tabs, displayName) {
     classCallCheck(this, TabbedController);
-    var _this = possibleConstructorReturn(this, (TabbedController.__proto__ || Object.getPrototypeOf(TabbedController)).call(this, object, property, text));
+    var _this2 = possibleConstructorReturn(this, (TabbedController.__proto__ || Object.getPrototypeOf(TabbedController)).call(this, object, property));
+    var _this = _this2;
+    _this2.__button = document.createElement('div');
+    _this2.__button.innerHTML = text === undefined ? 'Fire' : text;
+    dom.bind(_this2.__button, 'click', function (e) {
+      e.preventDefault();
+      _this.fire();
+      return false;
+    });
+    dom.addClass(_this2.__button, 'button');
     var tabSize = tabs * 2;
-    _this.__button.style.marginLeft = tabSize.toString() + 'em';
-    return _this;
+    _this2.__button.style.paddingLeft = tabSize.toString() + 'em';
+    _this2.property = displayName;
+    _this2.domElement.appendChild(_this2.__button);
+    return _this2;
   }
+  createClass(TabbedController, [{
+    key: 'fire',
+    value: function fire() {
+      if (this.__onChange) {
+        this.__onChange.call(this);
+      }
+      this.getValue().call(this.object);
+      if (this.__onFinishChange) {
+        this.__onFinishChange.call(this, this.getValue());
+      }
+    }
+  }]);
   return TabbedController;
 }(Controller);
 
@@ -1525,7 +1548,7 @@ var ColorController = function (_Controller) {
         }
     }]);
     return ColorController;
-}(Controller);
+}(Controller$1);
 var vendors = ['-moz-', '-o-', '-webkit-', '-ms-', ''];
 function linearGradient(elem, x, a, b) {
     elem.style.background = '';
@@ -1587,7 +1610,7 @@ var ControllerFactory = function ControllerFactory(object, property) {
     return new StringController(object, property);
   }
   if (Common.isFunction(initialValue) && arguments[2] !== undefined) {
-    return new TabbedController(object, property, '', arguments[2] || 0);
+    return new TabbedController(object, property, '', arguments[2] || 0, arguments[3] || "Object");
   }
   if (Common.isFunction(initialValue)) {
     return new FunctionController(object, property, '');
@@ -2311,7 +2334,7 @@ function _add(gui, object, property, params) {
     var factoryArgs = [object, property].concat(params.factoryArgs);
     controller = ControllerFactory.apply(gui, factoryArgs);
   }
-  if (params.before instanceof Controller) {
+  if (params.before instanceof Controller$1) {
     params.before = params.before.__li;
   }
   recallSavedValue(gui, controller);
@@ -2505,7 +2528,7 @@ var color = {
   interpret: interpret
 };
 var controllers = {
-  Controller: Controller,
+  Controller: Controller$1,
   BooleanController: BooleanController,
   OptionController: OptionController,
   StringController: StringController,

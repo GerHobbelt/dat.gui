@@ -86,7 +86,16 @@ class NumberControllerBox extends NumberController {
 
     this.__input = document.createElement('input');
     this.__input.setAttribute('type', 'text');
+    this.__up = document.createElement('button');
+    this.__up.setAttribute('style', "position:absolute;right:0;height:10px;top:4px;background-color: #555;border: none;");
+    this.__down = document.createElement('button');
+    this.__down.setAttribute('style', "position:absolute;right:0;height:10px;top:15px;background-color: #555;border: none;");
+    dom.bind(this.__up, 'mousedown', function(){_this.setValue(_this.getValue() + _this.__impliedStep)});
+    dom.bind(this.__down, 'mousedown', function(){_this.setValue(_this.getValue() - _this.__impliedStep)});
 
+    // this.__input.setAttribute('type', 'number');
+    // this.__input.setAttribute('step', params.step || 1);
+    // this.__input.setAttribute('style', "width : 100px;");
     // Makes it so manually specified values are not truncated.
 
     dom.bind(this.__input, 'change', onChange);
@@ -100,11 +109,23 @@ class NumberControllerBox extends NumberController {
         _this.__truncationSuspended = false;
         onFinish();
       }
+
+      if (e.keyCode === 38) {
+        _this.setValue(_this.getValue() + _this.__impliedStep)
+      }
+
+      if (e.keyCode === 40) {
+        _this.setValue(_this.getValue() - _this.__impliedStep)
+      }
+
     });
 
     this.updateDisplay();
 
     this.domElement.appendChild(this.__input);
+    this.domElement.appendChild(this.__up);
+    this.domElement.appendChild(this.__down);
+
   }
 
   updateDisplay() {

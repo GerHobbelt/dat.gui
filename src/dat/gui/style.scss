@@ -147,6 +147,9 @@ $input-color: lighten($background-color, 8.5%);
       input[type=text] {
         color: $number-color;
       }
+      input[type=number] {
+        color: $number-color;
+      }
     }
 
     &.string {
@@ -170,6 +173,21 @@ $input-color: lighten($background-color, 8.5%);
 
       background: $input-color;
       outline: none;
+      &:hover {
+        background: lighten($input-color, $hover-lighten);
+      }
+      &:focus {
+        background: lighten($input-color, $active-lighten);
+        color: #fff;
+      }
+
+    }
+
+    input[type=number] {
+
+      background: $input-color;
+      outline: none;
+      border: none;
       &:hover {
         background: lighten($input-color, $hover-lighten);
       }

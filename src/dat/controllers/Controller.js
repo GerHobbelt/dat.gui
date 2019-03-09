@@ -131,6 +131,8 @@ class Controller {
     this.__transformInput = transformInput;
     this.__transformOutput = transformOutput;
 
+    this.updateDisplay();
+
     return this;
   }
 }

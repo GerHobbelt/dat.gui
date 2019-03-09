@@ -760,6 +760,7 @@ var Controller = function () {
       };
       this.__transformInput = transformInput;
       this.__transformOutput = transformOutput;
+      this.updateDisplay();
       return this;
     }
   }]);

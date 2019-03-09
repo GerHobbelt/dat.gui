@@ -699,48 +699,68 @@ var Controller = function () {
   function Controller(object, property) {
     classCallCheck(this, Controller);
     this.initialValue = object[property];
-    this.domElement = document.createElement('div');
+    this.domElement = document.createElement("div");
     this.object = object;
     this.property = property;
     this.__onChange = undefined;
     this.__onFinishChange = undefined;
+    this.__transformInput = function (x) {
+      return x;
+    };
+    this.__transformOutput = function (x) {
+      return x;
+    };
   }
   createClass(Controller, [{
-    key: 'onChange',
+    key: "onChange",
     value: function onChange(fnc) {
       this.__onChange = fnc;
       return this;
     }
   }, {
-    key: 'onFinishChange',
+    key: "onFinishChange",
     value: function onFinishChange(fnc) {
       this.__onFinishChange = fnc;
       return this;
     }
   }, {
-    key: 'setValue',
+    key: "setValue",
     value: function setValue(newValue) {
-      this.object[this.property] = newValue;
+      var __newValue = this.__transformOutput(newValue);
+      this.object[this.property] = __newValue;
       if (this.__onChange) {
-        this.__onChange.call(this, newValue);
+        this.__onChange.call(this, __newValue);
       }
       this.updateDisplay();
       return this;
     }
   }, {
-    key: 'getValue',
+    key: "getValue",
     value: function getValue() {
-      return this.object[this.property];
+      return this.__transformInput(this.object[this.property]);
     }
   }, {
-    key: 'updateDisplay',
+    key: "updateDisplay",
     value: function updateDisplay() {
       return this;
     }
   }, {
-    key: 'isModified',
+    key: "isModified",
     value: function isModified() {
       return this.initialValue !== this.getValue();
+    }
+  }, {
+    key: "transform",
+    value: function transform() {
+      var transformInput = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : function (x) {
+        return x;
+      };
+      var transformOutput = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function (x) {
+        return x;
+      };
+      this.__transformInput = transformInput;
+      this.__transformOutput = transformOutput;
+      return this;
     }
   }]);
   return Controller;

@@ -27,7 +27,7 @@
     "url": "https://github.com/dataarts/dat.gui/issues"
   },
   "homepage": "https://github.com/dataarts/dat.gui#readme",
-  "devDependencies": {
+  "dependencies": {
     "babel-core": "^6.26.3",
     "babel-plugin-external-helpers": "^6.22.0",
     "babel-preset-env": "^1.7.0",

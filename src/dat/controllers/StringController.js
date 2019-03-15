@@ -28,8 +28,15 @@ class StringController extends Controller {
 
     const _this = this;
 
+    /**
+     * Readonly field
+     * @type {Object}
+     */
+    this._readonly = false;
+
     function onChange() {
-      _this.setValue(_this.__input.value);
+      if (!_this._readonly)
+        _this.setValue(_this.__input.value);
     }
 
     function onBlur() {
@@ -62,6 +69,18 @@ class StringController extends Controller {
       this.__input.value = this.getValue();
     }
     return super.updateDisplay();
+  }
+
+  /**
+   * Set readonly mode
+   *
+   * @param {Number} ro 
+   * @default false
+   * @returns {dat.controllers.StringController} this
+   */
+  readonly(ro) {
+    this._readonly = ro;
+    return this;
   }
 }
 

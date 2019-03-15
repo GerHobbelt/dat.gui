@@ -28,12 +28,6 @@ class StringController extends Controller {
 
     const _this = this;
 
-    /**
-     * Readonly field
-     * @type {Object}
-     */
-    this._readonly = false;
-
     function onChange() {
       if (!_this._readonly)
         _this.setValue(_this.__input.value);
@@ -71,17 +65,6 @@ class StringController extends Controller {
     return super.updateDisplay();
   }
 
-  /**
-   * Set readonly mode
-   *
-   * @param {Number} ro 
-   * @default false
-   * @returns {dat.controllers.StringController} this
-   */
-  readonly(ro) {
-    this._readonly = ro;
-    return this;
-  }
 }
 
 export default StringController;

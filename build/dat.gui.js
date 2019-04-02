@@ -2079,6 +2079,7 @@ Common.extend(GUI.prototype,
       }
     });
     if (this.autoPlace) {
+      this.width += 40;
       setWidth(this, this.width);
     }
   },
@@ -2140,6 +2141,14 @@ Common.extend(GUI.prototype,
     if (!gui) {
       markPresetModified(this.getRoot(), false);
     }
+  },
+  deleteSave: function deleteSave() {
+    if (this.preset === DEFAULT_DEFAULT_PRESET_NAME || !confirm('Delete preset "' + this.preset + '". Are you sure?')) {
+      return;
+    }
+    delete this.load.remembered[this.preset];
+    this.preset = removeCurrentPresetOption(this);
+    this.saveToLocalStorageIfPossible();
   },
   listen: function listen(controller) {
     var init = this.__listening.length === 0;
@@ -2355,6 +2364,10 @@ function addPresetOption(gui, name, setSelected) {
     gui.__preset_select.selectedIndex = gui.__preset_select.length - 1;
   }
 }
+function removeCurrentPresetOption(gui) {
+  gui.__preset_select.removeChild(gui.__preset_select.options[gui.__preset_select.selectedIndex]);
+  return gui.__preset_select.options[gui.__preset_select.selectedIndex].value;
+}
 function showHideExplain(gui, explain) {
   explain.style.display = gui.useLocalStorage ? 'block' : 'none';
 }
@@ -2378,6 +2391,10 @@ function addSaveMenu(gui) {
   button3.innerHTML = 'Revert';
   dom.addClass(button3, 'button');
   dom.addClass(button3, 'revert');
+  var button4 = document.createElement('span');
+  button4.innerHTML = 'Delete';
+  dom.addClass(button4, 'button');
+  dom.addClass(button4, 'delete');
   var select = gui.__preset_select = document.createElement('select');
   if (gui.load && gui.load.remembered) {
     Common.each(gui.load.remembered, function (value, key) {
@@ -2397,6 +2414,7 @@ function addSaveMenu(gui) {
   div.appendChild(button);
   div.appendChild(button2);
   div.appendChild(button3);
+  div.appendChild(button4);
   if (SUPPORTS_LOCAL_STORAGE) {
     var explain = document.getElementById('dg-local-explain');
     var localStorageCheckBox = document.getElementById('dg-local-storage');
@@ -2434,6 +2452,9 @@ function addSaveMenu(gui) {
   });
   dom.bind(button3, 'click', function () {
     gui.revert();
+  });
+  dom.bind(button4, 'click', function () {
+    gui.deleteSave();
   });
 }
 function addResizeHandle(gui) {

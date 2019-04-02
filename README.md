@@ -8,7 +8,7 @@ or the [API documentation](API.md).
 
 
 ## MacroMan's extra features
-* hide/show methods on GUI instances
+* Delete button added onto preset menu
 * hide/show methods on Controllers
 
 See API.md for usage

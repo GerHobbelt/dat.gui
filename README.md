@@ -8,8 +8,9 @@ or the [API documentation](API.md).
 
 
 ## MacroMan's extra features
-* Delete button added onto preset menu
-* hide/show methods on Controllers
+* Added hide/show methods to all Controllers (feature #93).
+* Delete button added to preset menu (feature #215).
+* Pass passive option to most event listeners to improve scroll performance (cleanup #193).
 
 See API.md for usage
 
@@ -25,7 +26,7 @@ In your `head` tag, include the following code:
 ## Installing from npm
 
 ```bash
-$ npm install --save dat.gui
+$ npm install --save @macroman/dat.gui
 ```
 
 ```js
@@ -55,10 +56,20 @@ $ npm install
 $ npm run build
 ```
 
+## Running tests
+
+In the terminal, enter `npm run dev` and open http://localhost:8080/tests/
+
+* Open `qunit.html` to run automated unit tests
+* Open `manual.html` for a manual test suite - events are logged to the browser console.
+
+
 ## npm scripts
 
-- npm run build - Build development and production version of scripts.
-- npm run dev - Build development version of script and watch for changes.
+* npm run dev - Build development version of script and watch for changes.
+* npm run build - Build development and production version of scripts.
+* npm run build-docs - Automatically generate API.md from source code
+* npm run lint - Run eslint on all code
 
 
 ## Working with Content Security Policy

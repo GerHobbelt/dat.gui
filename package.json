@@ -1,7 +1,7 @@
 {
-  "name": "dat.gui",
+  "name": "@macroman/dat.gui",
   "version": "0.7.6",
-  "description": "A lightweight graphical user interface for changing variables in JavaScript.",
+  "description": "A lightweight graphical user interface for changing variables in JavaScript (fork with extra features).",
   "main": "build/dat.gui.js",
   "module": "build/dat.gui.module.js",
   "directories": {
@@ -18,14 +18,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dataarts/dat.gui.git"
+    "url": "git+https://github.com/MacroMan/dat.gui.git"
   },
-  "author": "Data Arts Team, Google",
+  "author": "Data Arts Team, Google with additions from MacroMan",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/dataarts/dat.gui/issues"
+    "url": "https://github.com/MacroMan/dat.gui/issues"
   },
-  "homepage": "https://github.com/dataarts/dat.gui#readme",
+  "homepage": "https://github.com/MacroMan/dat.gui#readme",
   "devDependencies": {
     "babel-core": "^6.26.3",
     "babel-plugin-external-helpers": "^6.22.0",

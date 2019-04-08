@@ -181,6 +181,20 @@ var Common = {
   },
   isFunction: function isFunction(obj) {
     return Object.prototype.toString.call(obj) === '[object Function]';
+  },
+  supportsPassive: function supportsPassive() {
+    var supportsPassive = false;
+    try {
+      var opts = Object.defineProperty({}, 'passive', {
+        get: function get() {
+          supportsPassive = true;
+        }
+      });
+      window.addEventListener('testPassive', null, opts);
+      window.removeEventListener('testPassive', null, opts);
+    } catch (e) {
+    }
+    return supportsPassive;
   }
 };
 
@@ -846,10 +860,12 @@ var dom = {
     Common.defaults(evt, aux);
     elem.dispatchEvent(evt);
   },
-  bind: function bind(elem, event, func, newBool) {
+  bind: function bind(elem, event, func, newBool, newPassive) {
     var bool = newBool || false;
+    var passive = newPassive || false;
     if (elem.addEventListener) {
-      elem.addEventListener(event, func, bool);
+      var listenerArg = Common.supportsPassive() ? { capture: bool, passive: passive } : bool;
+      elem.addEventListener(event, func, listenerArg);
     } else if (elem.attachEvent) {
       elem.attachEvent('on' + event, func);
     }
@@ -933,7 +949,7 @@ var BooleanController = function (_Controller) {
     function onChange() {
       _this.setValue(!_this.__prev);
     }
-    dom.bind(_this2.__checkbox, 'change', onChange, false);
+    dom.bind(_this2.__checkbox, 'change', onChange, false, true);
     _this2.domElement.appendChild(_this2.__checkbox);
     _this2.updateDisplay();
     return _this2;
@@ -990,7 +1006,7 @@ var OptionController = function (_Controller) {
     dom.bind(_this2.__select, 'change', function () {
       var desiredValue = this.options[this.selectedIndex].value;
       _this.setValue(desiredValue);
-    });
+    }, false, true);
     _this2.domElement.appendChild(_this2.__select);
     return _this2;
   }
@@ -1030,14 +1046,14 @@ var StringController = function (_Controller) {
     }
     _this2.__input = document.createElement('input');
     _this2.__input.setAttribute('type', 'text');
-    dom.bind(_this2.__input, 'keyup', onChange);
-    dom.bind(_this2.__input, 'change', onChange);
-    dom.bind(_this2.__input, 'blur', onBlur);
+    dom.bind(_this2.__input, 'keyup', onChange, false, true);
+    dom.bind(_this2.__input, 'change', onChange, false, true);
+    dom.bind(_this2.__input, 'blur', onBlur, false, true);
     dom.bind(_this2.__input, 'keydown', function (e) {
       if (e.keyCode === 13) {
         this.blur();
       }
-    });
+    }, false, true);
     _this2.updateDisplay();
     _this2.domElement.appendChild(_this2.__input);
     return _this2;
@@ -1157,15 +1173,15 @@ var NumberControllerBox = function (_NumberController) {
       onFinish();
     }
     function onMouseDown(e) {
-      dom.bind(window, 'mousemove', onMouseDrag);
-      dom.bind(window, 'mouseup', onMouseUp);
+      dom.bind(window, 'mousemove', onMouseDrag, false, true);
+      dom.bind(window, 'mouseup', onMouseUp, false, true);
       prevY = e.clientY;
     }
     _this2.__input = document.createElement('input');
     _this2.__input.setAttribute('type', 'text');
-    dom.bind(_this2.__input, 'change', onChange);
-    dom.bind(_this2.__input, 'blur', onBlur);
-    dom.bind(_this2.__input, 'mousedown', onMouseDown);
+    dom.bind(_this2.__input, 'change', onChange, false, true);
+    dom.bind(_this2.__input, 'blur', onBlur, false, true);
+    dom.bind(_this2.__input, 'mousedown', onMouseDown, false, true);
     dom.bind(_this2.__input, 'keydown', function (e) {
       if (e.keyCode === 13) {
         _this.__truncationSuspended = true;
@@ -1173,7 +1189,7 @@ var NumberControllerBox = function (_NumberController) {
         _this.__truncationSuspended = false;
         onFinish();
       }
-    });
+    }, false, true);
     _this2.updateDisplay();
     _this2.domElement.appendChild(_this2.__input);
     return _this2;
@@ -1200,13 +1216,13 @@ var NumberControllerSlider = function (_NumberController) {
     _this2.__background = document.createElement('div');
     _this2.__foreground = document.createElement('div');
     dom.bind(_this2.__background, 'mousedown', onMouseDown);
-    dom.bind(_this2.__background, 'touchstart', onTouchStart);
+    dom.bind(_this2.__background, 'touchstart', onTouchStart, false, true);
     dom.addClass(_this2.__background, 'slider');
     dom.addClass(_this2.__foreground, 'slider-fg');
     function onMouseDown(e) {
       document.activeElement.blur();
       dom.bind(window, 'mousemove', onMouseDrag);
-      dom.bind(window, 'mouseup', onMouseUp);
+      dom.bind(window, 'mouseup', onMouseUp, false, true);
       onMouseDrag(e);
     }
     function onMouseDrag(e) {
@@ -1226,8 +1242,8 @@ var NumberControllerSlider = function (_NumberController) {
       if (e.touches.length !== 1) {
         return;
       }
-      dom.bind(window, 'touchmove', onTouchMove);
-      dom.bind(window, 'touchend', onTouchEnd);
+      dom.bind(window, 'touchmove', onTouchMove, false, true);
+      dom.bind(window, 'touchend', onTouchEnd, false, true);
       onTouchMove(e);
     }
     function onTouchMove(e) {
@@ -1318,18 +1334,18 @@ var ColorController = function (_Controller) {
       if (e.keyCode === 13) {
         onBlur.call(this);
       }
-    });
-    dom.bind(_this2.__input, 'blur', onBlur);
+    }, false, true);
+    dom.bind(_this2.__input, 'blur', onBlur, false, true);
     dom.bind(_this2.__selector, 'mousedown', function ()        {
       dom.addClass(this, 'drag').bind(window, 'mouseup', function ()        {
         dom.removeClass(_this.__selector, 'drag');
       });
-    });
+    }, false, true);
     dom.bind(_this2.__selector, 'touchstart', function ()        {
       dom.addClass(this, 'drag').bind(window, 'touchend', function ()        {
         dom.removeClass(_this.__selector, 'drag');
-      });
-    });
+      }, false, true);
+    }, false, true);
     var valueField = document.createElement('div');
     Common.extend(_this2.__selector.style, {
       width: '122px',
@@ -1396,15 +1412,15 @@ var ColorController = function (_Controller) {
       setSV(e);
       dom.bind(window, 'mousemove', setSV);
       dom.bind(window, 'touchmove', setSV);
-      dom.bind(window, 'mouseup', fieldUpSV);
-      dom.bind(window, 'touchend', fieldUpSV);
+      dom.bind(window, 'mouseup', fieldUpSV, false, true);
+      dom.bind(window, 'touchend', fieldUpSV, false, true);
     }
     function fieldDownH(e) {
       setH(e);
       dom.bind(window, 'mousemove', setH);
       dom.bind(window, 'touchmove', setH);
-      dom.bind(window, 'mouseup', fieldUpH);
-      dom.bind(window, 'touchend', fieldUpH);
+      dom.bind(window, 'mouseup', fieldUpH, false, true);
+      dom.bind(window, 'touchend', fieldUpH, false, true);
     }
     function fieldUpSV() {
       dom.unbind(window, 'mousemove', setSV);

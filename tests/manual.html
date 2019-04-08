@@ -1,30 +1,77 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
     "http://www.w3.org/TR/html4/loose.dtd">
 <html>
+
 <head>
 
   <script type="text/javascript" src="jquery.js"></script>
 
   <script type="text/javascript" src="../build/dat.gui.js"></script>
   <script type="text/javascript">
+    $.noConflict();
+    jQuery(document).ready(function($) {
+      var gui = new dat.GUI;
+      var obj = {
+        text: 'Some text',
+        number: 1,
+        slider: 5,
+        checkbox: true,
+        button: function() {},
+        select: 'One',
+        color0: '#ff0000',
+        color1: [0, 128, 255],
+        color2: [0, 128, 255, 0.4],
+        color3: {
+          h: 350,
+          s: 0.9,
+          v: 0.3
+        }
+      };
 
-  $.noConflict();
-  jQuery(document).ready(function($) {
-    var gui = new dat.GUI;
-    var obj = {
-      text: 'Some text',
-      number: 1
-    };
+      var controllers = [];
 
-    gui.remember(obj);
-    gui.add(obj, 'text');
-    gui.add(obj, 'number');
+      // Show preset bar
+      gui.remember(obj);
 
-  });
-</script>
+      // Add our controllers
+      var f1 = gui.addFolder('Text');
+      controllers.push(f1.add(obj, 'text'));
+      controllers.push(f1.add(obj, 'select', ['One', 'Two', 'Three']));
+      f1.open();
+
+      var f2 = gui.addFolder('Number');
+      controllers.push(f2.add(obj, 'number'));
+      controllers.push(f2.add(obj, 'slider', 0, 9));
+      f2.open();
+
+      var f3 = gui.addFolder('Other');
+      controllers.push(f3.add(obj, 'checkbox'));
+      controllers.push(f3.add(obj, 'button'));
+      f3.open();
+
+      var f4 = gui.addFolder('Colour');
+      controllers.push(f4.addColor(obj, 'color0'));
+      controllers.push(f4.addColor(obj, 'color1'));
+      controllers.push(f4.addColor(obj, 'color2'));
+      controllers.push(f4.addColor(obj, 'color3'));
+      f4.open();
+
+      for (var i = 0; i < controllers.length; i++) {
+        controllers[i].onChange(function(val) {
+          console.log(this.property, 'onChange:', val);
+        });
+        controllers[i].onFinishChange(function(val) {
+          console.log(this.property, 'onFinishChange:', val);
+        });
+      }
+
+    });
+  </script>
 
 </head>
+
 <body>
-<div>The menu should be right there -></div>
+  <div>The menu should be right there -></div>
 </body>
+
 </html>

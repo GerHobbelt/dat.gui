@@ -1,5 +1,8 @@
 ## Changelog
 
+### 0.7.5-0.1.1
+* Fixed left border color not working on non-hex color controllers ([#208](https://github.com/dataarts/dat.gui/issues/208))
+
 ### 0.7.5-0.1.0
 * Added hide/show methods to all Controllers ([#93](https://github.com/dataarts/dat.gui/issues/93)).
 * Delete button added to preset menu ([#215](https://github.com/dataarts/dat.gui/issues/)).

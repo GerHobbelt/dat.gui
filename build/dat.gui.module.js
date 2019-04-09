@@ -712,6 +712,7 @@ var Controller = function () {
     this.property = property;
     this.__onChange = undefined;
     this.__onFinishChange = undefined;
+    this.forceUpdateDisplay = false;
   }
   createClass(Controller, [{
     key: 'hide',
@@ -1022,7 +1023,7 @@ var OptionController = function (_Controller) {
   }, {
     key: 'updateDisplay',
     value: function updateDisplay() {
-      if (dom.isActive(this.__select)) return this;
+      if (dom.isActive(this.__select) && !this.forceUpdateDisplay) return this;
       this.__select.value = this.getValue();
       return get(OptionController.prototype.__proto__ || Object.getPrototypeOf(OptionController.prototype), 'updateDisplay', this).call(this);
     }
@@ -2229,7 +2230,8 @@ function augmentController(gui, li, controller) {
       controller.__li.firstElementChild.firstElementChild.innerHTML = _name;
       return controller;
     },
-    listen: function listen() {
+    listen: function listen(forceUpdateDisplay) {
+      controller.forceUpdateDisplay = !!forceUpdateDisplay;
       controller.__gui.listen(controller);
       return controller;
     },

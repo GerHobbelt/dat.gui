@@ -1,11 +1,17 @@
 ## Changelog
 
+### 0.7.1-0.1
+* Added hide/show methods to all Controllers ([#93](https://github.com/dataarts/dat.gui/issues/93)).
+* Delete button added to preset menu ([#215](https://github.com/dataarts/dat.gui/issues/)).
+* Pass passive option to most event listeners to improve scroll performance ([#193](https://github.com/dataarts/dat.gui/issues/)).
+* Added forceUpdateDisplay to listen(). Allows overiding of the active check on GUI inputs before updating ([#212](https://github.com/dataarts/dat.gui/issues/212)).
+
 ### 0.7.1
  * Fix listener cleanup in .destroy() and .removeFolder(). #177
 
 ### 0.7.0
  * Changed build system to Rollup, publishing ES6 and UMD modules. #172
- * Added .removeFolder(). #113 #158 
+ * Added .removeFolder(). #113 #158
  * Added API documentation. #165
  * Improved touch support. #173
 
@@ -37,7 +43,7 @@
  * Ported to ES6
  * Exported using Universal Module Definition (UMD) for max compatibility (Commonjs, Requirejs, AMD, global var)
  * Now using webpack for build
- * Optional external CSS file (dat.gui.css) for use on CSP-enabled servers that block unsafe-inline 
+ * Optional external CSS file (dat.gui.css) for use on CSP-enabled servers that block unsafe-inline
  * Added updateDisplay() to GUI, to update all controls in all folders - https://github.com/dataarts/dat.gui/pull/97
  * Fixed GUI.destroy() to remove all window eventListeners - https://github.com/dataarts/dat.gui/pull/88
  * Fixed performance issue when rotated on tablet/mobile - https://github.com/dataarts/dat.gui/pull/91
@@ -47,7 +53,7 @@
  * Fixed issues with step parameters in sliders - https://github.com/dataarts/dat.gui/issues/74
  * Fixed an issue with colors based on arrays - https://github.com/dataarts/dat.gui/pull/57
  * Fixed factory.js, Step param was not used - https://github.com/dataarts/dat.gui/pull/45
- 
+
 ### 0.5
  * Moved to requirejs for dependency management.
  * Changed global namespace from *DAT* to *dat* (lowercase).

@@ -290,9 +290,10 @@ An "abstract" class that represents a given property of an object.
     * [.domElement](#Controller+domElement) : <code>DOMElement</code>
     * [.object](#Controller+object) : <code>Object</code>
     * [.property](#Controller+property) : <code>String</code>
+    * [.forceUpdateDisplay](#Controller+forceUpdateDisplay) : <code>boolean</code>
     * [.options(options)](#Controller+options) ⇒ [<code>Controller</code>](#Controller)
     * [.name(name)](#Controller+name) ⇒ [<code>Controller</code>](#Controller)
-    * [.listen()](#Controller+listen) ⇒ [<code>Controller</code>](#Controller)
+    * [.listen(forceUpdateDisplay)](#Controller+listen) ⇒ [<code>Controller</code>](#Controller)
     * [.remove()](#Controller+remove) ⇒ [<code>Controller</code>](#Controller)
     * [.hide()](#Controller+hide)
     * [.show()](#Controller+show)
@@ -330,6 +331,12 @@ The object to manipulate
 The name of the property to manipulate
 
 **Kind**: instance property of [<code>Controller</code>](#Controller)  
+<a name="Controller+forceUpdateDisplay"></a>
+
+### controller.forceUpdateDisplay : <code>boolean</code>
+Whether to force update a display, even when input is active.
+
+**Kind**: instance property of [<code>Controller</code>](#Controller)  
 <a name="Controller+options"></a>
 
 ### controller.options(options) ⇒ [<code>Controller</code>](#Controller)
@@ -352,10 +359,15 @@ Sets the name of the controller.
 
 <a name="Controller+listen"></a>
 
-### controller.listen() ⇒ [<code>Controller</code>](#Controller)
+### controller.listen(forceUpdateDisplay) ⇒ [<code>Controller</code>](#Controller)
 Sets controller to listen for changes on its underlying object.
 
 **Kind**: instance method of [<code>Controller</code>](#Controller)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| forceUpdateDisplay | <code>boolean</code> | Whether to force update a display, even when input is active (default: false). |
+
 <a name="Controller+remove"></a>
 
 ### controller.remove() ⇒ [<code>Controller</code>](#Controller)

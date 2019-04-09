@@ -984,7 +984,7 @@ function augmentController(gui, li, controller) {
 
     /**
      * Sets controller to listen for changes on its underlying object.
-     * @param {boolean} forceUpdateDisplay Whether to force update a display, even when input is active.
+     * @param {boolean} forceUpdateDisplay Whether to force update a display, even when input is active (default: false).
      * @return {Controller}
      */
     listen: function(forceUpdateDisplay) {

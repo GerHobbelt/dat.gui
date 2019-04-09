@@ -8,9 +8,10 @@ or the [API documentation](API.md).
 
 
 ## MacroMan's extra features
-* Added hide/show methods to all Controllers (feature #93).
-* Delete button added to preset menu (feature #215).
-* Pass passive option to most event listeners to improve scroll performance (cleanup #193).
+* Added hide/show methods to all Controllers ([#93](https://github.com/dataarts/dat.gui/issues/93)).
+* Delete button added to preset menu ([#215](https://github.com/dataarts/dat.gui/issues/)).
+* Pass passive option to most event listeners to improve scroll performance ([#193](https://github.com/dataarts/dat.gui/issues/)).
+* Added forceUpdateDisplay to listen(). Allows overiding of the active check on GUI inputs before updating ([#212](https://github.com/dataarts/dat.gui/issues/212)).
 
 See API.md for usage
 

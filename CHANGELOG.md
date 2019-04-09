@@ -1,6 +1,6 @@
 ## Changelog
 
-### 0.7.1-0.1
+### 0.7.5-0.1.0
 * Added hide/show methods to all Controllers ([#93](https://github.com/dataarts/dat.gui/issues/93)).
 * Delete button added to preset menu ([#215](https://github.com/dataarts/dat.gui/issues/)).
 * Pass passive option to most event listeners to improve scroll performance ([#193](https://github.com/dataarts/dat.gui/issues/)).

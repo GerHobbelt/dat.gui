@@ -1,6 +1,6 @@
 {
   "name": "@macroman/dat.gui",
-  "version": "0.7.5-0.1.1",
+  "version": "1.0.0+dataarts-0.7.6",
   "description": "A lightweight graphical user interface for changing variables in JavaScript (fork with extra features).",
   "main": "build/dat.gui.js",
   "module": "build/dat.gui.module.js",
@@ -8,7 +8,7 @@
     "test": "tests"
   },
   "scripts": {
-    "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"serve --port 8080\"",
+    "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"serve -l 8080\"",
     "build": "rollup -c && rollup -c rollup.config.min.js",
     "build-docs": "jsdoc2md -f src/dat/gui/GUI.js src/dat/controllers/Controller.js src/dat/controllers/NumberController.js | replace-between --target API.md --token API",
     "lint": "eslint src",
@@ -20,13 +20,14 @@
     "type": "git",
     "url": "git+https://github.com/MacroMan/dat.gui.git"
   },
-  "author": "Data Arts Team, Google with additions from MacroMan",
+  "author": "Data Arts Team, Google, MacroMan",
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/MacroMan/dat.gui/issues"
   },
   "homepage": "https://github.com/MacroMan/dat.gui#readme",
   "devDependencies": {
+    "ajv": "^6.10.0",
     "babel-core": "^6.26.3",
     "babel-plugin-external-helpers": "^6.22.0",
     "babel-preset-env": "^1.7.0",
@@ -44,7 +45,7 @@
     "rollup-plugin-node-resolve": "^3.3.0",
     "rollup-plugin-sass": "^0.6.1",
     "rollup-plugin-uglify": "^2.0.1",
-    "serve": "^6.5.8"
+    "serve": "^11.0.0"
   },
   "eslintConfig": {
     "extends": "airbnb-base",
@@ -70,5 +71,6 @@
       "no-bitwise": 0,
       "no-plusplus": 0
     }
-  }
+  },
+  "dependencies": {}
 }

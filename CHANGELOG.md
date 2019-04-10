@@ -1,12 +1,18 @@
 ## Changelog
 
+### 1.0.0+dataarts-0.7.6
+* Updated version number to be compliant with Semantic Versioning 2.0.0
+ * First part is this projects version, starting at 1.0.0 to signify that it is production ready
+ * Second part (after the +) is the last merge point of the [upstream project](https://github.com/dataarts/dat.gui)
+* Brought all npm packages up to date and resolved vulnerabilities
+
 ### 0.7.5-0.1.1
 * Fixed left border color not working on non-hex color controllers ([#208](https://github.com/dataarts/dat.gui/issues/208))
 
 ### 0.7.5-0.1.0
 * Added hide/show methods to all Controllers ([#93](https://github.com/dataarts/dat.gui/issues/93)).
-* Delete button added to preset menu ([#215](https://github.com/dataarts/dat.gui/issues/)).
-* Pass passive option to most event listeners to improve scroll performance ([#193](https://github.com/dataarts/dat.gui/issues/)).
+* Delete button added to preset menu ([#215](https://github.com/dataarts/dat.gui/issues/215)).
+* Pass passive option to most event listeners to improve scroll performance ([#193](https://github.com/dataarts/dat.gui/issues/193)).
 * Added forceUpdateDisplay to listen(). Allows overiding of the active check on GUI inputs before updating ([#212](https://github.com/dataarts/dat.gui/issues/212)).
 
 ### 0.7.1

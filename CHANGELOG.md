@@ -1,5 +1,8 @@
 ## Changelog
 
+### 1.1.0+dataarts-0.7.6
+* Added value plotter controller, allowing tracking of basic numberic values over time. ([#191](https://github.com/dataarts/dat.gui/issues/191))
+
 ### 1.0.0+dataarts-0.7.6
 * Updated version number to be compliant with Semantic Versioning 2.0.0
  * First part is this projects version, starting at 1.0.0 to signify that it is production ready

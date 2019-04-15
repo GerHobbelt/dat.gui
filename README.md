@@ -13,8 +13,11 @@ or the [API documentation](API.md).
 * Pass passive option to most event listeners to improve scroll performance ([#193](https://github.com/dataarts/dat.gui/issues/193)).
 * Added forceUpdateDisplay to listen(). Allows overiding of the active check on GUI inputs before updating ([#212](https://github.com/dataarts/dat.gui/issues/212)).
 * Fixed left border color not working on non-hex color controllers ([#208](https://github.com/dataarts/dat.gui/issues/208))
+* Added value plotter controller ([#191](https://github.com/dataarts/dat.gui/issues/191))
 
-See API.md for usage
+![alt text](dat_panel.gif)
+
+See [API.md](API.md) for usage
 
 
 ## Packaged Builds

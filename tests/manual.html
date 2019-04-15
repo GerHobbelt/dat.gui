@@ -18,6 +18,7 @@
         checkbox: true,
         button: function() {},
         select: 'One',
+        plotter: 0,
         color0: '#ff0000',
         color1: [0, 128, 255],
         color2: [0, 128, 255, 0.4],
@@ -47,6 +48,7 @@
       var f3 = gui.addFolder('Other');
       controllers.push(f3.add(obj, 'checkbox'));
       controllers.push(f3.add(obj, 'button'));
+      controllers.push(f3.addPlotter(obj, 'plotter', 3, 0));
       f3.open();
 
       var f4 = gui.addFolder('Colour');
@@ -64,6 +66,17 @@
           console.log(this.property, 'onFinishChange:', val);
         });
       }
+
+      var angle = 0,
+        max = Math.PI * 2;
+      setInterval(function(){
+        angle += 0.1;
+        if (angle > max) {
+          angle = 0;
+        }
+
+        obj.plotter = Math.sin(angle) + 1.5;
+      }, 12);
 
     });
   </script>

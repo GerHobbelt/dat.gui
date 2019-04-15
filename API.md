@@ -42,6 +42,7 @@ manipulate variables and fire functions on the fly.
     * [.useLocalStorage](#GUI+useLocalStorage) : <code>Boolean</code>
     * [.add(object, property, [min], [max], [step])](#GUI+add) ⇒ [<code>Controller</code>](#Controller)
     * [.addColor(object, property)](#GUI+addColor) ⇒ [<code>Controller</code>](#Controller)
+    * [.addPlotter(object, property, max, period, type, fgColor, bgColor)](#GUI+addPlotter) ⇒ [<code>Controller</code>](#Controller)
     * [.remove(controller)](#GUI+remove)
     * [.destroy()](#GUI+destroy)
     * [.addFolder(name)](#GUI+addFolder) ⇒ <code>dat.gui.GUI</code>
@@ -196,6 +197,32 @@ gui.addColor(palette, 'color1');
 gui.addColor(palette, 'color2');
 gui.addColor(palette, 'color3');
 gui.addColor(palette, 'color4');
+```
+<a name="GUI+addPlotter"></a>
+
+### gui.addPlotter(object, property, max, period, type, fgColor, bgColor) ⇒ [<code>Controller</code>](#Controller)
+Adds a new plotter controller to the GUI.
+
+**Kind**: instance method of [<code>GUI</code>](#GUI)  
+**Returns**: [<code>Controller</code>](#Controller) - The controller that was added to the GUI.  
+
+| Param | Description |
+| --- | --- |
+| object |  |
+| property |  |
+| max | The maximum value that the plotter will display (default 10) |
+| period | The update interval in ms or use 0 to only update on value change (default 500) |
+| type | Type of graph to render - line or bar (default line) |
+| fgColor | Foreground color of the graph in hex (default #fff) |
+| bgColor | Background color of the graph in hex (default #000) |
+
+**Example**  
+```js
+var obj = {
+  value: 5
+};
+gui.addPlotter(obj, 'value', 10, 100);
+gui.addPlotter(obj, 'value', 10, 0);
 ```
 <a name="GUI+remove"></a>
 

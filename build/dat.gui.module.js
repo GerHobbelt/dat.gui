@@ -1719,6 +1719,7 @@ var GUI = function GUI(pars) {
   }
   var useLocalStorage = SUPPORTS_LOCAL_STORAGE && localStorage.getItem(getLocalStorageHash(this, 'isLocal')) === 'true';
   var saveToLocalStorage = void 0;
+  var titleRow = void 0;
   Object.defineProperties(this,
   {
     parent: {
@@ -1773,8 +1774,8 @@ var GUI = function GUI(pars) {
       },
       set: function set$$1(v) {
         params.name = v;
-        if (titleRowName) {
-          titleRowName.innerHTML = params.name;
+        if (titleRow) {
+          titleRow.innerHTML = params.name;
         }
       }
     },
@@ -1818,7 +1819,7 @@ var GUI = function GUI(pars) {
     }
   });
   if (Common.isUndefined(params.parent)) {
-    params.closed = false;
+    this.closed = params.closed || false;
     dom.addClass(this.domElement, GUI.CLASS_MAIN);
     dom.makeSelectable(this.domElement, false);
     if (SUPPORTS_LOCAL_STORAGE) {
@@ -1847,9 +1848,9 @@ var GUI = function GUI(pars) {
     if (params.closed === undefined) {
       params.closed = true;
     }
-    var _titleRowName = document.createTextNode(params.name);
-    dom.addClass(_titleRowName, 'controller-name');
-    var titleRow = addRow(_this, _titleRowName);
+    var titleRowName = document.createTextNode(params.name);
+    dom.addClass(titleRowName, 'controller-name');
+    titleRow = addRow(_this, titleRowName);
     var onClickTitle = function onClickTitle(e) {
       e.preventDefault();
       _this.closed = !_this.closed;
@@ -2005,6 +2006,12 @@ Common.extend(GUI.prototype,
   },
   close: function close() {
     this.closed = true;
+  },
+  hide: function hide() {
+    this.domElement.style.display = 'none';
+  },
+  show: function show() {
+    this.domElement.style.display = '';
   },
   onResize: function onResize() {
     var root = this.getRoot();

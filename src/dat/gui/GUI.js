@@ -177,6 +177,7 @@ const GUI = function(pars) {
     localStorage.getItem(getLocalStorageHash(this, 'isLocal')) === 'true';
 
   let saveToLocalStorage;
+  let titleRow;
 
   Object.defineProperties(this,
     /** @lends GUI.prototype */
@@ -267,8 +268,8 @@ const GUI = function(pars) {
         set: function(v) {
           // TODO Check for collisions among sibling folders
           params.name = v;
-          if (titleRowName) {
-            titleRowName.innerHTML = params.name;
+          if (titleRow) {
+            titleRow.innerHTML = params.name;
           }
         }
       },
@@ -335,7 +336,7 @@ const GUI = function(pars) {
 
   // Are we a root level GUI?
   if (common.isUndefined(params.parent)) {
-    params.closed = false;
+    this.closed = params.closed || false;
 
     dom.addClass(this.domElement, GUI.CLASS_MAIN);
     dom.makeSelectable(this.domElement, false);
@@ -376,7 +377,7 @@ const GUI = function(pars) {
     const titleRowName = document.createTextNode(params.name);
     dom.addClass(titleRowName, 'controller-name');
 
-    const titleRow = addRow(_this, titleRowName);
+    titleRow = addRow(_this, titleRowName);
 
     const onClickTitle = function(e) {
       e.preventDefault();
@@ -681,6 +682,20 @@ common.extend(
      */
     close: function() {
       this.closed = true;
+    },
+
+    /**
+    * Hides the GUI.
+    */
+    hide: function() {
+      this.domElement.style.display = 'none';
+    },
+
+    /**
+    * Shows the GUI.
+    */
+    show: function() {
+      this.domElement.style.display = '';
     },
 
 

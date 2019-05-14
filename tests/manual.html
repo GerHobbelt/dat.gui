@@ -69,14 +69,14 @@
 
       var angle = 0,
         max = Math.PI * 2;
-      setInterval(function(){
-        angle += 0.1;
+      setInterval(function() {
+        angle += 0.05;
         if (angle > max) {
           angle = 0;
         }
 
         obj.plotter = Math.sin(angle) + 1.5;
-      }, 12);
+      }, 10);
 
     });
   </script>

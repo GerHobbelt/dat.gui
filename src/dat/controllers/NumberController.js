@@ -20,7 +20,7 @@ function numDecimals(x) {
     return _x.length - _x.indexOf('.') - 1;
   }
 
-  return 0;
+  return 2;
 }
 
 /**

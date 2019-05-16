@@ -4,6 +4,20 @@ A lightweight graphical user interface for changing variables in JavaScript.
 Get started with dat.GUI by reading the [tutorial](http://workshop.chromeexperiments.com/examples/gui)
 or the [API documentation](API.md).
 
+This fork of dat.gui was specifically created to be used with the new ISF website. It can be used exactly the same way; however, it just needs to be built with the JS and CSS separately. This can be turned on and off by changing one line in `rollup.config.js`:
+```js
+plugins: [
+    ...
+    sass({
+        ...
+        insert: false
+        ...
+    })
+    ...
+]
+```
+
+This is because, when `insert` is set to `true`, the built dat.gui file appends the CSS file to the HTML, which means you can't control the order that it is included. Because the ISF website (or any website) needs to override the default styles, the default styles need to be included before the overrides. This is all set up on the ISF website to insert the files from `node_modules`, you just need to make sure you're pointing to the right dat.gui that is built in the right way.
 
 
 ## Packaged Builds

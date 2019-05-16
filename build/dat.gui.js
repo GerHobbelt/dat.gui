@@ -1053,7 +1053,7 @@ function numDecimals(x) {
   if (_x.indexOf('.') > -1) {
     return _x.length - _x.indexOf('.') - 1;
   }
-  return 0;
+  return 2;
 }
 var NumberController = function (_Controller) {
   inherits(NumberController, _Controller);
@@ -1263,6 +1263,10 @@ var FunctionController = function (_Controller) {
     dom.bind(_this2.__button, 'click', function (e) {
       e.preventDefault();
       _this.fire();
+      dom.addClass(_this.__button.parentElement.parentElement.parentElement, 'function--active');
+      setTimeout(function () {
+        dom.removeClass(_this.__button.parentElement.parentElement.parentElement, 'function--active');
+      }, 100);
       return false;
     });
     dom.addClass(_this2.__button, 'button');
@@ -1536,6 +1540,1100 @@ function hueGradient(elem) {
     elem.style.cssText += 'background: linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);';
 }
 
+var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+
+
+
+
+
+function createCommonjsModule(fn, module) {
+	return module = { exports: {} }, fn(module, module.exports), module.exports;
+}
+
+var Stream = function (data) {
+    this.data = data;
+    this.len = this.data.length;
+    this.pos = 0;
+    this.readByte = function () {
+        if (this.pos >= this.data.length) {
+            throw new Error('Attempted to read past end of stream.');
+        }
+        if (data instanceof Uint8Array)
+            return data[this.pos++];
+        else
+            return data.charCodeAt(this.pos++) & 0xFF;
+    };
+    this.readBytes = function (n) {
+        var bytes = [];
+        for (var i = 0; i < n; i++) {
+            bytes.push(this.readByte());
+        }
+        return bytes;
+    };
+    this.read = function (n) {
+        var s = '';
+        for (var i = 0; i < n; i++) {
+            s += String.fromCharCode(this.readByte());
+        }
+        return s;
+    };
+    this.readUnsigned = function () {
+        var a = this.readBytes(2);
+        return (a[1] << 8) + a[0];
+    };
+};
+var Stream_1 = Stream;
+
+var lzwDecode = function (minCodeSize, data) {
+    var pos = 0;
+    var readCode = function (size) {
+        var code = 0;
+        for (var i = 0; i < size; i++) {
+            if (data[pos >> 3] & (1 << (pos & 7))) {
+                code |= 1 << i;
+            }
+            pos++;
+        }
+        return code;
+    };
+    var clearCode = 1 << minCodeSize;
+    var eoiCode = clearCode + 1;
+    var codeSize = minCodeSize + 1;
+    var outputBlockSize = 4096,
+        bufferBlockSize = 4096;
+    var output = new Uint8Array(outputBlockSize),
+        buffer = new Uint8Array(bufferBlockSize),
+        dict = [];
+    var bufferOffset = 0,
+        outputOffset = 0;
+    var fill = function () {
+        for (var i = 0; i < clearCode; i++) {
+            dict[i] = new Uint8Array(1);
+            dict[i][0] = i;
+        }
+        dict[clearCode] = new Uint8Array(0);
+        dict[eoiCode] = null;
+    };
+    var clear = function () {
+        var keep = clearCode + 2;
+        dict.splice(keep, dict.length - keep);
+        codeSize = minCodeSize + 1;
+        bufferOffset = 0;
+    };
+    var enlargeOutput = function() {
+        var outputSize = output.length + outputBlockSize;
+        var newoutput = new Uint8Array(outputSize);
+        newoutput.set(output);
+        output = newoutput;
+        outputBlockSize = outputBlockSize << 1;
+    };
+    var enlargeBuffer = function() {
+        var bufferSize = buffer.length + bufferBlockSize;
+        var newbuffer = new Uint8Array(bufferSize);
+        newbuffer.set(buffer);
+        buffer = newbuffer;
+        bufferBlockSize = bufferBlockSize << 1;
+    };
+    var pushCode = function(code, last) {
+        var newlength = dict[last].byteLength + 1;
+        while (bufferOffset + newlength > buffer.length) enlargeBuffer();
+        var newdict = buffer.subarray(bufferOffset, bufferOffset + newlength);
+        newdict.set(dict[last]);
+        newdict[newlength-1] = dict[code][0];
+        bufferOffset += newlength;
+        dict.push(newdict);
+    };
+    var code;
+    var last;
+    fill();
+    while (true) {
+        last = code;
+        code = readCode(codeSize);
+        if (code === clearCode) {
+            clear();
+            continue;
+        }
+        if (code === eoiCode) break;
+        if (code < dict.length) {
+            if (last !== clearCode) {
+                pushCode(code, last);
+            }
+        }
+        else {
+            if (code !== dict.length) throw new Error('Invalid LZW code.');
+            pushCode(last, last);
+        }
+        var newsize = dict[code].length;
+        while (outputOffset + newsize > output.length) enlargeOutput();
+        output.set(dict[code], outputOffset);
+        outputOffset += newsize;
+        if (dict.length === (1 << codeSize) && codeSize < 12) {
+            codeSize++;
+        }
+    }
+    return output.subarray(0, outputOffset);
+};
+var lzwDecode_1 = lzwDecode;
+
+var bitsToNum = function (ba) {
+    return ba.reduce(function (s, n) {
+        return s * 2 + n;
+    }, 0);
+};
+var byteToBitArr = function (bite) {
+    var a = [];
+    for (var i = 7; i >= 0; i--) {
+        a.push( !! (bite & (1 << i)));
+    }
+    return a;
+};
+var parseGIF = function (st, handler) {
+    handler || (handler = {});
+    var parseCT = function (entries) {
+        var ct = [];
+        for (var i = 0; i < entries; i++) {
+            ct.push(st.readBytes(3));
+        }
+        return ct;
+    };
+    var readSubBlocks = function () {
+        var size, data, offset = 0;
+        var bufsize = 8192;
+        data = new Uint8Array(bufsize);
+        var resizeBuffer = function() {
+            var newdata = new Uint8Array(data.length + bufsize);
+            newdata.set(data);
+            data = newdata;
+        };
+        do {
+            size = st.readByte();
+            while (offset + size > data.length) resizeBuffer();
+            data.set(st.readBytes(size), offset);
+            offset += size;
+        } while (size !== 0);
+        return data.subarray(0, offset);
+    };
+    var parseHeader = function () {
+        var hdr = {};
+        hdr.sig = st.read(3);
+        hdr.ver = st.read(3);
+        if (hdr.sig !== 'GIF') throw new Error('Not a GIF file.');
+        hdr.width = st.readUnsigned();
+        hdr.height = st.readUnsigned();
+        var bits = byteToBitArr(st.readByte());
+        hdr.gctFlag = bits.shift();
+        hdr.colorRes = bitsToNum(bits.splice(0, 3));
+        hdr.sorted = bits.shift();
+        hdr.gctSize = bitsToNum(bits.splice(0, 3));
+        hdr.bgColor = st.readByte();
+        hdr.pixelAspectRatio = st.readByte();
+        if (hdr.gctFlag) {
+            hdr.gct = parseCT(1 << (hdr.gctSize + 1));
+        }
+        handler.hdr && handler.hdr(hdr);
+    };
+    var parseExt = function (block) {
+        var parseGCExt = function (block) {
+            var blockSize = st.readByte();
+            var bits = byteToBitArr(st.readByte());
+            block.reserved = bits.splice(0, 3);
+            block.disposalMethod = bitsToNum(bits.splice(0, 3));
+            block.userInput = bits.shift();
+            block.transparencyGiven = bits.shift();
+            block.delayTime = st.readUnsigned();
+            block.transparencyIndex = st.readByte();
+            block.terminator = st.readByte();
+            handler.gce && handler.gce(block);
+        };
+        var parseComExt = function (block) {
+            block.comment = readSubBlocks();
+            handler.com && handler.com(block);
+        };
+        var parsePTExt = function (block) {
+            var blockSize = st.readByte();
+            block.ptHeader = st.readBytes(12);
+            block.ptData = readSubBlocks();
+            handler.pte && handler.pte(block);
+        };
+        var parseAppExt = function (block) {
+            var parseNetscapeExt = function (block) {
+                var blockSize = st.readByte();
+                block.unknown = st.readByte();
+                block.iterations = st.readUnsigned();
+                block.terminator = st.readByte();
+                handler.app && handler.app.NETSCAPE && handler.app.NETSCAPE(block);
+            };
+            var parseUnknownAppExt = function (block) {
+                block.appData = readSubBlocks();
+                handler.app && handler.app[block.identifier] && handler.app[block.identifier](block);
+            };
+            var blockSize = st.readByte();
+            block.identifier = st.read(8);
+            block.authCode = st.read(3);
+            switch (block.identifier) {
+                case 'NETSCAPE':
+                    parseNetscapeExt(block);
+                    break;
+                default:
+                    parseUnknownAppExt(block);
+                    break;
+            }
+        };
+        var parseUnknownExt = function (block) {
+            block.data = readSubBlocks();
+            handler.unknown && handler.unknown(block);
+        };
+        block.label = st.readByte();
+        switch (block.label) {
+            case 0xF9:
+                block.extType = 'gce';
+                parseGCExt(block);
+                break;
+            case 0xFE:
+                block.extType = 'com';
+                parseComExt(block);
+                break;
+            case 0x01:
+                block.extType = 'pte';
+                parsePTExt(block);
+                break;
+            case 0xFF:
+                block.extType = 'app';
+                parseAppExt(block);
+                break;
+            default:
+                block.extType = 'unknown';
+                parseUnknownExt(block);
+                break;
+        }
+    };
+    var parseImg = function (img) {
+        var deinterlace = function (pixels, width) {
+            var newPixels = new Array(pixels.length);
+            var rows = pixels.length / width;
+            var cpRow = function (toRow, fromRow) {
+                var fromPixels = pixels.slice(fromRow * width, (fromRow + 1) * width);
+                newPixels.splice.apply(newPixels, [toRow * width, width].concat(fromPixels));
+            };
+            var offsets = [0, 4, 2, 1];
+            var steps = [8, 8, 4, 2];
+            var fromRow = 0;
+            for (var pass = 0; pass < 4; pass++) {
+                for (var toRow = offsets[pass]; toRow < rows; toRow += steps[pass]) {
+                    cpRow(toRow, fromRow);
+                    fromRow++;
+                }
+            }
+            return newPixels;
+        };
+        img.leftPos = st.readUnsigned();
+        img.topPos = st.readUnsigned();
+        img.width = st.readUnsigned();
+        img.height = st.readUnsigned();
+        var bits = byteToBitArr(st.readByte());
+        img.lctFlag = bits.shift();
+        img.interlaced = bits.shift();
+        img.sorted = bits.shift();
+        img.reserved = bits.splice(0, 2);
+        img.lctSize = bitsToNum(bits.splice(0, 3));
+        if (img.lctFlag) {
+            img.lct = parseCT(1 << (img.lctSize + 1));
+        }
+        img.lzwMinCodeSize = st.readByte();
+        var lzwData = readSubBlocks();
+        img.pixels = lzwDecode_1(img.lzwMinCodeSize, lzwData);
+        if (img.interlaced) {
+            img.pixels = deinterlace(img.pixels, img.width);
+        }
+        handler.img && handler.img(img);
+    };
+    var parseBlock = function () {
+        var block = {};
+        block.sentinel = st.readByte();
+        switch (String.fromCharCode(block.sentinel)) {
+            case '!':
+                block.type = 'ext';
+                parseExt(block);
+                break;
+            case ',':
+                block.type = 'img';
+                parseImg(block);
+                break;
+            case ';':
+                block.type = 'eof';
+                handler.eof && handler.eof(block);
+                break;
+            default:
+                throw new Error('Unknown block: 0x' + block.sentinel.toString(16));
+        }
+        if (block.type !== 'eof') setTimeout(parseBlock, 0);
+    };
+    var parse = function () {
+        parseHeader();
+        setTimeout(parseBlock, 0);
+    };
+    parse();
+};
+var parseGif = parseGIF;
+
+var sibgif = createCommonjsModule(function (module, exports) {
+(function (root, factory) {
+    if (typeof undefined === 'function' && undefined.amd) {
+        undefined([], factory);
+    } else {
+        module.exports = factory();
+    }
+}(commonjsGlobal, function () {
+    {
+        var Stream = Stream_1;
+        var parseGIF = parseGif;
+    }
+    var SuperGif = function ( opts ) {
+        var options = {
+            vp_l: 0,
+            vp_t: 0,
+            vp_w: null,
+            vp_h: null,
+            c_w: null,
+            c_h: null
+        };
+        for (var i in opts ) { options[i] = opts[i]; }
+        if (options.vp_w && options.vp_h) options.is_vp = true;
+        var stream;
+        var hdr;
+        var loadError = null;
+        var loading = false;
+        var transparency = null;
+        var delay = null;
+        var disposalMethod = null;
+        var disposalRestoreFromIdx = null;
+        var lastDisposalMethod = null;
+        var frame = null;
+        var lastImg = null;
+        var playing = true;
+        var forward = true;
+        var ctx_scaled = false;
+        var frames = [];
+        var frameOffsets = [];
+        var gif = options.gif;
+        if (typeof options.gif == 'undefined' && !!options.url) {
+            gif = document.createElement('img');
+            gif.src = options.url;
+        }
+        if (typeof options.auto_play == 'undefined')
+            options.auto_play = (!gif.getAttribute('data-autoplay') || gif.getAttribute('data-autoplay') == '1');
+        var onEndListener = (options.hasOwnProperty('on_end') ? options.on_end : null);
+        var loopDelay = (options.hasOwnProperty('loop_delay') ? options.loop_delay : 0);
+        var overrideLoopMode = (options.hasOwnProperty('loop_mode') ? options.loop_mode : 'auto');
+        var drawWhileLoading = (options.hasOwnProperty('draw_while_loading') ? options.draw_while_loading : true);
+        var showProgressBar = drawWhileLoading ? (options.hasOwnProperty('show_progress_bar') ? options.show_progress_bar : true) : false;
+        var progressBarHeight = (options.hasOwnProperty('progressbar_height') ? options.progressbar_height : 25);
+        var progressBarBackgroundColor = (options.hasOwnProperty('progressbar_background_color') ? options.progressbar_background_color : 'rgba(255,255,255,0.4)');
+        var progressBarForegroundColor = (options.hasOwnProperty('progressbar_foreground_color') ? options.progressbar_foreground_color : 'rgba(255,0,22,.8)');
+        var clear = function () {
+            transparency = null;
+            delay = null;
+            lastDisposalMethod = disposalMethod;
+            disposalMethod = null;
+            frame = null;
+        };
+        var handler = function () {
+            return {
+                hdr: withProgress(doHdr),
+                gce: withProgress(doGCE),
+                com: withProgress(doNothing),
+                app: {
+                    NETSCAPE: withProgress(doNothing)
+                },
+                img: withProgress(doImg, true),
+                eof: function (block) {
+                    pushFrame();
+                    doDecodeProgress(false);
+                    if ( ! (options.c_w && options.c_h) ) {
+                        canvas.width = hdr.width * get_canvas_scale();
+                        canvas.height = hdr.height * get_canvas_scale();
+                    }
+                    player.init();
+                    loading = false;
+                    if (load_callback) {
+                        load_callback(loadError, gif);
+                    }
+                }
+            };
+        };
+        var doParse = function () {
+            try {
+                parseGIF(stream, handler());
+            }
+            catch (err) {
+                doLoadError('parse');
+            }
+        };
+        var setSizes = function(w, h) {
+            canvas.width = w * get_canvas_scale();
+            canvas.height = h * get_canvas_scale();
+            toolbar.style.minWidth = ( w * get_canvas_scale() ) + 'px';
+            tmpCanvas.width = w;
+            tmpCanvas.height = h;
+            tmpCanvas.style.width = w + 'px';
+            tmpCanvas.style.height = h + 'px';
+            tmpCanvas.getContext('2d').setTransform(1, 0, 0, 1, 0, 0);
+        };
+        var setFrameOffset = function(frame, offset) {
+            if (!frameOffsets[frame]) {
+                frameOffsets[frame] = offset;
+                return;
+            }
+            if (typeof offset.x !== 'undefined') {
+                frameOffsets[frame].x = offset.x;
+            }
+            if (typeof offset.y !== 'undefined') {
+                frameOffsets[frame].y = offset.y;
+            }
+        };
+        var doShowProgress = function (pos, length, draw) {
+            if (draw && showProgressBar) {
+                var height = progressBarHeight;
+                var left, mid, top, width;
+                if (options.is_vp) {
+                    if (!ctx_scaled) {
+                        top = (options.vp_t + options.vp_h - height);
+                        height = height;
+                        left = options.vp_l;
+                        mid = left + (pos / length) * options.vp_w;
+                        width = canvas.width;
+                    } else {
+                        top = (options.vp_t + options.vp_h - height) / get_canvas_scale();
+                        height = height / get_canvas_scale();
+                        left = (options.vp_l / get_canvas_scale() );
+                        mid = left + (pos / length) * (options.vp_w / get_canvas_scale());
+                        width = canvas.width / get_canvas_scale();
+                    }
+                }
+                else {
+                    top = (canvas.height - height) / (ctx_scaled ? get_canvas_scale() : 1);
+                    mid = ((pos / length) * canvas.width) / (ctx_scaled ? get_canvas_scale() : 1);
+                    width = canvas.width / (ctx_scaled ? get_canvas_scale() : 1 );
+                    height /= ctx_scaled ? get_canvas_scale() : 1;
+                }
+                ctx.fillStyle = progressBarBackgroundColor;
+                ctx.fillRect(mid, top, width - mid, height);
+                ctx.fillStyle = progressBarForegroundColor;
+                ctx.fillRect(0, top, mid, height);
+            }
+        };
+        var doLoadError = function (originOfError) {
+            var drawError = function () {
+                ctx.fillStyle = 'black';
+                ctx.fillRect(0, 0, options.c_w ? options.c_w : hdr.width, options.c_h ? options.c_h : hdr.height);
+                ctx.strokeStyle = 'red';
+                ctx.lineWidth = 3;
+                ctx.moveTo(0, 0);
+                ctx.lineTo(options.c_w ? options.c_w : hdr.width, options.c_h ? options.c_h : hdr.height);
+                ctx.moveTo(0, options.c_h ? options.c_h : hdr.height);
+                ctx.lineTo(options.c_w ? options.c_w : hdr.width, 0);
+                ctx.stroke();
+            };
+            loadError = originOfError;
+            hdr = {
+                width: gif.width,
+                height: gif.height
+            };
+            frames = [];
+            drawError();
+        };
+        var doHdr = function (_hdr) {
+            hdr = _hdr;
+            setSizes(hdr.width, hdr.height);
+        };
+        var doGCE = function (gce) {
+            pushFrame();
+            clear();
+            transparency = gce.transparencyGiven ? gce.transparencyIndex : null;
+            delay = gce.delayTime;
+            disposalMethod = gce.disposalMethod;
+        };
+        var pushFrame = function () {
+            if (!frame) return;
+            var newFrame = {
+                data: frame.getImageData(0, 0, hdr.width, hdr.height),
+                delay: delay
+            };
+            if (options.includeDataURL) {
+                newFrame.dataURL = tmpCanvas.toDataURL();
+            }
+            frames.push(newFrame);
+            frameOffsets.push({ x: 0, y: 0 });
+        };
+        var doImg = function (img) {
+            if (!frame) frame = tmpCanvas.getContext('2d');
+            var currIdx = frames.length;
+            var ct = img.lctFlag ? img.lct : hdr.gct;
+            if (currIdx > 0) {
+                if (lastDisposalMethod === 3) {
+                    if (disposalRestoreFromIdx !== null) {
+                        frame.putImageData(frames[disposalRestoreFromIdx].data, 0, 0);
+                    } else {
+                        frame.clearRect(lastImg.leftPos, lastImg.topPos, lastImg.width, lastImg.height);
+                    }
+                } else {
+                    disposalRestoreFromIdx = currIdx - 1;
+                }
+                if (lastDisposalMethod === 2) {
+                    frame.clearRect(lastImg.leftPos, lastImg.topPos, lastImg.width, lastImg.height);
+                }
+            }
+            var imgData = frame.getImageData(img.leftPos, img.topPos, img.width, img.height);
+            for (var i = 0; i < img.pixels.length; i++) {
+                var pixel = img.pixels[i];
+                  if (pixel !== transparency) {
+                    var pix = ct[pixel];
+                    var idx = i * 4;
+                    imgData.data[idx    ] = pix[0];
+                    imgData.data[idx + 1] = pix[1];
+                    imgData.data[idx + 2] = pix[2];
+                    imgData.data[idx + 3] = 255;
+                  }
+            }
+            frame.putImageData(imgData, img.leftPos, img.topPos);
+            if (!ctx_scaled) {
+                ctx.scale(get_canvas_scale(),get_canvas_scale());
+                ctx_scaled = true;
+            }
+            if (drawWhileLoading) {
+                ctx.drawImage(tmpCanvas, 0, 0);
+                drawWhileLoading = options.auto_play;
+            }
+            lastImg = img;
+        };
+        var player = (function () {
+            var i = -1;
+            var iterationCount = 0;
+            var getNextFrameNo = function () {
+                var delta = (forward ? 1 : -1);
+                return (i + delta + frames.length) % frames.length;
+            };
+            var stepFrame = function (amount) {
+                i = i + amount;
+                putFrame();
+            };
+            var step = (function () {
+                var stepping = false;
+                var completeLoop = function () {
+                    if (onEndListener !== null)
+                        onEndListener(gif);
+                    iterationCount++;
+                    if (overrideLoopMode !== false || iterationCount < 0) {
+                        doStep();
+                    } else {
+                        stepping = false;
+                        playing = false;
+                    }
+                };
+                var doStep = function () {
+                    stepping = playing;
+                    if (!stepping) return;
+                    stepFrame(1);
+                    var delay = frames[i].delay * 10;
+                    if (!delay) delay = 100;
+                    var nextFrameNo = getNextFrameNo();
+                    if (nextFrameNo === 0) {
+                        delay += loopDelay;
+                        setTimeout(completeLoop, delay);
+                    } else {
+                        setTimeout(doStep, delay);
+                    }
+                };
+                return function () {
+                    if (!stepping) setTimeout(doStep, 0);
+                };
+            }());
+            var putFrame = function () {
+                var offset;
+                i = parseInt(i, 10);
+                if (i > frames.length - 1){
+                    i = 0;
+                }
+                if (i < 0){
+                    i = 0;
+                }
+                offset = frameOffsets[i];
+                tmpCanvas.getContext("2d").putImageData(frames[i].data, offset.x, offset.y);
+                ctx.globalCompositeOperation = "copy";
+                ctx.drawImage(tmpCanvas, 0, 0);
+            };
+            var play = function () {
+                playing = true;
+                step();
+            };
+            var pause = function () {
+                playing = false;
+            };
+            return {
+                init: function () {
+                    if (loadError) return;
+                    if ( ! (options.c_w && options.c_h) ) {
+                        ctx.scale(get_canvas_scale(),get_canvas_scale());
+                    }
+                    if (options.auto_play) {
+                        step();
+                    }
+                    else {
+                        i = 0;
+                        putFrame();
+                    }
+                },
+                step: step,
+                play: play,
+                pause: pause,
+                playing: playing,
+                move_relative: stepFrame,
+                current_frame: function() { return i; },
+                frames: function() { return frames },
+                length: function() { return frames.length },
+                move_to: function ( frame_idx ) {
+                    i = frame_idx;
+                    putFrame();
+                }
+            }
+        }());
+        var doDecodeProgress = function (draw) {
+            doShowProgress(stream.pos, stream.data.length, draw);
+        };
+        var doNothing = function () {};
+        var withProgress = function (fn, draw) {
+            return function (block) {
+                fn(block);
+                doDecodeProgress(draw);
+            };
+        };
+        var init = function () {
+            var parent = gif.parentNode;
+            var div = document.createElement('div');
+            canvas = document.createElement('canvas');
+            ctx = canvas.getContext('2d');
+            toolbar = document.createElement('div');
+            tmpCanvas = document.createElement('canvas');
+            div.width = canvas.width = gif.width;
+            div.height = canvas.height = gif.height;
+            toolbar.style.minWidth = gif.width + 'px';
+            div.className = 'jsgif';
+            toolbar.className = 'jsgif_toolbar';
+            div.appendChild(canvas);
+            div.appendChild(toolbar);
+            if (parent) {
+                parent.insertBefore(div, gif);
+                parent.removeChild(gif);
+            }
+            if (options.c_w && options.c_h) setSizes(options.c_w, options.c_h);
+            initialized=true;
+        };
+        var get_canvas_scale = function() {
+            var scale;
+            if (options.max_width && hdr && hdr.width > options.max_width) {
+                scale = options.max_width / hdr.width;
+            }
+            else {
+                scale = 1;
+            }
+            return scale;
+        };
+        var canvas, ctx, toolbar, tmpCanvas;
+        var initialized = false;
+        var load_callback = false;
+        var load_setup = function(callback) {
+            if (loading) return false;
+            if (callback) {
+                load_callback = callback;
+            } else {
+                load_callback = false;
+            }
+            loading = true;
+            frames = [];
+            clear();
+            disposalRestoreFromIdx = null;
+            lastDisposalMethod = null;
+            frame = null;
+            lastImg = null;
+            return true;
+        };
+        return {
+            play: player.play,
+            pause: player.pause,
+            move_relative: player.move_relative,
+            move_to: player.move_to,
+            get_frames       : function() { return player.frames() },
+            get_playing      : function() { return playing },
+            get_canvas       : function() { return canvas },
+            get_canvas_scale : function() { return get_canvas_scale() },
+            get_loading      : function() { return loading },
+            get_auto_play    : function() { return options.auto_play },
+            get_length       : function() { return player.length() },
+            get_current_frame: function() { return player.current_frame() },
+            load_url: function(src,callback){
+                if (!load_setup(callback)) return;
+                var h = new XMLHttpRequest();
+                h.open('GET', src, true);
+                if ('overrideMimeType' in h) {
+                    h.overrideMimeType('text/plain; charset=x-user-defined');
+                }
+                else if ('responseType' in h) {
+                    h.responseType = 'arraybuffer';
+                }
+                else {
+                    h.setRequestHeader('Accept-Charset', 'x-user-defined');
+                }
+                h.onloadstart = function() {
+                    if (!initialized) init();
+                };
+                h.onload = function(e) {
+                    if (this.status != 200) {
+                        doLoadError('xhr - response');
+                    }
+                    if (!('response' in this)) {
+                        this.response = new VBArray(this.responseText).toArray().map(String.fromCharCode).join('');
+                    }
+                    var data = this.response;
+                    if (data instanceof ArrayBuffer) {
+                        data = new Uint8Array(data);
+                    }
+                    stream = new Stream(data);
+                    setTimeout(doParse, 0);
+                };
+                h.onprogress = function (e) {
+                    if (e.lengthComputable) doShowProgress(e.loaded, e.total, true);
+                };
+                h.onerror = function() { doLoadError('xhr'); };
+                h.send();
+            },
+            load: function (callback) {
+                this.load_url(gif.getAttribute('data-animated-src') || gif.src,callback);
+            },
+            load_raw: function(arr, callback) {
+                if (!load_setup(callback)) return;
+                if (!initialized) init();
+                stream = new Stream(arr);
+                setTimeout(doParse, 0);
+            },
+            set_frame_offset: setFrameOffset
+        };
+    };
+    return SuperGif;
+}));
+});
+
+navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+
+var ImageController = function (_Controller) {
+  inherits(ImageController, _Controller);
+  function ImageController(object, property, opts) {
+    classCallCheck(this, ImageController);
+    var _this = possibleConstructorReturn(this, (ImageController.__proto__ || Object.getPrototypeOf(ImageController)).call(this, object, property));
+    var defaultOptions = void 0;
+    var disableVideo = false;
+    if (opts.defaults) {
+      disableVideo = opts.disableVideo;
+      defaultOptions = opts.defaults;
+    } else {
+      defaultOptions = opts;
+    }
+    _this.__controlContainer = document.createElement('div');
+    dom.addClass(_this.__controlContainer, 'image-picker');
+    _this.videoStreams = [];
+    _this.__selectedInputContainer = _this.__controlContainer.appendChild(document.createElement('div'));
+    dom.addClass(_this.__selectedInputContainer, 'selected-image');
+    _this.__swatches = _this.__controlContainer.appendChild(document.createElement('div'));
+    dom.addClass(_this.__swatches, 'image-swatches');
+    _this.__img = _this.__selectedInputContainer.appendChild(document.createElement('img'));
+    _this.__img.crossOrigin = 'anonymous';
+    _this.__video = _this.__selectedInputContainer.appendChild(document.createElement('video'));
+    _this.__input = _this.__controlContainer.appendChild(document.createElement('input'));
+    _this.__swatchButtons = _this.__swatches.appendChild(document.createElement('div'));
+    dom.addClass(_this.__swatchButtons, 'swatch-buttons');
+    _this.__swatchImages = _this.__swatches.appendChild(document.createElement('div'));
+    _this.__disableVideo = disableVideo;
+    dom.addClass(_this.__swatchImages, 'swatch-images');
+    _this.__useCamera = navigator.getUserMedia && !disableVideo;
+    if (_this.__useCamera) {
+      _this.__camera = _this.__swatchButtons.appendChild(document.createElement('div'));
+      _this.__cameraTitle = _this.__camera.appendChild(document.createElement('span'));
+      _this.__cameraTitle.innerHTML = "Video";
+      _this.__cameraIcon = _this.__camera.appendChild(document.createElement('div'));
+      dom.addClass(_this.__cameraIcon, 'camera-icon');
+      dom.addClass(_this.__camera, 'camera-button');
+    }
+    _this.__plus = _this.__swatchButtons.appendChild(document.createElement('div'));
+    _this.__plusTitle = _this.__plus.appendChild(document.createElement('span'));
+    _this.__plusTitle.innerHTML = "Image";
+    _this.__plusIcon = _this.__plus.appendChild(document.createElement('div'));
+    dom.addClass(_this.__plusIcon, 'new-image-icon');
+    dom.addClass(_this.__plus, 'new-image-button');
+    defaultOptions.forEach(function (option) {
+      _this.addSwatch(option.src, option.videoSrc);
+    });
+    _this.__video.className = _this.__img.className = 'content';
+    _this.__video.crossOrigin = 'anonymous';
+    _this.__video.setAttribute('playsinline', true);
+    _this.__input.type = 'file';
+    _this.__gifImg = _this.__selectedInputContainer.appendChild(document.createElement('img'));
+    _this.__gifImg.crossOrigin = 'anonymous';
+    dom.addClass(_this.__gifImg, 'content gif-img');
+    _this.__glGif = new sibgif({ gif: _this.__gifImg });
+    _this.__gifNeedsInitializing = true;
+    _this.initializeValue();
+    if (_this.__useCamera) {
+      dom.bind(_this.__camera, 'click', onCameraClick.bind(_this));
+    }
+    dom.bind(_this.__plus, 'click', chooseImage.bind(_this));
+    dom.bind(_this.__input, 'change', inputChange.bind(_this));
+    dom.bind(_this.__img, 'dragover', onDragOver.bind(_this));
+    dom.bind(_this.__img, 'dragleave', onDragLeave.bind(_this));
+    dom.bind(_this.__img, 'drop', onDrop.bind(_this));
+    dom.bind(_this.__video, 'dragover', onDragOver.bind(_this));
+    dom.bind(_this.__video, 'dragleave', onDragLeave.bind(_this));
+    dom.bind(_this.__video, 'drop', onDrop.bind(_this));
+    function chooseImage() {
+      this.__input.click();
+    }
+    function inputChange(e) {
+      var file = e.target.files[0];
+      file.isSaved = false;
+      this.parseFile(file);
+    }
+    function onDragOver(e) {
+      e.preventDefault();
+      e.target.classList.add('dragover');
+    }
+    function onDragLeave(e) {
+      e.target.classList.remove('dragover');
+    }
+    function onDrop(e) {
+      e.target.classList.remove('dragover');
+      var file = e.originalEvent.dataTransfer.files[0];
+      file.isSaved = false;
+      this.parseFile(file);
+    }
+    function onCameraClick() {
+      var _this2 = this;
+      navigator.mediaDevices.getUserMedia({ video: true }).then(function (localMediaStream) {
+        _this2.killStream();
+        _this2.videoStream = localMediaStream;
+        _this2.setValue({
+          type: 'video-stream',
+          value: localMediaStream,
+          domElement: _this2.__video
+        });
+      }).catch(function (err) {
+        _this2.killStream();
+      });
+    }
+    _this.domElement.appendChild(_this.__controlContainer);
+    return _this;
+  }
+  createClass(ImageController, [{
+    key: 'killStream',
+    value: function killStream() {
+      if (!this.videoStream) return;
+      this.videoStream.getTracks().forEach(function (track) {
+        return track.stop();
+      });
+    }
+  }, {
+    key: 'destruct',
+    value: function destruct() {
+      this.killStream();
+    }
+  }, {
+    key: 'initializeValue',
+    value: function initializeValue() {
+      var asset = this.getValue();
+      if (!asset) {
+        return;
+      }
+      if (asset.type === 'gif') {
+        if (this.__gifNeedsInitializing) {
+          this.setImage(asset.url, true);
+        } else {
+          this.setValue({
+            url: asset.url,
+            type: asset.type,
+            domElement: this.__glGif.get_canvas()
+          });
+        }
+      } else if (asset.type === 'image') {
+        this.setValue({
+          url: asset.url,
+          type: asset.type,
+          domElement: this.__img
+        });
+      } else if (asset.type === 'video') {
+        this.setValue({
+          url: asset.url,
+          type: asset.type,
+          domElement: this.__video
+        });
+      }
+    }
+  }, {
+    key: 'updateDisplay',
+    value: function updateDisplay() {
+      var asset = this.getValue();
+      if (!asset) {
+        return;
+      }
+      if (asset.type === 'image') {
+        this.setImage(asset.url, false);
+      } else if (asset.type === 'gif') {
+        this.setImage(asset.url, true);
+      } else if (asset.type === 'video') {
+        this.setVideo(asset.url);
+      } else if (asset.type === 'video-stream') {
+        this.setVideo(asset.value);
+      }
+    }
+  }, {
+    key: 'parseFile',
+    value: function parseFile(file) {
+      var type = file.type.split('/')[0];
+      if (this.__glGif) this.__glGif.pause();
+      if (type === 'image') {
+        var _url = file.urlOverride || URL.createObjectURL(file);
+        var isAnimated = file.type.split('/')[1] === 'gif' || file.animatedOverride;
+        if (!this.__disableVideo && isAnimated) {
+          if (this.__gifNeedsInitializing) {
+            this.setImage(_url, true);
+          } else {
+            this.setValue({
+              url: _url,
+              type: 'gif',
+              domElement: this.__glGif.get_canvas()
+            });
+          }
+        } else if (!isAnimated) {
+          this.setValue({
+            url: _url,
+            type: 'image',
+            domElement: this.__img
+          });
+          this.setImage(_url, false);
+        }
+      } else if (!this.__disableVideo && type === 'video') {
+        this.setValue({
+          url: url,
+          type: 'video',
+          domElement: this.__video
+        });
+        this.setVideo();
+      }
+    }
+  }, {
+    key: 'setImage',
+    value: function setImage(url, isAnimated) {
+      var _this3 = this;
+      if (this.__skipSetImage) {
+        this.__skipSetImage = false;
+        return;
+      }
+      this.__isVideo = false;
+      this.__isAnimated = isAnimated;
+      if (isAnimated) {
+        this.__img.src = '';
+        this.__img.style.display = 'none';
+        this.__gifImg.src = url;
+        if (this.__glGif.get_canvas()) {
+          this.__glGif.get_canvas().style.display = 'block';
+        }
+        this.__glGif.load(function (err) {
+          if (!err) {
+            _this3.__glGif.play().catch(function (e) {
+              return console.log(e);
+            });
+            if (_this3.__gifNeedsInitializing) {
+              _this3.__gifNeedsInitializing = false;
+              _this3.__skipSetImage = true;
+              _this3.setValue({
+                url: url,
+                type: 'gif',
+                domElement: _this3.__glGif.get_canvas()
+              });
+            }
+          }
+        });
+      } else {
+        if (this.__glGif.get_canvas()) {
+          this.__glGif.get_canvas().style.display = 'none';
+        }
+        this.__img.src = url;
+        this.__img.style.display = 'block';
+      }
+      this.__video.style.display = 'none';
+      this.__video.src = '';
+    }
+  }, {
+    key: 'setVideo',
+    value: function setVideo() {
+      var asset = this.getValue();
+      if (asset.type === 'video-stream') {
+        this.__video.srcObject = asset.value;
+      } else {
+        this.killStream();
+        this.__video.src = asset.url;
+      }
+      this.__isVideo = true;
+      this.__isAnimated = true;
+      this.__video.loop = true;
+      this.__video.volume = 0;
+      this.__video.play().catch(function (e) {
+        console.log(e, e.message, e.name);
+      });
+      this.__img.src = 'data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=';
+      this.__img.style.display = 'none';
+      if (this.__glGif.get_canvas()) {
+        this.__glGif.get_canvas().style.display = 'none';
+      }
+      this.__video.style.display = 'block';
+    }
+  }, {
+    key: 'addSwatch',
+    value: function addSwatch(src, videoSrc) {
+      var _this4 = this;
+      var swatch = this.__swatchImages.appendChild(document.createElement('img'));
+      swatch.src = src;
+      swatch.videoSrc = videoSrc;
+      swatch.className = 'swatch';
+      dom.bind(swatch, 'click', function () {
+        if (videoSrc) {
+          _this4.setValue({
+            url: videoSrc,
+            type: 'video',
+            domElement: _this4.__video
+          });
+        } else {
+          var isAnimated = src.split('.').pop() === 'gif';
+          if (isAnimated) {
+            if (_this4.__gifNeedsInitializing) {
+              _this4.setImage(url, true);
+            } else {
+              _this4.setValue({
+                url: src,
+                type: 'gif',
+                domElement: _this4.__glGif.get_canvas()
+              });
+            }
+          } else {
+            _this4.setValue({
+              url: src,
+              type: 'image',
+              domElement: _this4.__img
+            });
+          }
+        }
+      });
+    }
+  }]);
+  return ImageController;
+}(Controller);
+
 var css = {
   load: function load(url, indoc) {
     var doc = indoc || document;
@@ -1560,9 +2658,135 @@ var css = {
 
 var saveDialogContents = "<div id=\"dg-save\" class=\"dg dialogue\">\n\n  Here's the new load parameter for your <code>GUI</code>'s constructor:\n\n  <textarea id=\"dg-new-constructor\"></textarea>\n\n  <div id=\"dg-save-locally\">\n\n    <input id=\"dg-local-storage\" type=\"checkbox\"/> Automatically save\n    values to <code>localStorage</code> on exit.\n\n    <div id=\"dg-local-explain\">The values saved to <code>localStorage</code> will\n      override those passed to <code>dat.GUI</code>'s constructor. This makes it\n      easier to work incrementally, but <code>localStorage</code> is fragile,\n      and your friends may not see the same values you do.\n\n    </div>\n\n  </div>\n\n</div>";
 
+function pos2vec(pos, min, max) {
+  return [pos[0] * (max[0] - min[0]) + min[0], pos[1] * (max[1] - min[1]) + min[1]];
+}
+function vec2pos(vec, min, max) {
+  return [(vec[0] - min[0]) / (max[0] - min[0]), (vec[1] - min[1]) / (max[1] - min[1])];
+}
+var VectorController = function (_Controller) {
+  inherits(VectorController, _Controller);
+  function VectorController(object, property) {
+    var min = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [0, 0];
+    var max = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : [1, 1];
+    classCallCheck(this, VectorController);
+    var _this2 = possibleConstructorReturn(this, (VectorController.__proto__ || Object.getPrototypeOf(VectorController)).call(this, object, property, { min: min, max: max }));
+    _this2.__min = min;
+    _this2.__max = max;
+    _this2.__vec = _this2.getValue();
+    _this2.__temp = [0, 0];
+    var _this = _this2;
+    _this2.domElement = document.createElement('div');
+    dom.makeSelectable(_this2.domElement, false);
+    _this2.__selector = document.createElement('div');
+    _this2.__selector.className = 'vector-selector';
+    _this2.__pos_field = document.createElement('div');
+    _this2.__pos_field.className = 'saturation-field';
+    _this2.__field_knob = document.createElement('div');
+    _this2.__field_knob.className = 'field-knob';
+    dom.bind(_this2.__selector, 'mousedown', function ()        {
+      dom.addClass(this, 'drag').bind(window, 'mouseup', function ()        {
+        dom.removeClass(_this.__selector, 'drag');
+      });
+    });
+    dom.bind(_this2.__selector, 'touchstart', function ()        {
+      dom.addClass(this, 'drag').bind(window, 'touchend', function ()        {
+        dom.removeClass(_this.__selector, 'drag');
+      });
+    });
+    Common.extend(_this2.__selector.style, {
+      width: '52px',
+      height: '52px',
+      padding: '3px',
+      backgroundColor: '#222',
+      boxShadow: '0px 1px 3px rgba(0,0,0,0.3)'
+    });
+    Common.extend(_this2.__field_knob.style, {
+      position: 'absolute',
+      width: '12px',
+      height: '12px',
+      borderRadius: '12px',
+      zIndex: 1
+    });
+    Common.extend(_this2.__pos_field.style, {
+      width: '50px',
+      height: '50px',
+      marginRight: '3px',
+      display: 'inline-block',
+      cursor: 'pointer'
+    });
+    dom.bind(_this2.__pos_field, 'mousedown', fieldDown);
+    dom.bind(_this2.__pos_field, 'touchstart', fieldDown);
+    dom.bind(_this2.__field_knob, 'mousedown', fieldDown);
+    dom.bind(_this2.__field_knob, 'touchstart', fieldDown);
+    function fieldDown(e) {
+      setSV(e);
+      dom.bind(window, 'mousemove', setSV);
+      dom.bind(window, 'touchmove', setSV);
+      dom.bind(window, 'mouseup', fieldUpSV);
+      dom.bind(window, 'touchend', fieldUpSV);
+    }
+    function fieldUpSV() {
+      dom.unbind(window, 'mousemove', setSV);
+      dom.unbind(window, 'touchmove', setSV);
+      dom.unbind(window, 'mouseup', fieldUpSV);
+      dom.unbind(window, 'touchend', fieldUpSV);
+      onFinish();
+    }
+    function onFinish() {
+      if (_this.__onFinishChange) {
+        _this.__onFinishChange.call(_this, _this.__vec);
+      }
+    }
+    _this2.__selector.appendChild(_this2.__field_knob);
+    _this2.__selector.appendChild(_this2.__pos_field);
+    _this2.domElement.appendChild(_this2.__selector);
+    _this2.updateDisplay();
+    function setSV(e) {
+      if (e.type.indexOf('touch') === -1) {
+        e.preventDefault();
+      }
+      var fieldRect = _this.__pos_field.getBoundingClientRect();
+      var _ref = e.touches && e.touches[0] || e,
+          clientX = _ref.clientX,
+          clientY = _ref.clientY;
+      var x = (clientX - fieldRect.left) / (fieldRect.right - fieldRect.left);
+      var y = 1 - (clientY - fieldRect.top) / (fieldRect.bottom - fieldRect.top);
+      if (x > 1) {
+        x = 1;
+      } else if (x < 0) {
+        x = 0;
+      }
+      if (y > 1) {
+        y = 1;
+      } else if (y < 0) {
+        y = 0;
+      }
+      _this.__vec = pos2vec([x, y], _this.__min, _this.__max);
+      _this.setValue(_this.__vec);
+      return false;
+    }
+    return _this2;
+  }
+  createClass(VectorController, [{
+    key: 'updateDisplay',
+    value: function updateDisplay() {
+      this.__vec = this.getValue();
+      var offset = vec2pos(this.__vec, this.__min, this.__max);
+      Common.extend(this.__field_knob.style, {
+        marginLeft: 50 * offset[0] - 7 + 'px',
+        marginTop: 50 * (1 - offset[1]) - 7 + 'px'
+      });
+      this.__temp[0] = 1;
+      this.__temp[1] = 1;
+    }
+  }]);
+  return VectorController;
+}(Controller);
+
 var ControllerFactory = function ControllerFactory(object, property) {
   var initialValue = object[property];
-  if (Common.isArray(arguments[2]) || Common.isObject(arguments[2])) {
+  if (arguments.length <= 3 && (Common.isArray(arguments[2]) || Common.isObject(arguments[2]))) {
     return new OptionController(object, property, arguments[2]);
   }
   if (Common.isNumber(initialValue)) {
@@ -1577,6 +2801,12 @@ var ControllerFactory = function ControllerFactory(object, property) {
     }
     return new NumberControllerBox(object, property, { min: arguments[2], max: arguments[3] });
   }
+  if (Common.isArray(initialValue) && initialValue.length === 2) {
+    if (arguments.length > 3) {
+      return new VectorController(object, property, arguments[2], arguments[3]);
+    }
+    return new VectorController(object, property);
+  }
   if (Common.isString(initialValue)) {
     return new StringController(object, property);
   }
@@ -1589,10 +2819,80 @@ var ControllerFactory = function ControllerFactory(object, property) {
   return null;
 };
 
-function requestAnimationFrame(callback) {
+var NumberControllerAnimator = function (_NumberController) {
+  inherits(NumberControllerAnimator, _NumberController);
+  function NumberControllerAnimator(object, property, params) {
+    classCallCheck(this, NumberControllerAnimator);
+    var _this2 = possibleConstructorReturn(this, (NumberControllerAnimator.__proto__ || Object.getPrototypeOf(NumberControllerAnimator)).call(this, object, property, params));
+    var _this = _this2;
+    dom.addClass(_this2.domElement, 'button-container');
+    _this2.__animationMode = null;
+    _this2.__sineButton = document.createElement('button');
+    dom.addClass(_this2.__sineButton, 'sine-button');
+    _this2.__sawButton = document.createElement('button');
+    dom.addClass(_this2.__sawButton, 'saw-button');
+    dom.bind(_this2.__sawButton, 'click', toggleSaw);
+    dom.bind(_this2.__sineButton, 'click', toggleSine);
+    function toggleSaw(e) {
+      e.stopPropagation();
+      e.preventDefault();
+      if (_this.__animationMode === 'saw') {
+        stopAnimating();
+        dom.removeClass(_this.__sawButton, 'saw-button--activated');
+      } else {
+        if (_this.__animationMode === 'sine') {
+          dom.removeClass(_this.__sineButton, 'sine-button--activated');
+        }
+        _this.__animationMode = 'saw';
+        dom.addClass(_this.__sawButton, 'saw-button--activated');
+        animate();
+      }
+    }
+    function toggleSine(e) {
+      e.stopPropagation();
+      e.preventDefault();
+      if (_this.__animationMode === 'sine') {
+        stopAnimating();
+        dom.removeClass(_this.__sineButton, 'sine-button--activated');
+      } else {
+        if (_this.__animationMode === 'saw') {
+          dom.removeClass(_this.__sawButton, 'saw-button--activated');
+        }
+        _this.__animationMode = 'sine';
+        dom.addClass(_this.__sineButton, 'sine-button--activated');
+        animate();
+      }
+    }
+    function animate() {
+      if (_this.__animationMode === null) return;
+      var percent = void 0;
+      if (_this.__animationMode === 'sine') {
+        percent = Math.sin(Date.now() / 1000) / 2 + 0.5;
+      } else if (_this.__animationMode === 'saw') {
+        percent = Date.now() / 2000 % 1;
+      }
+      if (_this.__min !== undefined && _this.__max !== undefined) {
+        _this.setValue((_this.__max - _this.__min) * percent + _this.__min);
+      } else {
+        _this.setValue(percent);
+      }
+      requestAnimationFrame(animate);
+    }
+    function stopAnimating() {
+      _this.__animationMode = null;
+    }
+    _this2.updateDisplay();
+    _this2.domElement.appendChild(_this2.__sawButton);
+    _this2.domElement.appendChild(_this2.__sineButton);
+    return _this2;
+  }
+  return NumberControllerAnimator;
+}(NumberController);
+
+function requestAnimationFrame$1(callback) {
   setTimeout(callback, 1000 / 60);
 }
-var requestAnimationFrame$1 = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || requestAnimationFrame;
+var requestAnimationFrame$2 = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || requestAnimationFrame$1;
 
 var CenteredDiv = function () {
   function CenteredDiv() {
@@ -1950,7 +3250,16 @@ Common.extend(GUI.prototype,
       color: true
     });
   },
+  addImage: function addImage(object, property) {
+    return _add(this, object, property, {
+      factoryArgs: Array.prototype.slice.call(arguments, 2),
+      image: true
+    });
+  },
   remove: function remove(controller) {
+    if (controller.destruct) {
+      controller.destruct();
+    }
     this.__ul.removeChild(controller.__li);
     this.__controllers.splice(this.__controllers.indexOf(controller), 1);
     var _this = this;
@@ -2219,6 +3528,18 @@ function augmentController(gui, li, controller) {
     });
     dom.addClass(li, 'has-slider');
     controller.domElement.insertBefore(box.domElement, controller.domElement.firstElementChild);
+    var animateButtons = new NumberControllerAnimator(controller.object, controller.property, { min: controller.__min, max: controller.__max, step: controller.__step });
+    Common.each(['updateDisplay', 'onChange', 'onFinishChange', 'step'], function (method) {
+      var pc = controller[method];
+      var pb = animateButtons[method];
+      controller[method] = animateButtons[method] = function () {
+        var args = Array.prototype.slice.call(arguments);
+        pb.apply(animateButtons, args);
+        return pc.apply(controller, args);
+      };
+    });
+    dom.addClass(li, 'has-animate-buttons');
+    controller.domElement.insertBefore(animateButtons.domElement, controller.domElement.firstElementChild);
   } else if (controller instanceof NumberControllerBox) {
     var r = function r(returned) {
       if (Common.isNumber(controller.__min) && Common.isNumber(controller.__max)) {
@@ -2261,6 +3582,8 @@ function augmentController(gui, li, controller) {
       return val;
     }, controller.updateDisplay);
     controller.updateDisplay();
+  } else if (controller instanceof VectorController) {
+    dom.addClass(li, 'vector');
   }
   controller.setValue = Common.compose(function (val) {
     if (gui.getRoot().__preset_select && controller.isModified()) {
@@ -2304,6 +3627,8 @@ function _add(gui, object, property, params) {
   var controller = void 0;
   if (params.color) {
     controller = new ColorController(object, property);
+  } else if (params.image) {
+    controller = new ImageController(object, property, params.factoryArgs[0]);
   } else {
     var factoryArgs = [object, property].concat(params.factoryArgs);
     controller = ControllerFactory.apply(gui, factoryArgs);
@@ -2323,6 +3648,8 @@ function _add(gui, object, property, params) {
   dom.addClass(li, GUI.CLASS_CONTROLLER_ROW);
   if (controller instanceof ColorController) {
     dom.addClass(li, 'color');
+  } else if (controller instanceof ImageController) {
+    dom.addClass(li, 'image');
   } else {
     dom.addClass(li, _typeof(controller.getValue()));
   }
@@ -2487,7 +3814,7 @@ function setPresetSelectIndex(gui) {
 }
 function updateDisplays(controllerArray) {
   if (controllerArray.length !== 0) {
-    requestAnimationFrame$1.call(window, function () {
+    requestAnimationFrame$2.call(window, function () {
       updateDisplays(controllerArray);
     });
   }

@@ -197,7 +197,7 @@ $button-height: 20px;
 
   .slider {
     float: left;
-    width: 66%;
+    width: 47%;
     margin-left: -5px;
     margin-right: 0;
     height: 19px;
@@ -226,8 +226,13 @@ $button-height: 20px;
   }
 
   /** allow overflow for color selector */
-  .cr.color {
+  .cr.color, .cr.vector {
     overflow: visible;
+  }
+
+  /** make image selector row taller */
+  .cr.image {
+    max-width: 350px;
   }
 
   .selector {

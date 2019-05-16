@@ -17,6 +17,7 @@ import resolve from 'rollup-plugin-node-resolve';
 import cleanup from 'rollup-plugin-cleanup';
 import babel from 'rollup-plugin-babel';
 import sass from 'rollup-plugin-sass';
+import commonjs from 'rollup-plugin-commonjs';
 
 const banner = fs.readFileSync(path.join(__dirname, 'licenseBanner.txt'));
 
@@ -42,13 +43,18 @@ export default {
   plugins: [
     resolve(),
     sass({
-      insert: true,
+      // insert: true makes dat.gui automatically append the styles when just the JS is included,
+      // with insert: false both the JS and CSS need to explicitly be included
+      insert: false,
       output: 'build/dat.gui.css',
       options: {outputStyle: 'compressed'}
     }),
     babel({
       plugins: ['external-helpers'],
       exclude: 'node_modules/**'
+    }),
+    commonjs({
+      'node_modules/wsgif/sibgif.js': [ 'SuperGif' ]
     }),
     cleanup()
   ]

@@ -16,10 +16,13 @@ import saveDialogueContents from './saveDialogue.html';
 import ControllerFactory from '../controllers/ControllerFactory';
 import Controller from '../controllers/Controller';
 import BooleanController from '../controllers/BooleanController';
+import VectorController from '../controllers/VectorController';
 import FunctionController from '../controllers/FunctionController';
 import NumberControllerBox from '../controllers/NumberControllerBox';
 import NumberControllerSlider from '../controllers/NumberControllerSlider';
+import NumberControllerAnimator from '../controllers/NumberControllerAnimator';
 import ColorController from '../controllers/ColorController';
+import ImageController from '../controllers/ImageController';
 import requestAnimationFrame from '../utils/requestAnimationFrame';
 import CenteredDiv from '../dom/CenteredDiv';
 import dom from '../dom/dom';
@@ -557,12 +560,34 @@ common.extend(
     },
 
     /**
+     * @param object
+     * @param property
+     * @returns {dat.controllers.ImageController } THe new controller that was added.
+     * @instance
+     */
+    addImage: function(object, property) {
+      return add(
+        this,
+        object,
+        property,
+        {
+          factoryArgs: Array.prototype.slice.call(arguments, 2),
+          image: true
+        }
+      );
+    },
+
+    /**
      * Removes the given controller from the GUI.
      * @param {Controller} controller
      * @instance
      */
     remove: function(controller) {
       // TODO listening?
+      // Hacky remove check, should be in events
+      if (controller.destruct) {
+        controller.destruct()
+      }
       this.__ul.removeChild(controller.__li);
       this.__controllers.splice(this.__controllers.indexOf(controller), 1);
       const _this = this;
@@ -1005,6 +1030,23 @@ function augmentController(gui, li, controller) {
 
     dom.addClass(li, 'has-slider');
     controller.domElement.insertBefore(box.domElement, controller.domElement.firstElementChild);
+
+    // Add animation buttons to slider.
+    const animateButtons = new NumberControllerAnimator(controller.object, controller.property,
+      { min: controller.__min, max: controller.__max, step: controller.__step });
+
+    common.each(['updateDisplay', 'onChange', 'onFinishChange', 'step'], function(method) {
+      const pc = controller[method];
+      const pb = animateButtons[method];
+      controller[method] = animateButtons[method] = function() {
+        const args = Array.prototype.slice.call(arguments);
+        pb.apply(animateButtons, args);
+        return pc.apply(controller, args);
+      };
+    });
+    dom.addClass(li, 'has-animate-buttons');
+    controller.domElement.insertBefore(animateButtons.domElement, controller.domElement.firstElementChild);
+
   } else if (controller instanceof NumberControllerBox) {
     const r = function(returned) {
       // Have we defined both boundaries?
@@ -1064,7 +1106,10 @@ function augmentController(gui, li, controller) {
     }, controller.updateDisplay);
 
     controller.updateDisplay();
+  } else if (controller instanceof VectorController) {
+    dom.addClass(li, 'vector');
   }
+
 
   controller.setValue = common.compose(function(val) {
     if (gui.getRoot().__preset_select && controller.isModified()) {
@@ -1138,6 +1183,8 @@ function add(gui, object, property, params) {
 
   if (params.color) {
     controller = new ColorController(object, property);
+  } else if (params.image) {
+    controller = new ImageController(object, property, params.factoryArgs[0]);
   } else {
     const factoryArgs = [object, property].concat(params.factoryArgs);
     controller = ControllerFactory.apply(gui, factoryArgs);
@@ -1164,6 +1211,8 @@ function add(gui, object, property, params) {
   dom.addClass(li, GUI.CLASS_CONTROLLER_ROW);
   if (controller instanceof ColorController) {
     dom.addClass(li, 'color');
+  } else if (controller instanceof ImageController) {
+    dom.addClass(li, 'image');
   } else {
     dom.addClass(li, typeof controller.getValue());
   }

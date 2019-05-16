@@ -34,6 +34,10 @@ class FunctionController extends Controller {
     dom.bind(this.__button, 'click', function(e) {
       e.preventDefault();
       _this.fire();
+      dom.addClass(_this.__button.parentElement.parentElement.parentElement, 'function--active');
+      setTimeout(() => {
+        dom.removeClass(_this.__button.parentElement.parentElement.parentElement, 'function--active');
+      }, 100);
       return false;
     });
 

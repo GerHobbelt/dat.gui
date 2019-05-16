@@ -11,6 +11,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
+import VectorController from './VectorController';
 import OptionController from './OptionController';
 import NumberControllerBox from './NumberControllerBox';
 import NumberControllerSlider from './NumberControllerSlider';
@@ -23,7 +24,11 @@ const ControllerFactory = function(object, property) {
   const initialValue = object[property];
 
   // Providing options?
-  if (common.isArray(arguments[2]) || common.isObject(arguments[2])) {
+  if (
+    arguments.length <= 3
+    && (common.isArray(arguments[2])
+      || common.isObject(arguments[2]))
+  ) {
     return new OptionController(object, property, arguments[2]);
   }
 
@@ -46,6 +51,13 @@ const ControllerFactory = function(object, property) {
                         { min: arguments[2], max: arguments[3], step: arguments[4] });
     }
     return new NumberControllerBox(object, property, { min: arguments[2], max: arguments[3] });
+  }
+  if (common.isArray(initialValue) && initialValue.length === 2) {
+    if (arguments.length > 3) {
+      return new VectorController(object, property, arguments[2], arguments[3]);
+    }
+
+    return new VectorController(object, property);
   }
 
   if (common.isString(initialValue)) {

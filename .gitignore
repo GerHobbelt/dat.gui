@@ -1,3 +1,20 @@
+lib-cov
+*.seed
+*.log
+*.csv
+*.dat
+*.out
+*.pid
+*.gz
+
+pids
+logs
+results
+
+# Node/NPM
+npm-debug.log
+node_modules
+
 .DS_Store
 .sass-cache
 .idea
@@ -5,9 +22,6 @@
 # editor bak files
 *~
 *.bak
-
-# Node/NPM
-node_modules/
 
 # ignore github analysis scripts' temporaries
 __forks.info__/

@@ -1,3 +1,5 @@
+# UI Controller (dat.gui ported to commonjs)
+
 ## dynamic_properties branch
 
 This branch add the possibility for controllers to handle "dynamic properties".
@@ -30,35 +32,36 @@ In your `head` tag, include the following code:
 ```
 
 
+## As commonjs module
 
-## Using dat.GUI with require.js
+Install the module:
 
-Internally, dat.GUI uses [require.js](http://requirejs.org/) to handle dependency management. If you're making changes to the source and want to see the effects of your changes without building, use require js.
-
-In your `head` tag, include the following code:
-
-```html
-<script data-main="path/to/main" src="path/to/requirejs/require.js"></script>
+```
+npm install dat.gui
 ```
 
-Then, in `path/to/main.js`:
+Use it:
 
-```javascript
-require([
-  'path/to/gui/module/GUI'
-], function(GUI) {
+``` js
+var dat = require('dat.gui');
+var obj = { x: 5 };
+var gui = new dat.GUI();
 
-  // No namespace necessary
-  var gui = new GUI();
-  ...
+gui.add(obj, 'x').onChange(function() {
+  // obj.x will now have updated value
 });
 ```
 
 
+
+
+
+
+
 ## Directory Contents
 
-* build: Concatenated source code.
-* src: Modular code in [require.js](http://requirejs.org/) format. Also includes css, [scss](http://sass-lang.com/), and html, some of which is included during build.
+* build: Concatenated source code for browsers.
+* src: source code in commonjs format.
 * tests: [QUnit](https://github.com/jquery/qunit) test suite.
 * utils: [node.js](http://nodejs.org/) utility scripts for compiling source.
 
@@ -68,21 +71,17 @@ require([
 In the terminal, enter the following:
 
 ```sh
-$ cd utils
-$ node build_gui.js
+npm start
 ```
 
-This will create a namespaced, unminified build of dat.GUI at `build/dat.GUI.js`
-
-To create a namespaced, _minified_ build of dat.GUI at `build/dat.GUI.min.js`, using Closure Compiler, use the `min` parameter:
-
-```sh
-$ node ../utils/build_gui.js min
-```
-
-
+This will create a browserified build of dat.GUI at `build/dat.gui.js` and its
+minified version at `build/dat.gui.min.js`.
 
 ## Change log
+
+### Pending version number
+ * Moved to commonjs, made it browserify friendly.
+ * Back to GitHub.
 
 ### 0.5
 
@@ -107,7 +106,7 @@ $ node ../utils/build_gui.js min
 
 The following libraries / open-source projects were used in the development of dat.GUI:
 
-* [require.js](http://requirejs.org/)
+* [browserify](http://browserify.org/)
 * [Sass](http://sass-lang.com/)
 * [node.js](http://nodejs.org/)
 * [QUnit](https://github.com/jquery/qunit) / [jquery](http://jquery.com/)

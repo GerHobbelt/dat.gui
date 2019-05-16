@@ -165,7 +165,7 @@ $input-color: lighten($background-color, 8.5%);
 
   /** Controllers */
   .c {
-
+    
     input[type=text] {
 
       background: $input-color;
@@ -199,6 +199,69 @@ $input-color: lighten($background-color, 8.5%);
 
   }
 
+  /* Light theme styles */
+
+  &.light-theme.main {
+    &.taller-than-window .close-button {
+      border-top: 1px solid #ddd;
+    }
+    .close-button {
+      background-color: #e8e8e8;
+    }
+    .close-button:hover {
+      background-color: #ddd;
+    }
+    &::-webkit-scrollbar {
+      background: #fafafa;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: #bbb;
+    }
+  }
+  &.light-theme, &.light-theme .dg {
+    color: #555;
+    text-shadow: none !important;
+  
+    li:not(.folder) {
+      background: #fafafa;
+      border-bottom: 1px solid #ddd;
+    }
+    li.save-row .button {
+      text-shadow: none !important;
+    }
+    li.title {
+      background: #e8e8e8 url(data:image/gif;base64,R0lGODlhBQAFAIQWAP8AAP8A/wAA/wD//wD/AP//AH8AAH8AfwAAfwB/fwB/AIJ/AAAAABkZGTMzM0xMTGZmZn9/f5mZmbKysszMzOXl5f///////////////////////////////////////yH5BAEKAB8ALAAAAAAFAAUAAAUL4CeOJGOa3zkyYggAOw==) 6px 10px no-repeat;
+    }
+    .closed li.title {
+      background-image: url(data:image/gif;base64,R0lGODlhBQAFAIQWAP8AAP8A/wAA/wD//wD/AP//AH8AAH8AfwAAfwB/fwB/AIJ/AAAAABkZGTMzM0xMTGZmZn9/f5mZmbKysszMzOXl5f///////////////////////////////////////yH5BAEKAB8ALAAAAAAFAAUAAAUL4PcxosiQ5pmWaAgAOw==);
+    }
+    .cr.function:hover, .cr.boolean:hover {
+      background: #fff;
+    }
+    .c input[type=text] {
+      background: #e9e9e9;
+    }
+    .c input[type=text]:hover {
+      background: #eee;
+    }
+    .c input[type=text]:focus {
+      background: #eee;
+      color: #555;
+    }
+    .c .slider {
+      background: #e9e9e9;
+    }
+    .c .slider:hover {
+      background: #eee;
+    }
+    li.save-row .button, li.save-row .button.gears {
+      background-color: #bbb;
+      /* box-shadow: none; */
+    }
+    li.save-row {
+      padding-top: 4px;
+    }
+  }
 }
 
 /** Image Controller */

@@ -145,7 +145,8 @@ const GUI = function(pars) {
   params = common.defaults(params, {
     closeOnTop: false,
     autoPlace: true,
-    width: GUI.DEFAULT_WIDTH
+    width: GUI.DEFAULT_WIDTH,
+    showCloseButton: true,
   });
 
   params = common.defaults(params, {
@@ -186,6 +187,39 @@ const GUI = function(pars) {
   Object.defineProperties(this,
     /** @lends GUI.prototype */
     {
+
+      /**
+       * Toggles light theme
+       * @type Boolean
+       */
+      lightTheme: {
+        set: function(v) {
+          params.lightTheme = v;
+          if (v) dom.addClass(_this.domElement, GUI.CLASS_LIGHT_THEME);
+          else dom.removeClass(_this.domElement, GUI.CLASS_LIGHT_THEME);
+        },
+
+        get: function() {
+          return params.lightTheme;
+        }
+      },
+
+      /**
+       * Toggles open/close button
+       * @type Boolean
+       */
+      showCloseButton: {
+        set: function(v) {
+          params.showCloseButton = v;
+          if (v) dom.removeClass(_this.__closeButton, GUI.CLASS_DISPLAY_NONE);
+          else dom.addClass(_this.__closeButton, GUI.CLASS_DISPLAY_NONE);
+        },
+
+        get: function() {
+          return params.showCloseButton;
+        }
+      },
+
       /**
        * The parent <code>GUI</code>
        * @type dat.gui.GUI
@@ -345,6 +379,11 @@ const GUI = function(pars) {
     dom.addClass(this.domElement, GUI.CLASS_MAIN);
     dom.makeSelectable(this.domElement, false);
 
+    if (params.lightTheme) {
+      dom.addClass(this.domElement, GUI.CLASS_LIGHT_THEME);
+      this.__folders
+    }
+
     // Are we supposed to be loading locally?
     if (SUPPORTS_LOCAL_STORAGE) {
       if (useLocalStorage) {
@@ -367,6 +406,9 @@ const GUI = function(pars) {
     } else {
       dom.addClass(this.__closeButton, GUI.CLASS_CLOSE_BOTTOM);
       this.domElement.appendChild(this.__closeButton);
+    }
+    if (!params.showCloseButton) {
+      dom.addClass(this.__closeButton, GUI.CLASS_DISPLAY_NONE);
     }
 
     dom.bind(this.__closeButton, 'click', function() {
@@ -476,6 +518,8 @@ GUI.CLASS_CLOSE_BUTTON = 'close-button';
 GUI.CLASS_CLOSE_TOP = 'close-top';
 GUI.CLASS_CLOSE_BOTTOM = 'close-bottom';
 GUI.CLASS_DRAG = 'drag';
+GUI.CLASS_DISPLAY_NONE = 'display-none';
+GUI.CLASS_LIGHT_THEME = 'light-theme';
 
 GUI.DEFAULT_WIDTH = 245;
 GUI.TEXT_CLOSED = 'Close View Controls';

@@ -502,6 +502,7 @@ common.extend(
      *
      * @param {Object} object The object to be manipulated
      * @param {String} property The name of the property to be manipulated
+     * @param {String} label The label to display for the object controller
      * @param {Number} [min] Minimum allowed value
      * @param {Number} [max] Maximum allowed value
      * @param {Number} [step] Increment by which to change value
@@ -518,13 +519,14 @@ common.extend(
      * var person = {age: 45};
      * gui.add(person, 'age', 0, 100);
      */
-    add: function(object, property) {
+    add: function(object, property, label) {
       return add(
         this,
         object,
         property,
+        label,
         {
-          factoryArgs: Array.prototype.slice.call(arguments, 2)
+          factoryArgs: Array.prototype.slice.call(arguments, 3)
         }
       );
     },
@@ -1175,7 +1177,7 @@ function recallSavedValue(gui, controller) {
   }
 }
 
-function add(gui, object, property, params) {
+function add(gui, object, property, label, params) {
   if (object[property] === undefined) {
     throw new Error(`Object "${object}" has no property "${property}"`);
   }
@@ -1201,7 +1203,12 @@ function add(gui, object, property, params) {
 
   const name = document.createElement('span');
   dom.addClass(name, 'property-name');
-  name.innerHTML = controller.property;
+
+  if (label !== null) {
+    name.innerHTML = label;
+  } else {
+    name.innerHTML = controller.property;
+  }
 
   const container = document.createElement('div');
   container.appendChild(name);

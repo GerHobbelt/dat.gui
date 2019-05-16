@@ -23,6 +23,7 @@ import NumberController from './controllers/NumberController';
 import NumberControllerBox from './controllers/NumberControllerBox';
 import NumberControllerSlider from './controllers/NumberControllerSlider';
 import FunctionController from './controllers/FunctionController';
+import TabbedController from './controllers/TabbedController';
 import ColorController from './controllers/ColorController';
 import ImageController from './controllers/ImageController';
 
@@ -44,6 +45,7 @@ export const controllers = {
   NumberControllerBox: NumberControllerBox,
   NumberControllerSlider: NumberControllerSlider,
   FunctionController: FunctionController,
+  TabbedController: TabbedController,
   ColorController: ColorController,
   ImageController: ImageController,
 };

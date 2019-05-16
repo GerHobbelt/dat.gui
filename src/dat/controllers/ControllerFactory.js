@@ -17,6 +17,7 @@ import NumberControllerBox from './NumberControllerBox';
 import NumberControllerSlider from './NumberControllerSlider';
 import StringController from './StringController';
 import FunctionController from './FunctionController';
+import TabbedController from './TabbedController';
 import BooleanController from './BooleanController';
 import common from '../utils/common';
 
@@ -62,6 +63,11 @@ const ControllerFactory = function(object, property) {
 
   if (common.isString(initialValue)) {
     return new StringController(object, property);
+  }
+
+  //arguments[2] is tabs. arguments[3] is the name of the object
+  if (common.isFunction(initialValue) && arguments[2] !== undefined) {
+    return new TabbedController(object, property, '', arguments[2] || 0, arguments[3] || "Object");
   }
 
   if (common.isFunction(initialValue)) {

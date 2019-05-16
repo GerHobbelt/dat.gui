@@ -1288,6 +1288,41 @@ var FunctionController = function (_Controller) {
   return FunctionController;
 }(Controller);
 
+var TabbedController = function (_Controller) {
+  inherits(TabbedController, _Controller);
+  function TabbedController(object, property, text, tabs, displayName) {
+    classCallCheck(this, TabbedController);
+    var _this2 = possibleConstructorReturn(this, (TabbedController.__proto__ || Object.getPrototypeOf(TabbedController)).call(this, object, property));
+    var _this = _this2;
+    _this2.__button = document.createElement('div');
+    _this2.__button.innerHTML = text === undefined ? 'Fire' : text;
+    dom.bind(_this2.__button, 'click', function (e) {
+      e.preventDefault();
+      _this.fire();
+      return false;
+    });
+    dom.addClass(_this2.__button, 'button');
+    var tabSize = tabs * 2;
+    _this2.__button.style.paddingLeft = tabSize.toString() + 'em';
+    _this2.property = displayName;
+    _this2.domElement.appendChild(_this2.__button);
+    return _this2;
+  }
+  createClass(TabbedController, [{
+    key: 'fire',
+    value: function fire() {
+      if (this.__onChange) {
+        this.__onChange.call(this);
+      }
+      this.getValue().call(this.object);
+      if (this.__onFinishChange) {
+        this.__onFinishChange.call(this, this.getValue());
+      }
+    }
+  }]);
+  return TabbedController;
+}(Controller);
+
 var ColorController = function (_Controller) {
     inherits(ColorController, _Controller);
     function ColorController(object, property) {
@@ -2810,6 +2845,9 @@ var ControllerFactory = function ControllerFactory(object, property) {
   if (Common.isString(initialValue)) {
     return new StringController(object, property);
   }
+  if (Common.isFunction(initialValue) && arguments[2] !== undefined) {
+    return new TabbedController(object, property, '', arguments[2] || 0, arguments[3] || "Object");
+  }
   if (Common.isFunction(initialValue)) {
     return new FunctionController(object, property, '');
   }
@@ -3565,7 +3603,7 @@ function augmentController(gui, li, controller) {
     dom.bind(controller.__checkbox, 'click', function (e) {
       e.stopPropagation();
     });
-  } else if (controller instanceof FunctionController) {
+  } else if (controller instanceof FunctionController || controller instanceof TabbedController) {
     dom.bind(li, 'click', function () {
       dom.fakeEvent(controller.__button, 'click');
     });
@@ -3837,6 +3875,7 @@ var controllers = {
   NumberControllerBox: NumberControllerBox,
   NumberControllerSlider: NumberControllerSlider,
   FunctionController: FunctionController,
+  TabbedController: TabbedController,
   ColorController: ColorController
 };
 var dom$1 = { dom: dom };

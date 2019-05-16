@@ -1,6 +1,6 @@
 {
-  "name": "dat.GUI",
-  "version": "0.5.0",
+  "name": "@gerhobbelt/dat.GUI",
+  "version": "0.5.0-1",
   "description": "a lightweight controller library for JavaScript from ChromeExperiments",
   "main": "index.js",
   "directories": {
@@ -9,7 +9,8 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "tests/index.html"
+    "test": "tests/index.html",
+    "pub": "npm publish --access public"
   },
   "repository": {
     "type": "git",
@@ -35,11 +36,11 @@
     "less": "2.5.3",
     "requirejs": "2.1.20",
     "grunt": "0.4.5",
-    "grunt-contrib-jshint": "git://github.com/GerHobbelt/grunt-contrib-jshint.git#master",
+    "@gerhobbelt/grunt-contrib-jshint": "0.0.0",
     "autoprefixer": "6.1.0",
     "grunt-contrib-concat": "0.5.1",
     "amdclean": "2.7.0",
-    "grunt-contrib-requirejs": "git://github.com/GerHobbelt/grunt-contrib-requirejs.git#master",
+    "@gerhobbelt/grunt-contrib-requirejs": "0.0.0",
     "load-grunt-tasks": "3.3.0"
   }
 }

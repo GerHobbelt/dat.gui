@@ -1,6 +1,6 @@
 {
   "name": "@macroman/dat.gui",
-  "version": "1.1.0+dataarts-0.7.6",
+  "version": "1.2.0+dataarts-0.7.6",
   "description": "A lightweight graphical user interface for changing variables in JavaScript (fork with extra features).",
   "main": "build/dat.gui.js",
   "module": "build/dat.gui.module.js",

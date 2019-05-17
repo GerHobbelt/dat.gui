@@ -45,6 +45,7 @@ class NumberControllerSlider extends NumberController {
 
     dom.bind(this.__background, 'mousedown', onMouseDown);
     dom.bind(this.__background, 'touchstart', onTouchStart, false, true);
+    dom.bind(this.__background, 'wheel', onWheel);
 
     dom.addClass(this.__background, 'slider');
     dom.addClass(this.__foreground, 'slider-fg');
@@ -100,6 +101,12 @@ class NumberControllerSlider extends NumberController {
       if (_this.__onFinishChange) {
         _this.__onFinishChange.call(_this, _this.getValue());
       }
+    }
+
+    function onWheel(e) {
+      e.preventDefault();
+      const direction = (-e.deltaY >> 10) || 1;
+      _this.setValue(_this.getValue() + direction * _this.__impliedStep);
     }
 
     this.updateDisplay();

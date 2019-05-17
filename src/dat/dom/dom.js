@@ -15,7 +15,7 @@ import common from '../utils/common';
 
 const EVENT_MAP = {
   HTMLEvents: ['change'],
-  MouseEvents: ['click', 'mousemove', 'mousedown', 'mouseup', 'mouseover'],
+  MouseEvents: ['click', 'mousemove', 'mousedown', 'mouseup', 'mouseover', 'wheel'],
   KeyboardEvents: ['keydown']
 };
 

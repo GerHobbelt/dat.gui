@@ -1,5 +1,5 @@
 # dat.GUI
-@MacroMan's fork with extra features
+@MacroMan's fork with extra features - v1.2.0+dataarts-0.7.6
 
 A lightweight graphical user interface for changing variables in JavaScript.
 
@@ -14,8 +14,9 @@ or the [API documentation](API.md).
 * Added forceUpdateDisplay to listen(). Allows overiding of the active check on GUI inputs before updating ([#212](https://github.com/dataarts/dat.gui/issues/212)).
 * Fixed left border color not working on non-hex color controllers ([#208](https://github.com/dataarts/dat.gui/issues/208))
 * Added value plotter controller ([#191](https://github.com/dataarts/dat.gui/issues/191))
+* Implemented number box changes on keyboard arrow up/down, mouse wheel scroll and converted inputs to number. ([#195](https://github.com/dataarts/dat.gui/issues/195))
 
-![alt text](dat_panel.gif)
+![dat.gui preview of all inputs](dat_panel.gif)
 
 See [API.md](API.md) for usage
 
@@ -27,6 +28,9 @@ In your `head` tag, include the following code:
 ```html
 <script type="text/javascript" src="dat.gui.min.js"></script>
 ```
+
+## Example code
+See `tests/manual.html` for an example of each type of controller.
 
 ## Installing from npm
 
@@ -89,3 +93,4 @@ The following libraries / open-source projects were used in the development of d
  * [Sass](http://sass-lang.com/)
  * [Node.js](http://nodejs.org/)
  * [QUnit](https://github.com/jquery/qunit) / [jquery](http://jquery.com/)
+ * [stats.js](http://mrdoob.github.io/stats.js/)

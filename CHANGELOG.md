@@ -1,5 +1,8 @@
 ## Changelog
 
+### 1.2.0+dataarts-0.7.6
+* Implemented number box changes on keyboard arrow up/down, mouse wheel scroll and converted inputs to number. ([#195](https://github.com/dataarts/dat.gui/issues/195))
+
 ### 1.1.0+dataarts-0.7.6
 * Added value plotter controller, allowing tracking of basic numberic values over time. ([#191](https://github.com/dataarts/dat.gui/issues/191))
 

@@ -2,3 +2,4 @@
 .sass-cache
 .idea
 *.map
+node_modules/

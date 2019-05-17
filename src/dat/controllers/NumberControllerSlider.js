@@ -12,15 +12,13 @@
  */
 
 define([
-    'dat/gui/settings',
-    'dat/controllers/NumberController',
-    'dat/dom/dom',
-    'dat/utils/css',
-    'dat/utils/common',
-    'text!dat/controllers/NumberControllerSlider.css'
-],
-function(settings, NumberController, dom, css, common, styleSheet) {
-
+  "dat/gui/settings",
+  "dat/controllers/NumberController",
+  "dat/dom/dom",
+  "dat/utils/css",
+  "dat/utils/common",
+  "text!dat/controllers/NumberControllerSlider.css"
+], function(settings, NumberController, dom, css, common, styleSheet) {
   /**
    * @class Represents a given property of an object that is a number, contains
    * a minimum and maximum, and provides a slider element with which to
@@ -45,64 +43,57 @@ function(settings, NumberController, dom, css, common, styleSheet) {
 
     var _this = this;
 
-    this.__background = document.createElement('div');
-	this.__label = document.createElement('div');
-    this.__foreground = document.createElement('div');
-   
-	function getEnumArr(hash) {
-		var arr = [];
-		var k;
-		for (k in hash) {
-			arr.push({key:k, value:hash[k]});
-		}
-		arr = arr.sort(function (a, b) {
-			var result = true ? (a["value"] < b["value"]) : (a["value"] > b["value"]);
-			return result ? 1 : -1;
-		});
-		
-		return  arr.length > 0 ? arr : null;
-	}
-	
-	
-	if (enumeration) {
-		this.enumeration = getEnumArr(enumeration);
-	}
-	
-	this.__label.style.visibility = enumeration ? "visible" : "hidden";
-	
-    dom.bind(this.__background, 'mousedown', onMouseDown);
-    
-    dom.addClass(this.__background, 'slider');
-	dom.addClass(this.__label, 'label');
-    dom.addClass(this.__foreground, 'slider-fg');
-	
-	
-    function onMouseDown(e) {
+    this.__background = document.createElement("div");
+    this.__label = document.createElement("div");
+    this.__foreground = document.createElement("div");
 
-      dom.bind(settings.WINDOW, 'mousemove', onMouseDrag);
-      dom.bind(settings.WINDOW, 'mouseup', onMouseUp);
+    function getEnumArr(hash) {
+      var arr = [];
+      var k;
+      for (k in hash) {
+        arr.push({ key: k, value: hash[k] });
+      }
+      arr = arr.sort(function(a, b) {
+        var result = true ? a["value"] < b["value"] : a["value"] > b["value"];
+        return result ? 1 : -1;
+      });
+
+      return arr.length > 0 ? arr : null;
+    }
+
+    if (enumeration) {
+      this.enumeration = getEnumArr(enumeration);
+    }
+
+    this.__label.style.visibility = enumeration ? "visible" : "hidden";
+
+    dom.bind(this.__background, "mousedown", onMouseDown);
+
+    dom.addClass(this.__background, "slider");
+    dom.addClass(this.__label, "label");
+    dom.addClass(this.__foreground, "slider-fg");
+
+    function onMouseDown(e) {
+      dom.bind(settings.WINDOW, "mousemove", onMouseDrag);
+      dom.bind(settings.WINDOW, "mouseup", onMouseUp);
 
       onMouseDrag(e);
     }
 
     function onMouseDrag(e) {
-
       e.preventDefault();
 
       var offset = dom.getOffset(_this.__background);
       var width = dom.getWidth(_this.__background);
 
-      _this.setValue(
-      	map(e.clientX, offset.left, offset.left + width, _this.__min, _this.__max)
-      );
+      _this.setValue(map(e.clientX, offset.left, offset.left + width, _this.__min, _this.__max));
 
       return false;
-
     }
 
     function onMouseUp() {
-      dom.unbind(settings.WINDOW, 'mousemove', onMouseDrag);
-      dom.unbind(settings.WINDOW, 'mouseup', onMouseUp);
+      dom.unbind(settings.WINDOW, "mousemove", onMouseDrag);
+      dom.unbind(settings.WINDOW, "mouseup", onMouseUp);
       if (_this.__onFinishChange) {
         _this.__onFinishChange.call(_this, _this.getValue());
       }
@@ -110,11 +101,9 @@ function(settings, NumberController, dom, css, common, styleSheet) {
 
     this.updateDisplay();
 
-	
     this.__background.appendChild(this.__foreground);
-	this.__background.appendChild(this.__label);
+    this.__background.appendChild(this.__label);
     this.domElement.appendChild(this.__background);
-
   };
 
   NumberControllerSlider.superclass = NumberController;
@@ -127,52 +116,44 @@ function(settings, NumberController, dom, css, common, styleSheet) {
   };
 
   common.extend(
+    NumberControllerSlider.prototype,
+    NumberController.prototype,
 
-      NumberControllerSlider.prototype,
-      NumberController.prototype,
+    {
+      updateDisplay: function() {
+        var value = this.getValue();
+        var pct = (value - this.__min) / (this.__max - this.__min);
+        this.__foreground.style.width = pct * 100 + "%";
 
-      {
+        this.__label.innerHTML = value;
 
-        updateDisplay: function() {
-		  var value = this.getValue();
-          var pct = (value - this.__min)/(this.__max - this.__min);
-          this.__foreground.style.width = pct*100+'%';
-		 
-		  this.__label.innerHTML = value;
-		
-		  if (this.enumeration) {
-			  var chosenValue = null;
-			  var chosenIndex = null;
-			  var i = this.enumeration.length;
-			  while(--i > -1) {
-				  chosenValue = this.enumeration[i].value;
-				  if ( value < chosenValue) {
-					break;
-				  }
-				  chosenIndex = i;
-			  }
-			  
-			  if (chosenIndex == null) {
-				  chosenValue = "";
-			  }
-			  else chosenValue = this.enumeration[chosenIndex].key;
-			  
-			  this.__label.innerHTML = chosenValue;
-		  }
-	
-          return NumberControllerSlider.superclass.prototype.updateDisplay.call(this);
+        if (this.enumeration) {
+          var chosenValue = null;
+          var chosenIndex = null;
+          var i = this.enumeration.length;
+          while (--i > -1) {
+            chosenValue = this.enumeration[i].value;
+            if (value < chosenValue) {
+              break;
+            }
+            chosenIndex = i;
+          }
+
+          if (chosenIndex == null) {
+            chosenValue = "";
+          } else chosenValue = this.enumeration[chosenIndex].key;
+
+          this.__label.innerHTML = chosenValue;
         }
 
+        return NumberControllerSlider.superclass.prototype.updateDisplay.call(this);
       }
-
-
-
+    }
   );
 
-	function map(v, i1, i2, o1, o2) {
-		return o1 + (o2 - o1) * ((v - i1) / (i2 - i1));
-	}
+  function map(v, i1, i2, o1, o2) {
+    return o1 + (o2 - o1) * ((v - i1) / (i2 - i1));
+  }
 
   return NumberControllerSlider;
-
 });

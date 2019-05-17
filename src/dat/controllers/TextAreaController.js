@@ -11,12 +11,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define([
-    'dat/controllers/Controller',
-    'dat/dom/dom',
-    'dat/utils/common'
-], function(Controller, dom, common) {
-
+define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], function(Controller, dom, common) {
   /**
    * @class Provides a text area to alter the text property of an object.
    *
@@ -28,18 +23,17 @@ define([
    * @member dat.controllers
    */
   var TextAreaController = function(object, property) {
-
     TextAreaController.superclass.call(this, object, property);
 
     var _this = this;
 
-    this.__input = document.createElement('textarea');
+    this.__input = document.createElement("textarea");
     //this.__input.setAttribute('type', 'text');
 
-    dom.bind(this.__input, 'keyup', onChange);
-    dom.bind(this.__input, 'change', onChange);
-    dom.bind(this.__input, 'blur', onBlur);
-	/*
+    dom.bind(this.__input, "keyup", onChange);
+    dom.bind(this.__input, "change", onChange);
+    dom.bind(this.__input, "blur", onBlur);
+    /*
     dom.bind(this.__input, 'keydown', function(e) {
       if (e.keyCode === 13) {
         this.blur();
@@ -60,31 +54,25 @@ define([
     this.updateDisplay();
 
     this.domElement.appendChild(this.__input);
-
   };
 
   TextAreaController.superclass = Controller;
 
   common.extend(
+    TextAreaController.prototype,
+    Controller.prototype,
 
-      TextAreaController.prototype,
-      Controller.prototype,
-
-      {
-
-        updateDisplay: function() {
-          // Stops the caret from moving on account of:
-          // keyup -> setValue -> updateDisplay
-          if (!dom.isActive(this.__input)) {
-            this.__input.value = this.getValue();
-          }
-          return TextAreaController.superclass.prototype.updateDisplay.call(this);
+    {
+      updateDisplay: function() {
+        // Stops the caret from moving on account of:
+        // keyup -> setValue -> updateDisplay
+        if (!dom.isActive(this.__input)) {
+          this.__input.value = this.getValue();
         }
-
+        return TextAreaController.superclass.prototype.updateDisplay.call(this);
       }
-
+    }
   );
 
   return TextAreaController;
-
 });

@@ -11,13 +11,12 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define([
-    'dat/gui/settings',
-    'dat/controllers/Controller',
-    'dat/dom/dom',
-    'dat/utils/common'
-], function(settings, Controller, dom, common) {
-
+define(["dat/gui/settings", "dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], function(
+  settings,
+  Controller,
+  dom,
+  common
+) {
   /**
    * @class Provides a GUI interface to fire a specified method, a property of an object.
    *
@@ -29,47 +28,36 @@ define([
    * @member dat.controllers
    */
   var FunctionController = function(object, property, text) {
-
     FunctionController.superclass.call(this, object, property);
 
     var _this = this;
 
-    this.__button = settings.DOCUMENT.createElement('div');
-    this.__button.innerHTML = text === undefined ? 'Fire' : text;
-    dom.bind(this.__button, 'click', function(e) {
+    this.__button = settings.DOCUMENT.createElement("div");
+    this.__button.innerHTML = text === undefined ? "Fire" : text;
+    dom.bind(this.__button, "click", function(e) {
       e.preventDefault();
       _this.fire();
       return false;
     });
 
-    dom.addClass(this.__button, 'button');
+    dom.addClass(this.__button, "button");
 
     this.domElement.appendChild(this.__button);
-
-
   };
 
   FunctionController.superclass = Controller;
 
-  common.extend(
-
-      FunctionController.prototype,
-      Controller.prototype,
-      {
-
-        fire: function() {
-          if (this.__onChange) {
-            this.__onChange.call(this);
-          }
-          this.getValue().call(this.object);
-          if (this.__onFinishChange) {
-            this.__onFinishChange.call(this, this.getValue());
-          }
-        }
+  common.extend(FunctionController.prototype, Controller.prototype, {
+    fire: function() {
+      if (this.__onChange) {
+        this.__onChange.call(this);
       }
-
-  );
+      this.getValue().call(this.object);
+      if (this.__onFinishChange) {
+        this.__onFinishChange.call(this, this.getValue());
+      }
+    }
+  });
 
   return FunctionController;
-
 });

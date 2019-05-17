@@ -13,14 +13,9 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define([
-    'dat/controllers/Controller',
-    'dat/dom/dom',
-    'dat/utils/common'
-], function (Controller, dom, common) {
-
+define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], function(Controller, dom, common) {
   /**
-   * @class Provides a text input to alter the array property of an object. 
+   * @class Provides a text input to alter the array property of an object.
    *        Automatically converts strings to numbers and boolean values if appropriate.
    *
    * @extends dat.controllers.Controller
@@ -31,26 +26,24 @@ define([
    * @member dat.controllers
    */
   var ArrayController = function(object, property) {
-
     ArrayController.superclass.call(this, object, property);
 
     var _this = this;
 
-    this.__input = document.createElement('input');
-    this.__input.setAttribute('type', 'text');
+    this.__input = document.createElement("input");
+    this.__input.setAttribute("type", "text");
 
-    dom.bind(this.__input, 'keyup', onChange);
-    dom.bind(this.__input, 'change', onChange);
-    dom.bind(this.__input, 'blur', onBlur);
-    dom.bind(this.__input, 'keydown', function(e) {
+    dom.bind(this.__input, "keyup", onChange);
+    dom.bind(this.__input, "change", onChange);
+    dom.bind(this.__input, "blur", onBlur);
+    dom.bind(this.__input, "keydown", function(e) {
       if (e.keyCode === 13) {
         this.blur();
       }
     });
-    
 
     function onChange() {
-      var arr = _this.__input.value.replace(/^\s*|\s*$/g, '').split(/\s*,\s*/)
+      var arr = _this.__input.value.replace(/^\s*|\s*$/g, "").split(/\s*,\s*/);
 
       // The resulting values will all be strings, so convert them here to actual data types
       for (var i = 0; i < arr.length; i++) {
@@ -58,11 +51,9 @@ define([
         if (!isNaN(value)) {
           arr[i] = +value;
           continue;
-        }
-        else if (value === 'true') {
+        } else if (value === "true") {
           arr[i] = true;
-        }
-        else if (value === 'false') {
+        } else if (value === "false") {
           arr[i] = false;
         }
       }
@@ -78,31 +69,25 @@ define([
     this.updateDisplay();
 
     this.domElement.appendChild(this.__input);
-
   };
 
   ArrayController.superclass = Controller;
 
   common.extend(
+    ArrayController.prototype,
+    Controller.prototype,
 
-      ArrayController.prototype,
-      Controller.prototype,
-
-      {
-
-        updateDisplay: function() {
-          // Stops the caret from moving on account of:
-          // keyup -> setValue -> updateDisplay
-          if (!dom.isActive(this.__input)) {
-            this.__input.value = this.getValue();
-          }
-          return ArrayController.superclass.prototype.updateDisplay.call(this);
+    {
+      updateDisplay: function() {
+        // Stops the caret from moving on account of:
+        // keyup -> setValue -> updateDisplay
+        if (!dom.isActive(this.__input)) {
+          this.__input.value = this.getValue();
         }
-
+        return ArrayController.superclass.prototype.updateDisplay.call(this);
       }
-
+    }
   );
 
   return ArrayController;
-
 });

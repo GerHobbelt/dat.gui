@@ -11,14 +11,12 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define([
-    'dat/gui/settings',
-    'dat/controllers/Controller',
-    'dat/dom/dom',
-    'dat/utils/common'
-],
-function(settings, Controller, dom, common) {
-
+define(["dat/gui/settings", "dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], function(
+  settings,
+  Controller,
+  dom,
+  common
+) {
   /**
    * @class Provides a select input to alter the property of an object, using a
    * list of accepted values.
@@ -33,7 +31,6 @@ function(settings, Controller, dom, common) {
    * @member dat.controllers
    */
   var OptionController = function(object, property, options) {
-
     OptionController.superclass.call(this, object, property);
 
     var _this = this;
@@ -42,7 +39,7 @@ function(settings, Controller, dom, common) {
      * The drop down menu
      * @ignore
      */
-    this.__select = settings.DOCUMENT.createElement('select');
+    this.__select = settings.DOCUMENT.createElement("select");
 
     if (common.isArray(options)) {
       var map = {};
@@ -53,52 +50,44 @@ function(settings, Controller, dom, common) {
     }
 
     common.each(options, function(value, key) {
-
-      var opt = settings.DOCUMENT.createElement('option');
+      var opt = settings.DOCUMENT.createElement("option");
       opt.innerHTML = key;
-      opt.setAttribute('value', value);
+      opt.setAttribute("value", value);
       _this.__select.appendChild(opt);
-
     });
 
     // Acknowledge original value
     this.updateDisplay();
 
-    dom.bind(this.__select, 'change', function() {
+    dom.bind(this.__select, "change", function() {
       var desiredValue = this.options[this.selectedIndex].value;
       _this.setValue(desiredValue);
     });
 
     this.domElement.appendChild(this.__select);
-
   };
 
   OptionController.superclass = Controller;
 
   common.extend(
+    OptionController.prototype,
+    Controller.prototype,
 
-      OptionController.prototype,
-      Controller.prototype,
-
-      {
-
-        setValue: function(v) {
-          var toReturn = OptionController.superclass.prototype.setValue.call(this, v);
-          if (this.__onFinishChange) {
-            this.__onFinishChange.call(this, this.getValue());
-          }
-          return toReturn;
-        },
-
-        updateDisplay: function() {
-          this.__select.value = this.getValue();
-          return OptionController.superclass.prototype.updateDisplay.call(this);
+    {
+      setValue: function(v) {
+        var toReturn = OptionController.superclass.prototype.setValue.call(this, v);
+        if (this.__onFinishChange) {
+          this.__onFinishChange.call(this, this.getValue());
         }
+        return toReturn;
+      },
 
+      updateDisplay: function() {
+        this.__select.value = this.getValue();
+        return OptionController.superclass.prototype.updateDisplay.call(this);
       }
-
+    }
   );
 
   return OptionController;
-
 });

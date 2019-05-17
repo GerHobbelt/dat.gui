@@ -3191,6 +3191,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	  },
 	
 	  destroy: function destroy() {
+
+	  	var _this = this;
+	  	
+	  	_common2.default.each(this.__folders, function (folder) {
+	  	  _this.removeFolder(folder);
+	  	});
+
 	    if (this.autoPlace) {
 	      autoPlaceContainer.removeChild(this.domElement);
 	    }
@@ -3242,6 +3249,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var li = addRow(this, gui.domElement);
 	    _dom2.default.addClass(li, 'folder');
 	    return gui;
+	  },
+	
+	  removeFolder: function removeFolder(folder) {
+	    this.__ul.removeChild(folder.domElement.parentElement);
+	
+	    delete this.__folders[folder.name];
+	
+	    // Do we have saved appearance data for this folder?
+	    if (this.load && // Anything loaded?
+	    this.load.folders && // Was my parent a dead-end?
+	    this.load.folders[folder.name]) {
+	      delete this.load.folders[folder.name];
+	    }
+	
+	    var _this = this;
+	    _common2.default.defer(function () {
+	      _this.onResize();
+	    });
 	  },
 	
 	  open: function open() {

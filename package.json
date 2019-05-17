@@ -13,7 +13,7 @@
     "watch": "rollup --watch -c && rollup --watch -c rollup.config.js",
     "build-docs": "jsdoc2md -f src/dat/gui/GUI.js src/dat/controllers/Controller.js src/dat/controllers/NumberController.js | replace-between --target API.md --token API",
     "lint": "eslint src",
-    "fix": "eslint --fix src",
+    "fix": "eslint --fix src && prettier --print-width 120 --write src/**/*.js",
     "preversion": "npm run lint",
     "version": "npm run build && git add -A build",
     "postversion": "git push && git push --tags && npm publish",
@@ -76,7 +76,8 @@
       "no-restricted-syntax": 0,
       "no-restricted-globals": 0,
       "no-bitwise": 0,
-      "no-plusplus": 0
+      "no-plusplus": 0,
+      "quotes": ["error", "double", { "avoidEscape": true }]
     }
   },
   "dependencies": {

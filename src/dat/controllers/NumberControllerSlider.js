@@ -11,8 +11,8 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import NumberController from './NumberController';
-import dom from '../dom/dom';
+import NumberController from "./NumberController";
+import dom from "../dom/dom";
 
 function map(v, i1, i2, o1, o2) {
   return o1 + (o2 - o1) * ((v - i1) / (i2 - i1));
@@ -40,17 +40,17 @@ class NumberControllerSlider extends NumberController {
 
     const _this = this;
 
-    this.__background = document.createElement('div');
-    this.__foreground = document.createElement('div');
+    this.__background = document.createElement("div");
+    this.__foreground = document.createElement("div");
 
-    dom.bind(this.__background, 'mousedown', onMouseDown);
-    dom.bind(this.__background, 'touchstart', onTouchStart);
+    dom.bind(this.__background, "mousedown", onMouseDown);
+    dom.bind(this.__background, "touchstart", onTouchStart);
 
-    const mousewheelevt = /Firefox/i.test(navigator.userAgent) ? 'DOMMouseScroll' : 'mousewheel';
+    const mousewheelevt = /Firefox/i.test(navigator.userAgent) ? "DOMMouseScroll" : "mousewheel";
     dom.bind(this.__background, mousewheelevt, onMouseWheel);
 
-    dom.addClass(this.__background, 'slider');
-    dom.addClass(this.__foreground, 'slider-fg');
+    dom.addClass(this.__background, "slider");
+    dom.addClass(this.__foreground, "slider-fg");
 
     function onMouseWheel(e) {
       let value = _this.getValue();
@@ -66,8 +66,8 @@ class NumberControllerSlider extends NumberController {
     function onMouseDown(e) {
       document.activeElement.blur();
 
-      dom.bind(window, 'mousemove', onMouseDrag);
-      dom.bind(window, 'mouseup', onMouseUp);
+      dom.bind(window, "mousemove", onMouseDrag);
+      dom.bind(window, "mouseup", onMouseUp);
 
       onMouseDrag(e);
     }
@@ -83,8 +83,8 @@ class NumberControllerSlider extends NumberController {
     }
 
     function onMouseUp() {
-      dom.unbind(window, 'mousemove', onMouseDrag);
-      dom.unbind(window, 'mouseup', onMouseUp);
+      dom.unbind(window, "mousemove", onMouseDrag);
+      dom.unbind(window, "mouseup", onMouseUp);
       if (_this.__onFinishChange) {
         _this.__onFinishChange.call(_this, _this.getValue());
       }
@@ -94,8 +94,8 @@ class NumberControllerSlider extends NumberController {
       if (e.touches.length !== 1) {
         return;
       }
-      dom.bind(window, 'touchmove', onTouchMove);
-      dom.bind(window, 'touchend', onTouchEnd);
+      dom.bind(window, "touchmove", onTouchMove);
+      dom.bind(window, "touchend", onTouchEnd);
       onTouchMove(e);
     }
 
@@ -107,8 +107,8 @@ class NumberControllerSlider extends NumberController {
     }
 
     function onTouchEnd() {
-      dom.unbind(window, 'touchmove', onTouchMove);
-      dom.unbind(window, 'touchend', onTouchEnd);
+      dom.unbind(window, "touchmove", onTouchMove);
+      dom.unbind(window, "touchend", onTouchEnd);
       if (_this.__onFinishChange) {
         _this.__onFinishChange.call(_this, _this.getValue());
       }
@@ -125,7 +125,7 @@ class NumberControllerSlider extends NumberController {
       return;
     }
     const pct = (this.getValue() - this.__min) / (this.__max - this.__min);
-    this.__foreground.style.width = pct * 100 + '%';
+    this.__foreground.style.width = pct * 100 + "%";
     return super.updateDisplay();
   }
 }

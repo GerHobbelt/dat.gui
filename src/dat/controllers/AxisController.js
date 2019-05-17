@@ -1,5 +1,5 @@
-import Controller from './Controller';
-import dom from '../dom/dom';
+import Controller from "./Controller";
+import dom from "../dom/dom";
 
 /**
  * @class Represents a given property of an object that is a 2D Vector,
@@ -24,7 +24,7 @@ class AxisController extends Controller {
     super(object, property, { min, max, step });
     const _this = this;
 
-    this.domElement = document.createElement('div');
+    this.domElement = document.createElement("div");
   }
 }
 

@@ -142,8 +142,8 @@ const Common = {
   },
 
   isArray:
-    Array.isArray
-    || function(obj) {
+    Array.isArray ||
+    function(obj) {
       return obj.constructor === Array;
     },
 
@@ -156,7 +156,7 @@ const Common = {
   },
 
   isString: function(obj) {
-    return obj === obj + '';
+    return obj === obj + "";
   },
 
   isBoolean: function(obj) {
@@ -164,7 +164,7 @@ const Common = {
   },
 
   isFunction: function(obj) {
-    return Object.prototype.toString.call(obj) === '[object Function]';
+    return Object.prototype.toString.call(obj) === "[object Function]";
   }
 };
 

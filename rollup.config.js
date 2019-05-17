@@ -55,12 +55,15 @@ export default {
     babel({
       babelrc: false,
       comments: true,
-      sourceMap: true,
+      sourceMap: false,
       presets: [
-        ["@babel/preset-env", {
-          modules: false,
-          loose: true,
-        }],
+        [
+          "@babel/preset-env",
+          {
+            modules: false,
+            loose: true
+          }
+        ]
       ],
       exclude: "node_modules/**"
     }),

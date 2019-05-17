@@ -1,6 +1,6 @@
-import Controller from './Controller';
-import dom from '../dom/dom';
-import common from '../utils/common';
+import Controller from "./Controller";
+import dom from "../dom/dom";
+import common from "../utils/common";
 
 /*
  * Linearly maps a position in [0,1] to our vector range.
@@ -32,74 +32,74 @@ class VectorController extends Controller {
 
     const _this = this;
 
-    this.domElement = document.createElement('div');
+    this.domElement = document.createElement("div");
 
     dom.makeSelectable(this.domElement, false);
 
-    this.__selector = document.createElement('div');
-    this.__selector.className = 'vector-selector';
+    this.__selector = document.createElement("div");
+    this.__selector.className = "vector-selector";
 
-    this.__pos_field = document.createElement('div');
-    this.__pos_field.className = 'saturation-field';
+    this.__pos_field = document.createElement("div");
+    this.__pos_field.className = "saturation-field";
 
-    this.__field_knob = document.createElement('div');
-    this.__field_knob.className = 'field-knob';
+    this.__field_knob = document.createElement("div");
+    this.__field_knob.className = "field-knob";
 
-    dom.bind(this.__selector, 'mousedown', function(/* e */) {
-      dom.addClass(this, 'drag').bind(window, 'mouseup', function(/* e */) {
-        dom.removeClass(_this.__selector, 'drag');
+    dom.bind(this.__selector, "mousedown", function(/* e */) {
+      dom.addClass(this, "drag").bind(window, "mouseup", function(/* e */) {
+        dom.removeClass(_this.__selector, "drag");
       });
     });
 
-    dom.bind(this.__selector, 'touchstart', function(/* e */) {
-      dom.addClass(this, 'drag').bind(window, 'touchend', function(/* e */) {
-        dom.removeClass(_this.__selector, 'drag');
+    dom.bind(this.__selector, "touchstart", function(/* e */) {
+      dom.addClass(this, "drag").bind(window, "touchend", function(/* e */) {
+        dom.removeClass(_this.__selector, "drag");
       });
     });
 
     common.extend(this.__selector.style, {
-      width: '52px',
-      height: '52px',
-      padding: '3px',
-      backgroundColor: '#222',
-      boxShadow: '0px 1px 3px rgba(0,0,0,0.3)'
+      width: "52px",
+      height: "52px",
+      padding: "3px",
+      backgroundColor: "#222",
+      boxShadow: "0px 1px 3px rgba(0,0,0,0.3)"
     });
 
     common.extend(this.__field_knob.style, {
-      position: 'absolute',
-      width: '12px',
-      height: '12px',
-      borderRadius: '12px',
+      position: "absolute",
+      width: "12px",
+      height: "12px",
+      borderRadius: "12px",
       zIndex: 1
     });
 
     common.extend(this.__pos_field.style, {
-      width: '50px',
-      height: '50px',
-      marginRight: '3px',
-      display: 'inline-block',
-      cursor: 'pointer'
+      width: "50px",
+      height: "50px",
+      marginRight: "3px",
+      display: "inline-block",
+      cursor: "pointer"
     });
 
-    dom.bind(this.__pos_field, 'mousedown', fieldDown);
-    dom.bind(this.__pos_field, 'touchstart', fieldDown);
+    dom.bind(this.__pos_field, "mousedown", fieldDown);
+    dom.bind(this.__pos_field, "touchstart", fieldDown);
 
-    dom.bind(this.__field_knob, 'mousedown', fieldDown);
-    dom.bind(this.__field_knob, 'touchstart', fieldDown);
+    dom.bind(this.__field_knob, "mousedown", fieldDown);
+    dom.bind(this.__field_knob, "touchstart", fieldDown);
 
     function fieldDown(e) {
       setSV(e);
-      dom.bind(window, 'mousemove', setSV);
-      dom.bind(window, 'touchmove', setSV);
-      dom.bind(window, 'mouseup', fieldUpSV);
-      dom.bind(window, 'touchend', fieldUpSV);
+      dom.bind(window, "mousemove", setSV);
+      dom.bind(window, "touchmove", setSV);
+      dom.bind(window, "mouseup", fieldUpSV);
+      dom.bind(window, "touchend", fieldUpSV);
     }
 
     function fieldUpSV() {
-      dom.unbind(window, 'mousemove', setSV);
-      dom.unbind(window, 'touchmove', setSV);
-      dom.unbind(window, 'mouseup', fieldUpSV);
-      dom.unbind(window, 'touchend', fieldUpSV);
+      dom.unbind(window, "mousemove", setSV);
+      dom.unbind(window, "touchmove", setSV);
+      dom.unbind(window, "mouseup", fieldUpSV);
+      dom.unbind(window, "touchend", fieldUpSV);
       onFinish();
     }
 
@@ -116,7 +116,7 @@ class VectorController extends Controller {
     this.updateDisplay();
 
     function setSV(e) {
-      if (e.type.indexOf('touch') === -1) {
+      if (e.type.indexOf("touch") === -1) {
         e.preventDefault();
       }
 
@@ -148,8 +148,8 @@ class VectorController extends Controller {
     this.__vec = this.getValue();
     const offset = vec2pos(this.__vec, this.__min, this.__max);
     common.extend(this.__field_knob.style, {
-      marginLeft: 50 * offset[0] - 7 + 'px',
-      marginTop: 50 * (1 - offset[1]) - 7 + 'px'
+      marginLeft: 50 * offset[0] - 7 + "px",
+      marginTop: 50 * (1 - offset[1]) - 7 + "px"
     });
 
     this.__temp[0] = 1;
@@ -157,6 +157,6 @@ class VectorController extends Controller {
   }
 }
 
-const vendors = ['-moz-', '-o-', '-webkit-', '-ms-', ''];
+const vendors = ["-moz-", "-o-", "-webkit-", "-ms-", ""];
 
 export default VectorController;

@@ -11,8 +11,8 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import Controller from './Controller';
-import dom from '../dom/dom';
+import Controller from "./Controller";
+import dom from "../dom/dom";
 
 /**
  * @class Provides a GUI interface to fire a specified method, a property of an object.
@@ -28,19 +28,19 @@ class TabbedController extends Controller {
 
     const _this = this;
 
-    this.__button = document.createElement('div');
-    this.__button.innerHTML = text === undefined ? 'Fire' : text;
+    this.__button = document.createElement("div");
+    this.__button.innerHTML = text === undefined ? "Fire" : text;
 
-    dom.bind(this.__button, 'click', function(e) {
+    dom.bind(this.__button, "click", function(e) {
       e.preventDefault();
       _this.fire();
       return false;
     });
 
-    dom.addClass(this.__button, 'button');
+    dom.addClass(this.__button, "button");
 
     const tabSize = tabs * 2; // 2em = 1 tab
-    this.__button.style.paddingLeft = tabSize.toString() + 'em';
+    this.__button.style.paddingLeft = tabSize.toString() + "em";
     this.property = displayName;
     this.domElement.appendChild(this.__button);
   }

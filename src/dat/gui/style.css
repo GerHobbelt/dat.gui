@@ -283,7 +283,8 @@
       color: #fff; }
   .dg .c .slider {
     background: #303030;
-    cursor: ew-resize; }
+    cursor: ew-resize;
+    overflow: hidden; }
   .dg .c .slider-fg {
     background: #2FA1D6; }
   .dg .c .slider:hover {

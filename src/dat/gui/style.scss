@@ -213,6 +213,7 @@ $row-easing-height: 80px;
     .slider {
       background: $input-color;
       cursor: ew-resize;
+      overflow: hidden;
     }
 
     .slider-fg {

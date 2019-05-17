@@ -635,7 +635,16 @@ common.extend(
       return gui;
     },
 
-    removeFolder: function(folder) {
+    /**
+     * @param name
+     */
+    removeFolder: function(name) {
+      var folder = this.__folders[name];
+      if (!folder) {
+        return;
+      }
+      folder.close();
+
       this.__ul.removeChild(folder.domElement.parentElement);
 
       delete this.__folders[folder.name];

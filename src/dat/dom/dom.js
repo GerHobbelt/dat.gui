@@ -11,12 +11,12 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import common from '../utils/common';
+import common from "../utils/common";
 
 const EVENT_MAP = {
-  HTMLEvents: ['change'],
-  MouseEvents: ['click', 'mousemove', 'mousedown', 'mouseup', 'mouseover'],
-  KeyboardEvents: ['keydown']
+  HTMLEvents: ["change"],
+  MouseEvents: ["click", "mousemove", "mousedown", "mouseup", "mouseover"],
+  KeyboardEvents: ["keydown"]
 };
 
 const EVENT_MAP_INV = {};
@@ -29,7 +29,7 @@ common.each(EVENT_MAP, function(v, k) {
 const CSS_VALUE_PIXELS = /(\d+(\.\d+)?)px/;
 
 function cssValueToPixels(val) {
-  if (val === '0' || common.isUndefined(val)) {
+  if (val === "0" || common.isUndefined(val)) {
     return 0;
   }
 
@@ -49,7 +49,6 @@ function cssValueToPixels(val) {
  * @member dat.dom
  */
 const dom = {
-
   /**
    *
    * @param elem
@@ -58,14 +57,15 @@ const dom = {
   makeSelectable: function(elem, selectable) {
     if (elem === undefined || elem.style === undefined) return;
 
-    elem.onselectstart = selectable ? function() {
-      return false;
-    } : function() {
-    };
+    elem.onselectstart = selectable
+      ? function() {
+          return false;
+        }
+      : function() {};
 
-    elem.style.MozUserSelect = selectable ? 'auto' : 'none';
-    elem.style.KhtmlUserSelect = selectable ? 'auto' : 'none';
-    elem.unselectable = selectable ? 'on' : 'off';
+    elem.style.MozUserSelect = selectable ? "auto" : "none";
+    elem.style.KhtmlUserSelect = selectable ? "auto" : "none";
+    elem.unselectable = selectable ? "on" : "off";
   },
 
   /**
@@ -86,7 +86,7 @@ const dom = {
       vertical = true;
     }
 
-    elem.style.position = 'absolute';
+    elem.style.position = "absolute";
 
     if (horizontal) {
       elem.style.left = 0;
@@ -108,47 +108,61 @@ const dom = {
     const params = pars || {};
     const className = EVENT_MAP_INV[eventType];
     if (!className) {
-      throw new Error('Event type ' + eventType + ' not supported.');
+      throw new Error("Event type " + eventType + " not supported.");
     }
     const evt = document.createEvent(className);
     switch (className) {
-      case 'MouseEvents':
-        {
-          const clientX = params.x || params.clientX || 0;
-          const clientY = params.y || params.clientY || 0;
-          evt.initMouseEvent(eventType, params.bubbles || false,
-            params.cancelable || true, window, params.clickCount || 1,
-            0, // screen X
-            0, // screen Y
-            clientX, // client X
-            clientY, // client Y
-            false, false, false, false, 0, null);
-          break;
-        }
-      case 'KeyboardEvents':
-        {
-          const init = evt.initKeyboardEvent || evt.initKeyEvent; // webkit || moz
-          common.defaults(params, {
-            cancelable: true,
-            ctrlKey: false,
-            altKey: false,
-            shiftKey: false,
-            metaKey: false,
-            keyCode: undefined,
-            charCode: undefined
-          });
-          init(eventType, params.bubbles || false,
-            params.cancelable, window,
-            params.ctrlKey, params.altKey,
-            params.shiftKey, params.metaKey,
-            params.keyCode, params.charCode);
-          break;
-        }
-      default:
-        {
-          evt.initEvent(eventType, params.bubbles || false, params.cancelable || true);
-          break;
-        }
+      case "MouseEvents": {
+        const clientX = params.x || params.clientX || 0;
+        const clientY = params.y || params.clientY || 0;
+        evt.initMouseEvent(
+          eventType,
+          params.bubbles || false,
+          params.cancelable || true,
+          window,
+          params.clickCount || 1,
+          0, // screen X
+          0, // screen Y
+          clientX, // client X
+          clientY, // client Y
+          false,
+          false,
+          false,
+          false,
+          0,
+          null
+        );
+        break;
+      }
+      case "KeyboardEvents": {
+        const init = evt.initKeyboardEvent || evt.initKeyEvent; // webkit || moz
+        common.defaults(params, {
+          cancelable: true,
+          ctrlKey: false,
+          altKey: false,
+          shiftKey: false,
+          metaKey: false,
+          keyCode: undefined,
+          charCode: undefined
+        });
+        init(
+          eventType,
+          params.bubbles || false,
+          params.cancelable,
+          window,
+          params.ctrlKey,
+          params.altKey,
+          params.shiftKey,
+          params.metaKey,
+          params.keyCode,
+          params.charCode
+        );
+        break;
+      }
+      default: {
+        evt.initEvent(eventType, params.bubbles || false, params.cancelable || true);
+        break;
+      }
     }
     common.defaults(evt, aux);
     elem.dispatchEvent(evt);
@@ -166,7 +180,7 @@ const dom = {
     if (elem.addEventListener) {
       elem.addEventListener(event, func, bool);
     } else if (elem.attachEvent) {
-      elem.attachEvent('on' + event, func);
+      elem.attachEvent("on" + event, func);
     }
     return dom;
   },
@@ -183,7 +197,7 @@ const dom = {
     if (elem.removeEventListener) {
       elem.removeEventListener(event, func, bool);
     } else if (elem.detachEvent) {
-      elem.detachEvent('on' + event, func);
+      elem.detachEvent("on" + event, func);
     }
     return dom;
   },
@@ -200,7 +214,10 @@ const dom = {
       const classes = elem.className.split(/ +/);
       if (classes.indexOf(className) === -1) {
         classes.push(className);
-        elem.className = classes.join(' ').replace(/^\s+/, '').replace(/\s+$/, '');
+        elem.className = classes
+          .join(" ")
+          .replace(/^\s+/, "")
+          .replace(/\s+$/, "");
       }
     }
     return dom;
@@ -214,13 +231,13 @@ const dom = {
   removeClass: function(elem, className) {
     if (className) {
       if (elem.className === className) {
-        elem.removeAttribute('class');
+        elem.removeAttribute("class");
       } else {
         const classes = elem.className.split(/ +/);
         const index = classes.indexOf(className);
         if (index !== -1) {
           classes.splice(index, 1);
-          elem.className = classes.join(' ');
+          elem.className = classes.join(" ");
         }
       }
     } else {
@@ -230,7 +247,7 @@ const dom = {
   },
 
   hasClass: function(elem, className) {
-    return new RegExp('(?:^|\\s+)' + className + '(?:\\s+|$)').test(elem.className) || false;
+    return new RegExp("(?:^|\\s+)" + className + "(?:\\s+|$)").test(elem.className) || false;
   },
 
   /**
@@ -240,11 +257,13 @@ const dom = {
   getWidth: function(elem) {
     const style = getComputedStyle(elem);
 
-    return cssValueToPixels(style['border-left-width']) +
-      cssValueToPixels(style['border-right-width']) +
-      cssValueToPixels(style['padding-left']) +
-      cssValueToPixels(style['padding-right']) +
-      cssValueToPixels(style.width);
+    return (
+      cssValueToPixels(style["border-left-width"]) +
+      cssValueToPixels(style["border-right-width"]) +
+      cssValueToPixels(style["padding-left"]) +
+      cssValueToPixels(style["padding-right"]) +
+      cssValueToPixels(style.width)
+    );
   },
 
   /**
@@ -254,11 +273,13 @@ const dom = {
   getHeight: function(elem) {
     const style = getComputedStyle(elem);
 
-    return cssValueToPixels(style['border-top-width']) +
-      cssValueToPixels(style['border-bottom-width']) +
-      cssValueToPixels(style['padding-top']) +
-      cssValueToPixels(style['padding-bottom']) +
-      cssValueToPixels(style.height);
+    return (
+      cssValueToPixels(style["border-top-width"]) +
+      cssValueToPixels(style["border-bottom-width"]) +
+      cssValueToPixels(style["padding-top"]) +
+      cssValueToPixels(style["padding-bottom"]) +
+      cssValueToPixels(style.height)
+    );
   },
 
   /**
@@ -286,7 +307,6 @@ const dom = {
   isActive: function(elem) {
     return elem === document.activeElement && (elem.type || elem.href);
   }
-
 };
 
 export default dom;

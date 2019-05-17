@@ -11,9 +11,9 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import NumberController from './NumberController';
-import dom from '../dom/dom';
-import common from '../utils/common';
+import NumberController from "./NumberController";
+import dom from "../dom/dom";
+import common from "../utils/common";
 
 function roundToDecimal(value, decimals) {
   const tenTo = Math.pow(10, decimals);
@@ -53,7 +53,7 @@ class NumberControllerBox extends NumberController {
 
     function onChange() {
       var value = _this.__input.value;
-      if(params && params.suffix){
+      if (params && params.suffix) {
         value = value.replace(params.suffix, "");
       }
       const attempted = parseFloat(value);
@@ -80,26 +80,26 @@ class NumberControllerBox extends NumberController {
     }
 
     function onMouseUp() {
-      dom.unbind(window, 'mousemove', onMouseDrag);
-      dom.unbind(window, 'mouseup', onMouseUp);
+      dom.unbind(window, "mousemove", onMouseDrag);
+      dom.unbind(window, "mouseup", onMouseUp);
       onFinish();
     }
 
     function onMouseDown(e) {
-      dom.bind(window, 'mousemove', onMouseDrag);
-      dom.bind(window, 'mouseup', onMouseUp);
+      dom.bind(window, "mousemove", onMouseDrag);
+      dom.bind(window, "mouseup", onMouseUp);
       prevY = e.clientY;
     }
 
-    this.__input = document.createElement('input');
-    this.__input.setAttribute('type', 'text');
+    this.__input = document.createElement("input");
+    this.__input.setAttribute("type", "text");
 
     // Makes it so manually specified values are not truncated.
 
-    dom.bind(this.__input, 'change', onChange);
-    dom.bind(this.__input, 'blur', onBlur);
-    dom.bind(this.__input, 'mousedown', onMouseDown);
-    dom.bind(this.__input, 'keydown', function(e) {
+    dom.bind(this.__input, "change", onChange);
+    dom.bind(this.__input, "blur", onBlur);
+    dom.bind(this.__input, "mousedown", onMouseDown);
+    dom.bind(this.__input, "keydown", function(e) {
       // When pressing enter, you can be as precise as you want.
       if (e.keyCode === 13) {
         _this.__truncationSuspended = true;
@@ -118,7 +118,9 @@ class NumberControllerBox extends NumberController {
     // if (dom.isActive(this.__input)) return this; // prevent number from updating if user is trying to manually update
 
     var suffix = params && params.suffix ? params.suffix : "";
-    this.__input.value = this.__truncationSuspended ? this.getValue() : roundToDecimal(this.getValue(), this.__precision) + suffix;
+    this.__input.value = this.__truncationSuspended
+      ? this.getValue()
+      : roundToDecimal(this.getValue(), this.__precision) + suffix;
     return super.updateDisplay();
   }
 }

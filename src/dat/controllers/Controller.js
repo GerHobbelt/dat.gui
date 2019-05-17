@@ -25,7 +25,7 @@ class Controller {
      * Those who extend this class will put their DOM elements in here.
      * @type {DOMElement}
      */
-    this.domElement = document.createElement('div');
+    this.domElement = document.createElement("div");
 
     /**
      * The object to manipulate
@@ -127,10 +127,9 @@ class Controller {
   }
 
   borderWidth(px) {
-    this.__li.style.borderLeftWidth = px + 'px';
+    this.__li.style.borderLeftWidth = px + "px";
     return this;
   }
-
 }
 
 export default Controller;

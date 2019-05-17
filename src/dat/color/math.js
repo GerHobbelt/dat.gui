@@ -19,17 +19,10 @@ const ColorMath = {
 
     const f = h / 60 - Math.floor(h / 60);
     const p = v * (1.0 - s);
-    const q = v * (1.0 - (f * s));
-    const t = v * (1.0 - ((1.0 - f) * s));
+    const q = v * (1.0 - f * s);
+    const t = v * (1.0 - (1.0 - f) * s);
 
-    const c = [
-      [v, t, p],
-      [q, v, p],
-      [p, v, t],
-      [p, q, v],
-      [t, p, v],
-      [v, p, q]
-    ][hi];
+    const c = [[v, t, p], [q, v, p], [p, v, t], [p, q, v], [t, p, v], [v, p, q]][hi];
 
     return {
       r: c[0] * 255,
@@ -82,11 +75,11 @@ const ColorMath = {
   },
 
   component_from_hex: function(hex, componentIndex) {
-    return (hex >> (componentIndex * 8)) & 0xFF;
+    return (hex >> (componentIndex * 8)) & 0xff;
   },
 
   hex_with_component: function(hex, componentIndex, value) {
-    return value << (tmpComponent = componentIndex * 8) | (hex & ~(0xFF << tmpComponent));
+    return (value << (tmpComponent = componentIndex * 8)) | (hex & ~(0xff << tmpComponent));
   }
 };
 

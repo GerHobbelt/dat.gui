@@ -14,13 +14,12 @@
 var path = require("path");
 
 module.exports = {
-  target: 'web',
+  target: "web",
 
-  context: path.resolve(__dirname, '..', 'src'),
+  context: path.resolve(__dirname, "..", "src"),
 
   entry: {
-    main: '../index',
-
+    main: "../index"
   },
 
   module: {
@@ -28,46 +27,46 @@ module.exports = {
       {
         test: /\.js$/,
         exclude: /(node_modules|bower_components)/,
-        loader: 'eslint-loader'
-      },
+        loader: "eslint-loader"
+      }
     ],
     loaders: [
       {
         test: /\.js$/,
-        loader: 'babel',
+        loader: "babel",
         exclude: /(node_modules|bower_components)/,
         query: {
-          presets: [["es2015", {"loose": true}], "stage-0"],
+          presets: [["es2015", { loose: true }], "stage-0"],
           plugins: ["add-module-exports"]
         }
       },
       {
         test: /\.css$/,
-        loader: 'style-loader!css-loader'
+        loader: "style-loader!css-loader"
       },
       {
         test: /\.png$/,
-        loader: 'url-loader?limit=100000'
+        loader: "url-loader?limit=100000"
       },
       {
         test: /\.jpg$/,
-        loader: 'file-loader'
+        loader: "file-loader"
       },
       {
         test: /\.scss$/,
-        loader: 'css-loader!sass-loader'
+        loader: "css-loader!sass-loader"
       },
       {
         test: /\.html$/,
-        loader: 'html-loader'
+        loader: "html-loader"
       }
     ]
   },
 
   output: {
-    path: path.join(__dirname, '..', 'build'),
-    filename: 'dat.gui.js',
-    library: ['dat'],
-    libraryTarget: 'umd'
+    path: path.join(__dirname, "..", "build"),
+    filename: "dat.gui.js",
+    library: ["dat"],
+    libraryTarget: "umd"
   }
 };

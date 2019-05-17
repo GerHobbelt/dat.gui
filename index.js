@@ -11,6 +11,6 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import dat from './src/dat/index';
+import dat from "./src/dat/index";
 
 export default dat;

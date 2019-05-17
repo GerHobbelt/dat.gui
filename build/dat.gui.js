@@ -2992,6 +2992,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	    },
 	
 	    /**
+	     * The name of <code>GUI</code>. Used for folders. i.e
+	     * a folder's title
+	     * @type String
+	     */
+	    title: {
+	      get: function get() {
+	        return params.title;
+	      },
+	      set: function set(v) {
+	        params.title = v;
+	        if (titleRow) {
+	          if (_common2.default.isString(params.title)) {
+	            titleRow.setAttribute('title', params.title);
+	          } else {
+	            titleRow.removeAttribute('title');
+	          }
+	        }
+	      }
+	    },
+	
+	    /**
 	     * Whether the <code>GUI</code> is collapsed or not
 	     * @type Boolean
 	     */
@@ -3094,7 +3115,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var _titleRowName = document.createTextNode(params.name);
 	    _dom2.default.addClass(_titleRowName, 'controller-name');
 	
-	    var titleRow = addRow(_this, _titleRowName);
+	    var _titleRow = addRow(_this, _titleRowName);
+	
+	    if (_common2.default.isString(params.title)) {
+	      _titleRow.setAttribute('title', params.title);
+	    }
 	
 	    var onClickTitle = function onClickTitle(e) {
 	      e.preventDefault();
@@ -3104,8 +3129,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    _dom2.default.addClass(this.__ul, GUI.CLASS_CLOSED);
 	
-	    _dom2.default.addClass(titleRow, 'title');
-	    _dom2.default.bind(titleRow, 'click', onClickTitle);
+	    _dom2.default.addClass(_titleRow, 'title');
+	    _dom2.default.bind(_titleRow, 'click', onClickTitle);
 	
 	    if (!params.closed) {
 	      this.closed = false;
@@ -3265,19 +3290,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  /**
 	   * @param name
+	   * @param [title]
 	   * @returns {dat.gui.GUI} The new folder.
 	   * @throws {Error} if this GUI already has a folder by the specified
 	   * name
 	   * @instance
 	   */
-	  addFolder: function addFolder(name) {
+	  addFolder: function addFolder(name, title) {
 	    // We have to prevent collisions on names in order to have a key
 	    // by which to remember saved values
 	    if (this.__folders[name] !== undefined) {
 	      throw new Error('You already have a folder in this GUI by the' + ' name "' + name + '"');
 	    }
 	
-	    var newGuiParams = { name: name, parent: this };
+	    var newGuiParams = { name: name, parent: this, title: title };
 	
 	    // We need to pass down the autoPlace trait so that we can
 	    // attach event listeners to open/close folder actions to
@@ -3582,6 +3608,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    name: function name(v) {
 	      controller.__li.firstElementChild.firstElementChild.innerHTML = v;
+	      return controller;
+	    },
+	
+	    title: function title(v) {
+	      if (_common2.default.isString(v)) {
+	        controller.__li.setAttribute('title', v);
+	      } else {
+	        controller.__li.removeAttribute('title');
+	      }
 	      return controller;
 	    },
 	

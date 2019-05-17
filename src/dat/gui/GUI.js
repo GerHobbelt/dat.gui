@@ -274,6 +274,27 @@ const GUI = function(pars) {
       },
 
       /**
+       * The name of <code>GUI</code>. Used for folders. i.e
+       * a folder's title
+       * @type String
+       */
+      title: {
+        get: function() {
+          return params.title;
+        },
+        set: function(v) {
+          params.title = v;
+          if (titleRow) {
+            if (common.isString(params.title)) {
+              titleRow.setAttribute('title', params.title);
+            } else {
+              titleRow.removeAttribute('title');
+            }
+          }
+        }
+      },
+
+      /**
        * Whether the <code>GUI</code> is collapsed or not
        * @type Boolean
        */
@@ -377,6 +398,10 @@ const GUI = function(pars) {
     dom.addClass(titleRowName, 'controller-name');
 
     const titleRow = addRow(_this, titleRowName);
+
+    if (common.isString(params.title)) {
+      titleRow.setAttribute('title', params.title);
+    }
 
     const onClickTitle = function(e) {
       e.preventDefault();
@@ -597,12 +622,13 @@ common.extend(
     /**
      * Creates a new subfolder GUI instance.
      * @param name
+     * @param [title]
      * @returns {dat.gui.GUI} The new folder.
      * @throws {Error} if this GUI already has a folder by the specified
      * name
      * @instance
      */
-    addFolder: function(name) {
+    addFolder: function(name, title) {
       // We have to prevent collisions on names in order to have a key
       // by which to remember saved values
       if (this.__folders[name] !== undefined) {
@@ -610,7 +636,7 @@ common.extend(
           ' name "' + name + '"');
       }
 
-      const newGuiParams = { name: name, parent: this };
+      const newGuiParams = { name: name, parent: this, title: title };
 
       // We need to pass down the autoPlace trait so that we can
       // attach event listeners to open/close folder actions to
@@ -941,6 +967,15 @@ function augmentController(gui, li, controller) {
 
     name: function (v) {
       controller.__li.firstElementChild.firstElementChild.innerHTML = v;
+      return controller;
+    },
+
+    title: function (v) {
+      if (common.isString(v)) {
+        controller.__li.setAttribute('title', v);
+      } else {
+        controller.__li.removeAttribute('title');
+      }
       return controller;
     },
 

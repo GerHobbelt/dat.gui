@@ -11,8 +11,8 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import Controller from './Controller';
-import dom from '../dom/dom';
+import Controller from "./Controller";
+import dom from "../dom/dom";
 
 /**
  * @class Provides a text input to alter the string property of an object.
@@ -40,13 +40,13 @@ class StringController extends Controller {
       }
     }
 
-    this.__input = document.createElement('input');
-    this.__input.setAttribute('type', 'text');
+    this.__input = document.createElement("input");
+    this.__input.setAttribute("type", "text");
 
-    dom.bind(this.__input, 'keyup', onChange);
-    dom.bind(this.__input, 'change', onChange);
-    dom.bind(this.__input, 'blur', onBlur);
-    dom.bind(this.__input, 'keydown', function(e) {
+    dom.bind(this.__input, "keyup", onChange);
+    dom.bind(this.__input, "change", onChange);
+    dom.bind(this.__input, "blur", onBlur);
+    dom.bind(this.__input, "keydown", function(e) {
       if (e.keyCode === 13) {
         this.blur();
       }

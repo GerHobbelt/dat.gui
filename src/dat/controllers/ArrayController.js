@@ -13,9 +13,9 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import Controller from './Controller';
-import dom from '../dom/dom';
-import common from '../utils/common';
+import Controller from "./Controller";
+import dom from "../dom/dom";
+import common from "../utils/common";
 
 /**
  * @class Provides a text input to alter the array property of an object.
@@ -34,16 +34,16 @@ class ArrayController extends Controller {
 
     const _this = this;
 
-    this.__div = document.createElement('div');
+    this.__div = document.createElement("div");
     this.__inputs = [];
 
-    this.__new = document.createElement('input');
-    this.__new.setAttribute('type', 'text');
-    dom.bind(this.__new, 'keydown', function(e) {
+    this.__new = document.createElement("input");
+    this.__new.setAttribute("type", "text");
+    dom.bind(this.__new, "keydown", function(e) {
       if (e.keyCode === 13) {
         const values = _this.getValue();
         values.push(_this.__new.value);
-        _this.__new.value = '';
+        _this.__new.value = "";
 
         _this.updateDisplay();
       }
@@ -71,25 +71,25 @@ class ArrayController extends Controller {
 
     this.__inputs = [];
 
-    this.getValue().forEach(function (v) {
-      const group = document.createElement('div');
-      dom.addClass(group, 'array-input');
-      const input = document.createElement('input');
+    this.getValue().forEach(function(v) {
+      const group = document.createElement("div");
+      dom.addClass(group, "array-input");
+      const input = document.createElement("input");
       group.appendChild(input);
-      input.setAttribute('type', 'text');
+      input.setAttribute("type", "text");
       input.value = v;
 
-      const remove = document.createElement('span');
-      remove.innerHTML = '&nbsp;';
-      dom.addClass(remove, 'remove-icon');
+      const remove = document.createElement("span");
+      remove.innerHTML = "&nbsp;";
+      dom.addClass(remove, "remove-icon");
       group.appendChild(remove);
 
-      dom.bind(remove, 'click', onRemove);
+      dom.bind(remove, "click", onRemove);
 
-      dom.bind(input, 'keyup', onChange);
-      dom.bind(input, 'change', onChange);
-      dom.bind(input, 'blur', onBlur);
-      dom.bind(input, 'keydown', function(e) {
+      dom.bind(input, "keyup", onChange);
+      dom.bind(input, "change", onChange);
+      dom.bind(input, "blur", onBlur);
+      dom.bind(input, "keydown", function(e) {
         if (e.keyCode === 13) {
           this.blur();
         }
@@ -102,21 +102,20 @@ class ArrayController extends Controller {
     function onRemove(e) {
       for (let i = 0; i < _this.__inputs.length; i++) {
         if (_this.__inputs[i].parentElement === e.target.parentElement) {
-          const values = _this.getValue().filter(v => v !== _this.__inputs[i].value)
-          _this.setValue(values)
+          const values = _this.getValue().filter(v => v !== _this.__inputs[i].value);
+          _this.setValue(values);
         }
       }
     }
 
     function onChange() {
-
       if (_this.__changing) {
         return;
       }
 
       _this.__changing = true;
 
-      const values = _this.__inputs.map(function (i) {
+      const values = _this.__inputs.map(function(i) {
         return i.value;
       });
 

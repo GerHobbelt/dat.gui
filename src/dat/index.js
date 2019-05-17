@@ -11,23 +11,23 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import Color from './color/Color';
-import math from './color/math';
-import interpret from './color/interpret';
+import Color from "./color/Color";
+import math from "./color/math";
+import interpret from "./color/interpret";
 
-import Controller from './controllers/Controller';
-import BooleanController from './controllers/BooleanController';
-import OptionController from './controllers/OptionController';
-import StringController from './controllers/StringController';
-import NumberController from './controllers/NumberController';
-import NumberControllerBox from './controllers/NumberControllerBox';
-import NumberControllerSlider from './controllers/NumberControllerSlider';
-import FunctionController from './controllers/FunctionController';
-import ColorController from './controllers/ColorController';
-import ArrayController from './controllers/ArrayController';
+import Controller from "./controllers/Controller";
+import BooleanController from "./controllers/BooleanController";
+import OptionController from "./controllers/OptionController";
+import StringController from "./controllers/StringController";
+import NumberController from "./controllers/NumberController";
+import NumberControllerBox from "./controllers/NumberControllerBox";
+import NumberControllerSlider from "./controllers/NumberControllerSlider";
+import FunctionController from "./controllers/FunctionController";
+import ColorController from "./controllers/ColorController";
+import ArrayController from "./controllers/ArrayController";
 
-import dom from './dom/dom';
-import GUI from './gui/GUI';
+import dom from "./dom/dom";
+import GUI from "./gui/GUI";
 
 export default {
   color: {
@@ -46,7 +46,7 @@ export default {
     NumberControllerSlider: NumberControllerSlider,
     FunctionController: FunctionController,
     ColorController: ColorController,
-    ArrayController: ArrayController,
+    ArrayController: ArrayController
   },
 
   dom: {

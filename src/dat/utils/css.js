@@ -14,22 +14,23 @@
 module.exports = {
   load: function(url, indoc) {
     const doc = indoc || document;
-    const link = doc.createElement('link');
-    link.type = 'text/css';
-    link.rel = 'stylesheet';
+    const link = doc.createElement("link");
+    link.type = "text/css";
+    link.rel = "stylesheet";
     link.href = url;
-    doc.getElementsByTagName('head')[0].appendChild(link);
+    doc.getElementsByTagName("head")[0].appendChild(link);
   },
 
   inject: function(css, indoc) {
     const doc = indoc || document;
-    const injected = document.createElement('style');
-    injected.type = 'text/css';
+    const injected = document.createElement("style");
+    injected.type = "text/css";
     injected.innerHTML = css;
-    const head = doc.getElementsByTagName('head')[0];
+    const head = doc.getElementsByTagName("head")[0];
     try {
       head.appendChild(injected);
-    } catch (e) { // Unable to inject CSS, probably because of a Content Security Policy
+    } catch (e) {
+      // Unable to inject CSS, probably because of a Content Security Policy
     }
   }
 };

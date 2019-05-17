@@ -600,7 +600,7 @@
     }
   });
 
-  var Controller$1 = (function() {
+  var Controller = (function() {
     function Controller(object, property) {
       this.initialValue = object[property];
       this.domElement = document.createElement("div");
@@ -900,7 +900,7 @@
       return _Controller.prototype.updateDisplay.call(this);
     };
     return BooleanController;
-  })(Controller$1);
+  })(Controller);
 
   var OptionController = (function(_Controller) {
     _inheritsLoose(OptionController, _Controller);
@@ -945,7 +945,7 @@
       return _Controller.prototype.updateDisplay.call(this);
     };
     return OptionController;
-  })(Controller$1);
+  })(Controller);
 
   var StringController = (function(_Controller) {
     _inheritsLoose(StringController, _Controller);
@@ -983,7 +983,7 @@
       return _Controller.prototype.updateDisplay.call(this);
     };
     return StringController;
-  })(Controller$1);
+  })(Controller);
 
   function numDecimals(x) {
     var _x = x.toString();
@@ -1041,7 +1041,7 @@
       return this;
     };
     return NumberController;
-  })(Controller$1);
+  })(Controller);
 
   function roundToDecimal(value, decimals) {
     var tenTo = Math.pow(10, decimals);
@@ -1243,7 +1243,7 @@
       }
     };
     return FunctionController;
-  })(Controller$1);
+  })(Controller);
 
   var TabbedController = (function(_Controller) {
     _inheritsLoose(TabbedController, _Controller);
@@ -1519,7 +1519,7 @@
       });
     };
     return ColorController;
-  })(Controller$1);
+  })(Controller);
   var vendors = ["-moz-", "-o-", "-webkit-", "-ms-", ""];
   function linearGradient(elem, x, a, b) {
     elem.style.background = "";
@@ -2656,7 +2656,7 @@
       });
     };
     return ImageController;
-  })(Controller$1);
+  })(Controller);
 
   var css = {
     load: function load(url, indoc) {
@@ -2812,7 +2812,7 @@
       this.__temp[1] = 1;
     };
     return VectorController;
-  })(Controller$1);
+  })(Controller);
 
   var ControllerFactory = function ControllerFactory(object, property) {
     var initialValue = object[property];
@@ -3314,13 +3314,13 @@
         factoryArgs: Array.prototype.slice.call(arguments, 3)
       });
     },
-    addColor: function addColor(object, property) {
-      return _add(this, object, property, {
+    addColor: function addColor(object, property, label) {
+      return _add(this, object, property, label, {
         color: true
       });
     },
-    addImage: function addImage(object, property) {
-      return _add(this, object, property, {
+    addImage: function addImage(object, property, label) {
+      return _add(this, object, property, label, {
         factoryArgs: Array.prototype.slice.call(arguments, 2),
         image: true
       });
@@ -3563,7 +3563,7 @@
         if (arguments.length > 1) {
           var nextSibling = controller.__li.nextElementSibling;
           controller.remove();
-          return _add(gui, controller.object, controller.property, {
+          return _add(gui, controller.object, controller.property, controller.label, {
             before: nextSibling,
             factoryArgs: [Common.toArray(arguments)]
           });
@@ -3571,7 +3571,7 @@
         if (Common.isArray(_options) || Common.isObject(_options)) {
           var _nextSibling = controller.__li.nextElementSibling;
           controller.remove();
-          return _add(gui, controller.object, controller.property, {
+          return _add(gui, controller.object, controller.property, controller.label, {
             before: _nextSibling,
             factoryArgs: [_options]
           });
@@ -3629,7 +3629,7 @@
           var oldName = controller.__li.firstElementChild.firstElementChild.innerHTML;
           var wasListening = controller.__gui.__listening.indexOf(controller) > -1;
           controller.remove();
-          var newController = _add(gui, controller.object, controller.property, {
+          var newController = _add(gui, controller.object, controller.property, controller.label, {
             before: controller.__li.nextElementSibling,
             factoryArgs: [controller.__min, controller.__max, controller.__step]
           });
@@ -3728,7 +3728,7 @@
       var factoryArgs = [object, property].concat(params.factoryArgs);
       controller = ControllerFactory.apply(gui, factoryArgs);
     }
-    if (params.before instanceof Controller$1) {
+    if (params.before instanceof Controller) {
       params.before = params.before.__li;
     }
     recallSavedValue(gui, controller);
@@ -3928,7 +3928,7 @@
     interpret: interpret
   };
   var controllers = {
-    Controller: Controller$1,
+    Controller: Controller,
     BooleanController: BooleanController,
     OptionController: OptionController,
     StringController: StringController,

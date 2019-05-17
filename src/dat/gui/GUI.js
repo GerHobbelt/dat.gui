@@ -583,8 +583,8 @@ common.extend(
      * gui.addColor(palette, 'color3');
      * gui.addColor(palette, 'color4');
      */
-    addColor: function(object, property) {
-      return add(this, object, property, {
+    addColor: function(object, property, label) {
+      return add(this, object, property, label, {
         color: true
       });
     },
@@ -595,8 +595,8 @@ common.extend(
      * @returns {dat.controllers.ImageController } THe new controller that was added.
      * @instance
      */
-    addImage: function(object, property) {
-      return add(this, object, property, {
+    addImage: function(object, property, label) {
+      return add(this, object, property, label, {
         factoryArgs: Array.prototype.slice.call(arguments, 2),
         image: true
       });
@@ -993,7 +993,7 @@ function augmentController(gui, li, controller) {
           const nextSibling = controller.__li.nextElementSibling;
           controller.remove();
 
-          return add(gui, controller.object, controller.property, {
+          return add(gui, controller.object, controller.property, controller.label, {
             before: nextSibling,
             factoryArgs: [common.toArray(arguments)]
           });
@@ -1003,7 +1003,7 @@ function augmentController(gui, li, controller) {
           const nextSibling = controller.__li.nextElementSibling;
           controller.remove();
 
-          return add(gui, controller.object, controller.property, {
+          return add(gui, controller.object, controller.property, controller.label, {
             before: nextSibling,
             factoryArgs: [options]
           });
@@ -1090,7 +1090,7 @@ function augmentController(gui, li, controller) {
         const wasListening = controller.__gui.__listening.indexOf(controller) > -1;
 
         controller.remove();
-        const newController = add(gui, controller.object, controller.property, {
+        const newController = add(gui, controller.object, controller.property, controller.label, {
           before: controller.__li.nextElementSibling,
           factoryArgs: [controller.__min, controller.__max, controller.__step]
         });

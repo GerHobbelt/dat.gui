@@ -11,7 +11,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import FunctionController from './Controller';
+import Controller from './Controller';
 import dom from '../dom/dom';
 
 /**

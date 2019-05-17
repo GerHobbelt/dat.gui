@@ -62,6 +62,7 @@ $button-height: 20px;
       /*opacity: 0;*/
       @include transition(opacity, 0.1s, linear);
       border: 0;
+      /*position: absolute;*/
 
       line-height: $button-height - 1;
       height: $button-height;

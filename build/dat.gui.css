@@ -52,6 +52,7 @@
       -moz-transition: opacity 0.1s linear;
       transition: opacity 0.1s linear;
       border: 0;
+      /*position: absolute;*/
       line-height: 19px;
       height: 20px;
       /* TODO, these are style notes */

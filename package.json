@@ -10,7 +10,9 @@
   },
   "scripts": {
     "test": "tests/index.html",
+    "build": "rollup -c && prettier --print-width 120 --write build/**/*.js && rollup -c rollup.config.min.js",
     "lint": "eslint src",
+    "fix": "eslint --fix src && prettier --print-width 120 --write src/**/*.js",
     "prettier": "prettier --print-width 120 --write *.js **/*.js **/*.ts",
     "pub": "npm publish --access public"
   },
@@ -33,6 +35,9 @@
   },
   "homepage": "https://github.com/dataarts/dat.gui",
   "devDependencies": {
+    "eslint": "^5.16.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.17.2",
     "qunit": "2.9.2",
     "sass": "1.20.1",
     "less": "3.9.0",
@@ -45,5 +50,36 @@
     "amdclean": "2.7.0",
     "@gerhobbelt/grunt-contrib-requirejs": "0.0.0",
     "load-grunt-tasks": "4.0.0"
+  },
+    "eslintConfig": {
+    "extends": "airbnb-base",
+    "rules": {
+      "comma-dangle": 0,
+      "func-names": 0,
+      "no-alert": 0,
+      "no-console": 1,
+      "no-unused-vars": 0,
+      "no-multi-assign": 0,
+      "no-use-before-define": 0,
+      "prefer-rest-params": 0,
+      "prefer-template": 0,
+      "prefer-destructuring": "warn",
+      "no-mixed-operators": 0,
+      "no-undef": 0,
+      "no-underscore-dangle": 0,
+      "prefer-arrow-callback": 0,
+      "space-before-function-paren": 0,
+      "global-require": 0,
+      "object-shorthand": 0,
+      "max-len": 0,
+      "no-param-reassign": 0,
+      "consistent-return": 0,
+      "no-restricted-syntax": 0,
+      "no-restricted-globals": 0,
+      "no-bitwise": 0,
+      "no-plusplus": 0,
+      "quotes": ["error", "double", { "avoidEscape": true }]
+    }
   }
+
 }

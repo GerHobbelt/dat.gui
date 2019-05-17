@@ -164,7 +164,8 @@
   .dg .selector.drag {
     display: block; }
   .dg li.save-row {
-    padding: 0; }
+    padding: 0;
+    position: sticky; }
     .dg li.save-row .button {
       display: inline-block;
       padding: 0px 6px; }
@@ -230,11 +231,10 @@
     border-bottom: 1px solid #2c2c2c; }
   .dg li.save-row {
     line-height: 25px;
-    background: #dad5cb;
-    border: 0; }
+    background: #1a1a1a; }
     .dg li.save-row select {
       margin-left: 5px;
-      width: 108px; }
+      width: 70px; }
     .dg li.save-row .button {
       margin-left: 5px;
       margin-top: 1px;
@@ -242,18 +242,18 @@
       font-size: 9px;
       line-height: 7px;
       padding: 4px 4px 5px 4px;
-      background: #c5bdad;
+      background: #010101;
       color: #fff;
-      text-shadow: 0 1px 0 #b0a58f;
-      box-shadow: 0 -1px 0 #b0a58f;
+      text-shadow: 0 1px 0 black;
+      box-shadow: 0 -1px 0 black;
       cursor: pointer; }
       .dg li.save-row .button.gears {
-        background: #c5bdad url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAANCAYAAAB/9ZQ7AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAQJJREFUeNpiYKAU/P//PwGIC/ApCABiBSAW+I8AClAcgKxQ4T9hoMAEUrxx2QSGN6+egDX+/vWT4e7N82AMYoPAx/evwWoYoSYbACX2s7KxCxzcsezDh3evFoDEBYTEEqycggWAzA9AuUSQQgeYPa9fPv6/YWm/Acx5IPb7ty/fw+QZblw67vDs8R0YHyQhgObx+yAJkBqmG5dPPDh1aPOGR/eugW0G4vlIoTIfyFcA+QekhhHJhPdQxbiAIguMBTQZrPD7108M6roWYDFQiIAAv6Aow/1bFwXgis+f2LUAynwoIaNcz8XNx3Dl7MEJUDGQpx9gtQ8YCueB+D26OECAAQDadt7e46D42QAAAABJRU5ErkJggg==) 2px 1px no-repeat;
+        background: #010101 url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAANCAYAAAB/9ZQ7AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAQJJREFUeNpiYKAU/P//PwGIC/ApCABiBSAW+I8AClAcgKxQ4T9hoMAEUrxx2QSGN6+egDX+/vWT4e7N82AMYoPAx/evwWoYoSYbACX2s7KxCxzcsezDh3evFoDEBYTEEqycggWAzA9AuUSQQgeYPa9fPv6/YWm/Acx5IPb7ty/fw+QZblw67vDs8R0YHyQhgObx+yAJkBqmG5dPPDh1aPOGR/eugW0G4vlIoTIfyFcA+QekhhHJhPdQxbiAIguMBTQZrPD7108M6roWYDFQiIAAv6Aow/1bFwXgis+f2LUAynwoIaNcz8XNx3Dl7MEJUDGQpx9gtQ8YCueB+D26OECAAQDadt7e46D42QAAAABJRU5ErkJggg==) 2px 1px no-repeat;
         height: 7px;
         width: 8px; }
       .dg li.save-row .button:hover {
-        background-color: #bab19e;
-        box-shadow: 0 -1px 0 #b0a58f; }
+        background-color: black;
+        box-shadow: 0 -1px 0 black; }
   .dg li.folder {
     border-bottom: 0; }
   .dg li.title {

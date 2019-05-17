@@ -35,7 +35,11 @@
 
     gui.add(obj, 'message');
     gui.add(obj, 'displayOutline');
-    gui.add(obj, 'explode');
+    var controller = gui.add(obj, 'explode').borderColor("red").borderWidth(10);
+    console.log(controller.__li.style);
+
+  
+    
 
     gui.add(obj, 'maxSize').min(-10).max(10).step(0.25);
     gui.add(obj, 'height').step(5); // Increment amount

@@ -28,6 +28,7 @@ import common from '../utils/common';
 import styleSheet from './style.scss'; // CSS to embed in build
 
 css.inject(styleSheet);
+// var scope = this;
 
 /** @ignore Outer-most className for GUI's */
 const CSS_NAMESPACE = 'dg';
@@ -167,7 +168,7 @@ const GUI = function(pars) {
   if (params.autoPlace && common.isUndefined(params.scrollable)) {
     params.scrollable = true;
   }
-//    params.scrollable = common.isUndefined(params.parent) && params.scrollable === true;
+  //    params.scrollable = common.isUndefined(params.parent) && params.scrollable === true;
 
   // Not part of params because I don't want people passing this in via
   // constructor. Should be a 'remembered' value.
@@ -178,7 +179,7 @@ const GUI = function(pars) {
   let saveToLocalStorage;
 
   Object.defineProperties(this,
-    /** @lends GUI.prototype */
+    /** @lends dat.gui.GUI.prototype */
     {
       /**
        * The parent <code>GUI</code>
@@ -835,7 +836,19 @@ common.extend(
       }
     },
 
-    listen: function(controller) {
+    delete: function() {
+      if (this.preset === DEFAULT_DEFAULT_PRESET_NAME) {
+        alert("Default preset can't be deleted.");
+        return;
+      }
+      const opt = this.__preset_select[this.__preset_select.selectedIndex];
+      deletePresetOption(this, opt);
+      delete this.load.remembered[this.preset];
+      this.preset = DEFAULT_DEFAULT_PRESET_NAME;
+      this.saveToLocalStorageIfPossible();
+    },
+
+    listen: function (controller) {
       const init = this.__listening.length === 0;
       this.__listening.push(controller);
       if (init) {
@@ -843,11 +856,11 @@ common.extend(
       }
     },
 
-    updateDisplay: function() {
-      common.each(this.__controllers, function(controller) {
+    updateDisplay: function () {
+      common.each(this.__controllers, function (controller) {
         controller.updateDisplay();
       });
-      common.each(this.__folders, function(folder) {
+      common.each(this.__folders, function (folder) {
         folder.updateDisplay();
       });
     }
@@ -894,7 +907,7 @@ function augmentController(gui, li, controller) {
   controller.__gui = gui;
 
   common.extend(controller, {
-    options: function(options) {
+    options: function (options) {
       if (arguments.length > 1) {
         const nextSibling = controller.__li.nextElementSibling;
         controller.remove();
@@ -926,17 +939,17 @@ function augmentController(gui, li, controller) {
       }
     },
 
-    name: function(v) {
+    name: function (v) {
       controller.__li.firstElementChild.firstElementChild.innerHTML = v;
       return controller;
     },
 
-    listen: function() {
+    listen: function () {
       controller.__gui.listen(controller);
       return controller;
     },
 
-    remove: function() {
+    remove: function () {
       controller.__gui.remove(controller);
       return controller;
     }
@@ -947,10 +960,10 @@ function augmentController(gui, li, controller) {
     const box = new NumberControllerBox(controller.object, controller.property,
       { min: controller.__min, max: controller.__max, step: controller.__step });
 
-    common.each(['updateDisplay', 'onChange', 'onFinishChange', 'step'], function(method) {
+    common.each(['updateDisplay', 'onChange', 'onFinishChange', 'step'], function (method) {
       const pc = controller[method];
       const pb = box[method];
-      controller[method] = box[method] = function() {
+      controller[method] = box[method] = function () {
         const args = Array.prototype.slice.call(arguments);
         pb.apply(box, args);
         return pc.apply(controller, args);
@@ -960,7 +973,7 @@ function augmentController(gui, li, controller) {
     dom.addClass(li, 'has-slider');
     controller.domElement.insertBefore(box.domElement, controller.domElement.firstElementChild);
   } else if (controller instanceof NumberControllerBox) {
-    const r = function(returned) {
+    const r = function (returned) {
       // Have we defined both boundaries?
       if (common.isNumber(controller.__min) && common.isNumber(controller.__max)) {
         // Well, then lets just replace this with a slider.
@@ -991,28 +1004,28 @@ function augmentController(gui, li, controller) {
     controller.min = common.compose(r, controller.min);
     controller.max = common.compose(r, controller.max);
   } else if (controller instanceof BooleanController) {
-    dom.bind(li, 'click', function() {
+    dom.bind(li, 'click', function () {
       dom.fakeEvent(controller.__checkbox, 'click');
     });
 
-    dom.bind(controller.__checkbox, 'click', function(e) {
+    dom.bind(controller.__checkbox, 'click', function (e) {
       e.stopPropagation(); // Prevents double-toggle
     });
   } else if (controller instanceof FunctionController) {
-    dom.bind(li, 'click', function() {
+    dom.bind(li, 'click', function () {
       dom.fakeEvent(controller.__button, 'click');
     });
 
-    dom.bind(li, 'mouseover', function() {
+    dom.bind(li, 'mouseover', function () {
       dom.addClass(controller.__button, 'hover');
     });
 
-    dom.bind(li, 'mouseout', function() {
+    dom.bind(li, 'mouseout', function () {
       dom.removeClass(controller.__button, 'hover');
     });
   } else if (controller instanceof ColorController) {
     dom.addClass(li, 'color');
-    controller.updateDisplay = common.compose(function(val) {
+    controller.updateDisplay = common.compose(function (val) {
       li.style.borderLeftColor = controller.__color.toString();
       return val;
     }, controller.updateDisplay);
@@ -1020,7 +1033,7 @@ function augmentController(gui, li, controller) {
     controller.updateDisplay();
   }
 
-  controller.setValue = common.compose(function(val) {
+  controller.setValue = common.compose(function (val) {
     if (gui.getRoot().__preset_select && controller.isModified()) {
       markPresetModified(gui.getRoot(), true);
     }
@@ -1144,6 +1157,11 @@ function addPresetOption(gui, name, setSelected) {
   }
 }
 
+function deletePresetOption(gui, name) {
+  gui.__preset_select.removeChild(name);
+  gui.__preset_select.selectedIndex = 0;
+}
+
 function showHideExplain(gui, explain) {
   explain.style.display = gui.useLocalStorage ? 'block' : 'none';
 }
@@ -1177,17 +1195,22 @@ function addSaveMenu(gui) {
   dom.addClass(button3, 'button');
   dom.addClass(button3, 'revert');
 
+  const button4 = document.createElement('span');
+  button4.innerHTML = 'Delete';
+  dom.addClass(button4, 'button');
+  dom.addClass(button4, 'delete');
+
   const select = gui.__preset_select = document.createElement('select');
 
   if (gui.load && gui.load.remembered) {
-    common.each(gui.load.remembered, function(value, key) {
+    common.each(gui.load.remembered, function (value, key) {
       addPresetOption(gui, key, key === gui.preset);
     });
   } else {
     addPresetOption(gui, DEFAULT_DEFAULT_PRESET_NAME, false);
   }
 
-  dom.bind(select, 'change', function() {
+  dom.bind(select, 'change', function () {
     for (let index = 0; index < gui.__preset_select.length; index++) {
       gui.__preset_select[index].innerHTML = gui.__preset_select[index].value;
     }
@@ -1200,6 +1223,7 @@ function addSaveMenu(gui) {
   div.appendChild(button);
   div.appendChild(button2);
   div.appendChild(button3);
+  div.appendChild(button4);
 
   if (SUPPORTS_LOCAL_STORAGE) {
     const explain = document.getElementById('dg-local-explain');
@@ -1215,7 +1239,7 @@ function addSaveMenu(gui) {
     showHideExplain(gui, explain);
 
     // TODO: Use a boolean controller, fool!
-    dom.bind(localStorageCheckBox, 'change', function() {
+    dom.bind(localStorageCheckBox, 'change', function () {
       gui.useLocalStorage = !gui.useLocalStorage;
       showHideExplain(gui, explain);
     });
@@ -1223,32 +1247,38 @@ function addSaveMenu(gui) {
 
   const newConstructorTextArea = document.getElementById('dg-new-constructor');
 
-  dom.bind(newConstructorTextArea, 'keydown', function(e) {
+  dom.bind(newConstructorTextArea, 'keydown', function (e) {
     if (e.metaKey && (e.which === 67 || e.keyCode === 67)) {
       SAVE_DIALOGUE.hide();
     }
   });
 
-  dom.bind(gears, 'click', function() {
+  dom.bind(gears, 'click', function () {
     newConstructorTextArea.innerHTML = JSON.stringify(gui.getSaveObject(), undefined, 2);
     SAVE_DIALOGUE.show();
     newConstructorTextArea.focus();
     newConstructorTextArea.select();
   });
 
-  dom.bind(button, 'click', function() {
+  dom.bind(button, 'click', function () {
     gui.save();
   });
 
-  dom.bind(button2, 'click', function() {
+  dom.bind(button2, 'click', function () {
     const presetName = prompt('Enter a new preset name.');
     if (presetName) {
       gui.saveAs(presetName);
     }
   });
 
-  dom.bind(button3, 'click', function() {
+  dom.bind(button3, 'click', function () {
     gui.revert();
+  });
+
+  dom.bind(button4, 'click', function () {
+    if (confirm('Are you sure you want to delete this preset?')) {
+      gui.delete();
+    }
   });
 
   // div.appendChild(button2);
@@ -1320,7 +1350,7 @@ function getCurrentPreset(gui, useInitialValues) {
   const toReturn = {};
 
   // For each object I'm remembering
-  common.each(gui.__rememberedObjects, function(val, index) {
+  common.each(gui.__rememberedObjects, function (val, index) {
     const savedValues = {};
 
     // The controllers I've made for thcommon.isObject by property
@@ -1328,7 +1358,7 @@ function getCurrentPreset(gui, useInitialValues) {
       gui.__rememberedObjectIndecesToControllers[index];
 
     // Remember each value for each property
-    common.each(controllerMap, function(controller, property) {
+    common.each(controllerMap, function (controller, property) {
       savedValues[property] = useInitialValues ? controller.initialValue : controller.getValue();
     });
 
@@ -1349,12 +1379,12 @@ function setPresetSelectIndex(gui) {
 
 function updateDisplays(controllerArray) {
   if (controllerArray.length !== 0) {
-    requestAnimationFrame.call(window, function() {
+    requestAnimationFrame.call(window, function () {
       updateDisplays(controllerArray);
     });
   }
 
-  common.each(controllerArray, function(c) {
+  common.each(controllerArray, function (c) {
     c.updateDisplay();
   });
 }

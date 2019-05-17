@@ -22,7 +22,7 @@ See [API.md](API.md) for usage
 
 
 ## Packaged Builds
-The easiest way to use dat.GUI in your code is by using the built source at `build/dat.gui.min.js`. These built JavaScript files bundle all the necessary dependencies to run dat.GUI.
+The easiest way to use dat.GUI in your code is by using the built source at [`build/dat.gui.min.js`](build/dat.gui.min.js). This built JavaScript file bundles all the necessary dependencies to run dat.GUI.
 
 In your `head` tag, include the following code:
 ```html

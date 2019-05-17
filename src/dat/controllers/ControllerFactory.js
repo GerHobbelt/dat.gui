@@ -17,6 +17,7 @@ import NumberControllerSlider from './NumberControllerSlider';
 import StringController from './StringController';
 import FunctionController from './FunctionController';
 import BooleanController from './BooleanController';
+import ColorController from './ColorController';
 import common from '../utils/common';
 
 const ControllerFactory = function(object, property) {
@@ -34,7 +35,7 @@ const ControllerFactory = function(object, property) {
       // has step?
       if (common.isNumber(arguments[4])) {
         return new NumberControllerSlider(object, property,
-                        arguments[2], arguments[3], arguments[4]);
+          arguments[2], arguments[3], arguments[4]);
       }
 
       return new NumberControllerSlider(object, property, arguments[2], arguments[3]);
@@ -42,10 +43,17 @@ const ControllerFactory = function(object, property) {
 
     // number box
     if (common.isNumber(arguments[4])) { // has step
-      return new NumberControllerBox(object, property,
-                        { min: arguments[2], max: arguments[3], step: arguments[4] });
+      return new NumberControllerBox(object, property, { min: arguments[2], max: arguments[3], step: arguments[4] });
     }
     return new NumberControllerBox(object, property, { min: arguments[2], max: arguments[3] });
+  }
+
+  if (
+    (common.isArray(initialValue) && initialValue.length >= 3 && initialValue.length <= 4) ||
+    (common.isObject(initialValue) && initialValue.h && initialValue.s && initialValue.v) ||
+    (common.isString(initialValue) && initialValue[0] === '#' && (initialValue.length === 4 || initialValue.length === 7))
+  ) {
+    return new ColorController(object, property);
   }
 
   if (common.isString(initialValue)) {

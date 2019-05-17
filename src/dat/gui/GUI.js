@@ -79,8 +79,8 @@ const hideableGuis = [];
  *
  * @param {Object} [params]
  * @param {String} [params.name] The name of this GUI.
- * @param {Object} [params.load] JSON object representing the saved state of
- * this GUI.
+ * @param {Object} [params.load] JSON object representing the saved state of this GUI.
+ * @param {Object} [params.object] Providing your object will create a controller for each property automatically
  * @param {dat.gui.GUI} [params.parent] The GUI I'm nested in.
  * @param {Boolean} [params.autoPlace=true]
  * @param {Boolean} [params.hideable=true] If true, GUI is shown/hidden by <kbd>h</kbd> keypress.
@@ -126,12 +126,12 @@ const GUI = function(pars) {
    * @example
    * [
    *  {
-     *    propertyName: Controller,
-     *    anotherPropertyName: Controller
-     *  },
+   *    propertyName: Controller,
+   *    anotherPropertyName: Controller
+   *  },
    *  {
-     *    propertyName: Controller
-     *  }
+   *    propertyName: Controller
+   *  }
    * ]
    */
   this.__rememberedObjectIndecesToControllers = [];
@@ -169,7 +169,7 @@ const GUI = function(pars) {
   if (params.autoPlace && common.isUndefined(params.scrollable)) {
     params.scrollable = true;
   }
-//    params.scrollable = common.isUndefined(params.parent) && params.scrollable === true;
+  //    params.scrollable = common.isUndefined(params.parent) && params.scrollable === true;
 
   // Not part of params because I don't want people passing this in via
   // constructor. Should be a 'remembered' value.
@@ -454,6 +454,12 @@ const GUI = function(pars) {
   if (!params.parent) {
     resetWidth();
   }
+
+  if (common.isObject(params.object)) {
+    common.each(params.object, function(property, propertyName) {
+      _this.add(params.object, propertyName);
+    });
+  }
 };
 
 GUI.toggleHide = function() {
@@ -519,8 +525,7 @@ common.extend(
       return add(
         this,
         object,
-        property,
-        {
+        property, {
           factoryArgs: Array.prototype.slice.call(arguments, 2)
         }
       );
@@ -550,8 +555,7 @@ common.extend(
       return add(
         this,
         object,
-        property,
-        {
+        property, {
           color: true
         }
       );
@@ -581,8 +585,7 @@ common.extend(
       return add(
         this,
         object,
-        property,
-        {
+        property, {
           plotter: true,
           max: max || 10,
           period: (typeof period === 'number') ? period : 500,
@@ -722,15 +725,15 @@ common.extend(
     },
 
     /**
-    * Hides the GUI.
-    */
+     * Hides the GUI.
+     */
     hide: function() {
       this.domElement.style.display = 'none';
     },
 
     /**
-    * Shows the GUI.
-    */
+     * Shows the GUI.
+     */
     show: function() {
       this.domElement.style.display = '';
     },
@@ -985,8 +988,7 @@ function augmentController(gui, li, controller) {
         return add(
           gui,
           controller.object,
-          controller.property,
-          {
+          controller.property, {
             before: nextSibling,
             factoryArgs: [common.toArray(arguments)]
           }
@@ -1000,8 +1002,7 @@ function augmentController(gui, li, controller) {
         return add(
           gui,
           controller.object,
-          controller.property,
-          {
+          controller.property, {
             before: nextSibling,
             factoryArgs: [options]
           }
@@ -1042,8 +1043,7 @@ function augmentController(gui, li, controller) {
 
   // All sliders should be accompanied by a box.
   if (controller instanceof NumberControllerSlider) {
-    const box = new NumberControllerBox(controller.object, controller.property,
-      { min: controller.__min, max: controller.__max, step: controller.__step });
+    const box = new NumberControllerBox(controller.object, controller.property, { min: controller.__min, max: controller.__max, step: controller.__step });
 
     common.each(['updateDisplay', 'onChange', 'onFinishChange', 'step', 'min', 'max'], function(method) {
       const pc = controller[method];
@@ -1071,8 +1071,7 @@ function augmentController(gui, li, controller) {
         const newController = add(
           gui,
           controller.object,
-          controller.property,
-          {
+          controller.property, {
             before: controller.__li.nextElementSibling,
             factoryArgs: [controller.__min, controller.__max, controller.__step]
           });
@@ -1187,6 +1186,7 @@ function add(gui, object, property, params) {
   }
 
   let controller;
+  let value = object[property];
 
   if (params.color) {
     controller = new ColorController(object, property);

@@ -2346,7 +2346,48 @@ dat.GUI = dat.gui.GUI = (function (settings, css, saveDialogueContents, styleShe
           );
 
         },
+        addHifiColor: function(object, property) {
 
+          return add(
+              this,
+              object,
+              property,
+              {
+                hifiColor: true
+              }
+          );
+
+        },
+        /**
+         * @param object
+         * @param property
+         * @returns {dat.controllers.ColorController} The new controller that was added.
+         * @instance
+         */
+        addVec3: function(object, property) {
+
+          return add(
+              this,
+              object,
+              property,
+              {
+                vec3: true
+              }
+          );
+
+        },
+        addQuat: function(object, property) {
+
+          return add(
+              this,
+              object,
+              property,
+              {
+                quat: true
+              }
+          );
+
+        },
         /**
          * @param controller
          * @instance
@@ -3253,6 +3294,10 @@ dat.controllers.factory = (function (OptionController, NumberControllerBox, Numb
           return new BooleanController(object, property);
         }
 
+        if(common.isArray(initialValue)) {
+          return new ArrayController(object, property);
+        }
+
       }
 
     })(dat.controllers.OptionController,
@@ -3328,6 +3373,97 @@ dat.controllers.StringController = (function (settings, Controller, dom, common)
   );
 
   return StringController;
+
+})(dat.controllers.Controller,
+dat.dom.dom,
+dat.utils.common),
+dat.controllers.ArrayController = (function (Controller, dom, common) {
+
+  /**
+   * @class Provides a text input to alter the array property of an object. 
+   *        Automatically converts strings to numbers and boolean values if appropriate.
+   *
+   * @extends dat.controllers.Controller
+   *
+   * @param {Object} object The object to be manipulated
+   * @param {string} property The name of the property to be manipulated
+   *
+   * @member dat.controllers
+   */
+  var ArrayController = function(object, property) {
+
+    ArrayController.superclass.call(this, object, property);
+
+    var _this = this;
+
+    this.__input = document.createElement('input');
+    this.__input.setAttribute('type', 'text');
+
+    dom.bind(this.__input, 'keyup', onChange);
+    dom.bind(this.__input, 'change', onChange);
+    dom.bind(this.__input, 'blur', onBlur);
+    dom.bind(this.__input, 'keydown', function(e) {
+      if (e.keyCode === 13) {
+        this.blur();
+      }
+    });
+    
+
+    function onChange() {
+      var arr = _this.__input.value.replace(/^\s*|\s*$/g, '').split(/\s*,\s*/)
+
+      // The resulting values will all be strings, so convert them here to actual data types
+      for (var i = 0; i < arr.length; i++) {
+        var value = arr[i];
+        if (!isNaN(value)) {
+          arr[i] = +value;
+          continue;
+        }
+        else if (value === 'true') {
+          arr[i] = true;
+        }
+        else if (value === 'false') {
+          arr[i] = false;
+        }
+      }
+      _this.setValue(arr);
+    }
+
+    function onBlur() {
+      if (_this.__onFinishChange) {
+        _this.__onFinishChange.call(_this, _this.getValue());
+      }
+    }
+
+    this.updateDisplay();
+
+    this.domElement.appendChild(this.__input);
+
+  };
+
+  ArrayController.superclass = Controller;
+
+  common.extend(
+
+      ArrayController.prototype,
+      Controller.prototype,
+
+      {
+
+        updateDisplay: function() {
+          // Stops the caret from moving on account of:
+          // keyup -> setValue -> updateDisplay
+          if (!dom.isActive(this.__input)) {
+            this.__input.value = this.getValue();
+          }
+          return ArrayController.superclass.prototype.updateDisplay.call(this);
+        }
+
+      }
+
+  );
+
+  return ArrayController;
 
 })(dat.gui.settings,
 dat.controllers.Controller,

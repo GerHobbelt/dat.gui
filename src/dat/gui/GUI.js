@@ -655,7 +655,48 @@ define([
           );
 
         },
+        addHifiColor: function(object, property) {
 
+          return add(
+              this,
+              object,
+              property,
+              {
+                hifiColor: true
+              }
+          );
+
+        },
+        /**
+         * @param object
+         * @param property
+         * @returns {dat.controllers.ColorController} The new controller that was added.
+         * @instance
+         */
+        addVec3: function(object, property) {
+
+          return add(
+              this,
+              object,
+              property,
+              {
+                vec3: true
+              }
+          );
+
+        },
+        addQuat: function(object, property) {
+
+          return add(
+              this,
+              object,
+              property,
+              {
+                quat: true
+              }
+          );
+
+        },
         /**
          * @param controller
          * @instance

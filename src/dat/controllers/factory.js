@@ -17,6 +17,7 @@ define([
   'dat/controllers/NumberControllerSlider',
   'dat/controllers/StringController',
   'dat/controllers/TextAreaController',
+  'dat/controllers/ArrayController',
   'dat/controllers/FunctionController',
   'dat/controllers/BooleanController',
   'dat/utils/common'
@@ -58,6 +59,10 @@ define([
 
         if (common.isBoolean(initialValue)) {
           return new BooleanController(object, property);
+        }
+
+        if(common.isArray(initialValue)) {
+          return new ArrayController(object, property);
         }
 
       }

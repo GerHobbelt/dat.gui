@@ -50,7 +50,7 @@ export default {
       // with insert: false both the JS and CSS need to explicitly be included
       insert: false,
       output: "build/dat.gui.css",
-      options: { outputStyle: "compressed" }
+      options: { outputStyle: "expanded" }
     }),
     babel({
       babelrc: false,

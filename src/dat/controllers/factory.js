@@ -16,11 +16,12 @@ define([
   'dat/controllers/NumberControllerBox',
   'dat/controllers/NumberControllerSlider',
   'dat/controllers/StringController',
+  'dat/controllers/TextAreaController',
   'dat/controllers/FunctionController',
   'dat/controllers/BooleanController',
   'dat/utils/common'
 ],
-    function(OptionController, NumberControllerBox, NumberControllerSlider, StringController, FunctionController, BooleanController, common) {
+    function(OptionController, NumberControllerBox, NumberControllerSlider, StringController, TextAreaController, FunctionController, BooleanController, common) {
 
       return function(object, property) {
 
@@ -36,13 +37,12 @@ define([
         if (common.isNumber(initialValue)) {
 
           if (common.isNumber(arguments[2]) && common.isNumber(arguments[3])) {
-
             // Has min and max.
-            return new NumberControllerSlider(object, property, arguments[2], arguments[3]);
+            return new NumberControllerSlider(object, property, arguments[2], arguments[3], arguments[4], arguments[5]);
 
           } else {
 
-            return new NumberControllerBox(object, property, { min: arguments[2], max: arguments[3] });
+            return new NumberControllerBox(object, property, { min: arguments[2], max: arguments[3], step:arguments[4] });
 
           }
 

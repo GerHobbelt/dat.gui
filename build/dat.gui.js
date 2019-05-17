@@ -833,11 +833,12 @@ dat.controllers.NumberControllerBox = (function (NumberController, dom, common) 
   var NumberControllerBox = function(object, property, params) {
 
     this.__truncationSuspended = false;
-
+	this.__mouseIsDown = false;
+	
     NumberControllerBox.superclass.call(this, object, property, params);
 
     var _this = this;
-
+	
     /**
      * {Number} Previous mouse y position
      * @ignore
@@ -845,13 +846,20 @@ dat.controllers.NumberControllerBox = (function (NumberController, dom, common) 
     var prev_y;
 
     this.__input = document.createElement('input');
-    this.__input.setAttribute('type', 'text');
+   
+	if (this.__step != undefined) {
+		this.__input.setAttribute('step', this.__step);
+		this.__input.setAttribute('type', 'number');
+	}
+	else  this.__input.setAttribute('type', 'text');
 
     // Makes it so manually specified values are not truncated.
 
+	dom.bind(this.__input, 'input', onInput);
     dom.bind(this.__input, 'change', onChange);
     dom.bind(this.__input, 'blur', onBlur);
-    dom.bind(this.__input, 'mousedown', onMouseDown);
+	dom.bind(this.__input, "mousedown", onMouseDownDetect);
+   // dom.bind(this.__input, 'mousedown', onMouseDown);
     dom.bind(this.__input, 'keydown', function(e) {
 
       // When pressing entire, you can be as precise as you want.
@@ -860,18 +868,44 @@ dat.controllers.NumberControllerBox = (function (NumberController, dom, common) 
         this.blur();
         _this.__truncationSuspended = false;
       }
+	  else if (  (e.keyCode === 38 || e.keyCode === 40) && _this.__step) {
+		onChange();
+	  }
 
     });
+	
+	function onMouseDownDetect() {
+		_this.__mouseIsDown = true;
+		dom.bind(window, 'mouseup', onMouseUpDetect);
+	}
+	
+	function onMouseUpDetect() {
+		_this.__mouseIsDown = false;
+		dom.unbind(window, 'mouseup', onMouseUpDetect);
+	}
 
     function onChange() {
+      var attempted = parseFloat(_this.__input.value);
+      if (!common.isNaN(attempted)) _this.setValue(attempted);
+	 
+    }
+	
+	function onInput() {
+	  if (!_this.__mouseIsDown) {
+		return;
+	  }
       var attempted = parseFloat(_this.__input.value);
       if (!common.isNaN(attempted)) _this.setValue(attempted);
     }
 
     function onBlur() {
-      onChange();
+	  var attempted = parseFloat(_this.__input.value);
+      if (!common.isNaN(attempted)) _this.setValue(attempted);
+	  else _this.updateDisplay();
+	  
       if (_this.__onFinishChange) {
         _this.__onFinishChange.call(_this, _this.getValue());
+		
       }
     }
 
@@ -914,6 +948,11 @@ dat.controllers.NumberControllerBox = (function (NumberController, dom, common) 
 
           this.__input.value = this.__truncationSuspended ? this.getValue() : roundToDecimal(this.getValue(), this.__precision);
           return NumberControllerBox.superclass.prototype.updateDisplay.call(this);
+        },
+		 step: function(v) {
+			if (this.__input.getAttribute("type") != "number") this.__input.setAttribute("type", "number");
+			this.__input.setAttribute("step", v);
+          return NumberControllerBox.superclass.prototype.step.apply(this, arguments);
         }
 
       }
@@ -949,25 +988,47 @@ dat.controllers.NumberControllerSlider = (function (NumberController, dom, css, 
    * @param {Number} minValue Minimum allowed value
    * @param {Number} maxValue Maximum allowed value
    * @param {Number} stepValue Increment by which to change value
+   * @param {Object} enumeration Dynamic object of key value pairs for enumerable values/ranges
    *
    * @member dat.controllers
    */
-  var NumberControllerSlider = function(object, property, min, max, step) {
-
+  var NumberControllerSlider = function(object, property, min, max, step, enumeration) {
     NumberControllerSlider.superclass.call(this, object, property, { min: min, max: max, step: step });
 
     var _this = this;
 
     this.__background = document.createElement('div');
+	this.__label = document.createElement('div');
     this.__foreground = document.createElement('div');
-    
-
-
+   
+	function getEnumArr(hash) {
+		var arr = [];
+		var k;
+		for (k in hash) {
+			arr.push({key:k, value:hash[k]});
+		}
+		arr = arr.sort(function (a, b) {
+			var result = true ? (a["value"] < b["value"]) : (a["value"] > b["value"]);
+			return result ? 1 : -1;
+		});
+		
+		return  arr.length > 0 ? arr : null;
+	}
+	
+	
+	if (enumeration) {
+		this.enumeration = getEnumArr(enumeration);
+	}
+	
+	this.__label.style.visibility = enumeration ? "visible" : "hidden";
+	
     dom.bind(this.__background, 'mousedown', onMouseDown);
     
     dom.addClass(this.__background, 'slider');
+	dom.addClass(this.__label, 'label');
     dom.addClass(this.__foreground, 'slider-fg');
-
+	
+	
     function onMouseDown(e) {
 
       dom.bind(window, 'mousemove', onMouseDrag);
@@ -1001,7 +1062,9 @@ dat.controllers.NumberControllerSlider = (function (NumberController, dom, css, 
 
     this.updateDisplay();
 
+	
     this.__background.appendChild(this.__foreground);
+	this.__background.appendChild(this.__label);
     this.domElement.appendChild(this.__background);
 
   };
@@ -1023,8 +1086,32 @@ dat.controllers.NumberControllerSlider = (function (NumberController, dom, css, 
       {
 
         updateDisplay: function() {
-          var pct = (this.getValue() - this.__min)/(this.__max - this.__min);
+		  var value = this.getValue();
+          var pct = (value - this.__min)/(this.__max - this.__min);
           this.__foreground.style.width = pct*100+'%';
+		 
+		  this.__label.innerHTML = value;
+		
+		  if (this.enumeration) {
+			  var chosenValue = null;
+			  var chosenIndex = null;
+			  var i = this.enumeration.length;
+			  while(--i > -1) {
+				  chosenValue = this.enumeration[i].value;
+				  if ( value < chosenValue) {
+					break;
+				  }
+				  chosenIndex = i;
+			  }
+			  
+			  if (chosenIndex == null) {
+				  chosenValue = "";
+			  }
+			  else chosenValue = this.enumeration[chosenIndex].key;
+			  
+			  this.__label.innerHTML = chosenValue;
+		  }
+	
           return NumberControllerSlider.superclass.prototype.updateDisplay.call(this);
         }
 
@@ -1045,6 +1132,83 @@ dat.dom.dom,
 dat.utils.css,
 dat.utils.common,
 "/**\r\n * dat-gui JavaScript Controller Library\r\n * http://code.google.com/p/dat-gui\r\n *\r\n * Copyright 2011 Data Arts Team, Google Creative Lab\r\n *\r\n * Licensed under the Apache License, Version 2.0 (the \"License\");\r\n * you may not use this file except in compliance with the License.\r\n * You may obtain a copy of the License at\r\n *\r\n * http://www.apache.org/licenses/LICENSE-2.0\r\n */\r\n\r\n.slider {\r\n  box-shadow: inset 0 2px 4px rgba(0,0,0,0.15);\r\n  height: 1em;\r\n  border-radius: 1em;\r\n  background-color: #eee;\r\n  padding: 0 0.5em;\r\n  overflow: hidden;\r\n}\r\n\r\n.slider-fg {\r\n  padding: 1px 0 2px 0;\r\n  background-color: #aaa;\r\n  height: 1em;\r\n  margin-left: -0.5em;\r\n  padding-right: 0.5em;\r\n  border-radius: 1em 0 0 1em;\r\n}\r\n\r\n.slider-fg:after {\r\n  display: inline-block;\r\n  border-radius: 1em;\r\n  background-color: #fff;\r\n  border:  1px solid #aaa;\r\n  content: '';\r\n  float: right;\r\n  margin-right: -1em;\r\n  margin-top: -1px;\r\n  height: 0.9em;\r\n  width: 0.9em;\r\n}");
+
+
+dat.controllers.TextAreaController = (function (Controller, dom, common) {
+
+  /**
+   * @class Provides a text area to alter the text property of an object.
+   *
+   * @extends dat.controllers.Controller
+   *
+   * @param {Object} object The object to be manipulated
+   * @param {string} property The name of the property to be manipulated
+   *
+   * @member dat.controllers
+   */
+  var TextAreaController = function(object, property) {
+
+    TextAreaController.superclass.call(this, object, property);
+
+    var _this = this;
+
+    this.__input = document.createElement('textarea');
+    //this.__input.setAttribute('type', 'text');
+
+    dom.bind(this.__input, 'keyup', onChange);
+    dom.bind(this.__input, 'change', onChange);
+    dom.bind(this.__input, 'blur', onBlur);
+	/*
+    dom.bind(this.__input, 'keydown', function(e) {
+      if (e.keyCode === 13) {
+        this.blur();
+      }
+    });
+    */
+
+    function onChange() {
+      _this.setValue(_this.__input.value);
+    }
+
+    function onBlur() {
+      if (_this.__onFinishChange) {
+        _this.__onFinishChange.call(_this, _this.getValue());
+      }
+    }
+
+    this.updateDisplay();
+
+    this.domElement.appendChild(this.__input);
+
+  };
+
+  TextAreaController.superclass = Controller;
+
+  common.extend(
+
+      TextAreaController.prototype,
+      Controller.prototype,
+
+      {
+
+        updateDisplay: function() {
+          // Stops the caret from moving on account of:
+          // keyup -> setValue -> updateDisplay
+          if (!dom.isActive(this.__input)) {
+            this.__input.value = this.getValue();
+          }
+          return TextAreaController.superclass.prototype.updateDisplay.call(this);
+        }
+
+      }
+
+  );
+
+  return TextAreaController;
+
+})(dat.controllers.Controller,
+dat.dom.dom,
+dat.utils.common);
 
 
 dat.controllers.FunctionController = (function (Controller, dom, common) {
@@ -1609,6 +1773,7 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
     this.__folders = {};
 
     this.__controllers = [];
+	this.__onClosedChange = null;
 
     /**
      * List of objects I'm remembering for save, only used in top level GUI
@@ -1639,6 +1804,8 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
     this.__listening = [];
 
     params = params || {};
+	
+	
 
     // Default parameters
     params = common.defaults(params, {
@@ -1762,7 +1929,7 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
            */
           name: {
             get: function() {
-              return params.name;
+              return params.name || "";
             },
             set: function(v) {
               // TODO Check for collisions among sibling folders
@@ -1868,7 +2035,7 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
       dom.bind(this.__closeButton, 'click', function() {
 
         _this.closed = !_this.closed;
-
+		if (_this.__onClosedChange) _this.__onClosedChange.call(_this, _this.closed);
 
       });
 
@@ -1888,6 +2055,7 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
       var on_click_title = function(e) {
         e.preventDefault();
         _this.closed = !_this.closed;
+		if (_this.__onClosedChange) _this.__onClosedChange.call(_this, _this.closed);
         return false;
       };
 
@@ -1962,6 +2130,80 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
 	    }
 
   };
+  
+   GUI.prototype.onClosedChange = function(fnc) {
+	  this.__onClosedChange = fnc;
+	  return this;
+  }
+		  
+  GUI.prototype.getControllerByName = function(name, recurse) {
+		  
+		var controllers = this.__controllers;
+		var i = controllers.length;
+		while(--i > -1) {
+			if (controllers[i].property === name) {
+				return controllers[i];
+			}
+		}
+		var folders = this.__folders;
+		var tryFI;
+		if (recurse) {
+			for (i in folders) {
+				tryFI = folders[i].getControllerByName(name, true);
+				if (tryFI != null) return tryFI;
+			}
+		}
+		return null;
+  }
+  
+	  GUI.prototype.getFolderByName = function(name) {
+			return this.__folders[name];
+	  }
+	  
+	  GUI.prototype.getAllControllers = function(recurse, myArray) {
+		if (recurse == undefined) recurse = true;
+		var i;
+		var arr = myArray!= null ? myArray : [];
+
+		var controllers = this.__controllers;
+		for (i in controllers) {
+			arr.push(controllers[i]);
+		}
+		
+		if (recurse) {
+			var folders = this.__folders;
+			for (i in folders) {
+				folders[i].getAllControllers(true, arr);
+			}
+		}
+		return arr;
+	  }
+	  
+	  /*
+	  *  Gets this current GUI (usually) and all sub-folder GUIs under this GUI as an array of {name/gui} pairs. The "this" current gui uses empty string.
+	  *  @param  recurse (optional) By default, it will recurse multiple levels deep. Set to false to only scan current level from current GUI.
+	  *  @param  myArray (optional) Supply an existing array to use instead.  If supplied, will not push current GUI into array, only the subfolder GUIs.
+	  *  @return   The array of {name/gui} value pairs
+	  */
+	  GUI.prototype.getAllGUIs = function(recurse, myArray) {
+		if (recurse == undefined) recurse = true;
+		var i;
+		var arr = myArray!= null ? myArray : [this];
+		var folders = this.__folders;
+		
+
+		for (i in folders) {
+			arr.push(folders[i]);
+		}
+		
+		if (recurse) {
+			for (i in folders) {
+				
+				folders[i].getAllGUIs(true, arr);
+			}
+		}
+		return arr;
+	  }
 
   GUI.toggleHide = function() {
 
@@ -1971,6 +2213,8 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
       gui.domElement.style.opacity = hide ? 0 : 1;
     });
   };
+  
+
 
   GUI.CLASS_AUTO_PLACE = 'a';
   GUI.CLASS_AUTO_PLACE_CONTAINER = 'ac';
@@ -1987,7 +2231,7 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
 
   dom.bind(window, 'keydown', function(e) {
 
-    if (document.activeElement.type !== 'text' &&
+    if ( (document.activeElement.type !== 'text' && document.activeElement.nodeName.toString().toLowerCase() !== "textarea") &&
         (e.which === HIDE_KEY_CODE || e.keyCode == HIDE_KEY_CODE)) {
       GUI.toggleHide();
     }
@@ -2008,7 +2252,7 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
          * @instance
          */
         add: function(object, property) {
-
+			
           return add(
               this,
               object,
@@ -2034,6 +2278,24 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
               property,
               {
                 color: true
+              }
+          );
+
+        },
+		 /**
+         * @param object
+         * @param property
+         * @returns {dat.controllers.TextAreaController} The new controller that was added.
+         * @instance
+         */
+        addTextArea: function(object, property) {
+
+          return add(
+              this,
+              object,
+              property,
+              {
+                multiline: true
               }
           );
 
@@ -2146,7 +2408,7 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
             var h = 0;
 
             common.each(root.__ul.childNodes, function(node) {
-              if (! (root.autoPlace && node === root.__save_row))
+              if (! (root.autoPlace && node === root.__save_row) && node.nodeType===1 )
                 h += dom.getHeight(node);
             });
 
@@ -2326,6 +2588,7 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
 
     var controller;
 
+	
     if (params.color) {
 
       controller = new ColorController(object, property);
@@ -2334,7 +2597,13 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
 
       controller = new EasingFunctionController(object, property);
 
-    } else {
+    }
+	else if (params.multiline) {
+
+		 controller = new TextAreaController(object, property);
+
+	}
+	else {
 
       var factoryArgs = [object,property].concat(params.factoryArgs);
       controller = controllerFactory.apply(gui, factoryArgs);
@@ -2353,9 +2622,12 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
     dom.addClass(name, 'property-name');
     name.innerHTML = controller.property;
 
+	var clear = document.createElement('div');
+	clear.style.clear = "both";
     var container = document.createElement('div');
     container.appendChild(name);
     container.appendChild(controller.domElement);
+	container.appendChild(clear);
 
     var li = addRow(gui, container, params.before);
 
@@ -2472,7 +2744,7 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
     else if (controller instanceof NumberControllerBox) {
 
       var r = function(returned) {
-
+	
         // Have we defined both boundaries?
         if (common.isNumber(controller.__min) && common.isNumber(controller.__max)) {
 
@@ -2787,6 +3059,12 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
       dom.bind(window, 'mousemove', drag);
       dom.bind(window, 'mouseup', dragStop);
 
+	 
+	  gui.domElement.dispatchEvent(new CustomEvent("dragstart", {
+			bubbles: true,
+			cancelable: true
+		}));
+		
       return false;
 
     }
@@ -2808,7 +3086,10 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
       dom.removeClass(gui.__closeButton, GUI.CLASS_DRAG);
       dom.unbind(window, 'mousemove', drag);
       dom.unbind(window, 'mouseup', dragStop);
-
+	   gui.domElement.dispatchEvent(new CustomEvent("dragstop", {
+			bubbles: true,
+			cancelable: true
+		}));
     }
 
   }
@@ -2895,6 +3176,8 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
     });
 
   }
+  
+  
 
   return GUI;
 
@@ -2917,13 +3200,12 @@ dat.controllers.factory = (function (OptionController, NumberControllerBox, Numb
         if (common.isNumber(initialValue)) {
 
           if (common.isNumber(arguments[2]) && common.isNumber(arguments[3])) {
-
             // Has min and max.
-            return new NumberControllerSlider(object, property, arguments[2], arguments[3]);
+            return new NumberControllerSlider(object, property, arguments[2], arguments[3], arguments[4], arguments[5]);
 
           } else {
 
-            return new NumberControllerBox(object, property, { min: arguments[2], max: arguments[3] });
+            return new NumberControllerBox(object, property, { min: arguments[2], max: arguments[3], step:arguments[4] });
 
           }
 
@@ -3020,6 +3302,7 @@ dat.controllers.StringController = (function (Controller, dom, common) {
 })(dat.controllers.Controller,
 dat.dom.dom,
 dat.utils.common),
+dat.controllers.TextAreaController,
 dat.controllers.FunctionController,
 dat.controllers.BooleanController,
 dat.utils.common),

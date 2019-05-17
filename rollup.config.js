@@ -53,7 +53,15 @@ export default {
       options: { outputStyle: "compressed" }
     }),
     babel({
-      plugins: ["external-helpers"],
+      babelrc: false,
+      comments: true,
+      sourceMap: true,
+      presets: [
+        ["@babel/preset-env", {
+          modules: false,
+          loose: true,
+        }],
+      ],
       exclude: "node_modules/**"
     }),
     commonjs({

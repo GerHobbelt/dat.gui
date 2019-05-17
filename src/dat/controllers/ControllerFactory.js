@@ -11,15 +11,15 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import VectorController from "./VectorController";
-import OptionController from "./OptionController";
-import NumberControllerBox from "./NumberControllerBox";
-import NumberControllerSlider from "./NumberControllerSlider";
-import StringController from "./StringController";
-import FunctionController from "./FunctionController";
-import TabbedController from "./TabbedController";
-import BooleanController from "./BooleanController";
-import common from "../utils/common";
+import VectorController from './VectorController';
+import OptionController from './OptionController';
+import NumberControllerBox from './NumberControllerBox';
+import NumberControllerSlider from './NumberControllerSlider';
+import StringController from './StringController';
+import FunctionController from './FunctionController';
+import TabbedController from './TabbedController';
+import BooleanController from './BooleanController';
+import common from '../utils/common';
 
 const ControllerFactory = function(object, property) {
   const initialValue = object[property];
@@ -60,13 +60,13 @@ const ControllerFactory = function(object, property) {
     return new StringController(object, property);
   }
 
-  //arguments[2] is tabs. arguments[3] is the name of the object
+  // arguments[2] is tabs. arguments[3] is the name of the object
   if (common.isFunction(initialValue) && arguments[2] !== undefined) {
-    return new TabbedController(object, property, "", arguments[2] || 0, arguments[3] || "Object");
+    return new TabbedController(object, property, '', arguments[2] || 0, arguments[3] || 'Object');
   }
 
   if (common.isFunction(initialValue)) {
-    return new FunctionController(object, property, "");
+    return new FunctionController(object, property, '');
   }
 
   if (common.isBoolean(initialValue)) {

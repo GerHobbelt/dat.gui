@@ -17,36 +17,36 @@ export default function(color, forceCSSHex) {
   const r = Math.round(color.r);
   const g = Math.round(color.g);
   const b = Math.round(color.b);
-  const a = color.a;
+  const { a } = color;
   const h = Math.round(color.h);
   const s = color.s.toFixed(1);
   const v = color.v.toFixed(1);
 
-  if (forceCSSHex || colorFormat === "THREE_CHAR_HEX" || colorFormat === "SIX_CHAR_HEX") {
+  if (forceCSSHex || colorFormat === 'THREE_CHAR_HEX' || colorFormat === 'SIX_CHAR_HEX') {
     let str = color.hex.toString(16);
     while (str.length < 6) {
-      str = "0" + str;
+      str = '0' + str;
     }
-    return "#" + str;
-  } else if (colorFormat === "CSS_RGB") {
-    return "rgb(" + r + "," + g + "," + b + ")";
-  } else if (colorFormat === "CSS_RGBA") {
-    return "rgba(" + r + "," + g + "," + b + "," + a + ")";
-  } else if (colorFormat === "HEX") {
-    return "0x" + color.hex.toString(16);
-  } else if (colorFormat === "RGB_ARRAY") {
-    return "[" + r + "," + g + "," + b + "]";
-  } else if (colorFormat === "RGBA_ARRAY") {
-    return "[" + r + "," + g + "," + b + "," + a + "]";
-  } else if (colorFormat === "RGB_OBJ") {
-    return "{r:" + r + ",g:" + g + ",b:" + b + "}";
-  } else if (colorFormat === "RGBA_OBJ") {
-    return "{r:" + r + ",g:" + g + ",b:" + b + ",a:" + a + "}";
-  } else if (colorFormat === "HSV_OBJ") {
-    return "{h:" + h + ",s:" + s + ",v:" + v + "}";
-  } else if (colorFormat === "HSVA_OBJ") {
-    return "{h:" + h + ",s:" + s + ",v:" + v + ",a:" + a + "}";
+    return '#' + str;
+  } if (colorFormat === 'CSS_RGB') {
+    return 'rgb(' + r + ',' + g + ',' + b + ')';
+  } if (colorFormat === 'CSS_RGBA') {
+    return 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';
+  } if (colorFormat === 'HEX') {
+    return '0x' + color.hex.toString(16);
+  } if (colorFormat === 'RGB_ARRAY') {
+    return '[' + r + ',' + g + ',' + b + ']';
+  } if (colorFormat === 'RGBA_ARRAY') {
+    return '[' + r + ',' + g + ',' + b + ',' + a + ']';
+  } if (colorFormat === 'RGB_OBJ') {
+    return '{r:' + r + ',g:' + g + ',b:' + b + '}';
+  } if (colorFormat === 'RGBA_OBJ') {
+    return '{r:' + r + ',g:' + g + ',b:' + b + ',a:' + a + '}';
+  } if (colorFormat === 'HSV_OBJ') {
+    return '{h:' + h + ',s:' + s + ',v:' + v + '}';
+  } if (colorFormat === 'HSVA_OBJ') {
+    return '{h:' + h + ',s:' + s + ',v:' + v + ',a:' + a + '}';
   }
 
-  return "unknown format";
+  return 'unknown format';
 }

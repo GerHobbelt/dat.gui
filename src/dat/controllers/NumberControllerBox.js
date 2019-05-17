@@ -11,12 +11,12 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import NumberController from "./NumberController";
-import dom from "../dom/dom";
-import common from "../utils/common";
+import NumberController from './NumberController';
+import dom from '../dom/dom';
+import common from '../utils/common';
 
 function roundToDecimal(value, decimals) {
-  const tenTo = Math.pow(10, decimals);
+  const tenTo = 10 ** decimals;
   return Math.round(value * tenTo) / tenTo;
 }
 
@@ -48,7 +48,7 @@ class NumberControllerBox extends NumberController {
      */
     let prevY;
 
-    const mousewheelevt = /Firefox/i.test(navigator.userAgent) ? "DOMMouseScroll" : "mousewheel";
+    const mousewheelevt = /Firefox/i.test(navigator.userAgent) ? 'DOMMouseScroll' : 'mousewheel';
 
     function onMouseWheel(e) {
       let value = _this.getValue();
@@ -85,27 +85,27 @@ class NumberControllerBox extends NumberController {
     }
 
     function onMouseUp() {
-      dom.unbind(window, "mousemove", onMouseDrag);
-      dom.unbind(window, "mouseup", onMouseUp);
+      dom.unbind(window, 'mousemove', onMouseDrag);
+      dom.unbind(window, 'mouseup', onMouseUp);
       onFinish();
     }
 
     function onMouseDown(e) {
-      dom.bind(window, "mousemove", onMouseDrag);
-      dom.bind(window, "mouseup", onMouseUp);
+      dom.bind(window, 'mousemove', onMouseDrag);
+      dom.bind(window, 'mouseup', onMouseUp);
       prevY = e.clientY;
     }
 
-    this.__input = document.createElement("input");
-    this.__input.setAttribute("type", "text");
+    this.__input = document.createElement('input');
+    this.__input.setAttribute('type', 'text');
 
     // Makes it so manually specified values are not truncated.
 
-    dom.bind(this.__input, "change", onChange);
-    dom.bind(this.__input, "blur", onBlur);
-    dom.bind(this.__input, "mousedown", onMouseDown);
+    dom.bind(this.__input, 'change', onChange);
+    dom.bind(this.__input, 'blur', onBlur);
+    dom.bind(this.__input, 'mousedown', onMouseDown);
     dom.bind(this.__input, mousewheelevt, onMouseWheel);
-    dom.bind(this.__input, "keydown", function(e) {
+    dom.bind(this.__input, 'keydown', function(e) {
       // When pressing enter, you can be as precise as you want.
       if (e.keyCode === 13) {
         _this.__truncationSuspended = true;

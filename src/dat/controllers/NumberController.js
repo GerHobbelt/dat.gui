@@ -11,13 +11,13 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import Controller from "./Controller";
-import common from "../utils/common";
+import Controller from './Controller';
+import common from '../utils/common';
 
 function numDecimals(x) {
   const _x = x.toString();
-  if (_x.indexOf(".") > -1) {
-    return _x.length - _x.indexOf(".") - 1;
+  if (_x.indexOf('.') > -1) {
+    return _x.length - _x.indexOf('.') - 1;
   }
 
   return 2;
@@ -50,7 +50,7 @@ class NumberController extends Controller {
         this.__impliedStep = 1; // What are we, psychics?
       } else {
         // Hey Doug, check this out.
-        this.__impliedStep = Math.pow(10, Math.floor(Math.log(Math.abs(this.initialValue)) / Math.LN10)) / 10;
+        this.__impliedStep = (10 ** Math.floor(Math.log(Math.abs(this.initialValue)) / Math.LN10)) / 10;
       }
     } else {
       this.__impliedStep = this.__step;

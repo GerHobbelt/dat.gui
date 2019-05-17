@@ -1,41 +1,11 @@
-/**
- * dat-gui JavaScript Controller Library
- * http://code.google.com/p/dat-gui
- *
- * Copyright 2011 Data Arts Team, Google Creative Lab
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- */
-
 (function(global, factory) {
   typeof exports === "object" && typeof module !== "undefined"
     ? factory(exports)
     : typeof define === "function" && define.amd
     ? define(["exports"], factory)
-    : factory((global.dat = {}));
+    : ((global = global || self), factory((global.dat = {})));
 })(this, function(exports) {
   "use strict";
-
-  function ___$insertStyle(css) {
-    if (!css) {
-      return;
-    }
-    if (typeof window === "undefined") {
-      return;
-    }
-
-    var style = document.createElement("style");
-
-    style.setAttribute("type", "text/css");
-    style.innerHTML = css;
-    document.head.appendChild(style);
-
-    return css;
-  }
 
   function colorToString(color, forceCSSHex) {
     var colorFormat = color.__state.conversionName.toString();
@@ -52,23 +22,32 @@
         str = "0" + str;
       }
       return "#" + str;
-    } else if (colorFormat === "CSS_RGB") {
+    }
+    if (colorFormat === "CSS_RGB") {
       return "rgb(" + r + "," + g + "," + b + ")";
-    } else if (colorFormat === "CSS_RGBA") {
+    }
+    if (colorFormat === "CSS_RGBA") {
       return "rgba(" + r + "," + g + "," + b + "," + a + ")";
-    } else if (colorFormat === "HEX") {
+    }
+    if (colorFormat === "HEX") {
       return "0x" + color.hex.toString(16);
-    } else if (colorFormat === "RGB_ARRAY") {
+    }
+    if (colorFormat === "RGB_ARRAY") {
       return "[" + r + "," + g + "," + b + "]";
-    } else if (colorFormat === "RGBA_ARRAY") {
+    }
+    if (colorFormat === "RGBA_ARRAY") {
       return "[" + r + "," + g + "," + b + "," + a + "]";
-    } else if (colorFormat === "RGB_OBJ") {
+    }
+    if (colorFormat === "RGB_OBJ") {
       return "{r:" + r + ",g:" + g + ",b:" + b + "}";
-    } else if (colorFormat === "RGBA_OBJ") {
+    }
+    if (colorFormat === "RGBA_OBJ") {
       return "{r:" + r + ",g:" + g + ",b:" + b + ",a:" + a + "}";
-    } else if (colorFormat === "HSV_OBJ") {
+    }
+    if (colorFormat === "HSV_OBJ") {
       return "{h:" + h + ",s:" + s + ",v:" + v + "}";
-    } else if (colorFormat === "HSVA_OBJ") {
+    }
+    if (colorFormat === "HSVA_OBJ") {
       return "{h:" + h + ",s:" + s + ",v:" + v + ",a:" + a + "}";
     }
     return "unknown format";
@@ -129,8 +108,8 @@
       if (ARR_EACH && obj.forEach && obj.forEach === ARR_EACH) {
         obj.forEach(itr, scope);
       } else if (obj.length === obj.length + 0) {
-        var key = void 0;
-        var l = void 0;
+        var key;
+        var l;
         for (key = 0, l = obj.length; key < l; key++) {
           if (key in obj && itr.call(scope, obj[key], key) === this.BREAK) {
             return;
@@ -148,7 +127,7 @@
       setTimeout(fnc, 0);
     },
     debounce: function debounce(func, threshold, callImmediately) {
-      var timeout = void 0;
+      var timeout;
       return function() {
         var obj = this;
         var args = arguments;
@@ -432,8 +411,8 @@
       }
     }
   ];
-  var result = void 0;
-  var toReturn = void 0;
+  var result;
+  var toReturn;
   var interpret = function interpret() {
     toReturn = false;
     var original = arguments.length > 1 ? Common.toArray(arguments) : arguments[0];
@@ -454,7 +433,7 @@
     return toReturn;
   };
 
-  var tmpComponent = void 0;
+  var tmpComponent;
   var ColorMath = {
     hsv_to_rgb: function hsv_to_rgb(h, s, v) {
       var hi = Math.floor(h / 60) % 6;
@@ -473,8 +452,8 @@
       var min = Math.min(r, g, b);
       var max = Math.max(r, g, b);
       var delta = max - min;
-      var h = void 0;
-      var s = void 0;
+      var h;
+      var s;
       if (max !== 0) {
         s = delta / max;
       } else {
@@ -511,136 +490,41 @@
       return (hex >> (componentIndex * 8)) & 0xff;
     },
     hex_with_component: function hex_with_component(hex, componentIndex, value) {
-      return (value << (tmpComponent = componentIndex * 8)) | (hex & ~(0xff << tmpComponent));
+      value = (value << (tmpComponent = componentIndex * 8)) | (hex & ~(0xff << tmpComponent));
+      return value;
     }
-  };
-
-  var _typeof =
-    typeof Symbol === "function" && typeof Symbol.iterator === "symbol"
-      ? function(obj) {
-          return typeof obj;
-        }
-      : function(obj) {
-          return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype
-            ? "symbol"
-            : typeof obj;
-        };
-
-  var classCallCheck = function(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  };
-
-  var createClass = (function() {
-    function defineProperties(target, props) {
-      for (var i = 0; i < props.length; i++) {
-        var descriptor = props[i];
-        descriptor.enumerable = descriptor.enumerable || false;
-        descriptor.configurable = true;
-        if ("value" in descriptor) descriptor.writable = true;
-        Object.defineProperty(target, descriptor.key, descriptor);
-      }
-    }
-
-    return function(Constructor, protoProps, staticProps) {
-      if (protoProps) defineProperties(Constructor.prototype, protoProps);
-      if (staticProps) defineProperties(Constructor, staticProps);
-      return Constructor;
-    };
-  })();
-
-  var get = function get(object, property, receiver) {
-    if (object === null) object = Function.prototype;
-    var desc = Object.getOwnPropertyDescriptor(object, property);
-
-    if (desc === undefined) {
-      var parent = Object.getPrototypeOf(object);
-
-      if (parent === null) {
-        return undefined;
-      } else {
-        return get(parent, property, receiver);
-      }
-    } else if ("value" in desc) {
-      return desc.value;
-    } else {
-      var getter = desc.get;
-
-      if (getter === undefined) {
-        return undefined;
-      }
-
-      return getter.call(receiver);
-    }
-  };
-
-  var inherits = function(subClass, superClass) {
-    if (typeof superClass !== "function" && superClass !== null) {
-      throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
-    }
-
-    subClass.prototype = Object.create(superClass && superClass.prototype, {
-      constructor: {
-        value: subClass,
-        enumerable: false,
-        writable: true,
-        configurable: true
-      }
-    });
-    if (superClass)
-      Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : (subClass.__proto__ = superClass);
-  };
-
-  var possibleConstructorReturn = function(self, call) {
-    if (!self) {
-      throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-    }
-
-    return call && (typeof call === "object" || typeof call === "function") ? call : self;
   };
 
   var Color = (function() {
     function Color() {
-      classCallCheck(this, Color);
       this.__state = interpret.apply(this, arguments);
       if (this.__state === false) {
         throw new Error("Failed to interpret color arguments");
       }
       this.__state.a = this.__state.a || 1;
     }
-    createClass(Color, [
-      {
-        key: "toString",
-        value: function toString() {
-          return colorToString(this);
-        }
-      },
-      {
-        key: "toHexString",
-        value: function toHexString() {
-          return colorToString(this, true);
-        }
-      },
-      {
-        key: "toOriginal",
-        value: function toOriginal() {
-          return this.__state.conversion.write(this);
-        }
-      }
-    ]);
+    var _proto = Color.prototype;
+    _proto.toString = function toString() {
+      return colorToString(this);
+    };
+    _proto.toHexString = function toHexString() {
+      return colorToString(this, true);
+    };
+    _proto.toOriginal = function toOriginal() {
+      return this.__state.conversion.write(this);
+    };
     return Color;
   })();
   function defineRGBComponent(target, component, componentHexIndex) {
     Object.defineProperty(target, component, {
-      get: function get$$1() {
+      get: function get() {
         if (this.__state.space === "RGB") {
           return this.__state[component];
         }
         Color.recalculateRGB(this, component, componentHexIndex);
         return this.__state[component];
       },
-      set: function set$$1(v) {
+      set: function set(v) {
         if (this.__state.space !== "RGB") {
           Color.recalculateRGB(this, component, componentHexIndex);
           this.__state.space = "RGB";
@@ -651,14 +535,14 @@
   }
   function defineHSVComponent(target, component) {
     Object.defineProperty(target, component, {
-      get: function get$$1() {
+      get: function get() {
         if (this.__state.space === "HSV") {
           return this.__state[component];
         }
         Color.recalculateHSV(this);
         return this.__state[component];
       },
-      set: function set$$1(v) {
+      set: function set(v) {
         if (this.__state.space !== "HSV") {
           Color.recalculateHSV(this);
           this.__state.space = "HSV";
@@ -696,29 +580,28 @@
   defineHSVComponent(Color.prototype, "s");
   defineHSVComponent(Color.prototype, "v");
   Object.defineProperty(Color.prototype, "a", {
-    get: function get$$1() {
+    get: function get() {
       return this.__state.a;
     },
-    set: function set$$1(v) {
+    set: function set(v) {
       this.__state.a = v;
     }
   });
   Object.defineProperty(Color.prototype, "hex", {
-    get: function get$$1() {
+    get: function get() {
       if (!this.__state.space !== "HEX") {
         this.__state.hex = ColorMath.rgb_to_hex(this.r, this.g, this.b);
       }
       return this.__state.hex;
     },
-    set: function set$$1(v) {
+    set: function set(v) {
       this.__state.space = "HEX";
       this.__state.hex = v;
     }
   });
 
-  var Controller = (function() {
+  var Controller$1 = (function() {
     function Controller(object, property) {
-      classCallCheck(this, Controller);
       this.initialValue = object[property];
       this.domElement = document.createElement("div");
       this.object = object;
@@ -726,53 +609,49 @@
       this.__onChange = undefined;
       this.__onFinishChange = undefined;
     }
-    createClass(Controller, [
-      {
-        key: "onChange",
-        value: function onChange(fnc) {
-          this.__onChange = fnc;
-          return this;
-        }
-      },
-      {
-        key: "onFinishChange",
-        value: function onFinishChange(fnc) {
-          this.__onFinishChange = fnc;
-          return this;
-        }
-      },
-      {
-        key: "setValue",
-        value: function setValue(newValue) {
-          this.object[this.property] = newValue;
-          if (this.__onChange) {
-            this.__onChange.call(this, newValue);
-          }
-          this.updateDisplay();
-          return this;
-        }
-      },
-      {
-        key: "getValue",
-        value: function getValue() {
-          return this.object[this.property];
-        }
-      },
-      {
-        key: "updateDisplay",
-        value: function updateDisplay() {
-          return this;
-        }
-      },
-      {
-        key: "isModified",
-        value: function isModified() {
-          return this.initialValue !== this.getValue();
-        }
+    var _proto = Controller.prototype;
+    _proto.onChange = function onChange(fnc) {
+      this.__onChange = fnc;
+      return this;
+    };
+    _proto.onFinishChange = function onFinishChange(fnc) {
+      this.__onFinishChange = fnc;
+      return this;
+    };
+    _proto.setValue = function setValue(newValue) {
+      var oldValue = this.object[this.property];
+      this.object[this.property] = newValue;
+      if (this.__onChange) {
+        this.__onChange.call(this, newValue, oldValue);
       }
-    ]);
+      this.updateDisplay();
+      return this;
+    };
+    _proto.getValue = function getValue() {
+      return this.object[this.property];
+    };
+    _proto.updateDisplay = function updateDisplay() {
+      return this;
+    };
+    _proto.isModified = function isModified() {
+      return this.initialValue !== this.getValue();
+    };
     return Controller;
   })();
+
+  function _inheritsLoose(subClass, superClass) {
+    subClass.prototype = Object.create(superClass.prototype);
+    subClass.prototype.constructor = subClass;
+    subClass.__proto__ = superClass;
+  }
+
+  function _assertThisInitialized(self) {
+    if (self === void 0) {
+      throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+    }
+
+    return self;
+  }
 
   var EVENT_MAP = {
     HTMLEvents: ["change"],
@@ -965,7 +844,10 @@
     },
     getOffset: function getOffset(el) {
       var elem = el;
-      var offset = { left: 0, top: 0 };
+      var offset = {
+        left: 0,
+        top: 0
+      };
       if (elem.offsetParent) {
         do {
           offset.left += elem.offsetLeft;
@@ -981,14 +863,11 @@
   };
 
   var BooleanController = (function(_Controller) {
-    inherits(BooleanController, _Controller);
+    _inheritsLoose(BooleanController, _Controller);
     function BooleanController(object, property) {
-      classCallCheck(this, BooleanController);
-      var _this2 = possibleConstructorReturn(
-        this,
-        (BooleanController.__proto__ || Object.getPrototypeOf(BooleanController)).call(this, object, property)
-      );
-      var _this = _this2;
+      var _this2;
+      _this2 = _Controller.call(this, object, property) || this;
+      var _this = _assertThisInitialized(_this2);
       _this2.__prev = _this2.getValue();
       _this2.__checkbox = document.createElement("input");
       _this2.__checkbox.setAttribute("type", "checkbox");
@@ -1000,54 +879,36 @@
       _this2.updateDisplay();
       return _this2;
     }
-    createClass(BooleanController, [
-      {
-        key: "setValue",
-        value: function setValue(v) {
-          var toReturn = get(
-            BooleanController.prototype.__proto__ || Object.getPrototypeOf(BooleanController.prototype),
-            "setValue",
-            this
-          ).call(this, v);
-          if (this.__onFinishChange) {
-            this.__onFinishChange.call(this, this.getValue());
-          }
-          this.__prev = this.getValue();
-          return toReturn;
-        }
-      },
-      {
-        key: "updateDisplay",
-        value: function updateDisplay() {
-          if (this.getValue() === true) {
-            this.__checkbox.setAttribute("checked", "checked");
-            this.__checkbox.checked = true;
-            this.__prev = true;
-          } else {
-            this.__checkbox.checked = false;
-            this.__prev = false;
-          }
-          return get(
-            BooleanController.prototype.__proto__ || Object.getPrototypeOf(BooleanController.prototype),
-            "updateDisplay",
-            this
-          ).call(this);
-        }
+    var _proto = BooleanController.prototype;
+    _proto.setValue = function setValue(v) {
+      var toReturn = _Controller.prototype.setValue.call(this, v);
+      if (this.__onFinishChange) {
+        this.__onFinishChange.call(this, this.getValue());
       }
-    ]);
+      this.__prev = this.getValue();
+      return toReturn;
+    };
+    _proto.updateDisplay = function updateDisplay() {
+      if (this.getValue() === true) {
+        this.__checkbox.setAttribute("checked", "checked");
+        this.__checkbox.checked = true;
+        this.__prev = true;
+      } else {
+        this.__checkbox.checked = false;
+        this.__prev = false;
+      }
+      return _Controller.prototype.updateDisplay.call(this);
+    };
     return BooleanController;
-  })(Controller);
+  })(Controller$1);
 
   var OptionController = (function(_Controller) {
-    inherits(OptionController, _Controller);
+    _inheritsLoose(OptionController, _Controller);
     function OptionController(object, property, opts) {
-      classCallCheck(this, OptionController);
-      var _this2 = possibleConstructorReturn(
-        this,
-        (OptionController.__proto__ || Object.getPrototypeOf(OptionController)).call(this, object, property)
-      );
+      var _this2;
+      _this2 = _Controller.call(this, object, property) || this;
       var options = opts;
-      var _this = _this2;
+      var _this = _assertThisInitialized(_this2);
       _this2.__select = document.createElement("select");
       if (Common.isArray(options)) {
         var map = {};
@@ -1070,46 +931,28 @@
       _this2.domElement.appendChild(_this2.__select);
       return _this2;
     }
-    createClass(OptionController, [
-      {
-        key: "setValue",
-        value: function setValue(v) {
-          var toReturn = get(
-            OptionController.prototype.__proto__ || Object.getPrototypeOf(OptionController.prototype),
-            "setValue",
-            this
-          ).call(this, v);
-          if (this.__onFinishChange) {
-            this.__onFinishChange.call(this, this.getValue());
-          }
-          return toReturn;
-        }
-      },
-      {
-        key: "updateDisplay",
-        value: function updateDisplay() {
-          if (dom.isActive(this.__select)) return this;
-          this.__select.value = this.getValue();
-          return get(
-            OptionController.prototype.__proto__ || Object.getPrototypeOf(OptionController.prototype),
-            "updateDisplay",
-            this
-          ).call(this);
-        }
+    var _proto = OptionController.prototype;
+    _proto.setValue = function setValue(v) {
+      var toReturn = _Controller.prototype.setValue.call(this, v);
+      if (this.__onFinishChange) {
+        this.__onFinishChange.call(this, this.getValue());
       }
-    ]);
+      return toReturn;
+    };
+    _proto.updateDisplay = function updateDisplay() {
+      if (dom.isActive(this.__select)) return this;
+      this.__select.value = this.getValue();
+      return _Controller.prototype.updateDisplay.call(this);
+    };
     return OptionController;
-  })(Controller);
+  })(Controller$1);
 
   var StringController = (function(_Controller) {
-    inherits(StringController, _Controller);
+    _inheritsLoose(StringController, _Controller);
     function StringController(object, property) {
-      classCallCheck(this, StringController);
-      var _this2 = possibleConstructorReturn(
-        this,
-        (StringController.__proto__ || Object.getPrototypeOf(StringController)).call(this, object, property)
-      );
-      var _this = _this2;
+      var _this2;
+      _this2 = _Controller.call(this, object, property) || this;
+      var _this = _assertThisInitialized(_this2);
       function onChange() {
         _this.setValue(_this.__input.value);
       }
@@ -1132,23 +975,15 @@
       _this2.domElement.appendChild(_this2.__input);
       return _this2;
     }
-    createClass(StringController, [
-      {
-        key: "updateDisplay",
-        value: function updateDisplay() {
-          if (!dom.isActive(this.__input)) {
-            this.__input.value = this.getValue();
-          }
-          return get(
-            StringController.prototype.__proto__ || Object.getPrototypeOf(StringController.prototype),
-            "updateDisplay",
-            this
-          ).call(this);
-        }
+    var _proto = StringController.prototype;
+    _proto.updateDisplay = function updateDisplay() {
+      if (!dom.isActive(this.__input)) {
+        this.__input.value = this.getValue();
       }
-    ]);
+      return _Controller.prototype.updateDisplay.call(this);
+    };
     return StringController;
-  })(Controller);
+  })(Controller$1);
 
   function numDecimals(x) {
     var _x = x.toString();
@@ -1158,13 +993,10 @@
     return 2;
   }
   var NumberController = (function(_Controller) {
-    inherits(NumberController, _Controller);
+    _inheritsLoose(NumberController, _Controller);
     function NumberController(object, property, params) {
-      classCallCheck(this, NumberController);
-      var _this = possibleConstructorReturn(
-        this,
-        (NumberController.__proto__ || Object.getPrototypeOf(NumberController)).call(this, object, property)
-      );
+      var _this;
+      _this = _Controller.call(this, object, property) || this;
       var _params = params || {};
       _this.__min = _params.min;
       _this.__max = _params.max;
@@ -1181,73 +1013,57 @@
       _this.__precision = numDecimals(_this.__impliedStep);
       return _this;
     }
-    createClass(NumberController, [
-      {
-        key: "setValue",
-        value: function setValue(v) {
-          var _v = v;
-          if (this.__min !== undefined && _v < this.__min) {
-            _v = this.__min;
-          } else if (this.__max !== undefined && _v > this.__max) {
-            _v = this.__max;
-          }
-          if (this.__step !== undefined && _v % this.__step !== 0) {
-            _v = Math.round(_v / this.__step) * this.__step;
-          }
-          return get(
-            NumberController.prototype.__proto__ || Object.getPrototypeOf(NumberController.prototype),
-            "setValue",
-            this
-          ).call(this, _v);
-        }
-      },
-      {
-        key: "min",
-        value: function min(minValue) {
-          this.__min = minValue;
-          return this;
-        }
-      },
-      {
-        key: "max",
-        value: function max(maxValue) {
-          this.__max = maxValue;
-          return this;
-        }
-      },
-      {
-        key: "step",
-        value: function step(stepValue) {
-          this.__step = stepValue;
-          this.__impliedStep = stepValue;
-          this.__precision = numDecimals(stepValue);
-          return this;
-        }
+    var _proto = NumberController.prototype;
+    _proto.setValue = function setValue(v) {
+      var _v = v;
+      if (this.__min !== undefined && _v < this.__min) {
+        _v = this.__min;
+      } else if (this.__max !== undefined && _v > this.__max) {
+        _v = this.__max;
       }
-    ]);
+      if (this.__step !== undefined && _v % this.__step !== 0) {
+        _v = Math.round(_v / this.__step) * this.__step;
+      }
+      return _Controller.prototype.setValue.call(this, _v);
+    };
+    _proto.min = function min(minValue) {
+      this.__min = minValue;
+      return this;
+    };
+    _proto.max = function max(maxValue) {
+      this.__max = maxValue;
+      return this;
+    };
+    _proto.step = function step(stepValue) {
+      this.__step = stepValue;
+      this.__impliedStep = stepValue;
+      this.__precision = numDecimals(stepValue);
+      return this;
+    };
     return NumberController;
-  })(Controller);
+  })(Controller$1);
 
   function roundToDecimal(value, decimals) {
     var tenTo = Math.pow(10, decimals);
     return Math.round(value * tenTo) / tenTo;
   }
   var NumberControllerBox = (function(_NumberController) {
-    inherits(NumberControllerBox, _NumberController);
+    _inheritsLoose(NumberControllerBox, _NumberController);
     function NumberControllerBox(object, property, params) {
-      classCallCheck(this, NumberControllerBox);
-      var _this2 = possibleConstructorReturn(
-        this,
-        (NumberControllerBox.__proto__ || Object.getPrototypeOf(NumberControllerBox)).call(
-          this,
-          object,
-          property,
-          params
-        )
-      );
+      var _this2;
+      _this2 = _NumberController.call(this, object, property, params) || this;
       _this2.__truncationSuspended = false;
-      var _this = _this2;
-      var prevY = void 0;
+      var _this = _assertThisInitialized(_this2);
+      var prevY;
+      var mousewheelevt = /Firefox/i.test(navigator.userAgent) ? "DOMMouseScroll" : "mousewheel";
+      function onMouseWheel(e) {
+        var value = _this.getValue();
+        var delta = (e.deltaY || -e.wheelDelta || e.detail) >> 10 || 1;
+        e.preventDefault();
+        if (delta < 0) value += _this.__impliedStep;
+        else value -= _this.__impliedStep;
+        _this.setValue(value);
+      }
       function onChange() {
         var attempted = parseFloat(_this.__input.value);
         if (!Common.isNaN(attempted)) {
@@ -1282,6 +1098,7 @@
       dom.bind(_this2.__input, "change", onChange);
       dom.bind(_this2.__input, "blur", onBlur);
       dom.bind(_this2.__input, "mousedown", onMouseDown);
+      dom.bind(_this2.__input, mousewheelevt, onMouseWheel);
       dom.bind(_this2.__input, "keydown", function(e) {
         if (e.keyCode === 13) {
           _this.__truncationSuspended = true;
@@ -1294,21 +1111,16 @@
       _this2.domElement.appendChild(_this2.__input);
       return _this2;
     }
-    createClass(NumberControllerBox, [
-      {
-        key: "updateDisplay",
-        value: function updateDisplay() {
-          this.__input.value = this.__truncationSuspended
-            ? this.getValue()
-            : roundToDecimal(this.getValue(), this.__precision);
-          return get(
-            NumberControllerBox.prototype.__proto__ || Object.getPrototypeOf(NumberControllerBox.prototype),
-            "updateDisplay",
-            this
-          ).call(this);
-        }
+    var _proto = NumberControllerBox.prototype;
+    _proto.updateDisplay = function updateDisplay() {
+      if (this.__input === document.activeElement) {
+        return;
       }
-    ]);
+      this.__input.value = this.__truncationSuspended
+        ? this.getValue()
+        : roundToDecimal(this.getValue(), this.__precision);
+      return _NumberController.prototype.updateDisplay.call(this);
+    };
     return NumberControllerBox;
   })(NumberController);
 
@@ -1316,25 +1128,33 @@
     return o1 + (o2 - o1) * ((v - i1) / (i2 - i1));
   }
   var NumberControllerSlider = (function(_NumberController) {
-    inherits(NumberControllerSlider, _NumberController);
+    _inheritsLoose(NumberControllerSlider, _NumberController);
     function NumberControllerSlider(object, property, min, max, step) {
-      classCallCheck(this, NumberControllerSlider);
-      var _this2 = possibleConstructorReturn(
-        this,
-        (NumberControllerSlider.__proto__ || Object.getPrototypeOf(NumberControllerSlider)).call(
-          this,
-          object,
-          property,
-          { min: min, max: max, step: step }
-        )
-      );
-      var _this = _this2;
+      var _this2;
+      _this2 =
+        _NumberController.call(this, object, property, {
+          min: min,
+          max: max,
+          step: step
+        }) || this;
+      var _this = _assertThisInitialized(_this2);
       _this2.__background = document.createElement("div");
       _this2.__foreground = document.createElement("div");
       dom.bind(_this2.__background, "mousedown", onMouseDown);
       dom.bind(_this2.__background, "touchstart", onTouchStart);
+      var mousewheelevt = /Firefox/i.test(navigator.userAgent) ? "DOMMouseScroll" : "mousewheel";
+      dom.bind(_this2.__background, mousewheelevt, onMouseWheel);
       dom.addClass(_this2.__background, "slider");
       dom.addClass(_this2.__foreground, "slider-fg");
+      function onMouseWheel(e) {
+        var value = _this.getValue();
+        var delta = (e.deltaY || -e.wheelDelta || e.detail) >> 10 || 1;
+        e.preventDefault();
+        document.activeElement.blur();
+        if (delta < 0) value += _this.__impliedStep;
+        else value -= _this.__impliedStep;
+        _this.setValue(value);
+      }
       function onMouseDown(e) {
         document.activeElement.blur();
         dom.bind(window, "mousemove", onMouseDrag);
@@ -1379,32 +1199,24 @@
       _this2.domElement.appendChild(_this2.__background);
       return _this2;
     }
-    createClass(NumberControllerSlider, [
-      {
-        key: "updateDisplay",
-        value: function updateDisplay() {
-          var pct = (this.getValue() - this.__min) / (this.__max - this.__min);
-          this.__foreground.style.width = pct * 100 + "%";
-          return get(
-            NumberControllerSlider.prototype.__proto__ || Object.getPrototypeOf(NumberControllerSlider.prototype),
-            "updateDisplay",
-            this
-          ).call(this);
-        }
+    var _proto = NumberControllerSlider.prototype;
+    _proto.updateDisplay = function updateDisplay() {
+      if (this.__input === document.activeElement) {
+        return;
       }
-    ]);
+      var pct = (this.getValue() - this.__min) / (this.__max - this.__min);
+      this.__foreground.style.width = pct * 100 + "%";
+      return _NumberController.prototype.updateDisplay.call(this);
+    };
     return NumberControllerSlider;
   })(NumberController);
 
   var FunctionController = (function(_Controller) {
-    inherits(FunctionController, _Controller);
+    _inheritsLoose(FunctionController, _Controller);
     function FunctionController(object, property, text) {
-      classCallCheck(this, FunctionController);
-      var _this2 = possibleConstructorReturn(
-        this,
-        (FunctionController.__proto__ || Object.getPrototypeOf(FunctionController)).call(this, object, property)
-      );
-      var _this = _this2;
+      var _this2;
+      _this2 = _Controller.call(this, object, property) || this;
+      var _this = _assertThisInitialized(_this2);
       _this2.__button = document.createElement("div");
       _this2.__button.innerHTML = text === undefined ? "Fire" : text;
       dom.bind(_this2.__button, "click", function(e) {
@@ -1420,32 +1232,25 @@
       _this2.domElement.appendChild(_this2.__button);
       return _this2;
     }
-    createClass(FunctionController, [
-      {
-        key: "fire",
-        value: function fire() {
-          if (this.__onChange) {
-            this.__onChange.call(this);
-          }
-          this.getValue().call(this.object);
-          if (this.__onFinishChange) {
-            this.__onFinishChange.call(this, this.getValue());
-          }
-        }
+    var _proto = FunctionController.prototype;
+    _proto.fire = function fire() {
+      if (this.__onChange) {
+        this.__onChange.call(this);
       }
-    ]);
+      this.getValue().call(this.object);
+      if (this.__onFinishChange) {
+        this.__onFinishChange.call(this, this.getValue());
+      }
+    };
     return FunctionController;
-  })(Controller);
+  })(Controller$1);
 
   var TabbedController = (function(_Controller) {
-    inherits(TabbedController, _Controller);
+    _inheritsLoose(TabbedController, _Controller);
     function TabbedController(object, property, text, tabs, displayName) {
-      classCallCheck(this, TabbedController);
-      var _this2 = possibleConstructorReturn(
-        this,
-        (TabbedController.__proto__ || Object.getPrototypeOf(TabbedController)).call(this, object, property)
-      );
-      var _this = _this2;
+      var _this2;
+      _this2 = _Controller.call(this, object, property) || this;
+      var _this = _assertThisInitialized(_this2);
       _this2.__button = document.createElement("div");
       _this2.__button.innerHTML = text === undefined ? "Fire" : text;
       dom.bind(_this2.__button, "click", function(e) {
@@ -1460,34 +1265,27 @@
       _this2.domElement.appendChild(_this2.__button);
       return _this2;
     }
-    createClass(TabbedController, [
-      {
-        key: "fire",
-        value: function fire() {
-          if (this.__onChange) {
-            this.__onChange.call(this);
-          }
-          this.getValue().call(this.object);
-          if (this.__onFinishChange) {
-            this.__onFinishChange.call(this, this.getValue());
-          }
-        }
+    var _proto = TabbedController.prototype;
+    _proto.fire = function fire() {
+      if (this.__onChange) {
+        this.__onChange.call(this);
       }
-    ]);
+      this.getValue().call(this.object);
+      if (this.__onFinishChange) {
+        this.__onFinishChange.call(this, this.getValue());
+      }
+    };
     return TabbedController;
   })(Controller);
 
   var ColorController = (function(_Controller) {
-    inherits(ColorController, _Controller);
+    _inheritsLoose(ColorController, _Controller);
     function ColorController(object, property) {
-      classCallCheck(this, ColorController);
-      var _this2 = possibleConstructorReturn(
-        this,
-        (ColorController.__proto__ || Object.getPrototypeOf(ColorController)).call(this, object, property)
-      );
+      var _this2;
+      _this2 = _Controller.call(this, object, property) || this;
       _this2.__color = new Color(_this2.getValue());
       _this2.__temp = new Color(0);
-      var _this = _this2;
+      var _this = _assertThisInitialized(_this2);
       _this2.domElement = document.createElement("div");
       dom.makeSelectable(_this2.domElement, false);
       _this2.__selector = document.createElement("div");
@@ -1676,56 +1474,52 @@
       }
       return _this2;
     }
-    createClass(ColorController, [
-      {
-        key: "updateDisplay",
-        value: function updateDisplay() {
-          var i = interpret(this.getValue());
-          if (i !== false) {
-            var mismatch = false;
-            Common.each(
-              Color.COMPONENTS,
-              function(component) {
-                if (
-                  !Common.isUndefined(i[component]) &&
-                  !Common.isUndefined(this.__color.__state[component]) &&
-                  i[component] !== this.__color.__state[component]
-                ) {
-                  mismatch = true;
-                  return {};
-                }
-              },
-              this
-            );
-            if (mismatch) {
-              Common.extend(this.__color.__state, i);
+    var _proto = ColorController.prototype;
+    _proto.updateDisplay = function updateDisplay() {
+      var i = interpret(this.getValue());
+      if (i !== false) {
+        var mismatch = false;
+        Common.each(
+          Color.COMPONENTS,
+          function(component) {
+            if (
+              !Common.isUndefined(i[component]) &&
+              !Common.isUndefined(this.__color.__state[component]) &&
+              i[component] !== this.__color.__state[component]
+            ) {
+              mismatch = true;
+              return {};
             }
-          }
-          Common.extend(this.__temp.__state, this.__color.__state);
-          this.__temp.a = 1;
-          var flip = this.__color.v < 0.5 || this.__color.s > 0.5 ? 255 : 0;
-          var _flip = 255 - flip;
-          Common.extend(this.__field_knob.style, {
-            marginLeft: 100 * this.__color.s - 7 + "px",
-            marginTop: 100 * (1 - this.__color.v) - 7 + "px",
-            backgroundColor: this.__temp.toHexString(),
-            border: this.__field_knob_border + "rgb(" + flip + "," + flip + "," + flip + ")"
-          });
-          this.__hue_knob.style.marginTop = (1 - this.__color.h / 360) * 100 + "px";
-          this.__temp.s = 1;
-          this.__temp.v = 1;
-          linearGradient(this.__saturation_field, "left", "#fff", this.__temp.toHexString());
-          this.__input.value = this.__color.toString();
-          Common.extend(this.__input.style, {
-            backgroundColor: this.__color.toHexString(),
-            color: "rgb(" + flip + "," + flip + "," + flip + ")",
-            textShadow: this.__input_textShadow + "rgba(" + _flip + "," + _flip + "," + _flip + ",.7)"
-          });
+          },
+          this
+        );
+        if (mismatch) {
+          Common.extend(this.__color.__state, i);
         }
       }
-    ]);
+      Common.extend(this.__temp.__state, this.__color.__state);
+      this.__temp.a = 1;
+      var flip = this.__color.v < 0.5 || this.__color.s > 0.5 ? 255 : 0;
+      var _flip = 255 - flip;
+      Common.extend(this.__field_knob.style, {
+        marginLeft: 100 * this.__color.s - 7 + "px",
+        marginTop: 100 * (1 - this.__color.v) - 7 + "px",
+        backgroundColor: this.__temp.toHexString(),
+        border: this.__field_knob_border + "rgb(" + flip + "," + flip + "," + flip + ")"
+      });
+      this.__hue_knob.style.marginTop = (1 - this.__color.h / 360) * 100 + "px";
+      this.__temp.s = 1;
+      this.__temp.v = 1;
+      linearGradient(this.__saturation_field, "left", "#fff", this.__temp.toHexString());
+      this.__input.value = this.__color.toString();
+      Common.extend(this.__input.style, {
+        backgroundColor: this.__color.toHexString(),
+        color: "rgb(" + flip + "," + flip + "," + flip + ")",
+        textShadow: this.__input_textShadow + "rgba(" + _flip + "," + _flip + "," + _flip + ",.7)"
+      });
+    };
     return ColorController;
-  })(Controller);
+  })(Controller$1);
   var vendors = ["-moz-", "-o-", "-webkit-", "-ms-", ""];
   function linearGradient(elem, x, a, b) {
     elem.style.background = "";
@@ -1748,7 +1542,9 @@
   }
 
   var commonjsGlobal =
-    typeof window !== "undefined"
+    typeof globalThis !== "undefined"
+      ? globalThis
+      : typeof window !== "undefined"
       ? window
       : typeof global !== "undefined"
       ? global
@@ -2087,9 +1883,7 @@
 
   var sibgif = createCommonjsModule(function(module, exports) {
     (function(root, factory) {
-      if (typeof undefined === "function" && undefined.amd) {
-        undefined([], factory);
-      } else {
+      {
         module.exports = factory();
       }
     })(commonjsGlobal, function() {
@@ -2122,7 +1916,6 @@
         var frame = null;
         var lastImg = null;
         var playing = true;
-        var forward = true;
         var ctx_scaled = false;
         var frames = [];
         var frameOffsets = [];
@@ -2327,7 +2120,7 @@
           var i = -1;
           var iterationCount = 0;
           var getNextFrameNo = function() {
-            var delta = forward ? 1 : -1;
+            var delta = 1;
             return (i + delta + frames.length) % frames.length;
           };
           var stepFrame = function(amount) {
@@ -2565,14 +2358,11 @@
     navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
 
   var ImageController = (function(_Controller) {
-    inherits(ImageController, _Controller);
+    _inheritsLoose(ImageController, _Controller);
     function ImageController(object, property, opts) {
-      classCallCheck(this, ImageController);
-      var _this = possibleConstructorReturn(
-        this,
-        (ImageController.__proto__ || Object.getPrototypeOf(ImageController)).call(this, object, property)
-      );
-      var defaultOptions = void 0;
+      var _this;
+      _this = _Controller.call(this, object, property) || this;
+      var defaultOptions;
       var disableVideo = false;
       if (opts.defaults) {
         disableVideo = opts.disableVideo;
@@ -2621,20 +2411,22 @@
       _this.__gifImg = _this.__selectedInputContainer.appendChild(document.createElement("img"));
       _this.__gifImg.crossOrigin = "anonymous";
       dom.addClass(_this.__gifImg, "content gif-img");
-      _this.__glGif = new sibgif({ gif: _this.__gifImg });
+      _this.__glGif = new sibgif({
+        gif: _this.__gifImg
+      });
       _this.__gifNeedsInitializing = true;
       _this.initializeValue();
       if (_this.__useCamera) {
-        dom.bind(_this.__camera, "click", onCameraClick.bind(_this));
+        dom.bind(_this.__camera, "click", onCameraClick.bind(_assertThisInitialized(_this)));
       }
-      dom.bind(_this.__plus, "click", chooseImage.bind(_this));
-      dom.bind(_this.__input, "change", inputChange.bind(_this));
-      dom.bind(_this.__img, "dragover", onDragOver.bind(_this));
-      dom.bind(_this.__img, "dragleave", onDragLeave.bind(_this));
-      dom.bind(_this.__img, "drop", onDrop.bind(_this));
-      dom.bind(_this.__video, "dragover", onDragOver.bind(_this));
-      dom.bind(_this.__video, "dragleave", onDragLeave.bind(_this));
-      dom.bind(_this.__video, "drop", onDrop.bind(_this));
+      dom.bind(_this.__plus, "click", chooseImage.bind(_assertThisInitialized(_this)));
+      dom.bind(_this.__input, "change", inputChange.bind(_assertThisInitialized(_this)));
+      dom.bind(_this.__img, "dragover", onDragOver.bind(_assertThisInitialized(_this)));
+      dom.bind(_this.__img, "dragleave", onDragLeave.bind(_assertThisInitialized(_this)));
+      dom.bind(_this.__img, "drop", onDrop.bind(_assertThisInitialized(_this)));
+      dom.bind(_this.__video, "dragover", onDragOver.bind(_assertThisInitialized(_this)));
+      dom.bind(_this.__video, "dragleave", onDragLeave.bind(_assertThisInitialized(_this)));
+      dom.bind(_this.__video, "drop", onDrop.bind(_assertThisInitialized(_this)));
       function chooseImage() {
         this.__input.click();
       }
@@ -2659,7 +2451,9 @@
       function onCameraClick() {
         var _this2 = this;
         navigator.mediaDevices
-          .getUserMedia({ video: true })
+          .getUserMedia({
+            video: true
+          })
           .then(function(localMediaStream) {
             _this2.killStream();
             _this2.videoStream = localMediaStream;
@@ -2669,225 +2463,200 @@
               domElement: _this2.__video
             });
           })
-          .catch(function(err) {
+          ["catch"](function(err) {
             _this2.killStream();
           });
       }
       _this.domElement.appendChild(_this.__controlContainer);
       return _this;
     }
-    createClass(ImageController, [
-      {
-        key: "killStream",
-        value: function killStream() {
-          if (!this.videoStream) return;
-          this.videoStream.getTracks().forEach(function(track) {
-            return track.stop();
-          });
-        }
-      },
-      {
-        key: "destruct",
-        value: function destruct() {
-          this.killStream();
-        }
-      },
-      {
-        key: "initializeValue",
-        value: function initializeValue() {
-          var asset = this.getValue();
-          if (!asset) {
-            return;
-          }
-          if (asset.type === "gif") {
-            if (this.__gifNeedsInitializing) {
-              this.setImage(asset.url, true);
-            } else {
-              this.setValue({
-                url: asset.url,
-                type: asset.type,
-                domElement: this.__glGif.get_canvas()
-              });
-            }
-          } else if (asset.type === "image") {
-            this.setValue({
-              url: asset.url,
-              type: asset.type,
-              domElement: this.__img
-            });
-          } else if (asset.type === "video") {
-            this.setValue({
-              url: asset.url,
-              type: asset.type,
-              domElement: this.__video
-            });
-          }
-        }
-      },
-      {
-        key: "updateDisplay",
-        value: function updateDisplay() {
-          var asset = this.getValue();
-          if (!asset) {
-            return;
-          }
-          if (asset.type === "image") {
-            this.setImage(asset.url, false);
-          } else if (asset.type === "gif") {
-            this.setImage(asset.url, true);
-          } else if (asset.type === "video") {
-            this.setVideo(asset.url);
-          } else if (asset.type === "video-stream") {
-            this.setVideo(asset.value);
-          }
-        }
-      },
-      {
-        key: "parseFile",
-        value: function parseFile(file) {
-          var type = file.type.split("/")[0];
-          if (this.__glGif) this.__glGif.pause();
-          if (type === "image") {
-            var _url = file.urlOverride || URL.createObjectURL(file);
-            var isAnimated = file.type.split("/")[1] === "gif" || file.animatedOverride;
-            if (!this.__disableVideo && isAnimated) {
-              if (this.__gifNeedsInitializing) {
-                this.setImage(_url, true);
-              } else {
-                this.setValue({
-                  url: _url,
-                  type: "gif",
-                  domElement: this.__glGif.get_canvas()
-                });
-              }
-            } else if (!isAnimated) {
-              this.setValue({
-                url: _url,
-                type: "image",
-                domElement: this.__img
-              });
-              this.setImage(_url, false);
-            }
-          } else if (!this.__disableVideo && type === "video") {
-            this.setValue({
-              url: url,
-              type: "video",
-              domElement: this.__video
-            });
-            this.setVideo();
-          }
-        }
-      },
-      {
-        key: "setImage",
-        value: function setImage(url, isAnimated) {
-          var _this3 = this;
-          if (this.__skipSetImage) {
-            this.__skipSetImage = false;
-            return;
-          }
-          this.__isVideo = false;
-          this.__isAnimated = isAnimated;
-          if (isAnimated) {
-            this.__img.src = "";
-            this.__img.style.display = "none";
-            this.__gifImg.src = url;
-            if (this.__glGif.get_canvas()) {
-              this.__glGif.get_canvas().style.display = "block";
-            }
-            this.__glGif.load(function(err) {
-              if (!err) {
-                _this3.__glGif.play().catch(function(e) {
-                  return console.log(e);
-                });
-                if (_this3.__gifNeedsInitializing) {
-                  _this3.__gifNeedsInitializing = false;
-                  _this3.__skipSetImage = true;
-                  _this3.setValue({
-                    url: url,
-                    type: "gif",
-                    domElement: _this3.__glGif.get_canvas()
-                  });
-                }
-              }
-            });
-          } else {
-            if (this.__glGif.get_canvas()) {
-              this.__glGif.get_canvas().style.display = "none";
-            }
-            this.__img.src = url;
-            this.__img.style.display = "block";
-          }
-          this.__video.style.display = "none";
-          this.__video.src = "";
-        }
-      },
-      {
-        key: "setVideo",
-        value: function setVideo() {
-          var asset = this.getValue();
-          if (asset.type === "video-stream") {
-            this.__video.srcObject = asset.value;
-          } else {
-            this.killStream();
-            this.__video.src = asset.url;
-          }
-          this.__isVideo = true;
-          this.__isAnimated = true;
-          this.__video.loop = true;
-          this.__video.volume = 0;
-          this.__video.play().catch(function(e) {
-            console.log(e, e.message, e.name);
-          });
-          this.__img.src = "data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=";
-          this.__img.style.display = "none";
-          if (this.__glGif.get_canvas()) {
-            this.__glGif.get_canvas().style.display = "none";
-          }
-          this.__video.style.display = "block";
-        }
-      },
-      {
-        key: "addSwatch",
-        value: function addSwatch(src, videoSrc) {
-          var _this4 = this;
-          var swatch = this.__swatchImages.appendChild(document.createElement("img"));
-          swatch.src = src;
-          swatch.videoSrc = videoSrc;
-          swatch.className = "swatch";
-          dom.bind(swatch, "click", function() {
-            if (videoSrc) {
-              _this4.setValue({
-                url: videoSrc,
-                type: "video",
-                domElement: _this4.__video
-              });
-            } else {
-              var isAnimated = src.split(".").pop() === "gif";
-              if (isAnimated) {
-                if (_this4.__gifNeedsInitializing) {
-                  _this4.setImage(url, true);
-                } else {
-                  _this4.setValue({
-                    url: src,
-                    type: "gif",
-                    domElement: _this4.__glGif.get_canvas()
-                  });
-                }
-              } else {
-                _this4.setValue({
-                  url: src,
-                  type: "image",
-                  domElement: _this4.__img
-                });
-              }
-            }
-          });
-        }
+    var _proto = ImageController.prototype;
+    _proto.killStream = function killStream() {
+      if (!this.videoStream) return;
+      this.videoStream.getTracks().forEach(function(track) {
+        return track.stop();
+      });
+    };
+    _proto.destruct = function destruct() {
+      this.killStream();
+    };
+    _proto.initializeValue = function initializeValue() {
+      var asset = this.getValue();
+      if (!asset) {
+        return;
       }
-    ]);
+      if (asset.type === "gif") {
+        if (this.__gifNeedsInitializing) {
+          this.setImage(asset.url, true);
+        } else {
+          this.setValue({
+            url: asset.url,
+            type: asset.type,
+            domElement: this.__glGif.get_canvas()
+          });
+        }
+      } else if (asset.type === "image") {
+        this.setValue({
+          url: asset.url,
+          type: asset.type,
+          domElement: this.__img
+        });
+      } else if (asset.type === "video") {
+        this.setValue({
+          url: asset.url,
+          type: asset.type,
+          domElement: this.__video
+        });
+      }
+    };
+    _proto.updateDisplay = function updateDisplay() {
+      var asset = this.getValue();
+      if (!asset) {
+        return;
+      }
+      if (asset.type === "image") {
+        this.setImage(asset.url, false);
+      } else if (asset.type === "gif") {
+        this.setImage(asset.url, true);
+      } else if (asset.type === "video") {
+        this.setVideo(asset.url);
+      } else if (asset.type === "video-stream") {
+        this.setVideo(asset.value);
+      }
+    };
+    _proto.parseFile = function parseFile(file) {
+      var type = file.type.split("/")[0];
+      if (this.__glGif) this.__glGif.pause();
+      if (type === "image") {
+        var _url = file.urlOverride || URL.createObjectURL(file);
+        var isAnimated = file.type.split("/")[1] === "gif" || file.animatedOverride;
+        if (!this.__disableVideo && isAnimated) {
+          if (this.__gifNeedsInitializing) {
+            this.setImage(_url, true);
+          } else {
+            this.setValue({
+              url: _url,
+              type: "gif",
+              domElement: this.__glGif.get_canvas()
+            });
+          }
+        } else if (!isAnimated) {
+          this.setValue({
+            url: _url,
+            type: "image",
+            domElement: this.__img
+          });
+          this.setImage(_url, false);
+        }
+      } else if (!this.__disableVideo && type === "video") {
+        this.setValue({
+          url: url,
+          type: "video",
+          domElement: this.__video
+        });
+        this.setVideo();
+      }
+    };
+    _proto.setImage = function setImage(url, isAnimated) {
+      var _this3 = this;
+      if (this.__skipSetImage) {
+        this.__skipSetImage = false;
+        return;
+      }
+      this.__isVideo = false;
+      this.__isAnimated = isAnimated;
+      if (isAnimated) {
+        this.__img.src = "";
+        this.__img.style.display = "none";
+        this.__gifImg.src = url;
+        if (this.__glGif.get_canvas()) {
+          this.__glGif.get_canvas().style.display = "block";
+        }
+        this.__glGif.load(function(err) {
+          if (!err) {
+            _this3.__glGif.play()["catch"](function(e) {
+              return console.log(e);
+            });
+            if (_this3.__gifNeedsInitializing) {
+              _this3.__gifNeedsInitializing = false;
+              _this3.__skipSetImage = true;
+              _this3.setValue({
+                url: url,
+                type: "gif",
+                domElement: _this3.__glGif.get_canvas()
+              });
+            }
+          }
+        });
+      } else {
+        if (this.__glGif.get_canvas()) {
+          this.__glGif.get_canvas().style.display = "none";
+        }
+        this.__img.src = url;
+        this.__img.style.display = "block";
+      }
+      this.__video.style.display = "none";
+      this.__video.src = "";
+    };
+    _proto.setVideo = function setVideo() {
+      var asset = this.getValue();
+      if (asset.type === "video-stream") {
+        this.__video.srcObject = asset.value;
+      } else {
+        this.killStream();
+        this.__video.src = asset.url;
+      }
+      this.__isVideo = true;
+      this.__isAnimated = true;
+      this.__video.loop = true;
+      this.__video.volume = 0;
+      this.__video.play()["catch"](function(e) {
+        console.log(e, e.message, e.name);
+      });
+      this.__img.src = "data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=";
+      this.__img.style.display = "none";
+      if (this.__glGif.get_canvas()) {
+        this.__glGif.get_canvas().style.display = "none";
+      }
+      this.__video.style.display = "block";
+    };
+    _proto.addSwatch = function addSwatch(src, videoSrc) {
+      var _this4 = this;
+      var swatch = this.__swatchImages.appendChild(document.createElement("img"));
+      swatch.src = src;
+      swatch.videoSrc = videoSrc;
+      swatch.className = "swatch";
+      dom.bind(swatch, "click", function() {
+        if (videoSrc) {
+          _this4.setValue({
+            url: videoSrc,
+            type: "video",
+            domElement: _this4.__video
+          });
+        } else {
+          var isAnimated = src.split(".").pop() === "gif";
+          if (isAnimated) {
+            if (_this4.__gifNeedsInitializing) {
+              _this4.setImage(url, true);
+            } else {
+              _this4.setValue({
+                url: src,
+                type: "gif",
+                domElement: _this4.__glGif.get_canvas()
+              });
+            }
+          } else {
+            _this4.setValue({
+              url: src,
+              type: "image",
+              domElement: _this4.__img
+            });
+          }
+        }
+      });
+    };
     return ImageController;
-  })(Controller);
+  })(Controller$1);
 
   var css = {
     load: function load(url, indoc) {
@@ -2920,23 +2689,25 @@
     return [(vec[0] - min[0]) / (max[0] - min[0]), (vec[1] - min[1]) / (max[1] - min[1])];
   }
   var VectorController = (function(_Controller) {
-    inherits(VectorController, _Controller);
-    function VectorController(object, property) {
-      var min = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [0, 0];
-      var max = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : [1, 1];
-      classCallCheck(this, VectorController);
-      var _this2 = possibleConstructorReturn(
-        this,
-        (VectorController.__proto__ || Object.getPrototypeOf(VectorController)).call(this, object, property, {
+    _inheritsLoose(VectorController, _Controller);
+    function VectorController(object, property, min, max) {
+      var _this2;
+      if (min === void 0) {
+        min = [0, 0];
+      }
+      if (max === void 0) {
+        max = [1, 1];
+      }
+      _this2 =
+        _Controller.call(this, object, property, {
           min: min,
           max: max
-        })
-      );
+        }) || this;
       _this2.__min = min;
       _this2.__max = max;
       _this2.__vec = _this2.getValue();
       _this2.__temp = [0, 0];
-      var _this = _this2;
+      var _this = _assertThisInitialized(_this2);
       _this2.domElement = document.createElement("div");
       dom.makeSelectable(_this2.domElement, false);
       _this2.__selector = document.createElement("div");
@@ -3029,23 +2800,19 @@
       }
       return _this2;
     }
-    createClass(VectorController, [
-      {
-        key: "updateDisplay",
-        value: function updateDisplay() {
-          this.__vec = this.getValue();
-          var offset = vec2pos(this.__vec, this.__min, this.__max);
-          Common.extend(this.__field_knob.style, {
-            marginLeft: 50 * offset[0] - 7 + "px",
-            marginTop: 50 * (1 - offset[1]) - 7 + "px"
-          });
-          this.__temp[0] = 1;
-          this.__temp[1] = 1;
-        }
-      }
-    ]);
+    var _proto = VectorController.prototype;
+    _proto.updateDisplay = function updateDisplay() {
+      this.__vec = this.getValue();
+      var offset = vec2pos(this.__vec, this.__min, this.__max);
+      Common.extend(this.__field_knob.style, {
+        marginLeft: 50 * offset[0] - 7 + "px",
+        marginTop: 50 * (1 - offset[1]) - 7 + "px"
+      });
+      this.__temp[0] = 1;
+      this.__temp[1] = 1;
+    };
     return VectorController;
-  })(Controller);
+  })(Controller$1);
 
   var ControllerFactory = function ControllerFactory(object, property) {
     var initialValue = object[property];
@@ -3060,9 +2827,16 @@
         return new NumberControllerSlider(object, property, arguments[2], arguments[3]);
       }
       if (Common.isNumber(arguments[4])) {
-        return new NumberControllerBox(object, property, { min: arguments[2], max: arguments[3], step: arguments[4] });
+        return new NumberControllerBox(object, property, {
+          min: arguments[2],
+          max: arguments[3],
+          step: arguments[4]
+        });
       }
-      return new NumberControllerBox(object, property, { min: arguments[2], max: arguments[3] });
+      return new NumberControllerBox(object, property, {
+        min: arguments[2],
+        max: arguments[3]
+      });
     }
     if (Common.isArray(initialValue) && initialValue.length === 2) {
       if (arguments.length > 3) {
@@ -3086,19 +2860,11 @@
   };
 
   var NumberControllerAnimator = (function(_NumberController) {
-    inherits(NumberControllerAnimator, _NumberController);
+    _inheritsLoose(NumberControllerAnimator, _NumberController);
     function NumberControllerAnimator(object, property, params) {
-      classCallCheck(this, NumberControllerAnimator);
-      var _this2 = possibleConstructorReturn(
-        this,
-        (NumberControllerAnimator.__proto__ || Object.getPrototypeOf(NumberControllerAnimator)).call(
-          this,
-          object,
-          property,
-          params
-        )
-      );
-      var _this = _this2;
+      var _this2;
+      _this2 = _NumberController.call(this, object, property, params) || this;
+      var _this = _assertThisInitialized(_this2);
       dom.addClass(_this2.domElement, "button-container");
       _this2.__animationMode = null;
       _this2.__sineButton = document.createElement("button");
@@ -3139,7 +2905,7 @@
       }
       function animate() {
         if (_this.__animationMode === null) return;
-        var percent = void 0;
+        var percent;
         if (_this.__animationMode === "sine") {
           percent = Math.sin(Date.now() / 1000) / 2 + 0.5;
         } else if (_this.__animationMode === "saw") {
@@ -3176,7 +2942,6 @@
 
   var CenteredDiv = (function() {
     function CenteredDiv() {
-      classCallCheck(this, CenteredDiv);
       this.backgroundElement = document.createElement("div");
       Common.extend(this.backgroundElement.style, {
         backgroundColor: "rgba(0,0,0,0.8)",
@@ -3206,56 +2971,44 @@
         _this.hide();
       });
     }
-    createClass(CenteredDiv, [
-      {
-        key: "show",
-        value: function show() {
-          var _this = this;
-          this.backgroundElement.style.display = "block";
-          this.domElement.style.display = "block";
-          this.domElement.style.opacity = 0;
-          this.domElement.style.webkitTransform = "scale(1.1)";
-          this.layout();
-          Common.defer(function() {
-            _this.backgroundElement.style.opacity = 1;
-            _this.domElement.style.opacity = 1;
-            _this.domElement.style.webkitTransform = "scale(1)";
-          });
-        }
-      },
-      {
-        key: "hide",
-        value: function hide() {
-          var _this = this;
-          var hide = function hide() {
-            _this.domElement.style.display = "none";
-            _this.backgroundElement.style.display = "none";
-            dom.unbind(_this.domElement, "webkitTransitionEnd", hide);
-            dom.unbind(_this.domElement, "transitionend", hide);
-            dom.unbind(_this.domElement, "oTransitionEnd", hide);
-          };
-          dom.bind(this.domElement, "webkitTransitionEnd", hide);
-          dom.bind(this.domElement, "transitionend", hide);
-          dom.bind(this.domElement, "oTransitionEnd", hide);
-          this.backgroundElement.style.opacity = 0;
-          this.domElement.style.opacity = 0;
-          this.domElement.style.webkitTransform = "scale(1.1)";
-        }
-      },
-      {
-        key: "layout",
-        value: function layout() {
-          this.domElement.style.left = window.innerWidth / 2 - dom.getWidth(this.domElement) / 2 + "px";
-          this.domElement.style.top = window.innerHeight / 2 - dom.getHeight(this.domElement) / 2 + "px";
-        }
-      }
-    ]);
+    var _proto = CenteredDiv.prototype;
+    _proto.show = function show() {
+      var _this = this;
+      this.backgroundElement.style.display = "block";
+      this.domElement.style.display = "block";
+      this.domElement.style.opacity = 0;
+      this.domElement.style.webkitTransform = "scale(1.1)";
+      this.layout();
+      Common.defer(function() {
+        _this.backgroundElement.style.opacity = 1;
+        _this.domElement.style.opacity = 1;
+        _this.domElement.style.webkitTransform = "scale(1)";
+      });
+    };
+    _proto.hide = function hide() {
+      var _this = this;
+      var hide = function hide() {
+        _this.domElement.style.display = "none";
+        _this.backgroundElement.style.display = "none";
+        dom.unbind(_this.domElement, "webkitTransitionEnd", hide);
+        dom.unbind(_this.domElement, "transitionend", hide);
+        dom.unbind(_this.domElement, "oTransitionEnd", hide);
+      };
+      dom.bind(this.domElement, "webkitTransitionEnd", hide);
+      dom.bind(this.domElement, "transitionend", hide);
+      dom.bind(this.domElement, "oTransitionEnd", hide);
+      this.backgroundElement.style.opacity = 0;
+      this.domElement.style.opacity = 0;
+      this.domElement.style.webkitTransform = "scale(1.1)";
+    };
+    _proto.layout = function layout() {
+      this.domElement.style.left = window.innerWidth / 2 - dom.getWidth(this.domElement) / 2 + "px";
+      this.domElement.style.top = window.innerHeight / 2 - dom.getHeight(this.domElement) / 2 + "px";
+    };
     return CenteredDiv;
   })();
 
-  var styleSheet = ___$insertStyle(
-    ".dg ul{list-style:none;margin:0;padding:0;width:100%;clear:both}.dg.ac{position:fixed;top:0;left:0;right:0;height:0;z-index:0}.dg:not(.ac) .main{overflow:hidden}.dg.main{-webkit-transition:opacity .1s linear;-o-transition:opacity .1s linear;-moz-transition:opacity .1s linear;transition:opacity .1s linear}.dg.main.taller-than-window{overflow-y:auto}.dg.main.taller-than-window .close-button{opacity:1;margin-top:-1px;border-top:1px solid #2c2c2c}.dg.main ul.closed .close-button{opacity:1 !important}.dg.main:hover .close-button,.dg.main .close-button.drag{opacity:1}.dg.main .close-button{-webkit-transition:opacity .1s linear;-o-transition:opacity .1s linear;-moz-transition:opacity .1s linear;transition:opacity .1s linear;border:0;line-height:19px;height:20px;cursor:pointer;text-align:center;background-color:#000}.dg.main .close-button.close-top{position:relative}.dg.main .close-button.close-bottom{position:absolute}.dg.main .close-button:hover{background-color:#111}.dg.main .close-button.display-none{display:none}.dg.a{float:right;margin-right:15px;overflow-y:visible}.dg.a.has-save>ul.close-top{margin-top:0}.dg.a.has-save>ul.close-bottom{margin-top:27px}.dg.a.has-save>ul.closed{margin-top:0}.dg.a .save-row{top:0;z-index:1002}.dg.a .save-row.close-top{position:relative}.dg.a .save-row.close-bottom{position:fixed}.dg li{-webkit-transition:height .1s ease-out;-o-transition:height .1s ease-out;-moz-transition:height .1s ease-out;transition:height .1s ease-out;-webkit-transition:overflow .1s linear;-o-transition:overflow .1s linear;-moz-transition:overflow .1s linear;transition:overflow .1s linear}.dg li:not(.folder){cursor:auto;height:27px;line-height:27px;padding:0 4px 0 5px}.dg li.folder{padding:0;border-left:4px solid transparent}.dg li.title{cursor:pointer;margin-left:-4px}.dg .closed li:not(.title),.dg .closed ul li,.dg .closed ul li>*{height:0;overflow:hidden;border:0}.dg .cr{clear:both;padding-left:3px;height:27px;overflow:hidden}.dg .property-name{cursor:default;float:left;clear:left;width:40%;overflow:hidden;text-overflow:ellipsis}.dg .c{float:left;width:60%;position:relative}.dg .c input[type=text]{border:0;margin-top:4px;padding:3px;width:100%;float:right}.dg .has-slider input[type=text]{width:30%;margin-left:0}.dg .slider{float:left;width:66%;margin-left:-5px;margin-right:0;height:19px;margin-top:4px}.dg .slider-fg{height:100%}.dg .c input[type=checkbox]{margin-top:7px}.dg .c select{margin-top:5px}.dg .cr.function,.dg .cr.function .property-name,.dg .cr.function *,.dg .cr.boolean,.dg .cr.boolean *{cursor:pointer}.dg .cr.color{overflow:visible}.dg .selector{display:none;position:absolute;margin-left:-9px;margin-top:23px;z-index:10}.dg .c:hover .selector,.dg .selector.drag{display:block}.dg li.save-row{padding:0}.dg li.save-row .button{display:inline-block;padding:0px 6px}.dg.dialogue{background-color:#222;width:460px;padding:15px;font-size:13px;line-height:15px}#dg-new-constructor{padding:10px;color:#222;font-family:Monaco, monospace;font-size:10px;border:0;resize:none;box-shadow:inset 1px 1px 1px #888;word-wrap:break-word;margin:12px 0;display:block;width:440px;overflow-y:scroll;height:100px;position:relative}#dg-local-explain{display:none;font-size:11px;line-height:17px;border-radius:3px;background-color:#333;padding:8px;margin-top:10px}#dg-local-explain code{font-size:10px}#dat-gui-save-locally{display:none}.dg{color:#eee;font:11px 'Lucida Grande', sans-serif;text-shadow:0 -1px 0 #111}.dg.main::-webkit-scrollbar{width:5px;background:#1a1a1a}.dg.main::-webkit-scrollbar-corner{height:0;display:none}.dg.main::-webkit-scrollbar-thumb{border-radius:5px;background:#676767}.dg li:not(.folder){background:#1a1a1a;border-bottom:1px solid #2c2c2c}.dg li.save-row{line-height:25px;background:#dad5cb;border:0}.dg li.save-row select{margin-left:5px;width:108px}.dg li.save-row .button{margin-left:5px;margin-top:1px;border-radius:2px;font-size:9px;line-height:7px;padding:4px 4px 5px 4px;background:#c5bdad;color:#fff;text-shadow:0 1px 0 #b0a58f;box-shadow:0 -1px 0 #b0a58f;cursor:pointer}.dg li.save-row .button.gears{background:#c5bdad url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAANCAYAAAB/9ZQ7AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAQJJREFUeNpiYKAU/P//PwGIC/ApCABiBSAW+I8AClAcgKxQ4T9hoMAEUrxx2QSGN6+egDX+/vWT4e7N82AMYoPAx/evwWoYoSYbACX2s7KxCxzcsezDh3evFoDEBYTEEqycggWAzA9AuUSQQgeYPa9fPv6/YWm/Acx5IPb7ty/fw+QZblw67vDs8R0YHyQhgObx+yAJkBqmG5dPPDh1aPOGR/eugW0G4vlIoTIfyFcA+QekhhHJhPdQxbiAIguMBTQZrPD7108M6roWYDFQiIAAv6Aow/1bFwXgis+f2LUAynwoIaNcz8XNx3Dl7MEJUDGQpx9gtQ8YCueB+D26OECAAQDadt7e46D42QAAAABJRU5ErkJggg==) 2px 1px no-repeat;height:7px;width:8px}.dg li.save-row .button:hover{background-color:#bab19e;box-shadow:0 -1px 0 #b0a58f}.dg li.folder{border-bottom:0}.dg li.title{padding-left:16px;background:#000 url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlI+hKgFxoCgAOw==) 6px 10px no-repeat;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.2)}.dg .closed li.title{background-image:url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlGIWqMCbWAEAOw==)}.dg .cr.boolean{border-left:3px solid #806787}.dg .cr.color{border-left:3px solid}.dg .cr.function{border-left:3px solid #e61d5f}.dg .cr.number{border-left:3px solid #2FA1D6}.dg .cr.number input[type=text]{color:#2FA1D6}.dg .cr.string{border-left:3px solid #1ed36f}.dg .cr.string input[type=text]{color:#1ed36f}.dg .cr.function:hover,.dg .cr.boolean:hover{background:#111}.dg .c input[type=text]{background:#303030;outline:none}.dg .c input[type=text]:hover{background:#3c3c3c}.dg .c input[type=text]:focus{background:#494949;color:#fff}.dg .c .slider{background:#303030;cursor:ew-resize}.dg .c .slider-fg{background:#2FA1D6;max-width:100%}.dg .c .slider:hover{background:#3c3c3c}.dg .c .slider:hover .slider-fg{background:#44abda}.dg.light-theme.main.taller-than-window .close-button{border-top:1px solid #ddd}.dg.light-theme.main .close-button{background-color:#e8e8e8}.dg.light-theme.main .close-button:hover{background-color:#ddd}.dg.light-theme.main::-webkit-scrollbar{background:#fafafa}.dg.light-theme.main::-webkit-scrollbar-thumb{background:#bbb}.dg.light-theme,.dg.light-theme .dg{color:#555;text-shadow:none !important}.dg.light-theme li:not(.folder),.dg.light-theme .dg li:not(.folder){background:#fafafa;border-bottom:1px solid #ddd}.dg.light-theme li.save-row .button,.dg.light-theme .dg li.save-row .button{text-shadow:none !important}.dg.light-theme li.title,.dg.light-theme .dg li.title{background:#e8e8e8 url(data:image/gif;base64,R0lGODlhBQAFAIQWAP8AAP8A/wAA/wD//wD/AP//AH8AAH8AfwAAfwB/fwB/AIJ/AAAAABkZGTMzM0xMTGZmZn9/f5mZmbKysszMzOXl5f///////////////////////////////////////yH5BAEKAB8ALAAAAAAFAAUAAAUL4CeOJGOa3zkyYggAOw==) 6px 10px no-repeat}.dg.light-theme .closed li.title,.dg.light-theme .dg .closed li.title{background-image:url(data:image/gif;base64,R0lGODlhBQAFAIQWAP8AAP8A/wAA/wD//wD/AP//AH8AAH8AfwAAfwB/fwB/AIJ/AAAAABkZGTMzM0xMTGZmZn9/f5mZmbKysszMzOXl5f///////////////////////////////////////yH5BAEKAB8ALAAAAAAFAAUAAAUL4PcxosiQ5pmWaAgAOw==)}.dg.light-theme .cr.function:hover,.dg.light-theme .cr.boolean:hover,.dg.light-theme .dg .cr.function:hover,.dg.light-theme .dg .cr.boolean:hover{background:#fff}.dg.light-theme .c input[type=text],.dg.light-theme .dg .c input[type=text]{background:#e9e9e9}.dg.light-theme .c input[type=text]:hover,.dg.light-theme .dg .c input[type=text]:hover{background:#eee}.dg.light-theme .c input[type=text]:focus,.dg.light-theme .dg .c input[type=text]:focus{background:#eee;color:#555}.dg.light-theme .c .slider,.dg.light-theme .dg .c .slider{background:#e9e9e9}.dg.light-theme .c .slider:hover,.dg.light-theme .dg .c .slider:hover{background:#eee}.dg.light-theme li.save-row .button,.dg.light-theme li.save-row .button.gears,.dg.light-theme .dg li.save-row .button,.dg.light-theme .dg li.save-row .button.gears{background-color:#bbb}.dg.light-theme li.save-row,.dg.light-theme .dg li.save-row{padding-top:4px}\n"
-  );
+  var styleSheet = "";
 
   css.inject(styleSheet);
   var CSS_NAMESPACE = "dg";
@@ -3269,9 +3022,9 @@
       return false;
     }
   })();
-  var SAVE_DIALOGUE = void 0;
+  var SAVE_DIALOGUE;
   var autoPlaceVirgin = true;
-  var autoPlaceContainer = void 0;
+  var autoPlaceContainer;
   var hide = false;
   var hideableGuis = [];
   var GUI = function GUI(pars) {
@@ -3301,7 +3054,9 @@
         params.load.preset = params.preset;
       }
     } else {
-      params.load = { preset: DEFAULT_DEFAULT_PRESET_NAME };
+      params.load = {
+        preset: DEFAULT_DEFAULT_PRESET_NAME
+      };
     }
     if (Common.isUndefined(params.parent) && params.hideable) {
       hideableGuis.push(this);
@@ -3312,57 +3067,57 @@
     }
     var useLocalStorage =
       SUPPORTS_LOCAL_STORAGE && localStorage.getItem(getLocalStorageHash(this, "isLocal")) === "true";
-    var saveToLocalStorage = void 0;
-    var titleRow = void 0;
+    var saveToLocalStorage;
+    var titleRow;
     Object.defineProperties(this, {
       lightTheme: {
-        set: function set$$1(v) {
+        set: function set(v) {
           params.lightTheme = v;
           if (v) dom.addClass(_this.domElement, GUI.CLASS_LIGHT_THEME);
           else dom.removeClass(_this.domElement, GUI.CLASS_LIGHT_THEME);
         },
-        get: function get$$1() {
+        get: function get() {
           return params.lightTheme;
         }
       },
       showCloseButton: {
-        set: function set$$1(v) {
+        set: function set(v) {
           params.showCloseButton = v;
           if (v) dom.removeClass(_this.__closeButton, GUI.CLASS_DISPLAY_NONE);
           else dom.addClass(_this.__closeButton, GUI.CLASS_DISPLAY_NONE);
         },
-        get: function get$$1() {
+        get: function get() {
           return params.showCloseButton;
         }
       },
       parent: {
-        get: function get$$1() {
+        get: function get() {
           return params.parent;
         }
       },
       scrollable: {
-        get: function get$$1() {
+        get: function get() {
           return params.scrollable;
         }
       },
       autoPlace: {
-        get: function get$$1() {
+        get: function get() {
           return params.autoPlace;
         }
       },
       closeOnTop: {
-        get: function get$$1() {
+        get: function get() {
           return params.closeOnTop;
         }
       },
       preset: {
-        get: function get$$1() {
+        get: function get() {
           if (_this.parent) {
             return _this.getRoot().preset;
           }
           return params.load.preset;
         },
-        set: function set$$1(v) {
+        set: function set(v) {
           if (_this.parent) {
             _this.getRoot().preset = v;
           } else {
@@ -3373,19 +3128,19 @@
         }
       },
       width: {
-        get: function get$$1() {
+        get: function get() {
           return params.width;
         },
-        set: function set$$1(v) {
+        set: function set(v) {
           params.width = v;
           setWidth(_this, v);
         }
       },
       name: {
-        get: function get$$1() {
+        get: function get() {
           return params.name;
         },
-        set: function set$$1(v) {
+        set: function set(v) {
           params.name = v;
           if (titleRow) {
             titleRow.innerHTML = params.name;
@@ -3393,10 +3148,10 @@
         }
       },
       closed: {
-        get: function get$$1() {
+        get: function get() {
           return params.closed;
         },
-        set: function set$$1(v) {
+        set: function set(v) {
           params.closed = v;
           if (params.closed) {
             dom.addClass(_this.__ul, GUI.CLASS_CLOSED);
@@ -3410,15 +3165,15 @@
         }
       },
       load: {
-        get: function get$$1() {
+        get: function get() {
           return params.load;
         }
       },
       useLocalStorage: {
-        get: function get$$1() {
+        get: function get() {
           return useLocalStorage;
         },
-        set: function set$$1(bool) {
+        set: function set(bool) {
           if (SUPPORTS_LOCAL_STORAGE) {
             useLocalStorage = bool;
             if (bool) {
@@ -3437,7 +3192,6 @@
       dom.makeSelectable(this.domElement, false);
       if (params.lightTheme) {
         dom.addClass(this.domElement, GUI.CLASS_LIGHT_THEME);
-        this.__folders;
       }
       if (SUPPORTS_LOCAL_STORAGE) {
         if (useLocalStorage) {
@@ -3546,8 +3300,8 @@
   GUI.CLASS_DISPLAY_NONE = "display-none";
   GUI.CLASS_LIGHT_THEME = "light-theme";
   GUI.DEFAULT_WIDTH = 245;
-  GUI.TEXT_CLOSED = "Close Controls";
-  GUI.TEXT_OPEN = "Open Controls";
+  GUI.TEXT_CLOSED = "Close View Controls";
+  GUI.TEXT_OPEN = "Open View Controls";
   GUI._keydownHandler = function(e) {
     if (document.activeElement.type !== "text" && (e.which === HIDE_KEY_CODE || e.keyCode === HIDE_KEY_CODE)) {
       GUI.toggleHide();
@@ -3601,9 +3355,12 @@
     },
     addFolder: function addFolder(name) {
       if (this.__folders[name] !== undefined) {
-        throw new Error("You already have a folder in this GUI by the" + ' name "' + name + '"');
+        throw new Error('You already have a folder in this GUI by the name "' + name + '"');
       }
-      var newGuiParams = { name: name, parent: this };
+      var newGuiParams = {
+        name: name,
+        parent: this
+      };
       newGuiParams.autoPlace = this.autoPlace;
       if (this.load && this.load.folders && this.load.folders[name]) {
         newGuiParams.closed = this.load.folders[name].closed;
@@ -3942,7 +3699,7 @@
       controllerMap[controller.property] = controller;
       if (root.load && root.load.remembered) {
         var presetMap = root.load.remembered;
-        var preset = void 0;
+        var preset;
         if (presetMap[gui.preset]) {
           preset = presetMap[gui.preset];
         } else if (presetMap[DEFAULT_DEFAULT_PRESET_NAME]) {
@@ -3962,7 +3719,7 @@
     if (object[property] === undefined) {
       throw new Error('Object "' + object + '" has no property "' + property + '"');
     }
-    var controller = void 0;
+    var controller;
     if (params.color) {
       controller = new ColorController(object, property);
     } else if (params.image) {
@@ -3971,7 +3728,7 @@
       var factoryArgs = [object, property].concat(params.factoryArgs);
       controller = ControllerFactory.apply(gui, factoryArgs);
     }
-    if (params.before instanceof Controller) {
+    if (params.before instanceof Controller$1) {
       params.before = params.before.__li;
     }
     recallSavedValue(gui, controller);
@@ -3993,7 +3750,7 @@
     } else if (controller instanceof ImageController) {
       dom.addClass(li, "image");
     } else {
-      dom.addClass(li, _typeof(controller.getValue()));
+      dom.addClass(li, typeof controller.getValue());
     }
     augmentController(gui, li, controller);
     gui.__controllers.push(controller);
@@ -4093,7 +3850,7 @@
     });
   }
   function addResizeHandle(gui) {
-    var pmouseX = void 0;
+    var pmouseX;
     gui.__resize_handle = document.createElement("div");
     Common.extend(gui.__resize_handle.style, {
       width: "6px",
@@ -4171,7 +3928,7 @@
     interpret: interpret
   };
   var controllers = {
-    Controller: Controller,
+    Controller: Controller$1,
     BooleanController: BooleanController,
     OptionController: OptionController,
     StringController: StringController,
@@ -4180,10 +3937,15 @@
     NumberControllerSlider: NumberControllerSlider,
     FunctionController: FunctionController,
     TabbedController: TabbedController,
-    ColorController: ColorController
+    ColorController: ColorController,
+    ImageController: ImageController
   };
-  var dom$1 = { dom: dom };
-  var gui = { GUI: GUI };
+  var dom$1 = {
+    dom: dom
+  };
+  var gui = {
+    GUI: GUI
+  };
   var GUI$1 = GUI;
   var index = {
     color: color,
@@ -4193,12 +3955,12 @@
     GUI: GUI$1
   };
 
+  exports.GUI = GUI$1;
   exports.color = color;
   exports.controllers = controllers;
+  exports.default = index;
   exports.dom = dom$1;
   exports.gui = gui;
-  exports.GUI = GUI$1;
-  exports["default"] = index;
 
   Object.defineProperty(exports, "__esModule", { value: true });
 });

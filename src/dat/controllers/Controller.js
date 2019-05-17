@@ -44,7 +44,7 @@ define([
      * @type {String}
      */
     this.property = property;
-
+    
     /**
      * The function to be called on change.
      * @type {Function}
@@ -120,7 +120,22 @@ define([
         getValue: function() {
           return this.object[this.property];
         },
+        
+         /**
+         * Set the drop handler
+         *
+         * @param {function} handler
+         */
+        setDropHandler: function(handler) {
+			  this.domElement.ondragover = function(event){event.preventDefault()};
+			  this.domElement.ondrop = function(event){
+				  event.preventDefault();
+				  handler.call(this, event.dataTransfer.getData("text"));
+				  };
 
+          return this;
+        },
+        
         /**
          * Refreshes the visual display of a Controller in order to keep sync
          * with the object's current value.

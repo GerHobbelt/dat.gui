@@ -212,7 +212,7 @@ dat.controllers.Controller = (function (common) {
      * @type {String}
      */
     this.property = property;
-
+    
     /**
      * The function to be called on change.
      * @type {Function}
@@ -285,7 +285,22 @@ dat.controllers.Controller = (function (common) {
         getValue: function() {
           return this.object[this.property];
         },
+        
+         /**
+         * Set the drop handler
+         *
+         * @param {function} handler
+         */
+        setDropHandler: function(handler) {
+			  this.domElement.ondragover = function(event){event.preventDefault()};
+			  this.domElement.ondrop = function(event){
+				  event.preventDefault();
+				  handler.call(this, event.dataTransfer.getData("text"));
+				  };
 
+          return this;
+        },
+        
         /**
          * Refreshes the visual display of a Controller in order to keep sync
          * with the object's current value.
@@ -2385,6 +2400,8 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
           this.__folders[name] = gui;
 
           var li = addRow(this, gui.domElement);
+		  li.setAttribute("draggable", "true");
+		  li.ondragstart = function(event){event.dataTransfer.setData("text", name)};
           dom.addClass(li, 'folder');
           return gui;
 
@@ -2620,14 +2637,14 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
 
     var name = document.createElement('span');
     dom.addClass(name, 'property-name');
-    name.innerHTML = controller.property;
+    name.innerHTML = controller.label;
 
-	var clear = document.createElement('div');
-	clear.style.clear = "both";
+    var clear = document.createElement('div');
+    clear.style.clear = "both";
     var container = document.createElement('div');
     container.appendChild(name);
     container.appendChild(controller.domElement);
-	container.appendChild(clear);
+    container.appendChild(clear);
 
     var li = addRow(gui, container, params.before);
 

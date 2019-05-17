@@ -720,6 +720,8 @@ define([
           this.__folders[name] = gui;
 
           var li = addRow(this, gui.domElement);
+		  li.setAttribute("draggable", "true");
+		  li.ondragstart = function(event){event.dataTransfer.setData("text", name)};
           dom.addClass(li, 'folder');
           return gui;
 
@@ -954,7 +956,7 @@ define([
 
     var name = document.createElement('span');
     dom.addClass(name, 'property-name');
-    name.innerHTML = controller.property;
+    name.innerHTML = controller.label;
 
 	var clear = document.createElement('div');
 	clear.style.clear = "both";

@@ -11,12 +11,8 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define([
-  'dat/controllers/Controller',
-  'dat/dom/dom',
-  'dat/utils/common'
-], function(Controller, dom, common) {
-  'use strict';
+define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], function(Controller, dom, common) {
+  "use strict";
 
   /**
    * @class Provides a checkbox input to alter the boolean property of an object.
@@ -28,15 +24,15 @@ define([
    * @member dat.controllers
    */
   var BooleanController = function(object, property, options) {
-    BooleanController.superclass.call(this, object, property, 'boolean', options);
+    BooleanController.superclass.call(this, object, property, "boolean", options);
 
     var _this = this;
     this.__prev = this.getValue();
 
-    this.__checkbox = document.createElement('input');
-    this.__checkbox.setAttribute('type', 'checkbox');
+    this.__checkbox = document.createElement("input");
+    this.__checkbox.setAttribute("type", "checkbox");
 
-    dom.bind(this.__checkbox, 'change', onChange, false);
+    dom.bind(this.__checkbox, "change", onChange, false);
 
     this.domElement.appendChild(this.__checkbox);
 
@@ -50,31 +46,26 @@ define([
 
   BooleanController.superclass = Controller;
 
-  common.extend(
-      BooleanController.prototype,
-      Controller.prototype,
-      {
-        setValue: function(v) {
-          var toReturn = BooleanController.superclass.prototype.setValue.call(this, v);
-          this.__prev = this.getValue();
-          return toReturn;
-        },
+  common.extend(BooleanController.prototype, Controller.prototype, {
+    setValue: function(v) {
+      var toReturn = BooleanController.superclass.prototype.setValue.call(this, v);
+      this.__prev = this.getValue();
+      return toReturn;
+    },
 
-        updateDisplay: function() {
-          if (this.getValue() === true) {
-            this.__checkbox.setAttribute('checked', 'checked');
-            this.__checkbox.checked = true;    
-          } else {
-            this.__checkbox.checked = false;
-          }
-
-          this.__checkbox.disabled = this.getReadonly();
-
-          return BooleanController.superclass.prototype.updateDisplay.call(this);
-        }
+    updateDisplay: function() {
+      if (this.getValue() === true) {
+        this.__checkbox.setAttribute("checked", "checked");
+        this.__checkbox.checked = true;
+      } else {
+        this.__checkbox.checked = false;
       }
-  );
+
+      this.__checkbox.disabled = this.getReadonly();
+
+      return BooleanController.superclass.prototype.updateDisplay.call(this);
+    }
+  });
 
   return BooleanController;
 });
-

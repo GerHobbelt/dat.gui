@@ -10,6 +10,8 @@
   },
   "scripts": {
     "test": "tests/index.html",
+    "lint": "eslint src",
+    "prettier": "prettier --print-width 120 --write *.js **/*.js **/*.ts",
     "pub": "npm publish --access public"
   },
   "repository": {
@@ -31,16 +33,17 @@
   },
   "homepage": "https://github.com/dataarts/dat.gui",
   "devDependencies": {
-    "qunit": "0.7.7",
-    "sass": "0.5.0",
-    "less": "2.5.3",
-    "requirejs": "2.1.20",
-    "grunt": "0.4.5",
+    "qunit": "2.9.2",
+    "sass": "1.20.1",
+    "less": "3.9.0",
+    "prettier": "^1.17.1",
+    "requirejs": "2.3.6",
+    "grunt": "1.0.4",
     "@gerhobbelt/grunt-contrib-jshint": "0.0.0",
-    "autoprefixer": "6.1.0",
-    "grunt-contrib-concat": "0.5.1",
+    "autoprefixer": "9.5.1",
+    "grunt-contrib-concat": "1.0.1",
     "amdclean": "2.7.0",
     "@gerhobbelt/grunt-contrib-requirejs": "0.0.0",
-    "load-grunt-tasks": "3.3.0"
+    "load-grunt-tasks": "4.0.0"
   }
 }

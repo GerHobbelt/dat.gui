@@ -12,14 +12,13 @@
  */
 
 define([
-    'dat/controllers/NumberController',
-    'dat/dom/dom',
-    'dat/utils/css',
-    'dat/utils/common',
-    'text!dat/controllers/NumberControllerSlider.css'
-], 
-function(NumberController, dom, css, common, styleSheet) {
-  'use strict';
+  "dat/controllers/NumberController",
+  "dat/dom/dom",
+  "dat/utils/css",
+  "dat/utils/common",
+  "text!dat/controllers/NumberControllerSlider.css"
+], function(NumberController, dom, css, common, styleSheet) {
+  "use strict";
 
   /**
    * @class Represents a given property of an object that is a number, contains
@@ -30,7 +29,7 @@ function(NumberController, dom, css, common, styleSheet) {
    *
    * @extends dat.controllers.Controller
    * @extends dat.controllers.NumberController
-   * 
+   *
    * @param {Object} object The object to be manipulated
    * @param {string} property The name of the property to be manipulated
    * @param {Number} minValue Minimum allowed value
@@ -45,8 +44,8 @@ function(NumberController, dom, css, common, styleSheet) {
     var _this = this;
 
     function onTouchDown(e) {
-      dom.bind(window, 'touchmove', onTouchDrag);
-      dom.bind(window, 'touchend', onTouchUp);
+      dom.bind(window, "touchmove", onTouchDrag);
+      dom.bind(window, "touchend", onTouchUp);
 
       onTouchDrag(e);
     }
@@ -56,29 +55,27 @@ function(NumberController, dom, css, common, styleSheet) {
 
       var offset = dom.getOffset(_this.__background);
       var width = dom.getWidth(_this.__background);
-      
-      _this.setValue(
-        map(e.touches[0].clientX, offset.left, offset.left + width, _this.__min, _this.__max)
-      );
+
+      _this.setValue(map(e.touches[0].clientX, offset.left, offset.left + width, _this.__min, _this.__max));
 
       return false;
     }
-    
+
     function onTouchUp(e) {
-      dom.unbind(window, 'touchmove', onTouchDrag);
-      dom.unbind(window, 'touchend', onTouchUp);
+      dom.unbind(window, "touchmove", onTouchDrag);
+      dom.unbind(window, "touchend", onTouchUp);
 
       e.preventDefault();
 
       _this.fireFinishChange({
         eventData: e,
-        eventSource: 'onTouchUp'
+        eventSource: "onTouchUp"
       });
-    }    
+    }
 
     function onMouseDown(e) {
-      dom.bind(window, 'mousemove', onMouseDrag);
-      dom.bind(window, 'mouseup', onMouseUp);
+      dom.bind(window, "mousemove", onMouseDrag);
+      dom.bind(window, "mouseup", onMouseUp);
 
       onMouseDrag(e);
     }
@@ -88,34 +85,32 @@ function(NumberController, dom, css, common, styleSheet) {
 
       var offset = dom.getOffset(_this.__background);
       var width = dom.getWidth(_this.__background);
-      
-      _this.setValue(
-        map(e.clientX, offset.left, offset.left + width, _this.__min, _this.__max)
-      );
+
+      _this.setValue(map(e.clientX, offset.left, offset.left + width, _this.__min, _this.__max));
 
       return false;
     }
 
     function onMouseUp(e) {
-      dom.unbind(window, 'mousemove', onMouseDrag);
-      dom.unbind(window, 'mouseup', onMouseUp);
+      dom.unbind(window, "mousemove", onMouseDrag);
+      dom.unbind(window, "mouseup", onMouseUp);
 
       e.preventDefault();
 
       _this.fireFinishChange({
         eventData: e,
-        eventSource: 'onMouseUp'
+        eventSource: "onMouseUp"
       });
     }
 
-    this.__background = document.createElement('div');
-    this.__foreground = document.createElement('div');
-    
-    dom.bind(this.__background, 'touchstart', onTouchDown);
-    dom.bind(this.__background, 'mousedown', onMouseDown);
-    
-    dom.addClass(this.__background, 'slider');
-    dom.addClass(this.__foreground, 'slider-fg');
+    this.__background = document.createElement("div");
+    this.__foreground = document.createElement("div");
+
+    dom.bind(this.__background, "touchstart", onTouchDown);
+    dom.bind(this.__background, "mousedown", onMouseDown);
+
+    dom.addClass(this.__background, "slider");
+    dom.addClass(this.__foreground, "slider-fg");
 
     this.updateDisplay();
 
@@ -132,17 +127,13 @@ function(NumberController, dom, css, common, styleSheet) {
     css.inject(styleSheet);
   };
 
-  common.extend(
-      NumberControllerSlider.prototype,
-      NumberController.prototype,
-      {
-        updateDisplay: function() {
-          var pct = (this.getValue() - this.__min) / (this.__max - this.__min);
-          this.__foreground.style.width = (pct * 100) + '%';
-          return NumberControllerSlider.superclass.prototype.updateDisplay.call(this);
-        }
-      }
-  );
+  common.extend(NumberControllerSlider.prototype, NumberController.prototype, {
+    updateDisplay: function() {
+      var pct = (this.getValue() - this.__min) / (this.__max - this.__min);
+      this.__foreground.style.width = pct * 100 + "%";
+      return NumberControllerSlider.superclass.prototype.updateDisplay.call(this);
+    }
+  });
 
   function map(v, i1, i2, o1, o2) {
     return o1 + (o2 - o1) * ((v - i1) / (i2 - i1));

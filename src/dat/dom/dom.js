@@ -11,16 +11,13 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define([
-  'dat/utils/common'
-], function(common) {
-
-  'use strict';
+define(["dat/utils/common"], function(common) {
+  "use strict";
 
   var EVENT_MAP = {
-    'HTMLEvents': ['change'],
-    'MouseEvents': ['click','mousemove','mousedown','mouseup', 'mouseover'],
-    'KeyboardEvents': ['keydown']
+    HTMLEvents: ["change"],
+    MouseEvents: ["click", "mousemove", "mousedown", "mouseup", "mouseover"],
+    KeyboardEvents: ["keydown"]
   };
 
   var EVENT_MAP_INV = {};
@@ -33,8 +30,7 @@ define([
   var CSS_VALUE_PIXELS = /(\d+(\.\d+)?)px/;
 
   function cssValueToPixels(val) {
-
-    if (val === '0' || common.isUndefined(val)) {
+    if (val === "0" || common.isUndefined(val)) {
       return 0;
     }
 
@@ -47,7 +43,6 @@ define([
     // TODO ...ems? %?
 
     return 0;
-
   }
 
   /**
@@ -55,27 +50,25 @@ define([
    * @member dat.dom
    */
   var dom = {
-
     /**
-     * 
+     *
      * @param elem
      * @param selectable
      */
     makeSelectable: function(elem, selectable) {
-
       if (elem === undefined || elem.style === undefined) {
         return;
       }
 
-      elem.onselectstart = selectable ? function() {
-        return false;
-      } : function() {
-      };
+      elem.onselectstart = selectable
+        ? function() {
+            return false;
+          }
+        : function() {};
 
-      elem.style.MozUserSelect = selectable ? 'auto' : 'none';
-      elem.style.KhtmlUserSelect = selectable ? 'auto' : 'none';
-      elem.unselectable = selectable ? 'on' : 'off';
-
+      elem.style.MozUserSelect = selectable ? "auto" : "none";
+      elem.style.KhtmlUserSelect = selectable ? "auto" : "none";
+      elem.unselectable = selectable ? "on" : "off";
     },
 
     /**
@@ -85,7 +78,6 @@ define([
      * @param vertical
      */
     makeFullscreen: function(elem, horizontal, vertical) {
-
       if (common.isUndefined(horizontal)) {
         horizontal = true;
       }
@@ -93,7 +85,7 @@ define([
         vertical = true;
       }
 
-      elem.style.position = 'absolute';
+      elem.style.position = "absolute";
 
       if (horizontal) {
         elem.style.left = 0;
@@ -103,7 +95,6 @@ define([
         elem.style.top = 0;
         elem.style.bottom = 0;
       }
-
     },
 
     /**
@@ -116,22 +107,32 @@ define([
       params = params || {};
       var className = EVENT_MAP_INV[eventType];
       if (!className) {
-        throw new Error('Event type ' + eventType + ' not supported.');
+        throw new Error("Event type " + eventType + " not supported.");
       }
       var evt = document.createEvent(className);
       switch (className) {
-        case 'MouseEvents':
+        case "MouseEvents":
           var clientX = params.x || params.clientX || 0;
           var clientY = params.y || params.clientY || 0;
-          evt.initMouseEvent(eventType, params.bubbles || false,
-              params.cancelable || true, window, params.clickCount || 1,
-              0, //screen X
-              0, //screen Y
-              clientX, //client X
-              clientY, //client Y
-              false, false, false, false, 0, null);
+          evt.initMouseEvent(
+            eventType,
+            params.bubbles || false,
+            params.cancelable || true,
+            window,
+            params.clickCount || 1,
+            0, //screen X
+            0, //screen Y
+            clientX, //client X
+            clientY, //client Y
+            false,
+            false,
+            false,
+            false,
+            0,
+            null
+          );
           break;
-        case 'KeyboardEvents':
+        case "KeyboardEvents":
           var init = evt.initKeyboardEvent || evt.initKeyEvent; // webkit || moz
           common.defaults(params, {
             cancelable: true,
@@ -142,15 +143,21 @@ define([
             keyCode: undefined,
             charCode: undefined
           });
-          init(eventType, params.bubbles || false,
-              params.cancelable, window,
-              params.ctrlKey, params.altKey,
-              params.shiftKey, params.metaKey,
-              params.keyCode, params.charCode);
+          init(
+            eventType,
+            params.bubbles || false,
+            params.cancelable,
+            window,
+            params.ctrlKey,
+            params.altKey,
+            params.shiftKey,
+            params.metaKey,
+            params.keyCode,
+            params.charCode
+          );
           break;
         default:
-          evt.initEvent(eventType, params.bubbles || false,
-              params.cancelable || true);
+          evt.initEvent(eventType, params.bubbles || false, params.cancelable || true);
           break;
       }
       common.defaults(evt, aux);
@@ -168,9 +175,8 @@ define([
       bool = bool || false;
       if (elem.addEventListener) {
         elem.addEventListener(event, func, bool);
-      }
-      else if (elem.attachEvent) {
-        elem.attachEvent('on' + event, func);
+      } else if (elem.attachEvent) {
+        elem.attachEvent("on" + event, func);
       }
       return dom;
     },
@@ -186,9 +192,8 @@ define([
       bool = bool || false;
       if (elem.removeEventListener) {
         elem.removeEventListener(event, func, bool);
-      }
-      else if (elem.detachEvent) {
-        elem.detachEvent('on' + event, func);
+      } else if (elem.detachEvent) {
+        elem.detachEvent("on" + event, func);
       }
       return dom;
     },
@@ -205,7 +210,10 @@ define([
         var classes = elem.className.split(/ +/);
         if (classes.indexOf(className) === -1) {
           classes.push(className);
-          elem.className = classes.join(' ').replace(/^\s+/, '').replace(/\s+$/, '');
+          elem.className = classes
+            .join(" ")
+            .replace(/^\s+/, "")
+            .replace(/\s+$/, "");
         }
       }
       return dom;
@@ -218,17 +226,17 @@ define([
      */
     removeClass: function(elem, className) {
       if (className) {
-        /* jshint -W035 */// jshint: ignore empty block
+        /* jshint -W035 */ // jshint: ignore empty block
         if (elem.className === undefined) {
           // elem.className = undefined;
         } else if (elem.className === className) {
-          elem.removeAttribute('class');
+          elem.removeAttribute("class");
         } else {
           var classes = elem.className.split(/ +/);
           var index = classes.indexOf(className);
           if (index !== -1) {
             classes.splice(index, 1);
-            elem.className = classes.join(' ');
+            elem.className = classes.join(" ");
           }
         }
         /* jshint +W035 */
@@ -239,7 +247,7 @@ define([
     },
 
     hasClass: function(elem, className) {
-      return new RegExp('(?:^|\\s+)' + className + '(?:\\s+|$)').test(elem.className) || false;
+      return new RegExp("(?:^|\\s+)" + className + "(?:\\s+|$)").test(elem.className) || false;
     },
 
     /**
@@ -247,14 +255,15 @@ define([
      * @param elem
      */
     getWidth: function(elem) {
-
       var style = getComputedStyle(elem);
 
-      return cssValueToPixels(style['border-left-width']) +
-          cssValueToPixels(style['border-right-width']) +
-          cssValueToPixels(style['padding-left']) +
-          cssValueToPixels(style['padding-right']) +
-          cssValueToPixels(style.width);
+      return (
+        cssValueToPixels(style["border-left-width"]) +
+        cssValueToPixels(style["border-right-width"]) +
+        cssValueToPixels(style["padding-left"]) +
+        cssValueToPixels(style["padding-right"]) +
+        cssValueToPixels(style.width)
+      );
     },
 
     /**
@@ -262,14 +271,15 @@ define([
      * @param elem
      */
     getHeight: function(elem) {
-
       var style = getComputedStyle(elem);
 
-      return cssValueToPixels(style['border-top-width']) +
-          cssValueToPixels(style['border-bottom-width']) +
-          cssValueToPixels(style['padding-top']) +
-          cssValueToPixels(style['padding-bottom']) +
-          cssValueToPixels(style.height);
+      return (
+        cssValueToPixels(style["border-top-width"]) +
+        cssValueToPixels(style["border-bottom-width"]) +
+        cssValueToPixels(style["padding-top"]) +
+        cssValueToPixels(style["padding-bottom"]) +
+        cssValueToPixels(style.height)
+      );
     },
 
     /**
@@ -277,7 +287,7 @@ define([
      * @param elem
      */
     getOffset: function(elem) {
-      var offset = {left: 0, top:0};
+      var offset = { left: 0, top: 0 };
       if (elem.offsetParent) {
         do {
           offset.left += elem.offsetLeft;
@@ -289,15 +299,13 @@ define([
 
     // http://stackoverflow.com/posts/2684561/revisions
     /**
-     * 
+     *
      * @param elem
      */
     isActive: function(elem) {
-      return elem === document.activeElement && ( elem.type || elem.href );
+      return elem === document.activeElement && (elem.type || elem.href);
     }
-
   };
 
   return dom;
-
 });

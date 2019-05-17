@@ -11,12 +11,8 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define([
-    'dat/controllers/Controller',
-    'dat/dom/dom',
-    'dat/utils/common'
-], function(Controller, dom, common) {
-  'use strict';
+define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], function(Controller, dom, common) {
+  "use strict";
 
   /**
    * @class Provides a text input to alter the string property of an object.
@@ -29,26 +25,26 @@ define([
    * @member dat.controllers
    */
   var StringController = function(object, property, options) {
-    StringController.superclass.call(this, object, property, 'string', options);
+    StringController.superclass.call(this, object, property, "string", options);
 
     var _this = this;
 
-    this.__input = document.createElement('input');
-    this.__input.setAttribute('type', 'text');
+    this.__input = document.createElement("input");
+    this.__input.setAttribute("type", "text");
 
-    dom.bind(this.__input, 'keyup', onChange);
-    dom.bind(this.__input, 'change', onChange);
-    dom.bind(this.__input, 'blur', onBlur);
-    dom.bind(this.__input, 'keydown', onKeyDown);
+    dom.bind(this.__input, "keyup", onChange);
+    dom.bind(this.__input, "change", onChange);
+    dom.bind(this.__input, "blur", onBlur);
+    dom.bind(this.__input, "keydown", onKeyDown);
 
     function onKeyDown(e) {
       if (e.keyCode === 13) {
         /* jshint validthis: true */
-        this.blur(); 
+        this.blur();
         /* jshint validthis: false */
       }
     }
-    
+
     function onChange() {
       _this.setValue(_this.__input.value);
     }
@@ -66,22 +62,17 @@ define([
 
   StringController.superclass = Controller;
 
-  common.extend(
-      StringController.prototype,
-      Controller.prototype,
-      {
-        updateDisplay: function() {
-          // Stops the caret from moving on account of:
-          // keyup -> setValue -> updateDisplay
-          if (!dom.isActive(this.__input)) {
-            this.__input.value = this.getValue();
-          }
-          this.__input.disabled = this.getReadonly();
-          return StringController.superclass.prototype.updateDisplay.call(this);
-        }
+  common.extend(StringController.prototype, Controller.prototype, {
+    updateDisplay: function() {
+      // Stops the caret from moving on account of:
+      // keyup -> setValue -> updateDisplay
+      if (!dom.isActive(this.__input)) {
+        this.__input.value = this.getValue();
       }
-  );
+      this.__input.disabled = this.getReadonly();
+      return StringController.superclass.prototype.updateDisplay.call(this);
+    }
+  });
 
   return StringController;
 });
-

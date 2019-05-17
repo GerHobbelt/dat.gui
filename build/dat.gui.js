@@ -29,13 +29,18 @@ dat.dom = dat.dom || {};
 /** @namespace */
 dat.color = dat.color || {};
 
-/** @namespace */
+dat.gui.settings = (function () {
+  return {
+    WINDOW: window.GUI_WINDOW || window,
+    DOCUMENT: document.GUI_DOCUMENT || document
+  }
+})();
 dat.easing = dat.easing || {};
 
-dat.utils.css = (function () {
+dat.utils.css = (function (settings) {
   return {
     load: function (url, doc) {
-      doc = doc || document;
+      doc = doc || settings.DOCUMENT;
       var link = doc.createElement('link');
       link.type = 'text/css';
       link.rel = 'stylesheet';
@@ -43,14 +48,14 @@ dat.utils.css = (function () {
       doc.getElementsByTagName('head')[0].appendChild(link);
     },
     inject: function(css, doc) {
-      doc = doc || document;
-      var injected = document.createElement('style');
+      doc = doc || settings.DOCUMENT;
+      var injected = settings.DOCUMENT.createElement('style');
       injected.type = 'text/css';
       injected.innerHTML = css;
       doc.getElementsByTagName('head')[0].appendChild(injected);
     }
   }
-})();
+})(dat.gui.settings);
 
 
 dat.utils.common = (function () {
@@ -181,7 +186,7 @@ dat.utils.common = (function () {
 })();
 
 
-dat.controllers.Controller = (function (common) {
+dat.controllers.Controller = (function (settings, common) {
 
   /**
    * @class An "abstract" class that represents a given property of an object.
@@ -199,7 +204,7 @@ dat.controllers.Controller = (function (common) {
      * Those who extend this class will put their DOM elements in here.
      * @type {DOMElement}
      */
-    this.domElement = document.createElement('div');
+    this.domElement = settings.DOCUMENT.createElement('div');
 
     /**
      * The object to manipulate
@@ -324,10 +329,11 @@ dat.controllers.Controller = (function (common) {
   return Controller;
 
 
-})(dat.utils.common);
+})(dat.gui.settings,
+dat.utils.common);
 
 
-dat.dom.dom = (function (common) {
+dat.dom.dom = (function (settings, common) {
 
   var EVENT_MAP = {
     'HTMLEvents': ['change'],
@@ -367,7 +373,7 @@ dat.dom.dom = (function (common) {
   var dom = {
 
     /**
-     * 
+     *
      * @param elem
      * @param selectable
      */
@@ -422,13 +428,13 @@ dat.dom.dom = (function (common) {
       if (!className) {
         throw new Error('Event type ' + eventType + ' not supported.');
       }
-      var evt = document.createEvent(className);
+      var evt = settings.DOCUMENT.createEvent(className);
       switch (className) {
         case 'MouseEvents':
           var clientX = params.x || params.clientX || 0;
           var clientY = params.y || params.clientY || 0;
           evt.initMouseEvent(eventType, params.bubbles || false,
-              params.cancelable || true, window, params.clickCount || 1,
+              params.cancelable || true, settings.WINDOW, params.clickCount || 1,
               0, //screen X
               0, //screen Y
               clientX, //client X
@@ -447,7 +453,7 @@ dat.dom.dom = (function (common) {
             charCode: undefined
           });
           init(eventType, params.bubbles || false,
-              params.cancelable, window,
+              params.cancelable, settings.WINDOW,
               params.ctrlKey, params.altKey,
               params.shiftKey, params.metaKey,
               params.keyCode, params.charCode);
@@ -587,21 +593,22 @@ dat.dom.dom = (function (common) {
 
     // http://stackoverflow.com/posts/2684561/revisions
     /**
-     * 
+     *
      * @param elem
      */
     isActive: function(elem) {
-      return elem === document.activeElement && ( elem.type || elem.href );
+      return elem === settings.DOCUMENT.activeElement && ( elem.type || elem.href );
     }
 
   };
 
   return dom;
 
-})(dat.utils.common);
+})(dat.gui.settings,
+dat.utils.common);
 
 
-dat.controllers.OptionController = (function (Controller, dom, common) {
+dat.controllers.OptionController = (function (settings, Controller, dom, common) {
 
   /**
    * @class Provides a select input to alter the property of an object, using a
@@ -626,7 +633,7 @@ dat.controllers.OptionController = (function (Controller, dom, common) {
      * The drop down menu
      * @ignore
      */
-    this.__select = document.createElement('select');
+    this.__select = settings.DOCUMENT.createElement('select');
 
     if (common.isArray(options)) {
       var map = {};
@@ -638,7 +645,7 @@ dat.controllers.OptionController = (function (Controller, dom, common) {
 
     common.each(options, function(value, key) {
 
-      var opt = document.createElement('option');
+      var opt = settings.DOCUMENT.createElement('option');
       opt.innerHTML = key;
       opt.setAttribute('value', value);
       _this.__select.appendChild(opt);
@@ -685,7 +692,8 @@ dat.controllers.OptionController = (function (Controller, dom, common) {
 
   return OptionController;
 
-})(dat.controllers.Controller,
+})(dat.gui.settings,
+dat.controllers.Controller,
 dat.dom.dom,
 dat.utils.common);
 
@@ -827,7 +835,7 @@ dat.controllers.NumberController = (function (Controller, common) {
 dat.utils.common);
 
 
-dat.controllers.NumberControllerBox = (function (NumberController, dom, common) {
+dat.controllers.NumberControllerBox = (function (settings, NumberController, dom, common) {
 
   /**
    * @class Represents a given property of an object that is a number and
@@ -860,7 +868,7 @@ dat.controllers.NumberControllerBox = (function (NumberController, dom, common) 
      */
     var prev_y;
 
-    this.__input = document.createElement('input');
+    this.__input = settings.DOCUMENT.createElement('input');
    
 	if (this.__step != undefined) {
 		this.__input.setAttribute('step', this.__step);
@@ -925,8 +933,8 @@ dat.controllers.NumberControllerBox = (function (NumberController, dom, common) 
     }
 
     function onMouseDown(e) {
-      dom.bind(window, 'mousemove', onMouseDrag);
-      dom.bind(window, 'mouseup', onMouseUp);
+      dom.bind(settings.WINDOW, 'mousemove', onMouseDrag);
+      dom.bind(settings.WINDOW, 'mouseup', onMouseUp);
       prev_y = e.clientY;
     }
 
@@ -940,8 +948,8 @@ dat.controllers.NumberControllerBox = (function (NumberController, dom, common) 
     }
 
     function onMouseUp() {
-      dom.unbind(window, 'mousemove', onMouseDrag);
-      dom.unbind(window, 'mouseup', onMouseUp);
+      dom.unbind(settings.WINDOW, 'mousemove', onMouseDrag);
+      dom.unbind(settings.WINDOW, 'mouseup', onMouseUp);
     }
 
     this.updateDisplay();
@@ -981,12 +989,13 @@ dat.controllers.NumberControllerBox = (function (NumberController, dom, common) 
 
   return NumberControllerBox;
 
-})(dat.controllers.NumberController,
+})(dat.gui.settings,
+dat.controllers.NumberController,
 dat.dom.dom,
 dat.utils.common);
 
 
-dat.controllers.NumberControllerSlider = (function (NumberController, dom, css, common, styleSheet) {
+dat.controllers.NumberControllerSlider = (function (settings, NumberController, dom, css, common, styleSheet) {
 
   /**
    * @class Represents a given property of an object that is a number, contains
@@ -997,7 +1006,7 @@ dat.controllers.NumberControllerSlider = (function (NumberController, dom, css, 
    *
    * @extends dat.controllers.Controller
    * @extends dat.controllers.NumberController
-   * 
+   *
    * @param {Object} object The object to be manipulated
    * @param {string} property The name of the property to be manipulated
    * @param {Number} minValue Minimum allowed value
@@ -1012,10 +1021,10 @@ dat.controllers.NumberControllerSlider = (function (NumberController, dom, css, 
 
     var _this = this;
 
-    this.__background = document.createElement('div');
+    this.__background = settings.DOCUMENT.createElement('div');
 	this.__label = document.createElement('div');
-    this.__foreground = document.createElement('div');
-   
+    this.__foreground = settings.DOCUMENT.createElement('div');
+    
 	function getEnumArr(hash) {
 		var arr = [];
 		var k;
@@ -1038,7 +1047,7 @@ dat.controllers.NumberControllerSlider = (function (NumberController, dom, css, 
 	this.__label.style.visibility = enumeration ? "visible" : "hidden";
 	
     dom.bind(this.__background, 'mousedown', onMouseDown);
-    
+
     dom.addClass(this.__background, 'slider');
 	dom.addClass(this.__label, 'label');
     dom.addClass(this.__foreground, 'slider-fg');
@@ -1046,8 +1055,8 @@ dat.controllers.NumberControllerSlider = (function (NumberController, dom, css, 
 	
     function onMouseDown(e) {
 
-      dom.bind(window, 'mousemove', onMouseDrag);
-      dom.bind(window, 'mouseup', onMouseUp);
+      dom.bind(settings.WINDOW, 'mousemove', onMouseDrag);
+      dom.bind(settings.WINDOW, 'mouseup', onMouseUp);
 
       onMouseDrag(e);
     }
@@ -1058,7 +1067,7 @@ dat.controllers.NumberControllerSlider = (function (NumberController, dom, css, 
 
       var offset = dom.getOffset(_this.__background);
       var width = dom.getWidth(_this.__background);
-      
+
       _this.setValue(
       	map(e.clientX, offset.left, offset.left + width, _this.__min, _this.__max)
       );
@@ -1068,8 +1077,8 @@ dat.controllers.NumberControllerSlider = (function (NumberController, dom, css, 
     }
 
     function onMouseUp() {
-      dom.unbind(window, 'mousemove', onMouseDrag);
-      dom.unbind(window, 'mouseup', onMouseUp);
+      dom.unbind(settings.WINDOW, 'mousemove', onMouseDrag);
+      dom.unbind(settings.WINDOW, 'mouseup', onMouseUp);
       if (_this.__onFinishChange) {
         _this.__onFinishChange.call(_this, _this.getValue());
       }
@@ -1141,8 +1150,9 @@ dat.controllers.NumberControllerSlider = (function (NumberController, dom, css, 
 	}
 
   return NumberControllerSlider;
-  
-})(dat.controllers.NumberController,
+
+})(dat.gui.settings,
+dat.controllers.NumberController,
 dat.dom.dom,
 dat.utils.css,
 dat.utils.common,
@@ -1226,7 +1236,7 @@ dat.dom.dom,
 dat.utils.common);
 
 
-dat.controllers.FunctionController = (function (Controller, dom, common) {
+dat.controllers.FunctionController = (function (settings, Controller, dom, common) {
 
   /**
    * @class Provides a GUI interface to fire a specified method, a property of an object.
@@ -1244,7 +1254,7 @@ dat.controllers.FunctionController = (function (Controller, dom, common) {
 
     var _this = this;
 
-    this.__button = document.createElement('div');
+    this.__button = settings.DOCUMENT.createElement('div');
     this.__button.innerHTML = text === undefined ? 'Fire' : text;
     dom.bind(this.__button, 'click', function(e) {
       e.preventDefault();
@@ -1266,7 +1276,7 @@ dat.controllers.FunctionController = (function (Controller, dom, common) {
       FunctionController.prototype,
       Controller.prototype,
       {
-        
+
         fire: function() {
           if (this.__onChange) {
             this.__onChange.call(this);
@@ -1282,12 +1292,13 @@ dat.controllers.FunctionController = (function (Controller, dom, common) {
 
   return FunctionController;
 
-})(dat.controllers.Controller,
+})(dat.gui.settings,
+dat.controllers.Controller,
 dat.dom.dom,
 dat.utils.common);
 
 
-dat.controllers.BooleanController = (function (Controller, dom, common) {
+dat.controllers.BooleanController = (function (settings, Controller, dom, common) {
 
   /**
    * @class Provides a checkbox input to alter the boolean property of an object.
@@ -1305,7 +1316,7 @@ dat.controllers.BooleanController = (function (Controller, dom, common) {
     var _this = this;
     this.__prev = this.getValue();
 
-    this.__checkbox = document.createElement('input');
+    this.__checkbox = settings.DOCUMENT.createElement('input');
     this.__checkbox.setAttribute('type', 'checkbox');
 
 
@@ -1341,10 +1352,10 @@ dat.controllers.BooleanController = (function (Controller, dom, common) {
         },
 
         updateDisplay: function() {
-          
+
           if (this.getValue() === true) {
             this.__checkbox.setAttribute('checked', 'checked');
-            this.__checkbox.checked = true;    
+            this.__checkbox.checked = true;
           } else {
               this.__checkbox.checked = false;
           }
@@ -1360,7 +1371,8 @@ dat.controllers.BooleanController = (function (Controller, dom, common) {
 
   return BooleanController;
 
-})(dat.controllers.Controller,
+})(dat.gui.settings,
+dat.controllers.Controller,
 dat.dom.dom,
 dat.utils.common);
 
@@ -1716,7 +1728,7 @@ dat.color.interpret = (function (toString, common) {
 dat.utils.common);
 
 
-dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, controllerFactory, Controller, BooleanController, FunctionController, NumberControllerBox, NumberControllerSlider, OptionController, ColorController, EasingFunctionController, requestAnimationFrame, CenteredDiv, dom, common) {
+dat.GUI = dat.gui.GUI = (function (settings, css, saveDialogueContents, styleSheet, controllerFactory, Controller, BooleanController, FunctionController, NumberControllerBox, NumberControllerSlider, OptionController, ColorController, EasingFunctionController, requestAnimationFrame, CenteredDiv, dom, common) {
 
   css.inject(styleSheet);
 
@@ -1732,7 +1744,7 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
 
   var SUPPORTS_LOCAL_STORAGE = (function() {
     try {
-      return 'localStorage' in window && window['localStorage'] !== null;
+      return 'localStorage' in settings.WINDOW && settings.WINDOW['localStorage'] !== null;
     } catch (e) {
       return false;
     }
@@ -1775,8 +1787,8 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
      * Outermost DOM Element
      * @type DOMElement
      */
-    this.domElement = document.createElement('div');
-    this.__ul = document.createElement('ul');
+    this.domElement = settings.DOCUMENT.createElement('div');
+    this.__ul = settings.DOCUMENT.createElement('ul');
     this.domElement.appendChild(this.__ul);
 
     dom.addClass(this.domElement, CSS_NAMESPACE);
@@ -1971,7 +1983,7 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
                 dom.removeClass(_this.__ul, GUI.CLASS_CLOSED);
               }
               // For browsers that aren't going to respect the CSS transition,
-              // Lets just check our height against the window height right off
+              // Lets just check our height against the settings.WINDOW height right off
               // the bat.
               this.onResize();
 
@@ -2005,9 +2017,9 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
               if (SUPPORTS_LOCAL_STORAGE) {
                 use_local_storage = bool;
                 if (bool) {
-                  dom.bind(window, 'unload', saveToLocalStorage);
+                  dom.bind(settings.WINDOW, 'unload', saveToLocalStorage);
                 } else {
-                  dom.unbind(window, 'unload', saveToLocalStorage);
+                  dom.unbind(settings.WINDOW, 'unload', saveToLocalStorage);
                 }
                 localStorage.setItem(getLocalStorageHash(_this, 'isLocal'), bool);
               }
@@ -2042,7 +2054,7 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
 
       }
 
-      this.__closeButton = document.createElement('div');
+      this.__closeButton = settings.DOCUMENT.createElement('div');
       this.__closeButton.innerHTML = GUI.TEXT_CLOSED;
       dom.addClass(this.__closeButton, GUI.CLASS_CLOSE_BUTTON);
       this.domElement.appendChild(this.__closeButton);
@@ -2062,7 +2074,7 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
         params.closed = true;
       }
 
-      var title_row_name = document.createTextNode(params.name);
+      var title_row_name = settings.DOCUMENT.createTextNode(params.name);
       dom.addClass(title_row_name, 'controller-name');
 
       var title_row = addRow(_this, title_row_name);
@@ -2090,10 +2102,10 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
       if (common.isUndefined(params.parent)) {
 
         if (auto_place_virgin) {
-          auto_place_container = document.createElement('div');
+          auto_place_container = settings.DOCUMENT.createElement('div');
           dom.addClass(auto_place_container, CSS_NAMESPACE);
           dom.addClass(auto_place_container, GUI.CLASS_AUTO_PLACE_CONTAINER);
-          document.body.appendChild(auto_place_container);
+          settings.DOCUMENT.body.appendChild(auto_place_container);
           auto_place_virgin = false;
         }
 
@@ -2111,7 +2123,7 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
 
     }
 
-    dom.bind(window, 'resize', function() { _this.onResize() });
+    dom.bind(settings.WINDOW, 'resize', function() { _this.onResize() });
     dom.bind(this.__ul, 'webkitTransitionEnd', function() { _this.onResize(); });
     dom.bind(this.__ul, 'transitionend', function() { _this.onResize() });
     dom.bind(this.__ul, 'oTransitionEnd', function() { _this.onResize() });
@@ -2244,9 +2256,9 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
   GUI.TEXT_CLOSED = 'Close Controls';
   GUI.TEXT_OPEN = 'Open Controls';
 
-  dom.bind(window, 'keydown', function(e) {
+  dom.bind(settings.WINDOW, 'keydown', function(e) {
 
-    if ( (document.activeElement.type !== 'text' && document.activeElement.nodeName.toString().toLowerCase() !== "textarea") &&
+    if ( (settings.DOCUMENT.activeElement.type !== 'text' && settings.DOCUMENT.activeElement.nodeName.toString().toLowerCase() !== "textarea") &&
         (e.which === HIDE_KEY_CODE || e.keyCode == HIDE_KEY_CODE)) {
       GUI.toggleHide();
     }
@@ -2429,9 +2441,9 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
                 h += dom.getHeight(node);
             });
 
-            if (window.innerHeight - top - CLOSE_BUTTON_HEIGHT < h) {
+            if (settings.WINDOW.innerHeight - top - CLOSE_BUTTON_HEIGHT < h) {
               dom.addClass(root.domElement, GUI.CLASS_TOO_TALL);
-              root.__ul.style.height = window.innerHeight - top - CLOSE_BUTTON_HEIGHT + 'px';
+              root.__ul.style.height = settings.WINDOW.innerHeight - top - CLOSE_BUTTON_HEIGHT + 'px';
             } else {
               dom.removeClass(root.domElement, GUI.CLASS_TOO_TALL);
               root.__ul.style.height = 'auto';
@@ -2635,13 +2647,13 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
 
     dom.addClass(controller.domElement, 'c');
 
-    var name = document.createElement('span');
+    var name = settings.DOCUMENT.createElement('span');
     dom.addClass(name, 'property-name');
     name.innerHTML = controller.label;
 
     var clear = document.createElement('div');
     clear.style.clear = "both";
-    var container = document.createElement('div');
+    var container = settings.DOCUMENT.createElement('div');
     container.appendChild(name);
     container.appendChild(controller.domElement);
     container.appendChild(clear);
@@ -2667,7 +2679,7 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
    * @param [liBefore] If specified, places the new row before another row
    */
   function addRow(gui, dom, liBefore) {
-    var li = document.createElement('li');
+    var li = settings.DOCUMENT.createElement('li');
     if (dom) li.appendChild(dom);
     if (liBefore) {
       gui.__ul.insertBefore(li, params.before);
@@ -2922,13 +2934,13 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
 
   function getLocalStorageHash(gui, key) {
     // TODO how does this deal with multiple GUI's?
-    return document.location.href + '.' + key;
+    return settings.DOCUMENT.location.href + '.' + key;
 
   }
 
   function addSaveMenu(gui) {
 
-    var div = gui.__save_row = document.createElement('li');
+    var div = gui.__save_row = settings.DOCUMENT.createElement('li');
 
     dom.addClass(gui.domElement, 'has-save');
 
@@ -2936,27 +2948,27 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
 
     dom.addClass(div, 'save-row');
 
-    var gears = document.createElement('span');
+    var gears = settings.DOCUMENT.createElement('span');
     gears.innerHTML = '&nbsp;';
     dom.addClass(gears, 'button gears');
 
     // TODO replace with FunctionController
-    var button = document.createElement('span');
+    var button = settings.DOCUMENT.createElement('span');
     button.innerHTML = 'Save';
     dom.addClass(button, 'button');
     dom.addClass(button, 'save');
 
-    var button2 = document.createElement('span');
+    var button2 = settings.DOCUMENT.createElement('span');
     button2.innerHTML = 'New';
     dom.addClass(button2, 'button');
     dom.addClass(button2, 'save-as');
 
-    var button3 = document.createElement('span');
+    var button3 = settings.DOCUMENT.createElement('span');
     button3.innerHTML = 'Revert';
     dom.addClass(button3, 'button');
     dom.addClass(button3, 'revert');
 
-    var select = gui.__preset_select = document.createElement('select');
+    var select = gui.__preset_select = settings.DOCUMENT.createElement('select');
 
     if (gui.load && gui.load.remembered) {
 
@@ -2987,12 +2999,12 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
 
     if (SUPPORTS_LOCAL_STORAGE) {
 
-      var saveLocally = document.getElementById('dg-save-locally');
-      var explain = document.getElementById('dg-local-explain');
+      var saveLocally = settings.DOCUMENT.getElementById('dg-save-locally');
+      var explain = settings.DOCUMENT.getElementById('dg-local-explain');
 
       saveLocally.style.display = 'block';
 
-      var localStorageCheckBox = document.getElementById('dg-local-storage');
+      var localStorageCheckBox = settings.DOCUMENT.getElementById('dg-local-storage');
 
       if (localStorage.getItem(getLocalStorageHash(gui, 'isLocal')) === 'true') {
         localStorageCheckBox.setAttribute('checked', 'checked');
@@ -3012,7 +3024,7 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
 
     }
 
-    var newConstructorTextArea = document.getElementById('dg-new-constructor');
+    var newConstructorTextArea = settings.DOCUMENT.getElementById('dg-new-constructor');
 
     dom.bind(newConstructorTextArea, 'keydown', function(e) {
       if (e.metaKey && (e.which === 67 || e.keyCode == 67)) {
@@ -3046,7 +3058,7 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
 
   function addResizeHandle(gui) {
 
-    gui.__resize_handle = document.createElement('div');
+    gui.__resize_handle = settings.DOCUMENT.createElement('div');
 
     common.extend(gui.__resize_handle.style, {
 
@@ -3073,8 +3085,8 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
       pmouseX = e.clientX;
 
       dom.addClass(gui.__closeButton, GUI.CLASS_DRAG);
-      dom.bind(window, 'mousemove', drag);
-      dom.bind(window, 'mouseup', dragStop);
+      dom.bind(settings.WINDOW, 'mousemove', drag);
+      dom.bind(settings.WINDOW, 'mouseup', dragStop);
 
 	 
 	  gui.domElement.dispatchEvent(new CustomEvent("dragstart", {
@@ -3101,8 +3113,9 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
     function dragStop() {
 
       dom.removeClass(gui.__closeButton, GUI.CLASS_DRAG);
-      dom.unbind(window, 'mousemove', drag);
-      dom.unbind(window, 'mouseup', dragStop);
+      dom.unbind(settings.WINDOW, 'mousemove', drag);
+      dom.unbind(settings.WINDOW, 'mouseup', dragStop);
+
 	   gui.domElement.dispatchEvent(new CustomEvent("dragstop", {
 			bubbles: true,
 			cancelable: true
@@ -3150,7 +3163,7 @@ dat.GUI = dat.gui.GUI = (function (css, saveDialogueContents, styleSheet, contro
   }
 
   function addPresetOption(gui, name, setSelected) {
-    var opt = document.createElement('option');
+    var opt = settings.DOCUMENT.createElement('option');
     opt.innerHTML = name;
     opt.value = name;
     gui.__preset_select.appendChild(opt);
@@ -3245,7 +3258,7 @@ dat.controllers.factory = (function (OptionController, NumberControllerBox, Numb
     })(dat.controllers.OptionController,
 dat.controllers.NumberControllerBox,
 dat.controllers.NumberControllerSlider,
-dat.controllers.StringController = (function (Controller, dom, common) {
+dat.controllers.StringController = (function (settings, Controller, dom, common) {
 
   /**
    * @class Provides a text input to alter the string property of an object.
@@ -3263,7 +3276,7 @@ dat.controllers.StringController = (function (Controller, dom, common) {
 
     var _this = this;
 
-    this.__input = document.createElement('input');
+    this.__input = settings.DOCUMENT.createElement('input');
     this.__input.setAttribute('type', 'text');
 
     dom.bind(this.__input, 'keyup', onChange);
@@ -3274,7 +3287,7 @@ dat.controllers.StringController = (function (Controller, dom, common) {
         this.blur();
       }
     });
-    
+
 
     function onChange() {
       _this.setValue(_this.__input.value);
@@ -3316,7 +3329,8 @@ dat.controllers.StringController = (function (Controller, dom, common) {
 
   return StringController;
 
-})(dat.controllers.Controller,
+})(dat.gui.settings,
+dat.controllers.Controller,
 dat.dom.dom,
 dat.utils.common),
 dat.controllers.TextAreaController,
@@ -3329,7 +3343,7 @@ dat.controllers.FunctionController,
 dat.controllers.NumberControllerBox,
 dat.controllers.NumberControllerSlider,
 dat.controllers.OptionController,
-dat.controllers.ColorController = (function (Controller, dom, Color, interpret, common) {
+dat.controllers.ColorController = (function (settings, Controller, dom, Color, interpret, common) {
 
   var ColorController = function(object, property) {
 
@@ -3340,27 +3354,27 @@ dat.controllers.ColorController = (function (Controller, dom, Color, interpret, 
 
     var _this = this;
 
-    this.domElement = document.createElement('div');
+    this.domElement = settings.DOCUMENT.createElement('div');
 
     dom.makeSelectable(this.domElement, false);
 
-    this.__selector = document.createElement('div');
+    this.__selector = settings.DOCUMENT.createElement('div');
     this.__selector.className = 'selector';
 
-    this.__saturation_field = document.createElement('div');
+    this.__saturation_field = settings.DOCUMENT.createElement('div');
     this.__saturation_field.className = 'saturation-field';
 
-    this.__field_knob = document.createElement('div');
+    this.__field_knob = settings.DOCUMENT.createElement('div');
     this.__field_knob.className = 'field-knob';
     this.__field_knob_border = '2px solid ';
 
-    this.__hue_knob = document.createElement('div');
+    this.__hue_knob = settings.DOCUMENT.createElement('div');
     this.__hue_knob.className = 'hue-knob';
 
-    this.__hue_field = document.createElement('div');
+    this.__hue_field = settings.DOCUMENT.createElement('div');
     this.__hue_field.className = 'hue-field';
 
-    this.__input = document.createElement('input');
+    this.__input = settings.DOCUMENT.createElement('input');
     this.__input.type = 'text';
     this.__input_textShadow = '0 1px 1px ';
 
@@ -3376,13 +3390,13 @@ dat.controllers.ColorController = (function (Controller, dom, Color, interpret, 
 
       dom
         .addClass(this, 'drag')
-        .bind(window, 'mouseup', function(e) {
+        .bind(settings.WINDOW, 'mouseup', function(e) {
           dom.removeClass(_this.__selector, 'drag');
         });
 
     });
 
-    var value_field = document.createElement('div');
+    var value_field = settings.DOCUMENT.createElement('div');
 
     common.extend(this.__selector.style, {
       width: '122px',
@@ -3401,7 +3415,7 @@ dat.controllers.ColorController = (function (Controller, dom, Color, interpret, 
       borderRadius: '12px',
       zIndex: 1
     });
-    
+
     common.extend(this.__hue_knob.style, {
       position: 'absolute',
       width: '15px',
@@ -3424,7 +3438,7 @@ dat.controllers.ColorController = (function (Controller, dom, Color, interpret, 
       height: '100%',
       background: 'none'
     });
-    
+
     linearGradient(value_field, 'top', 'rgba(0,0,0,0)', '#000');
 
     common.extend(this.__hue_field.style, {
@@ -3454,21 +3468,21 @@ dat.controllers.ColorController = (function (Controller, dom, Color, interpret, 
 
     dom.bind(this.__hue_field, 'mousedown', function(e) {
       setH(e);
-      dom.bind(window, 'mousemove', setH);
-      dom.bind(window, 'mouseup', unbindH);
+      dom.bind(settings.WINDOW, 'mousemove', setH);
+      dom.bind(settings.WINDOW, 'mouseup', unbindH);
     });
 
     function fieldDown(e) {
       setSV(e);
-      // document.body.style.cursor = 'none';
-      dom.bind(window, 'mousemove', setSV);
-      dom.bind(window, 'mouseup', unbindSV);
+      // settings.DOCUMENT.body.style.cursor = 'none';
+      dom.bind(settings.WINDOW, 'mousemove', setSV);
+      dom.bind(settings.WINDOW, 'mouseup', unbindSV);
     }
 
     function unbindSV() {
-      dom.unbind(window, 'mousemove', setSV);
-      dom.unbind(window, 'mouseup', unbindSV);
-      // document.body.style.cursor = 'default';
+      dom.unbind(settings.WINDOW, 'mousemove', setSV);
+      dom.unbind(settings.WINDOW, 'mouseup', unbindSV);
+      // settings.DOCUMENT.body.style.cursor = 'default';
     }
 
     function onBlur() {
@@ -3482,8 +3496,8 @@ dat.controllers.ColorController = (function (Controller, dom, Color, interpret, 
     }
 
     function unbindH() {
-      dom.unbind(window, 'mousemove', setH);
-      dom.unbind(window, 'mouseup', unbindH);
+      dom.unbind(settings.WINDOW, 'mousemove', setH);
+      dom.unbind(settings.WINDOW, 'mouseup', unbindH);
     }
 
     this.__saturation_field.appendChild(value_field);
@@ -3503,8 +3517,8 @@ dat.controllers.ColorController = (function (Controller, dom, Color, interpret, 
 
       var w = dom.getWidth(_this.__saturation_field);
       var o = dom.getOffset(_this.__saturation_field);
-      var s = (e.clientX - o.left + document.body.scrollLeft) / w;
-      var v = 1 - (e.clientY - o.top + document.body.scrollTop) / w;
+      var s = (e.clientX - o.left + settings.DOCUMENT.body.scrollLeft) / w;
+      var v = 1 - (e.clientY - o.top + settings.DOCUMENT.body.scrollTop) / w;
 
       if (v > 1) v = 1;
       else if (v < 0) v = 0;
@@ -3528,7 +3542,7 @@ dat.controllers.ColorController = (function (Controller, dom, Color, interpret, 
 
       var s = dom.getHeight(_this.__hue_field);
       var o = dom.getOffset(_this.__hue_field);
-      var h = 1 - (e.clientY - o.top + document.body.scrollTop) / s;
+      var h = 1 - (e.clientY - o.top + settings.DOCUMENT.body.scrollTop) / s;
 
       if (h > 1) h = 1;
       else if (h < 0) h = 0;
@@ -3611,16 +3625,16 @@ dat.controllers.ColorController = (function (Controller, dom, Color, interpret, 
       }
 
   );
-  
+
   var vendors = ['-moz-','-o-','-webkit-','-ms-',''];
-  
+
   function linearGradient(elem, x, a, b) {
     elem.style.background = '';
     common.each(vendors, function(vendor) {
       elem.style.cssText += 'background: ' + vendor + 'linear-gradient('+x+', '+a+' 0%, ' + b + ' 100%); ';
     });
   }
-  
+
   function hueGradient(elem) {
     elem.style.background = '';
     elem.style.cssText += 'background: -moz-linear-gradient(top,  #ff0000 0%, #ff00ff 17%, #0000ff 34%, #00ffff 50%, #00ff00 67%, #ffff00 84%, #ff0000 100%);'
@@ -3633,7 +3647,8 @@ dat.controllers.ColorController = (function (Controller, dom, Color, interpret, 
 
   return ColorController;
 
-})(dat.controllers.Controller,
+})(dat.gui.settings,
+dat.controllers.Controller,
 dat.dom.dom,
 dat.color.Color = (function (interpret, math, toString, common) {
 
@@ -4530,12 +4545,12 @@ dat.utils.requestAnimationFrame = (function () {
 
       };
 })(),
-dat.dom.CenteredDiv = (function (dom, common) {
+dat.dom.CenteredDiv = (function (settings, dom, common) {
 
 
   var CenteredDiv = function() {
 
-    this.backgroundElement = document.createElement('div');
+    this.backgroundElement = settings.DOCUMENT.createElement('div');
     common.extend(this.backgroundElement.style, {
       backgroundColor: 'rgba(0,0,0,0.8)',
       top: 0,
@@ -4550,7 +4565,7 @@ dat.dom.CenteredDiv = (function (dom, common) {
     dom.makeFullscreen(this.backgroundElement);
     this.backgroundElement.style.position = 'fixed';
 
-    this.domElement = document.createElement('div');
+    this.domElement = settings.DOCUMENT.createElement('div');
     common.extend(this.domElement.style, {
       position: 'fixed',
       display: 'none',
@@ -4561,8 +4576,8 @@ dat.dom.CenteredDiv = (function (dom, common) {
     });
 
 
-    document.body.appendChild(this.backgroundElement);
-    document.body.appendChild(this.domElement);
+    settings.DOCUMENT.body.appendChild(this.backgroundElement);
+    settings.DOCUMENT.body.appendChild(this.domElement);
 
     var _this = this;
     dom.bind(this.backgroundElement, 'click', function() {
@@ -4620,17 +4635,18 @@ dat.dom.CenteredDiv = (function (dom, common) {
   };
 
   CenteredDiv.prototype.layout = function() {
-    this.domElement.style.left = window.innerWidth/2 - dom.getWidth(this.domElement) / 2 + 'px';
-    this.domElement.style.top = window.innerHeight/2 - dom.getHeight(this.domElement) / 2 + 'px';
+    this.domElement.style.left = settings.WINDOW.innerWidth/2 - dom.getWidth(this.domElement) / 2 + 'px';
+    this.domElement.style.top = settings.WINDOW.innerHeight/2 - dom.getHeight(this.domElement) / 2 + 'px';
   };
-  
+
   function lockScroll(e) {
     console.log(e);
   }
 
   return CenteredDiv;
 
-})(dat.dom.dom,
+})(dat.gui.settings,
+dat.dom.dom,
 dat.utils.common),
 dat.dom.dom,
 dat.utils.common);

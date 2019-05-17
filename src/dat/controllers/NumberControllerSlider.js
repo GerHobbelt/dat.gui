@@ -12,13 +12,14 @@
  */
 
 define([
+    'dat/gui/settings',
     'dat/controllers/NumberController',
     'dat/dom/dom',
     'dat/utils/css',
     'dat/utils/common',
     'text!dat/controllers/NumberControllerSlider.css'
-], 
-function(NumberController, dom, css, common, styleSheet) {
+],
+function(settings, NumberController, dom, css, common, styleSheet) {
 
   /**
    * @class Represents a given property of an object that is a number, contains
@@ -29,7 +30,7 @@ function(NumberController, dom, css, common, styleSheet) {
    *
    * @extends dat.controllers.Controller
    * @extends dat.controllers.NumberController
-   * 
+   *
    * @param {Object} object The object to be manipulated
    * @param {string} property The name of the property to be manipulated
    * @param {Number} minValue Minimum allowed value
@@ -78,8 +79,8 @@ function(NumberController, dom, css, common, styleSheet) {
 	
     function onMouseDown(e) {
 
-      dom.bind(window, 'mousemove', onMouseDrag);
-      dom.bind(window, 'mouseup', onMouseUp);
+      dom.bind(settings.WINDOW, 'mousemove', onMouseDrag);
+      dom.bind(settings.WINDOW, 'mouseup', onMouseUp);
 
       onMouseDrag(e);
     }
@@ -90,7 +91,7 @@ function(NumberController, dom, css, common, styleSheet) {
 
       var offset = dom.getOffset(_this.__background);
       var width = dom.getWidth(_this.__background);
-      
+
       _this.setValue(
       	map(e.clientX, offset.left, offset.left + width, _this.__min, _this.__max)
       );
@@ -100,8 +101,8 @@ function(NumberController, dom, css, common, styleSheet) {
     }
 
     function onMouseUp() {
-      dom.unbind(window, 'mousemove', onMouseDrag);
-      dom.unbind(window, 'mouseup', onMouseUp);
+      dom.unbind(settings.WINDOW, 'mousemove', onMouseDrag);
+      dom.unbind(settings.WINDOW, 'mouseup', onMouseUp);
       if (_this.__onFinishChange) {
         _this.__onFinishChange.call(_this, _this.getValue());
       }
@@ -173,5 +174,5 @@ function(NumberController, dom, css, common, styleSheet) {
 	}
 
   return NumberControllerSlider;
-  
+
 });

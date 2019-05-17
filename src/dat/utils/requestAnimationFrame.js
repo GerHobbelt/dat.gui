@@ -12,8 +12,6 @@
  */
 
 define([], function() {
-  "use strict";
-
   /**
    * requirejs version of Paul Irish's RequestAnimationFrame
    * http://paulirish.com/2011/requestanimationframe-for-smart-animating/

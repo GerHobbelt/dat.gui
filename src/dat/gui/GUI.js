@@ -89,24 +89,22 @@ define([
   dom,
   common
 ) {
-  "use strict";
-
-  //var ARR_EACH = Array.prototype.forEach;
-  var ARR_SLICE = Array.prototype.slice;
+  // var ARR_EACH = Array.prototype.forEach;
+  const ARR_SLICE = Array.prototype.slice;
 
   css.inject(styleSheet);
 
   /** Outer-most className for GUI's */
-  var CSS_NAMESPACE = "dg";
+  const CSS_NAMESPACE = "dg";
 
-  var HIDE_KEY_CODE = 72;
+  const HIDE_KEY_CODE = 72;
 
   /** The only value shared between the JS and SCSS. Use caution. */
-  var CLOSE_BUTTON_HEIGHT = 20;
+  const CLOSE_BUTTON_HEIGHT = 20;
 
-  var DEFAULT_DEFAULT_PRESET_NAME = "Default";
+  const DEFAULT_DEFAULT_PRESET_NAME = "Default";
 
-  var SUPPORTS_LOCAL_STORAGE = (function() {
+  const SUPPORTS_LOCAL_STORAGE = (function() {
     try {
       return "localStorage" in window && window.localStorage !== null;
     } catch (e) {
@@ -114,19 +112,19 @@ define([
     }
   })();
 
-  var SAVE_DIALOGUE;
+  let SAVE_DIALOGUE;
 
   /** Have we yet to create an autoPlace GUI? */
-  var auto_place_virgin = true;
+  let auto_place_virgin = true;
 
   /** Fixed position div that auto place GUI's go inside */
-  var auto_place_container;
+  let auto_place_container;
 
   /** Are we hiding the GUI's ? */
-  var hide = false;
+  let hide = false;
 
   /** GUI's which should be hidden */
-  var hideable_guis = [];
+  const hideable_guis = [];
 
   /**
    * A lightweight controller library for JavaScript. It allows you to easily
@@ -144,7 +142,7 @@ define([
    * @param {Boolean} [params.closed] If true, starts closed
    */
   var GUI = function(params) {
-    var _this = this;
+    const _this = this;
 
     this.__typeControllers = {
       color: ColorController,
@@ -252,7 +250,7 @@ define([
       // only save the dat.GUI data when localStorage is available *and* has been enabled
       // (which it is by default; see `.useLocalStorage` get/set)
       if (_this.useLocalStorage) {
-        var save_record = _this.getSaveObject();
+        const save_record = _this.getSaveObject();
         localStorage.setItem(getLocalStorageHash(_this, "gui"), JSON.stringify(save_record));
       }
     }
@@ -295,9 +293,8 @@ define([
           get: function() {
             if (_this.parent) {
               return _this.getRoot().preset;
-            } else {
-              return params.load.preset;
             }
+            return params.load.preset;
           },
 
           set: function(v) {
@@ -402,12 +399,11 @@ define([
             if (!SUPPORTS_LOCAL_STORAGE) {
               return null;
             }
-            var rv = localStorage.getItem(getLocalStorageHash(_this, "isLocal"));
+            const rv = localStorage.getItem(getLocalStorageHash(_this, "isLocal"));
             if (rv === "0") {
               return true; // **default behaviour**: when the browser supports localStorage, it is available for dat.GUI data storage
-            } else {
-              return rv === "true";
             }
+            return rv === "true";
           },
           // @param {bool}:
           // - truthy value: explicitly enables localStorage (when the browser supports it)
@@ -446,11 +442,11 @@ define([
 
       // Are we supposed to be loading locally?
       if (SUPPORTS_LOCAL_STORAGE) {
-        var rv = this.useLocalStorage;
+        const rv = this.useLocalStorage;
         if (rv !== null) {
           this.useLocalStorage = true;
 
-          var saved_gui = localStorage.getItem(getLocalStorageHash(this, "gui"));
+          const saved_gui = localStorage.getItem(getLocalStorageHash(this, "gui"));
 
           // Mix the localStorage data with the optional user-provided load data:
           // user-provided load data prevails over localStorage data.
@@ -478,9 +474,9 @@ define([
       var title_row_name = document.createTextNode(params.name);
       dom.addClass(title_row_name, "controller-name");
 
-      var title_row = addRow(this, title_row_name);
+      const title_row = addRow(this, title_row_name);
 
-      var on_click_title = function(e) {
+      const on_click_title = function(e) {
         e.preventDefault();
         _this.closed = !_this.closed;
         return false;
@@ -551,7 +547,7 @@ define([
     };
 
     function resetWidth() {
-      var root = _this.getRoot();
+      const root = _this.getRoot();
       root.width += 1;
       common.defer(function() {
         root.width -= 1;
@@ -662,7 +658,7 @@ define([
         // TODO listening?
         this.__ul.removeChild(controller.__li);
         this.__controllers.splice(this.__controllers.indexOf(controller), 1);
-        var _this = this;
+        const _this = this;
         common.defer(function() {
           _this.onResize();
         });
@@ -689,7 +685,7 @@ define([
           throw new Error("You already have a folder in this GUI by the" + ' name "' + name + '"');
         }
 
-        var new_gui_params = { name: name, parent: this };
+        const new_gui_params = { name: name, parent: this };
 
         // We need to pass down the autoPlace trait so that we can
         // attach event listeners to open/close folder actions to
@@ -711,10 +707,10 @@ define([
           new_gui_params.load = this.load.folders[name];
         }
 
-        var gui = new GUI(new_gui_params);
+        const gui = new GUI(new_gui_params);
         this.__folders[name] = gui;
 
-        var li = addRow(this, gui.domElement);
+        const li = addRow(this, gui.domElement);
         dom.addClass(li, "folder");
         return gui;
       },
@@ -730,11 +726,11 @@ define([
       },
 
       onResize: function() {
-        var root = this.getRoot();
+        const root = this.getRoot();
 
         if (root.scrollable) {
-          var top = dom.getOffset(root.__ul).top;
-          var h = 0;
+          const { top } = dom.getOffset(root.__ul);
+          let h = 0;
 
           common.each(root.__ul.childNodes, function(node) {
             if (!(root.autoPlace && node === root.__save_row)) {
@@ -771,7 +767,7 @@ define([
        * @throws {Error} if not called on a top level GUI.
        * @instance
        */
-      remember: function(/*...args*/) {
+      remember: function(/* ...args */) {
         if (common.isUndefined(SAVE_DIALOGUE)) {
           SAVE_DIALOGUE = new CenteredDiv();
           SAVE_DIALOGUE.domElement.innerHTML = saveDialogueContents;
@@ -781,7 +777,7 @@ define([
           throw new Error("You can only call remember on a top level GUI.");
         }
 
-        var _this = this;
+        const _this = this;
 
         common.each(ARR_SLICE.call(arguments), function(object) {
           if (_this.__rememberedObjects.length === 0) {
@@ -793,7 +789,7 @@ define([
 
           // Check if any controllers which access this object have already been registered:
           // if so, update those controllers and the controller-to-object mapping.
-          var root = _this.getRoot();
+          const root = _this.getRoot();
 
           function scan_controllers(gui) {
             common.each(gui.__controllers, function(controller) {
@@ -822,7 +818,7 @@ define([
        * @instance
        */
       getRoot: function() {
-        var gui = this;
+        let gui = this;
         while (gui.parent) {
           gui = gui.parent;
         }
@@ -835,7 +831,7 @@ define([
        * @instance
        */
       getSaveObject: function() {
-        var toReturn = this.load;
+        const toReturn = this.load;
 
         toReturn.closed = this.closed;
 
@@ -921,7 +917,7 @@ define([
       },
 
       listen: function(controller) {
-        var init = this.__listening.length === 0;
+        const init = this.__listening.length === 0;
         this.__listening.push(controller);
         if (init) {
           updateDisplays(this.__listening);
@@ -932,8 +928,8 @@ define([
   );
 
   function add(gui, object, property, params) {
-    var factoryArgs = [object, property, params.controller, gui.__typeControllers].concat(params.factoryArgs);
-    var controller = controllerFactory.apply(gui, factoryArgs);
+    const factoryArgs = [object, property, params.controller, gui.__typeControllers].concat(params.factoryArgs);
+    const controller = controllerFactory.apply(gui, factoryArgs);
 
     if (!controller) {
       if (!(property in object)) {
@@ -957,15 +953,15 @@ define([
 
     dom.addClass(controller.domElement, "c");
 
-    var name = document.createElement("span");
+    const name = document.createElement("span");
     dom.addClass(name, "property-name");
     name.innerHTML = controller.property;
 
-    var container = document.createElement("div");
+    const container = document.createElement("div");
     container.appendChild(name);
     container.appendChild(controller.domElement);
 
-    var li = addRow(gui, container, params.before);
+    const li = addRow(gui, container, params.before);
 
     dom.addClass(li, GUI.CLASS_CONTROLLER_ROW);
     dom.addClass(li, controller.name);
@@ -985,7 +981,7 @@ define([
    * @param [liBefore] If specified, places the new row before another row
    */
   function addRow(gui, dom, liBefore) {
-    var li = document.createElement("li");
+    const li = document.createElement("li");
     if (dom) {
       li.appendChild(dom);
     }
@@ -1004,7 +1000,7 @@ define([
 
     common.extend(controller, {
       options: function(options) {
-        var next_sibling;
+        let next_sibling;
 
         if (arguments.length > 1) {
           next_sibling = controller.__li.nextElementSibling;
@@ -1045,7 +1041,7 @@ define([
 
     // All sliders should be accompanied by a box.
     if (controller instanceof NumberControllerSlider) {
-      var box = new NumberControllerBox(controller.object, controller.property, controller.getMetaInfo());
+      const box = new NumberControllerBox(controller.object, controller.property, controller.getMetaInfo());
 
       common.each(
         [
@@ -1061,10 +1057,10 @@ define([
           "setReadonly"
         ],
         function(method) {
-          var pc = controller[method];
-          var pb = box[method];
+          const pc = controller[method];
+          const pb = box[method];
           controller[method] = box[method] = function() {
-            var args = ARR_SLICE.call(arguments);
+            const args = ARR_SLICE.call(arguments);
             pc.apply(controller, args);
             return pb.apply(box, args);
           };
@@ -1074,7 +1070,7 @@ define([
       dom.addClass(li, "has-slider");
       controller.domElement.insertBefore(box.domElement, controller.domElement.firstElementChild);
     } else if (controller instanceof NumberControllerBox) {
-      var r = function(returned) {
+      const r = function(returned) {
         // Have we defined both boundaries?
         if (common.isNumber(controller.__min) && common.isNumber(controller.__max)) {
           // Well, then let's just replace this with a slider.
@@ -1142,16 +1138,16 @@ define([
 
   function recallSavedValue(gui, controller) {
     // Find the topmost GUI, that's where remembered objects live.
-    var root = gui.getRoot();
+    const root = gui.getRoot();
 
     // Does the object we're controlling match anything we've been told to
     // remember?
-    var matched_index = root.__rememberedObjects.indexOf(controller.object);
+    const matched_index = root.__rememberedObjects.indexOf(controller.object);
 
     // Why yes, it does!
     if (matched_index !== -1) {
       // Let me fetch a map of controllers for this object.
-      var controller_map = root.__rememberedObjectIndecesToControllers[matched_index];
+      let controller_map = root.__rememberedObjectIndecesToControllers[matched_index];
 
       // I believe this is the first controller we've created for this
       // object. Let's make a fresh map.
@@ -1165,10 +1161,10 @@ define([
 
       // Okay, now have we saved any values for this controller?
       if (root.load && root.load.remembered) {
-        var preset_map = root.load.remembered;
+        const preset_map = root.load.remembered;
 
         // Which preset are we trying to load?
-        var preset;
+        let preset;
 
         if (preset_map[gui.preset]) {
           preset = preset_map[gui.preset];
@@ -1187,7 +1183,7 @@ define([
           preset[matched_index][controller.property] !== undefined
         ) {
           // We did remember something for this guy ...
-          var value = preset[matched_index][controller.property];
+          const value = preset[matched_index][controller.property];
 
           // And that's what it is.
           controller.initialValue = value;
@@ -1203,7 +1199,7 @@ define([
   }
 
   function addSaveMenu(gui) {
-    var div = (gui.__save_row = document.createElement("li"));
+    const div = (gui.__save_row = document.createElement("li"));
 
     dom.addClass(gui.domElement, "has-save");
 
@@ -1211,27 +1207,27 @@ define([
 
     dom.addClass(div, "save-row");
 
-    var gears = document.createElement("span");
+    const gears = document.createElement("span");
     gears.innerHTML = "&nbsp;";
     dom.addClass(gears, "button gears");
 
     // TODO replace with FunctionController
-    var button = document.createElement("span");
+    const button = document.createElement("span");
     button.innerHTML = "Save";
     dom.addClass(button, "button");
     dom.addClass(button, "save");
 
-    var button2 = document.createElement("span");
+    const button2 = document.createElement("span");
     button2.innerHTML = "New";
     dom.addClass(button2, "button");
     dom.addClass(button2, "save-as");
 
-    var button3 = document.createElement("span");
+    const button3 = document.createElement("span");
     button3.innerHTML = "Revert";
     dom.addClass(button3, "button");
     dom.addClass(button3, "revert");
 
-    var select = (gui.__preset_select = document.createElement("select"));
+    const select = (gui.__preset_select = document.createElement("select"));
 
     if (gui.load && gui.load.remembered) {
       common.each(gui.load.remembered, function(value, key) {
@@ -1242,7 +1238,7 @@ define([
     }
 
     dom.bind(select, "change", function() {
-      for (var index = 0; index < gui.__preset_select.length; index++) {
+      for (let index = 0; index < gui.__preset_select.length; index++) {
         gui.__preset_select[index].innerHTML = gui.__preset_select[index].value;
       }
 
@@ -1260,12 +1256,12 @@ define([
     }
 
     if (SUPPORTS_LOCAL_STORAGE) {
-      var saveLocally = document.getElementById("dg-save-locally");
+      const saveLocally = document.getElementById("dg-save-locally");
       var explain = document.getElementById("dg-local-explain");
 
       saveLocally.style.display = "block";
 
-      var localStorageCheckBox = document.getElementById("dg-local-storage");
+      const localStorageCheckBox = document.getElementById("dg-local-storage");
 
       if (localStorage.getItem(getLocalStorageHash(gui, "isLocal")) === "true") {
         localStorageCheckBox.setAttribute("checked", "checked");
@@ -1280,7 +1276,7 @@ define([
       });
     }
 
-    var newConstructorTextArea = document.getElementById("dg-new-constructor");
+    const newConstructorTextArea = document.getElementById("dg-new-constructor");
 
     dom.bind(newConstructorTextArea, "keydown", function(e) {
       if (e.metaKey && (e.which === 67 || e.keyCode === 67)) {
@@ -1300,7 +1296,7 @@ define([
     });
 
     dom.bind(button2, "click", function() {
-      var presetName = prompt("Enter a new preset name.");
+      const presetName = prompt("Enter a new preset name.");
       if (presetName) {
         gui.saveAs(presetName);
       }
@@ -1323,7 +1319,7 @@ define([
       //      border: '1px solid blue'
     });
 
-    var pmouseX;
+    let pmouseX;
 
     dom.bind(gui.__resize_handle, "mousedown", dragStart);
     dom.bind(gui.__closeButton, "mousedown", dragStart);
@@ -1372,14 +1368,14 @@ define([
   }
 
   function getCurrentPreset(gui, useInitialValues) {
-    var toReturn = {};
+    const toReturn = {};
 
     // For each object I'm remembering
     common.each(gui.__rememberedObjects, function(val, index) {
-      var saved_values = {};
+      const saved_values = {};
 
       // The controllers I've made for this object by property
-      var controller_map = gui.__rememberedObjectIndecesToControllers[index];
+      const controller_map = gui.__rememberedObjectIndecesToControllers[index];
 
       // Remember each value for each property
       common.each(controller_map, function(controller, property) {
@@ -1394,7 +1390,7 @@ define([
   }
 
   function addPresetOption(gui, name, setSelected) {
-    var opt = document.createElement("option");
+    const opt = document.createElement("option");
     opt.innerHTML = name;
     opt.value = name;
     gui.__preset_select.appendChild(opt);
@@ -1404,7 +1400,7 @@ define([
   }
 
   function setPresetSelectIndex(gui) {
-    for (var index = 0; index < gui.__preset_select.length; index++) {
+    for (let index = 0; index < gui.__preset_select.length; index++) {
       if (gui.__preset_select[index].value === gui.preset) {
         gui.__preset_select.selectedIndex = index;
       }
@@ -1412,7 +1408,7 @@ define([
   }
 
   function markPresetModified(gui, modified) {
-    var opt = gui.__preset_select[gui.__preset_select.selectedIndex];
+    const opt = gui.__preset_select[gui.__preset_select.selectedIndex];
     //    console.log('mark', modified, opt);
     if (modified) {
       opt.innerHTML = opt.value + "*";

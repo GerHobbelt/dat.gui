@@ -12,8 +12,6 @@
  */
 
 define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], function(Controller, dom, common) {
-  "use strict";
-
   /**
    * @class Provides a controller to represent an UNDEFINED-valued property of an object.
    * @extends dat.controllers.Controller
@@ -26,7 +24,7 @@ define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], functi
   var UndefinedController = function(object, property, options) {
     UndefinedController.superclass.call(this, object, property, "undefined", options);
 
-    var _this = this;
+    const _this = this;
     this.__prev = this.getValue();
 
     this.__elem = document.createElement("em");

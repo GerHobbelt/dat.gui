@@ -9,8 +9,6 @@ define([
   "dat/utils/common",
   "text!dat/controllers/ImageController.css"
 ], function(Controller, dom, css, common, styleSheet) {
-  "use strict";
-
   /**
    * @class Provides a image/file input to alter the url property on an object
    *
@@ -24,7 +22,7 @@ define([
   function ImageController(Object, property) {
     ImageController.superclass.call(this, Object, property);
 
-    var _this = this;
+    const _this = this;
 
     this.__input = document.createElement("input");
     this.__input.setAttribute("type", "file");
@@ -40,14 +38,14 @@ define([
     dom.addClass(this.__label, "GUI-label-image");
 
     function onChange() {
-      var file = _this.__input.files[0];
-      var url = URL.createObjectURL(file);
+      const file = _this.__input.files[0];
+      const url = URL.createObjectURL(file);
       _this.__previewImage.src = url;
       _this.setValue(url);
     }
 
     dom.bind(this.__input, "change", onChange);
-    //todo: bind onDragRelease
+    // todo: bind onDragRelease
 
     this.updateDisplay();
     this.domElement.appendChild(this.__previewImage);

@@ -18,8 +18,6 @@ define([
   "dat/utils/common",
   "text!dat/controllers/NumberControllerSlider.css"
 ], function(NumberController, dom, css, common, styleSheet) {
-  "use strict";
-
   /**
    * @class Represents a given property of an object that is a number, contains
    * a minimum and maximum, and provides a slider element with which to
@@ -41,7 +39,7 @@ define([
   var NumberControllerSlider = function(object, property, min, max, step) {
     NumberControllerSlider.superclass.call(this, object, property, { min: min, max: max, step: step });
 
-    var _this = this;
+    const _this = this;
 
     function onTouchDown(e) {
       dom.bind(window, "touchmove", onTouchDrag);
@@ -53,8 +51,8 @@ define([
     function onTouchDrag(e) {
       e.preventDefault();
 
-      var offset = dom.getOffset(_this.__background);
-      var width = dom.getWidth(_this.__background);
+      const offset = dom.getOffset(_this.__background);
+      const width = dom.getWidth(_this.__background);
 
       _this.setValue(map(e.touches[0].clientX, offset.left, offset.left + width, _this.__min, _this.__max));
 
@@ -83,8 +81,8 @@ define([
     function onMouseDrag(e) {
       e.preventDefault();
 
-      var offset = dom.getOffset(_this.__background);
-      var width = dom.getWidth(_this.__background);
+      const offset = dom.getOffset(_this.__background);
+      const width = dom.getWidth(_this.__background);
 
       _this.setValue(map(e.clientX, offset.left, offset.left + width, _this.__min, _this.__max));
 
@@ -129,7 +127,7 @@ define([
 
   common.extend(NumberControllerSlider.prototype, NumberController.prototype, {
     updateDisplay: function() {
-      var pct = (this.getValue() - this.__min) / (this.__max - this.__min);
+      const pct = (this.getValue() - this.__min) / (this.__max - this.__min);
       this.__foreground.style.width = pct * 100 + "%";
       return NumberControllerSlider.superclass.prototype.updateDisplay.call(this);
     }

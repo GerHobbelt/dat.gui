@@ -12,8 +12,6 @@
  */
 
 define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], function(Controller, dom, common) {
-  "use strict";
-
   /**
    * @class Provides a NULL controller to represent a NULL property of an object.
    * @extends dat.controllers.Controller
@@ -26,7 +24,7 @@ define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], functi
   var NullController = function(object, property, options) {
     NullController.superclass.call(this, object, property, "null", options);
 
-    var _this = this;
+    const _this = this;
     this.__prev = this.getValue();
 
     this.__elem = document.createElement("em");

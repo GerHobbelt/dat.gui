@@ -12,14 +12,13 @@
  */
 
 define(["dat/color/toString", "dat/utils/common"], function(toString, common) {
-  "use strict";
+  let result;
+  let toReturn;
 
-  var result, toReturn;
-
-  var interpret = function() {
+  const interpret = function() {
     toReturn = false;
 
-    var original = arguments.length > 1 ? common.toArray(arguments) : arguments[0];
+    const original = arguments.length > 1 ? common.toArray(arguments) : arguments[0];
 
     common.each(INTERPRETATIONS, function(family) {
       if (family.litmus(original)) {
@@ -49,7 +48,7 @@ define(["dat/color/toString", "dat/utils/common"], function(toString, common) {
       conversions: {
         THREE_CHAR_HEX: {
           read: function(original) {
-            var test = original.match(/^#([A-F0-9])([A-F0-9])([A-F0-9])$/i);
+            const test = original.match(/^#([A-F0-9])([A-F0-9])([A-F0-9])$/i);
             if (test === null) {
               return false;
             }
@@ -74,7 +73,7 @@ define(["dat/color/toString", "dat/utils/common"], function(toString, common) {
 
         SIX_CHAR_HEX: {
           read: function(original) {
-            var test = original.match(/^#([A-F0-9]{6})$/i);
+            const test = original.match(/^#([A-F0-9]{6})$/i);
             if (test === null) {
               return false;
             }
@@ -90,7 +89,7 @@ define(["dat/color/toString", "dat/utils/common"], function(toString, common) {
 
         CSS_RGB: {
           read: function(original) {
-            var test = original.match(/^rgb\(\s*(.+)\s*,\s*(.+)\s*,\s*(.+)\s*\)/);
+            const test = original.match(/^rgb\(\s*(.+)\s*,\s*(.+)\s*,\s*(.+)\s*\)/);
             if (test === null) {
               return false;
             }
@@ -108,7 +107,7 @@ define(["dat/color/toString", "dat/utils/common"], function(toString, common) {
 
         CSS_RGBA: {
           read: function(original) {
-            var test = original.match(/^rgba\(\s*(.+)\s*,\s*(.+)\s*,\s*(.+)\s*\,\s*(.+)\s*\)/);
+            const test = original.match(/^rgba\(\s*(.+)\s*,\s*(.+)\s*,\s*(.+)\s*\,\s*(.+)\s*\)/);
             if (test === null) {
               return false;
             }

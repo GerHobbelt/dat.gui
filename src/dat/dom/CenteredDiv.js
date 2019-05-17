@@ -12,9 +12,7 @@
  */
 
 define(["dat/dom/dom", "dat/utils/common"], function(dom, common) {
-  "use strict";
-
-  var CenteredDiv = function() {
+  const CenteredDiv = function() {
     this.backgroundElement = document.createElement("div");
     common.extend(this.backgroundElement.style, {
       backgroundColor: "rgba(0,0,0,0.8)",
@@ -43,14 +41,14 @@ define(["dat/dom/dom", "dat/utils/common"], function(dom, common) {
     document.body.appendChild(this.backgroundElement);
     document.body.appendChild(this.domElement);
 
-    var _this = this;
+    const _this = this;
     dom.bind(this.backgroundElement, "click", function() {
       _this.hide();
     });
   };
 
   CenteredDiv.prototype.show = function() {
-    var _this = this;
+    const _this = this;
 
     this.backgroundElement.style.display = "block";
 
@@ -69,7 +67,7 @@ define(["dat/dom/dom", "dat/utils/common"], function(dom, common) {
   };
 
   CenteredDiv.prototype.hide = function() {
-    var _this = this;
+    const _this = this;
 
     var hide = function() {
       _this.domElement.style.display = "none";

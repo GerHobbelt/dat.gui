@@ -18,17 +18,15 @@ define([
   "dat/color/interpret",
   "dat/utils/common"
 ], function(Controller, dom, Color, interpret, common) {
-  "use strict";
-
   var ColorController = function(object, property, options) {
     ColorController.superclass.call(this, object, property, "color", options);
 
     this.__color = new Color(this.getValue());
     this.__temp = new Color(0);
 
-    var _this = this;
+    const _this = this;
 
-    //this.domElement = document.createElement('div');
+    // this.domElement = document.createElement('div');
 
     dom.makeSelectable(this.domElement, false);
 
@@ -83,7 +81,7 @@ define([
 
     /* jshint unused: true */
 
-    var value_field = document.createElement("div");
+    const value_field = document.createElement("div");
 
     common.extend(this.__selector.style, {
       width: "140px",
@@ -196,12 +194,12 @@ define([
     /*
     var setHValues = function (e) {
       setH(e);
-      alphaGradient(_this.__alpha_field, _this.__color); 
+      alphaGradient(_this.__alpha_field, _this.__color);
     };
 
     var setSVValues = function (e) {
       setSV(e);
-      alphaGradient(_this.__alpha_field, _this.__color); 
+      alphaGradient(_this.__alpha_field, _this.__color);
     };
     */
 
@@ -242,7 +240,7 @@ define([
 
     function onBlur() {
       /* jshint validthis: true */
-      var i = interpret(this.value);
+      const i = interpret(this.value);
       if (i !== false) {
         _this.__color.__state = i;
         _this.setValue(_this.__color.toOriginal());
@@ -281,11 +279,11 @@ define([
     function setSV(e) {
       e.preventDefault();
 
-      var w = dom.getWidth(_this.__saturation_field);
-      var o = dom.getOffset(_this.__saturation_field);
-      var scroll = getScroll(_this.__saturation_field);
-      var s = (e.clientX - o.left + scroll.left) / w;
-      var v = 1 - (e.clientY - o.top + scroll.top) / w;
+      const w = dom.getWidth(_this.__saturation_field);
+      const o = dom.getOffset(_this.__saturation_field);
+      const scroll = getScroll(_this.__saturation_field);
+      let s = (e.clientX - o.left + scroll.left) / w;
+      let v = 1 - (e.clientY - o.top + scroll.top) / w;
 
       if (v > 1) {
         v = 1;
@@ -310,10 +308,10 @@ define([
     function setH(e) {
       e.preventDefault();
 
-      var s = dom.getHeight(_this.__hue_field);
-      var o = dom.getOffset(_this.__hue_field);
-      var scroll = getScroll(_this.__hue_field);
-      var h = 1 - (e.clientY - o.top + scroll.top) / s;
+      const s = dom.getHeight(_this.__hue_field);
+      const o = dom.getOffset(_this.__hue_field);
+      const scroll = getScroll(_this.__hue_field);
+      let h = 1 - (e.clientY - o.top + scroll.top) / s;
 
       if (h > 1) {
         h = 1;
@@ -331,10 +329,10 @@ define([
     function setA(e) {
       e.preventDefault();
 
-      var s = dom.getHeight(_this.__alpha_field);
-      var o = dom.getOffset(_this.__alpha_field);
-      var scroll = getScroll(_this.__alpha_field);
-      var a = 1 - (e.clientY - o.top + scroll.top) / s;
+      const s = dom.getHeight(_this.__alpha_field);
+      const o = dom.getOffset(_this.__alpha_field);
+      const scroll = getScroll(_this.__alpha_field);
+      let a = 1 - (e.clientY - o.top + scroll.top) / s;
 
       if (a > 1) {
         a = 1;
@@ -366,14 +364,14 @@ define([
     }
 
     function getScroll(el) {
-      var scroll = {
+      const scroll = {
         top: el.scrollTop || 0,
         left: el.scrollLeft || 0
       };
       while ((el = el.parentNode)) {
         scroll.top += el.scrollTop || 0;
         scroll.left += el.scrollLeft || 0;
-        var cs = getComputedStyle(el, null);
+        const cs = getComputedStyle(el, null);
         if (cs.position === "fixed") {
           break;
         }
@@ -386,10 +384,10 @@ define([
 
   common.extend(ColorController.prototype, Controller.prototype, {
     updateDisplay: function() {
-      var i = interpret(this.getValue());
+      const i = interpret(this.getValue());
 
       if (i !== false) {
-        var mismatch = false;
+        let mismatch = false;
 
         // Check for mismatch on the interpreted value.
 
@@ -419,8 +417,8 @@ define([
 
       this.__temp.a = 1;
 
-      var flip = this.__color.v < 0.5 || this.__color.s > 0.5 ? 255 : 0;
-      var _flip = 255 - flip;
+      const flip = this.__color.v < 0.5 || this.__color.s > 0.5 ? 255 : 0;
+      const _flip = 255 - flip;
 
       common.extend(this.__field_knob.style, {
         marginLeft: 100 * this.__color.s - 7 + "px",
@@ -451,7 +449,7 @@ define([
     }
   });
 
-  var vendors = ["-moz-", "-o-", "-webkit-", "-ms-", ""];
+  const vendors = ["-moz-", "-o-", "-webkit-", "-ms-", ""];
 
   function linearGradient(elem, x, a, b) {
     elem.style.background = "";
@@ -477,12 +475,12 @@ define([
   function alphaGradient(elem, color) {
     elem.style.background = "";
 
-    var rgb = color.rgb,
-      r = Math.floor(color.r),
-      g = Math.floor(color.g),
-      b = Math.floor(color.b),
-      rgbaStart = "rgba(" + r + "," + g + "," + b + ",1)",
-      rgbaEnd = "rgba(" + r + "," + g + "," + b + ",0)";
+    const { rgb } = color;
+    const r = Math.floor(color.r);
+    const g = Math.floor(color.g);
+    const b = Math.floor(color.b);
+    const rgbaStart = "rgba(" + r + "," + g + "," + b + ",1)";
+    const rgbaEnd = "rgba(" + r + "," + g + "," + b + ",0)";
 
     common.each(vendors, function(vendor) {
       elem.style.cssText += "background: " + vendor + "linear-gradient(top, " + rgbaStart + " , " + rgbaEnd + "); ";

@@ -12,8 +12,6 @@
  */
 
 define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], function(Controller, dom, common) {
-  "use strict";
-
   /**
    * @class Provides a checkbox input to alter the boolean property of an object.
    * @extends dat.controllers.Controller
@@ -26,7 +24,7 @@ define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], functi
   var BooleanController = function(object, property, options) {
     BooleanController.superclass.call(this, object, property, "boolean", options);
 
-    var _this = this;
+    const _this = this;
     this.__prev = this.getValue();
 
     this.__checkbox = document.createElement("input");
@@ -48,7 +46,7 @@ define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], functi
 
   common.extend(BooleanController.prototype, Controller.prototype, {
     setValue: function(v) {
-      var toReturn = BooleanController.superclass.prototype.setValue.call(this, v);
+      const toReturn = BooleanController.superclass.prototype.setValue.call(this, v);
       this.__prev = this.getValue();
       return toReturn;
     },

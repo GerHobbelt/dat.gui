@@ -16,8 +16,6 @@ define(["dat/controllers/NumberController", "dat/dom/dom", "dat/utils/common"], 
   dom,
   common
 ) {
-  "use strict";
-
   /**
    * @class Represents a given property of an object that is a number and
    * provides an input element with which to manipulate it.
@@ -39,13 +37,13 @@ define(["dat/controllers/NumberController", "dat/dom/dom", "dat/utils/common"], 
 
     NumberControllerBox.superclass.call(this, object, property, params);
 
-    var _this = this;
+    const _this = this;
 
     /**
      * {Number} Previous mouse y position
      * @ignore
      */
-    var prev_y;
+    let prev_y;
 
     this.__input = document.createElement("input");
     this.__input.setAttribute("type", "text");
@@ -70,7 +68,7 @@ define(["dat/controllers/NumberController", "dat/dom/dom", "dat/utils/common"], 
     }
 
     function onChange(e) {
-      var attempted = parseFloat(_this.__input.value);
+      const attempted = parseFloat(_this.__input.value);
       if (!common.isNaN(attempted)) {
         _this.setValue(attempted);
       }
@@ -93,7 +91,7 @@ define(["dat/controllers/NumberController", "dat/dom/dom", "dat/utils/common"], 
     }
 
     function onTouchDrag(e) {
-      var diff = prev_y - e.touches[0].clientY;
+      const diff = prev_y - e.touches[0].clientY;
       _this.setValue(_this.getValue() + diff * _this.__impliedStep);
 
       prev_y = e.touches[0].clientY;
@@ -121,7 +119,7 @@ define(["dat/controllers/NumberController", "dat/dom/dom", "dat/utils/common"], 
     }
 
     function onMouseDrag(e) {
-      var diff = prev_y - e.clientY;
+      const diff = prev_y - e.clientY;
       _this.setValue(_this.getValue() + diff * _this.__impliedStep);
 
       prev_y = e.clientY;
@@ -157,7 +155,7 @@ define(["dat/controllers/NumberController", "dat/dom/dom", "dat/utils/common"], 
   });
 
   function roundToDecimal(value, decimals) {
-    var tenTo = Math.pow(10, decimals);
+    const tenTo = Math.pow(10, decimals);
     return Math.round(value * tenTo) / tenTo;
   }
 

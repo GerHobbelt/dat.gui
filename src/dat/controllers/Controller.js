@@ -74,8 +74,6 @@
  */
 
 define(["dat/utils/common"], function(common) {
-  "use strict";
-
   /**
    * @class An "abstract" class that represents a given property of an object.
    *
@@ -84,7 +82,7 @@ define(["dat/utils/common"], function(common) {
    *
    * @member dat.controllers
    */
-  var Controller = function(object, property, type, options) {
+  const Controller = function(object, property, type, options) {
     /**
      * The dynamic property info chunk, if applicable. Carries the getter and setter for this object/property.
      * @type {Object}
@@ -269,10 +267,10 @@ define(["dat/utils/common"], function(common) {
        * @param {Boolean} silent If true, don't call the onChange handler
        */
       setValue: function(newValue, silent) {
-        var readonly = this.getReadonly();
-        var oldValue = this.getValue();
-        var changed = oldValue !== newValue;
-        var msg = {
+        const readonly = this.getReadonly();
+        const oldValue = this.getValue();
+        const changed = oldValue !== newValue;
+        const msg = {
           newValue: newValue,
           oldValue: oldValue,
           isChange: changed,

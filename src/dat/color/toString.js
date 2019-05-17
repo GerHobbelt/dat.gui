@@ -12,20 +12,15 @@
  */
 
 define(["dat/utils/common"], function(common) {
-  "use strict";
-
   return function(color) {
     if (color.a === 1 || common.isUndefined(color.a)) {
-      var s = color.hex.toString(16);
+      let s = color.hex.toString(16);
       while (s.length < 6) {
         s = "0" + s;
       }
 
       return "#" + s;
-    } else {
-      return (
-        "rgba(" + Math.round(color.r) + "," + Math.round(color.g) + "," + Math.round(color.b) + "," + color.a + ")"
-      );
     }
+    return "rgba(" + Math.round(color.r) + "," + Math.round(color.g) + "," + Math.round(color.b) + "," + color.a + ")";
   };
 });

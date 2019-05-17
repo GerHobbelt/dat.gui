@@ -12,8 +12,6 @@
  */
 
 define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], function(Controller, dom, common) {
-  "use strict";
-
   /**
    * @class Provides a select input to alter the property of an object, using a
    * list of accepted values.
@@ -30,7 +28,7 @@ define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], functi
   var OptionController = function(object, property, params, options) {
     OptionController.superclass.call(this, object, property, "option", options);
 
-    var _this = this;
+    const _this = this;
     this.CUSTOM_FLAG = "";
 
     params = params || {};
@@ -42,7 +40,7 @@ define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], functi
     this.__select = document.createElement("select");
 
     if (common.isArray(params)) {
-      var map = {};
+      const map = {};
       common.each(params, function(element) {
         map[element] = element;
       });
@@ -50,14 +48,14 @@ define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], functi
     }
 
     common.each(params, function(value, key) {
-      var opt = document.createElement("option");
+      const opt = document.createElement("option");
       opt.innerHTML = value;
       opt.setAttribute("value", key);
       _this.__select.appendChild(opt);
     });
 
     if (params.custom) {
-      var opt = document.createElement("option");
+      const opt = document.createElement("option");
       opt.innerHTML = params.custom.display || "Custom";
       opt.setAttribute("value", _this.CUSTOM_FLAG);
       _this.__select.appendChild(opt);
@@ -69,7 +67,7 @@ define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], functi
     this.updateDisplay();
 
     dom.bind(this.__select, "change", function() {
-      var value = this.options[this.selectedIndex].value;
+      let { value } = this.options[this.selectedIndex];
       if (value === _this.CUSTOM_FLAG) {
         value = _this.__custom_controller.getValue();
       }
@@ -78,7 +76,7 @@ define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], functi
 
     if (this.__custom_controller) {
       this.__custom_controller.onChange(function() {
-        var value = this.getValue();
+        const value = this.getValue();
         _this.setValue(value);
       });
     }
@@ -93,13 +91,13 @@ define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], functi
 
   common.extend(OptionController.prototype, Controller.prototype, {
     setValue: function(v) {
-      var toReturn = OptionController.superclass.prototype.setValue.call(this, v);
+      const toReturn = OptionController.superclass.prototype.setValue.call(this, v);
       return toReturn;
     },
 
     updateDisplay: function() {
-      var value = this.getValue();
-      var custom = true;
+      const value = this.getValue();
+      let custom = true;
       if (value !== this.CUSTOM_FLAG) {
         common.each(this.__select.options, function(option) {
           if (value === option.value) {

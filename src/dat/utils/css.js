@@ -12,12 +12,10 @@
  */
 
 define([], function() {
-  "use strict";
-
   return {
     load: function(url, doc) {
       doc = doc || document;
-      var link = doc.createElement("link");
+      const link = doc.createElement("link");
       link.type = "text/css";
       link.rel = "stylesheet";
       link.href = url;
@@ -25,7 +23,7 @@ define([], function() {
     },
     inject: function(css, doc) {
       doc = doc || document;
-      var injected = document.createElement("style");
+      const injected = document.createElement("style");
       injected.type = "text/css";
       injected.innerHTML = css;
       doc.getElementsByTagName("head")[0].appendChild(injected);

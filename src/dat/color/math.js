@@ -12,19 +12,17 @@
  */
 
 define([], function() {
-  "use strict";
-
-  var tmpComponent;
+  let tmpComponent;
 
   return {
     hsv_to_rgb: function(h, s, v) {
-      var hi = Math.floor(h / 60) % 6;
+      const hi = Math.floor(h / 60) % 6;
 
-      var f = h / 60 - Math.floor(h / 60);
-      var p = v * (1.0 - s);
-      var q = v * (1.0 - f * s);
-      var t = v * (1.0 - (1.0 - f) * s);
-      var c = [[v, t, p], [q, v, p], [p, v, t], [p, q, v], [t, p, v], [v, p, q]][hi];
+      const f = h / 60 - Math.floor(h / 60);
+      const p = v * (1.0 - s);
+      const q = v * (1.0 - f * s);
+      const t = v * (1.0 - (1.0 - f) * s);
+      const c = [[v, t, p], [q, v, p], [p, v, t], [p, q, v], [t, p, v], [v, p, q]][hi];
 
       return {
         r: c[0] * 255,
@@ -34,11 +32,11 @@ define([], function() {
     },
 
     rgb_to_hsv: function(r, g, b) {
-      var min = Math.min(r, g, b),
-        max = Math.max(r, g, b),
-        delta = max - min,
-        h,
-        s;
+      const min = Math.min(r, g, b);
+      const max = Math.max(r, g, b);
+      const delta = max - min;
+      let h;
+      let s;
 
       if (max !== 0) {
         s = delta / max;
@@ -70,7 +68,7 @@ define([], function() {
     },
 
     rgb_to_hex: function(r, g, b) {
-      var hex = this.hex_with_component(0, 2, r);
+      let hex = this.hex_with_component(0, 2, r);
       hex = this.hex_with_component(hex, 1, g);
       hex = this.hex_with_component(hex, 0, b);
       return hex;

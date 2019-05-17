@@ -57,9 +57,7 @@ define([
   dat_utils_common,
   dat_utils_requestAnimationFrame
 ) {
-  "use strict";
-
-  var dat = {
+  const dat = {
     utils: {
       css: dat_utils_css,
       common: dat_utils_common,

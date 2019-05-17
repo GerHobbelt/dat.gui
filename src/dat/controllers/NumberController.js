@@ -12,8 +12,6 @@
  */
 
 define(["dat/controllers/Controller", "dat/utils/common"], function(Controller, common) {
-  "use strict";
-
   /**
    * When the user didn't specify a sane step size, infer a suitable stepsize from the initialValue.
    */
@@ -22,7 +20,7 @@ define(["dat/controllers/Controller", "dat/utils/common"], function(Controller, 
       return userSpecifiedStep;
     }
 
-    var v;
+    let v;
     if (!initialValue) {
       v = 1; // What are we, psychics?
     } else {
@@ -94,7 +92,7 @@ define(["dat/controllers/Controller", "dat/utils/common"], function(Controller, 
         }
 
         if (this.__mode !== "linear") {
-          var old_step = this.__impliedStep;
+          const old_step = this.__impliedStep;
           this.__impliedStep = guestimateImpliedStep(
             v,
             this.__step,
@@ -185,9 +183,8 @@ define(["dat/controllers/Controller", "dat/utils/common"], function(Controller, 
     x = x.toString();
     if (x.indexOf(".") > -1) {
       return x.length - x.indexOf(".") - 1;
-    } else {
-      return 0;
     }
+    return 0;
   }
 
   return NumberController;

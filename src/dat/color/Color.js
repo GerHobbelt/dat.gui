@@ -17,9 +17,7 @@ define(["dat/color/interpret", "dat/color/math", "dat/color/toString", "dat/util
   toString,
   common
 ) {
-  "use strict";
-
-  var Color = function() {
+  const Color = function() {
     this.__state = interpret.apply(this, arguments);
 
     if (this.__state === false) {
@@ -138,7 +136,7 @@ define(["dat/color/interpret", "dat/color/math", "dat/color/toString", "dat/util
   }
 
   function recalculateHSV(color) {
-    var result = math.rgb_to_hsv(color.r, color.g, color.b);
+    const result = math.rgb_to_hsv(color.r, color.g, color.b);
 
     common.extend(color.__state, {
       s: result.s,

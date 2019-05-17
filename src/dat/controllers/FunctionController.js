@@ -12,8 +12,6 @@
  */
 
 define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], function(Controller, dom, common) {
-  "use strict";
-
   /**
    * @class Provides a GUI interface to fire a specified method, a property of an object.
    *
@@ -33,7 +31,7 @@ define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], functi
 
     FunctionController.superclass.call(this, object, property);
 
-    var _this = this;
+    const _this = this;
 
     this.__button = document.createElement("div");
     this.__button.innerHTML = text === undefined ? "Fire" : text;
@@ -72,12 +70,12 @@ define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], functi
         user_data = [user_data];
       }
 
-      var msg = {
+      const msg = {
         userData: user_data,
-        //isChange: undefined,
+        // isChange: undefined,
         silent: silent,
         noGo: false,
-        //eventData: undefined,
+        // eventData: undefined,
         eventSource: "fire"
       };
       if (!silent) {

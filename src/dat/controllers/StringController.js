@@ -12,8 +12,6 @@
  */
 
 define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], function(Controller, dom, common) {
-  "use strict";
-
   /**
    * @class Provides a text input to alter the string property of an object.
    *
@@ -27,7 +25,7 @@ define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], functi
   var StringController = function(object, property, options) {
     StringController.superclass.call(this, object, property, "string", options);
 
-    var _this = this;
+    const _this = this;
 
     this.__input = document.createElement("input");
     this.__input.setAttribute("type", "text");

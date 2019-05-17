@@ -38,11 +38,9 @@ define([
   UndefinedController,
   common
 ) {
-  "use strict";
+  let firstTimeImageController = true;
 
-  var firstTimeImageController = true;
-
-  var ARR_SLICE = Array.prototype.slice;
+  const ARR_SLICE = Array.prototype.slice;
 
   function isControllerTemplate(f) {
     return (
@@ -70,7 +68,7 @@ define([
     options_6
   ) {
     // when the user specified a specific controller, we'll be using that one, otherwise we 'sniff' the correct controller giving the input values & ditto types.
-    var ControllerConstructor = controllers[controllerName];
+    let ControllerConstructor = controllers[controllerName];
     if (!ControllerConstructor && /* controllerName instanceof Controller */ isControllerTemplate(controllerName)) {
       ControllerConstructor = controllerName;
     }
@@ -87,9 +85,9 @@ define([
       );
     }
 
-    var dyninfo = common.setupDynamicProperty(object, property);
+    const dyninfo = common.setupDynamicProperty(object, property);
 
-    var initialValue = !dyninfo ? object[property] : dyninfo.getter.call(object);
+    const initialValue = !dyninfo ? object[property] : dyninfo.getter.call(object);
 
     // Providing options?
     if (common.isArray(options_1) || common.isObject(options_1)) {
@@ -111,16 +109,15 @@ define([
           options_5,
           options_6
         );
-      } else {
-        return new NumberControllerBox(object, property, {
-          min: options_1,
-          max: options_2,
-          step: options_3,
-          minimumSaneStepSize: options_4,
-          maximumSaneStepSize: options_5,
-          mode: options_6
-        });
       }
+      return new NumberControllerBox(object, property, {
+        min: options_1,
+        max: options_2,
+        step: options_3,
+        minimumSaneStepSize: options_4,
+        maximumSaneStepSize: options_5,
+        mode: options_6
+      });
     }
 
     if (common.isImagePath(initialValue)) {
@@ -136,7 +133,7 @@ define([
     }
 
     if (common.isFunction(initialValue)) {
-      var opts = ARR_SLICE.call(arguments, 5);
+      let opts = ARR_SLICE.call(arguments, 5);
       if (opts.length === 0) {
         opts = undefined;
       }

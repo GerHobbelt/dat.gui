@@ -1,7 +1,7 @@
-import SuperGif from 'wsgif';
-import Controller from './Controller';
-import dom from '../dom/dom';
-import '../utils/getUserMedia';
+import SuperGif from "wsgif";
+import Controller from "./Controller";
+import dom from "../dom/dom";
+import "../utils/getUserMedia";
 class ImageController extends Controller {
   constructor(object, property, opts) {
     super(object, property);
@@ -15,76 +15,76 @@ class ImageController extends Controller {
       defaultOptions = opts;
     }
 
-    this.__controlContainer = document.createElement('div');
-    dom.addClass(this.__controlContainer, 'image-picker');
+    this.__controlContainer = document.createElement("div");
+    dom.addClass(this.__controlContainer, "image-picker");
     this.videoStreams = [];
 
-    this.__selectedInputContainer = this.__controlContainer.appendChild(document.createElement('div'));
-    dom.addClass(this.__selectedInputContainer, 'selected-image');
+    this.__selectedInputContainer = this.__controlContainer.appendChild(document.createElement("div"));
+    dom.addClass(this.__selectedInputContainer, "selected-image");
 
-    this.__swatches = this.__controlContainer.appendChild(document.createElement('div'));
-    dom.addClass(this.__swatches, 'image-swatches');
+    this.__swatches = this.__controlContainer.appendChild(document.createElement("div"));
+    dom.addClass(this.__swatches, "image-swatches");
 
-    this.__img = this.__selectedInputContainer.appendChild(document.createElement('img'));
-    this.__img.crossOrigin = 'anonymous';
+    this.__img = this.__selectedInputContainer.appendChild(document.createElement("img"));
+    this.__img.crossOrigin = "anonymous";
 
-    this.__video = this.__selectedInputContainer.appendChild(document.createElement('video'));
-    this.__input = this.__controlContainer.appendChild(document.createElement('input'));
+    this.__video = this.__selectedInputContainer.appendChild(document.createElement("video"));
+    this.__input = this.__controlContainer.appendChild(document.createElement("input"));
 
-    this.__swatchButtons = this.__swatches.appendChild(document.createElement('div'));
-    dom.addClass(this.__swatchButtons, 'swatch-buttons');
+    this.__swatchButtons = this.__swatches.appendChild(document.createElement("div"));
+    dom.addClass(this.__swatchButtons, "swatch-buttons");
 
-    this.__swatchImages = this.__swatches.appendChild(document.createElement('div'));
+    this.__swatchImages = this.__swatches.appendChild(document.createElement("div"));
     this.__disableVideo = disableVideo;
-    dom.addClass(this.__swatchImages, 'swatch-images');
+    dom.addClass(this.__swatchImages, "swatch-images");
     this.__useCamera = navigator.getUserMedia && !disableVideo;
 
     if (this.__useCamera) {
-      this.__camera = this.__swatchButtons.appendChild(document.createElement('div'));
-      this.__cameraTitle = this.__camera.appendChild(document.createElement('span'));
+      this.__camera = this.__swatchButtons.appendChild(document.createElement("div"));
+      this.__cameraTitle = this.__camera.appendChild(document.createElement("span"));
       this.__cameraTitle.innerHTML = "Video";
-      this.__cameraIcon = this.__camera.appendChild(document.createElement('div'));
-      dom.addClass(this.__cameraIcon, 'camera-icon');
-      dom.addClass(this.__camera, 'camera-button');
+      this.__cameraIcon = this.__camera.appendChild(document.createElement("div"));
+      dom.addClass(this.__cameraIcon, "camera-icon");
+      dom.addClass(this.__camera, "camera-button");
     }
-    this.__plus = this.__swatchButtons.appendChild(document.createElement('div'));
-    this.__plusTitle = this.__plus.appendChild(document.createElement('span'));
+    this.__plus = this.__swatchButtons.appendChild(document.createElement("div"));
+    this.__plusTitle = this.__plus.appendChild(document.createElement("span"));
     this.__plusTitle.innerHTML = "Image";
-    this.__plusIcon = this.__plus.appendChild(document.createElement('div'));
-    dom.addClass(this.__plusIcon, 'new-image-icon');
-    dom.addClass(this.__plus, 'new-image-button');
+    this.__plusIcon = this.__plus.appendChild(document.createElement("div"));
+    dom.addClass(this.__plusIcon, "new-image-icon");
+    dom.addClass(this.__plus, "new-image-button");
 
-    defaultOptions.forEach((option) => {
+    defaultOptions.forEach(option => {
       this.addSwatch(option.src, option.videoSrc);
     });
 
-    this.__video.className = this.__img.className = 'content';
-    this.__video.crossOrigin = 'anonymous';
+    this.__video.className = this.__img.className = "content";
+    this.__video.crossOrigin = "anonymous";
     // should this be //webkit-playsinline?
     // as of iOS10 you don't need the prefix
-    this.__video.setAttribute('playsinline', true);
-    this.__input.type = 'file';
+    this.__video.setAttribute("playsinline", true);
+    this.__input.type = "file";
 
-    this.__gifImg = this.__selectedInputContainer.appendChild(document.createElement('img'));
-    this.__gifImg.crossOrigin = 'anonymous';
-    dom.addClass(this.__gifImg, 'content gif-img');
+    this.__gifImg = this.__selectedInputContainer.appendChild(document.createElement("img"));
+    this.__gifImg.crossOrigin = "anonymous";
+    dom.addClass(this.__gifImg, "content gif-img");
     this.__glGif = new SuperGif({ gif: this.__gifImg });
     this.__gifNeedsInitializing = true;
     // this.__glGif.load();
 
     this.initializeValue();
     if (this.__useCamera) {
-      dom.bind(this.__camera, 'click', onCameraClick.bind(this));
+      dom.bind(this.__camera, "click", onCameraClick.bind(this));
     }
-    dom.bind(this.__plus, 'click', chooseImage.bind(this));
-    dom.bind(this.__input, 'change', inputChange.bind(this));
+    dom.bind(this.__plus, "click", chooseImage.bind(this));
+    dom.bind(this.__input, "change", inputChange.bind(this));
 
-    dom.bind(this.__img, 'dragover', onDragOver.bind(this));
-    dom.bind(this.__img, 'dragleave', onDragLeave.bind(this));
-    dom.bind(this.__img, 'drop', onDrop.bind(this));
-    dom.bind(this.__video, 'dragover', onDragOver.bind(this));
-    dom.bind(this.__video, 'dragleave', onDragLeave.bind(this));
-    dom.bind(this.__video, 'drop', onDrop.bind(this));
+    dom.bind(this.__img, "dragover", onDragOver.bind(this));
+    dom.bind(this.__img, "dragleave", onDragLeave.bind(this));
+    dom.bind(this.__img, "drop", onDrop.bind(this));
+    dom.bind(this.__video, "dragover", onDragOver.bind(this));
+    dom.bind(this.__video, "dragleave", onDragLeave.bind(this));
+    dom.bind(this.__video, "drop", onDrop.bind(this));
 
     function chooseImage() {
       this.__input.click();
@@ -98,34 +98,35 @@ class ImageController extends Controller {
 
     function onDragOver(e) {
       e.preventDefault();
-      e.target.classList.add('dragover');
+      e.target.classList.add("dragover");
     }
 
     function onDragLeave(e) {
-      e.target.classList.remove('dragover');
+      e.target.classList.remove("dragover");
     }
 
     function onDrop(e) {
-      e.target.classList.remove('dragover');
+      e.target.classList.remove("dragover");
       const file = e.originalEvent.dataTransfer.files[0];
       file.isSaved = false;
       this.parseFile(file);
     }
 
     function onCameraClick() {
-      navigator.mediaDevices.getUserMedia({ video: true })
+      navigator.mediaDevices
+        .getUserMedia({ video: true })
         .then(localMediaStream => {
           this.killStream();
           this.videoStream = localMediaStream;
           this.setValue({
-            type: 'video-stream',
+            type: "video-stream",
             value: localMediaStream,
             domElement: this.__video
           });
         })
         .catch(err => {
           this.killStream();
-        })
+        });
     }
 
     // at the end
@@ -143,9 +144,11 @@ class ImageController extends Controller {
 
   initializeValue() {
     const asset = this.getValue();
-    if (!asset) { return; }
+    if (!asset) {
+      return;
+    }
     // const isAnimated = asset.url.split('.').pop() === 'gif';
-    if (asset.type === 'gif') {
+    if (asset.type === "gif") {
       if (this.__gifNeedsInitializing) {
         this.setImage(asset.url, true);
       } else {
@@ -155,13 +158,13 @@ class ImageController extends Controller {
           domElement: this.__glGif.get_canvas()
         });
       }
-    } else if (asset.type === 'image') {
+    } else if (asset.type === "image") {
       this.setValue({
         url: asset.url,
         type: asset.type,
         domElement: this.__img
       });
-    } else if (asset.type === 'video') {
+    } else if (asset.type === "video") {
       this.setValue({
         url: asset.url,
         type: asset.type,
@@ -172,47 +175,49 @@ class ImageController extends Controller {
 
   updateDisplay() {
     const asset = this.getValue();
-    if (!asset) { return; }
-    if (asset.type === 'image') {
+    if (!asset) {
+      return;
+    }
+    if (asset.type === "image") {
       this.setImage(asset.url, false);
-    } else if (asset.type === 'gif') {
+    } else if (asset.type === "gif") {
       this.setImage(asset.url, true);
-    } else if (asset.type === 'video') {
+    } else if (asset.type === "video") {
       this.setVideo(asset.url);
-    } else if (asset.type === 'video-stream') {
+    } else if (asset.type === "video-stream") {
       this.setVideo(asset.value);
     }
   }
 
   parseFile(file) {
     // is there a better way to get the mime type?
-    const type = file.type.split('/')[0];
+    const type = file.type.split("/")[0];
     if (this.__glGif) this.__glGif.pause();
-    if (type === 'image') {
+    if (type === "image") {
       const url = file.urlOverride || URL.createObjectURL(file);
-      const isAnimated = file.type.split('/')[1] === 'gif' || file.animatedOverride;
+      const isAnimated = file.type.split("/")[1] === "gif" || file.animatedOverride;
       if (!this.__disableVideo && isAnimated) {
         if (this.__gifNeedsInitializing) {
           this.setImage(url, true);
         } else {
           this.setValue({
             url: url,
-            type: 'gif',
+            type: "gif",
             domElement: this.__glGif.get_canvas()
           });
         }
       } else if (!isAnimated) {
         this.setValue({
           url: url,
-          type: 'image',
+          type: "image",
           domElement: this.__img
         });
         this.setImage(url, false);
       }
-    } else if (!this.__disableVideo && type === 'video') {
+    } else if (!this.__disableVideo && type === "video") {
       this.setValue({
         url: url,
-        type: 'video',
+        type: "video",
         domElement: this.__video
       });
       this.setVideo();
@@ -227,13 +232,13 @@ class ImageController extends Controller {
     this.__isVideo = false;
     this.__isAnimated = isAnimated;
     if (isAnimated) {
-      this.__img.src = '';
-      this.__img.style.display = 'none';
+      this.__img.src = "";
+      this.__img.style.display = "none";
       this.__gifImg.src = url;
       if (this.__glGif.get_canvas()) {
-        this.__glGif.get_canvas().style.display = 'block';
+        this.__glGif.get_canvas().style.display = "block";
       }
-      this.__glGif.load((err) => {
+      this.__glGif.load(err => {
         if (!err) {
           this.__glGif.play().catch(e => console.log(e));
           if (this.__gifNeedsInitializing) {
@@ -245,7 +250,7 @@ class ImageController extends Controller {
             this.__skipSetImage = true;
             this.setValue({
               url: url,
-              type: 'gif',
+              type: "gif",
               domElement: this.__glGif.get_canvas()
             });
           }
@@ -253,18 +258,18 @@ class ImageController extends Controller {
       });
     } else {
       if (this.__glGif.get_canvas()) {
-        this.__glGif.get_canvas().style.display = 'none';
+        this.__glGif.get_canvas().style.display = "none";
       }
       this.__img.src = url;
-      this.__img.style.display = 'block';
+      this.__img.style.display = "block";
     }
-    this.__video.style.display = 'none';
-    this.__video.src = '';
+    this.__video.style.display = "none";
+    this.__video.src = "";
   }
 
   setVideo() {
     const asset = this.getValue();
-    if (asset.type === 'video-stream') {
+    if (asset.type === "video-stream") {
       this.__video.srcObject = asset.value;
     } else {
       this.killStream();
@@ -275,45 +280,45 @@ class ImageController extends Controller {
     this.__video.loop = true;
     this.__video.volume = 0;
     this.__video.play().catch(e => {
-      console.log(e, e.message, e.name)
+      console.log(e, e.message, e.name);
     });
-    this.__img.src = 'data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=';
-    this.__img.style.display = 'none';
+    this.__img.src = "data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=";
+    this.__img.style.display = "none";
     if (this.__glGif.get_canvas()) {
-      this.__glGif.get_canvas().style.display = 'none';
+      this.__glGif.get_canvas().style.display = "none";
     }
-    this.__video.style.display = 'block';
+    this.__video.style.display = "block";
   }
 
   addSwatch(src, videoSrc) {
-    const swatch = this.__swatchImages.appendChild(document.createElement('img'));
+    const swatch = this.__swatchImages.appendChild(document.createElement("img"));
     swatch.src = src;
     swatch.videoSrc = videoSrc;
-    swatch.className = 'swatch';
+    swatch.className = "swatch";
 
-    dom.bind(swatch, 'click', () => {
+    dom.bind(swatch, "click", () => {
       if (videoSrc) {
         this.setValue({
           url: videoSrc,
-          type: 'video',
+          type: "video",
           domElement: this.__video
         });
       } else {
-        const isAnimated = src.split('.').pop() === 'gif';
+        const isAnimated = src.split(".").pop() === "gif";
         if (isAnimated) {
           if (this.__gifNeedsInitializing) {
             this.setImage(url, true);
           } else {
             this.setValue({
               url: src,
-              type: 'gif',
+              type: "gif",
               domElement: this.__glGif.get_canvas()
             });
           }
         } else {
           this.setValue({
             url: src,
-            type: 'image',
+            type: "image",
             domElement: this.__img
           });
         }

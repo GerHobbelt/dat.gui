@@ -11,24 +11,24 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import Color from './color/Color';
-import math from './color/math';
-import interpret from './color/interpret';
+import Color from "./color/Color";
+import math from "./color/math";
+import interpret from "./color/interpret";
 
-import Controller from './controllers/Controller';
-import BooleanController from './controllers/BooleanController';
-import OptionController from './controllers/OptionController';
-import StringController from './controllers/StringController';
-import NumberController from './controllers/NumberController';
-import NumberControllerBox from './controllers/NumberControllerBox';
-import NumberControllerSlider from './controllers/NumberControllerSlider';
-import FunctionController from './controllers/FunctionController';
-import TabbedController from './controllers/TabbedController';
-import ColorController from './controllers/ColorController';
-import ImageController from './controllers/ImageController';
+import Controller from "./controllers/Controller";
+import BooleanController from "./controllers/BooleanController";
+import OptionController from "./controllers/OptionController";
+import StringController from "./controllers/StringController";
+import NumberController from "./controllers/NumberController";
+import NumberControllerBox from "./controllers/NumberControllerBox";
+import NumberControllerSlider from "./controllers/NumberControllerSlider";
+import FunctionController from "./controllers/FunctionController";
+import TabbedController from "./controllers/TabbedController";
+import ColorController from "./controllers/ColorController";
+import ImageController from "./controllers/ImageController";
 
-import domImport from './dom/dom';
-import GUIImport from './gui/GUI';
+import domImport from "./dom/dom";
+import GUIImport from "./gui/GUI";
 
 export const color = {
   Color: Color,
@@ -47,7 +47,7 @@ export const controllers = {
   FunctionController: FunctionController,
   TabbedController: TabbedController,
   ColorController: ColorController,
-  ImageController: ImageController,
+  ImageController: ImageController
 };
 
 export const dom = { dom: domImport };

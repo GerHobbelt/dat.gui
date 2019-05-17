@@ -11,25 +11,21 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import VectorController from './VectorController';
-import OptionController from './OptionController';
-import NumberControllerBox from './NumberControllerBox';
-import NumberControllerSlider from './NumberControllerSlider';
-import StringController from './StringController';
-import FunctionController from './FunctionController';
-import TabbedController from './TabbedController';
-import BooleanController from './BooleanController';
-import common from '../utils/common';
+import VectorController from "./VectorController";
+import OptionController from "./OptionController";
+import NumberControllerBox from "./NumberControllerBox";
+import NumberControllerSlider from "./NumberControllerSlider";
+import StringController from "./StringController";
+import FunctionController from "./FunctionController";
+import TabbedController from "./TabbedController";
+import BooleanController from "./BooleanController";
+import common from "../utils/common";
 
 const ControllerFactory = function(object, property) {
   const initialValue = object[property];
 
   // Providing options?
-  if (
-    arguments.length <= 3
-    && (common.isArray(arguments[2])
-      || common.isObject(arguments[2]))
-  ) {
+  if (arguments.length <= 3 && (common.isArray(arguments[2]) || common.isObject(arguments[2]))) {
     return new OptionController(object, property, arguments[2]);
   }
 
@@ -39,17 +35,16 @@ const ControllerFactory = function(object, property) {
     if (common.isNumber(arguments[2]) && common.isNumber(arguments[3])) {
       // has step?
       if (common.isNumber(arguments[4])) {
-        return new NumberControllerSlider(object, property,
-                        arguments[2], arguments[3], arguments[4]);
+        return new NumberControllerSlider(object, property, arguments[2], arguments[3], arguments[4]);
       }
 
       return new NumberControllerSlider(object, property, arguments[2], arguments[3]);
     }
 
     // number box
-    if (common.isNumber(arguments[4])) { // has step
-      return new NumberControllerBox(object, property,
-                        { min: arguments[2], max: arguments[3], step: arguments[4] });
+    if (common.isNumber(arguments[4])) {
+      // has step
+      return new NumberControllerBox(object, property, { min: arguments[2], max: arguments[3], step: arguments[4] });
     }
     return new NumberControllerBox(object, property, { min: arguments[2], max: arguments[3] });
   }
@@ -67,11 +62,11 @@ const ControllerFactory = function(object, property) {
 
   //arguments[2] is tabs. arguments[3] is the name of the object
   if (common.isFunction(initialValue) && arguments[2] !== undefined) {
-    return new TabbedController(object, property, '', arguments[2] || 0, arguments[3] || "Object");
+    return new TabbedController(object, property, "", arguments[2] || 0, arguments[3] || "Object");
   }
 
   if (common.isFunction(initialValue)) {
-    return new FunctionController(object, property, '');
+    return new FunctionController(object, property, "");
   }
 
   if (common.isBoolean(initialValue)) {

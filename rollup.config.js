@@ -11,34 +11,37 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import fs from 'fs';
-import path from 'path';
-import resolve from 'rollup-plugin-node-resolve';
-import cleanup from 'rollup-plugin-cleanup';
-import babel from 'rollup-plugin-babel';
-import sass from 'rollup-plugin-sass';
-import commonjs from 'rollup-plugin-commonjs';
+import fs from "fs";
+import path from "path";
+import resolve from "rollup-plugin-node-resolve";
+import cleanup from "rollup-plugin-cleanup";
+import babel from "rollup-plugin-babel";
+import sass from "rollup-plugin-sass";
+import commonjs from "rollup-plugin-commonjs";
 
-const banner = fs.readFileSync(path.join(__dirname, 'licenseBanner.txt'));
+const banner = fs.readFileSync(path.join(__dirname, "licenseBanner.txt"));
 
 export default {
-  input: 'src/dat/index.js',
-  output: [{
-    // TODO: Remove default exports, and this line, in v0.8.0.
-    exports: 'named',
-    file: './build/dat.gui.js',
-    format: 'umd',
-    name: 'dat',
-    sourcemap: true,
-    banner: banner
-  }, {
-    file: './build/dat.gui.module.js',
-    format: 'es',
-    sourcemap: true,
-    banner: banner
-  }],
+  input: "src/dat/index.js",
+  output: [
+    {
+      // TODO: Remove default exports, and this line, in v0.8.0.
+      exports: "named",
+      file: "./build/dat.gui.js",
+      format: "umd",
+      name: "dat",
+      sourcemap: true,
+      banner: banner
+    },
+    {
+      file: "./build/dat.gui.module.js",
+      format: "es",
+      sourcemap: true,
+      banner: banner
+    }
+  ],
   watch: {
-    include: 'src/**'
+    include: "src/**"
   },
   plugins: [
     resolve(),
@@ -46,15 +49,15 @@ export default {
       // insert: true makes dat.gui automatically append the styles when just the JS is included,
       // with insert: false both the JS and CSS need to explicitly be included
       insert: false,
-      output: 'build/dat.gui.css',
-      options: {outputStyle: 'compressed'}
+      output: "build/dat.gui.css",
+      options: { outputStyle: "compressed" }
     }),
     babel({
-      plugins: ['external-helpers'],
-      exclude: 'node_modules/**'
+      plugins: ["external-helpers"],
+      exclude: "node_modules/**"
     }),
     commonjs({
-      'node_modules/wsgif/sibgif.js': [ 'SuperGif' ]
+      "node_modules/wsgif/sibgif.js": ["SuperGif"]
     }),
     cleanup()
   ]

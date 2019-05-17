@@ -11,11 +11,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define([
-  'dat/controllers/Controller',
-  'dat/utils/common'
-], function (Controller, common) {
-
+define(["dat/controllers/Controller", "dat/utils/common"], function(Controller, common) {
   /**
    * @class Represents a given property of an object that is a number.
    *
@@ -30,8 +26,7 @@ define([
    *
    * @member dat.controllers
    */
-  var NumberController = function (object, property, params) {
-
+  var NumberController = function(object, property, params) {
     NumberController.superclass.call(this, object, property);
 
     params = params || {};
@@ -41,36 +36,28 @@ define([
     this.__step = params.step;
 
     if (common.isUndefined(this.__step)) {
-
       if (this.initialValue == 0) {
         this.__impliedStep = 1; // What are we, psychics?
       } else {
         // Hey Doug, check this out.
         this.__impliedStep = Math.pow(10, Math.floor(Math.log(Math.abs(this.initialValue)) / Math.LN10)) / 10;
       }
-
     } else {
-
       this.__impliedStep = this.__step;
-
     }
 
     this.__precision = numDecimals(this.__impliedStep);
-
   };
 
   NumberController.superclass = Controller;
 
   common.extend(
-
     NumberController.prototype,
     Controller.prototype,
 
     /** @lends dat.controllers.NumberController.prototype */
     {
-
-      setValue: function (v) {
-
+      setValue: function(v) {
         if (this.__min !== undefined && v < this.__min) {
           v = this.__min;
         } else if (this.__max !== undefined && v > this.__max) {
@@ -82,7 +69,6 @@ define([
         }
 
         return NumberController.superclass.prototype.setValue.call(this, v);
-
       },
 
       /**
@@ -92,7 +78,7 @@ define([
        * <code>object[property]</code>
        * @returns {dat.controllers.NumberController} this
        */
-      min: function (v) {
+      min: function(v) {
         this.__min = v;
         return this;
       },
@@ -104,7 +90,7 @@ define([
        * <code>object[property]</code>
        * @returns {dat.controllers.NumberController} this
        */
-      max: function (v) {
+      max: function(v) {
         this.__max = v;
         return this;
       },
@@ -119,26 +105,23 @@ define([
        * difference otherwise stepValue is 1
        * @returns {dat.controllers.NumberController} this
        */
-      step: function (v) {
+      step: function(v) {
         this.__step = v;
         this.__impliedStep = v;
         this.__precision = numDecimals(v);
         return this;
       }
-
     }
-
   );
 
   function numDecimals(x) {
     x = x.toString();
-    if (x.indexOf('.') > -1) {
-      return x.length - x.indexOf('.') - 1;
+    if (x.indexOf(".") > -1) {
+      return x.length - x.indexOf(".") - 1;
     } else {
       return 0;
     }
   }
 
   return NumberController;
-
 });

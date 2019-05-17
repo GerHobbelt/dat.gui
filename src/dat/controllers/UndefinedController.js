@@ -13,12 +13,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define([
-  'dat/controllers/Controller',
-  'dat/dom/dom',
-  'dat/utils/common'
-], function (Controller, dom, common) {
-
+define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], function(Controller, dom, common) {
   /**
    * @class Provides a *disabled* text input indicating the value of the property
    *        is undefined. Calling reset() on the controller will remove and re-add it.
@@ -32,33 +27,29 @@ define([
    *
    * @member dat.controllers
    */
-  var UndefinedController = function (object, property) {
+  var UndefinedController = function(object, property) {
     UndefinedController.superclass.call(this, object, property);
 
     var _this = this;
 
-    this.__input = document.createElement('input');
-    this.__input.setAttribute('type', 'text');
-    this.__input.setAttribute('disabled', true);
+    this.__input = document.createElement("input");
+    this.__input.setAttribute("type", "text");
+    this.__input.setAttribute("disabled", true);
     this.domElement.appendChild(this.__input);
   };
 
   UndefinedController.superclass = Controller;
 
-  common.extend(
-    UndefinedController.prototype,
-    Controller.prototype, {
-      updateDisplay: function () {
-        if (this.__onFinishChange) {
-          if (!common.isUndefined(this.object[this.property])) {
-            this.__onFinishChange.call(this.object[this.property])
-          }
+  common.extend(UndefinedController.prototype, Controller.prototype, {
+    updateDisplay: function() {
+      if (this.__onFinishChange) {
+        if (!common.isUndefined(this.object[this.property])) {
+          this.__onFinishChange.call(this.object[this.property]);
         }
-        return UndefinedController.superclass.prototype.updateDisplay.call(this);
-      },
-
+      }
+      return UndefinedController.superclass.prototype.updateDisplay.call(this);
     }
-  );
+  });
 
   return UndefinedController;
 });

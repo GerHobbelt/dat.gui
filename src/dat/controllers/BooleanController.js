@@ -11,12 +11,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define([
-  'dat/controllers/Controller',
-  'dat/dom/dom',
-  'dat/utils/common'
-], function (Controller, dom, common) {
-
+define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], function(Controller, dom, common) {
   /**
    * @class Provides a checkbox input to alter the boolean property of an object.
    * @extends dat.controllers.Controller
@@ -26,17 +21,16 @@ define([
    *
    * @member dat.controllers
    */
-  var BooleanController = function (object, property) {
-
+  var BooleanController = function(object, property) {
     BooleanController.superclass.call(this, object, property);
 
     var _this = this;
     this.__prev = this.getValue();
 
-    this.__checkbox = document.createElement('input');
-    this.__checkbox.setAttribute('type', 'checkbox');
+    this.__checkbox = document.createElement("input");
+    this.__checkbox.setAttribute("type", "checkbox");
 
-    dom.bind(this.__checkbox, 'change', onChange, false);
+    dom.bind(this.__checkbox, "change", onChange, false);
 
     this.domElement.appendChild(this.__checkbox);
 
@@ -46,19 +40,16 @@ define([
     function onChange() {
       _this.setValue(!_this.__prev);
     }
-
   };
 
   BooleanController.superclass = Controller;
 
   common.extend(
-
     BooleanController.prototype,
     Controller.prototype,
 
     {
-
-      setValue: function (v) {
+      setValue: function(v) {
         var toReturn = BooleanController.superclass.prototype.setValue.call(this, v);
         if (this.__onFinishChange) {
           this.__onFinishChange.call(this, this.getValue());
@@ -67,23 +58,18 @@ define([
         return toReturn;
       },
 
-      updateDisplay: function () {
-
+      updateDisplay: function() {
         if (this.getValue() === true) {
-          this.__checkbox.setAttribute('checked', 'checked');
+          this.__checkbox.setAttribute("checked", "checked");
           this.__checkbox.checked = true;
         } else {
           this.__checkbox.checked = false;
         }
 
         return BooleanController.superclass.prototype.updateDisplay.call(this);
-
       }
-
     }
-
   );
 
   return BooleanController;
-
 });

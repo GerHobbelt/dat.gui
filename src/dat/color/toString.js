@@ -28,23 +28,32 @@ export default function(color, forceCSSHex) {
       str = "0" + str;
     }
     return "#" + str;
-  } if (colorFormat === "CSS_RGB") {
+  }
+  if (colorFormat === "CSS_RGB") {
     return "rgb(" + r + "," + g + "," + b + ")";
-  } if (colorFormat === "CSS_RGBA") {
+  }
+  if (colorFormat === "CSS_RGBA") {
     return "rgba(" + r + "," + g + "," + b + "," + a + ")";
-  } if (colorFormat === "HEX") {
+  }
+  if (colorFormat === "HEX") {
     return "0x" + color.hex.toString(16);
-  } if (colorFormat === "RGB_ARRAY") {
+  }
+  if (colorFormat === "RGB_ARRAY") {
     return "[" + r + "," + g + "," + b + "]";
-  } if (colorFormat === "RGBA_ARRAY") {
+  }
+  if (colorFormat === "RGBA_ARRAY") {
     return "[" + r + "," + g + "," + b + "," + a + "]";
-  } if (colorFormat === "RGB_OBJ") {
+  }
+  if (colorFormat === "RGB_OBJ") {
     return "{r:" + r + ",g:" + g + ",b:" + b + "}";
-  } if (colorFormat === "RGBA_OBJ") {
+  }
+  if (colorFormat === "RGBA_OBJ") {
     return "{r:" + r + ",g:" + g + ",b:" + b + ",a:" + a + "}";
-  } if (colorFormat === "HSV_OBJ") {
+  }
+  if (colorFormat === "HSV_OBJ") {
     return "{h:" + h + ",s:" + s + ",v:" + v + "}";
-  } if (colorFormat === "HSVA_OBJ") {
+  }
+  if (colorFormat === "HSVA_OBJ") {
     return "{h:" + h + ",s:" + s + ",v:" + v + ",a:" + a + "}";
   }
 

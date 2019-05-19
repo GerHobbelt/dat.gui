@@ -59,8 +59,8 @@ const dom = {
 
     elem.onselectstart = selectable
       ? function() {
-        return false;
-      }
+          return false;
+        }
       : function() {};
 
     elem.style.MozUserSelect = selectable ? "auto" : "none";
@@ -258,11 +258,11 @@ const dom = {
     const style = getComputedStyle(elem);
 
     return (
-      cssValueToPixels(style["border-left-width"])
-      + cssValueToPixels(style["border-right-width"])
-      + cssValueToPixels(style["padding-left"])
-      + cssValueToPixels(style["padding-right"])
-      + cssValueToPixels(style.width)
+      cssValueToPixels(style["border-left-width"]) +
+      cssValueToPixels(style["border-right-width"]) +
+      cssValueToPixels(style["padding-left"]) +
+      cssValueToPixels(style["padding-right"]) +
+      cssValueToPixels(style.width)
     );
   },
 
@@ -274,11 +274,11 @@ const dom = {
     const style = getComputedStyle(elem);
 
     return (
-      cssValueToPixels(style["border-top-width"])
-      + cssValueToPixels(style["border-bottom-width"])
-      + cssValueToPixels(style["padding-top"])
-      + cssValueToPixels(style["padding-bottom"])
-      + cssValueToPixels(style.height)
+      cssValueToPixels(style["border-top-width"]) +
+      cssValueToPixels(style["border-bottom-width"]) +
+      cssValueToPixels(style["padding-top"]) +
+      cssValueToPixels(style["padding-bottom"]) +
+      cssValueToPixels(style.height)
     );
   },
 

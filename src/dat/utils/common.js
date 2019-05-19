@@ -142,8 +142,8 @@ const Common = {
   },
 
   isArray:
-    Array.isArray
-    || function(obj) {
+    Array.isArray ||
+    function(obj) {
       return obj.constructor === Array;
     },
 

@@ -29,21 +29,21 @@ import domImport from "./dom/dom";
 import GUIImport from "./gui/GUI";
 
 export const color = {
-    Color: Color,
-    math: math,
-    interpret: interpret
+  Color: Color,
+  math: math,
+  interpret: interpret
 };
 
 export const controllers = {
-    Controller: Controller,
-    BooleanController: BooleanController,
-    OptionController: OptionController,
-    StringController: StringController,
-    NumberController: NumberController,
-    NumberControllerBox: NumberControllerBox,
-    NumberControllerSlider: NumberControllerSlider,
-    FunctionController: FunctionController,
-    ColorController: ColorController,
+  Controller: Controller,
+  BooleanController: BooleanController,
+  OptionController: OptionController,
+  StringController: StringController,
+  NumberController: NumberController,
+  NumberControllerBox: NumberControllerBox,
+  NumberControllerSlider: NumberControllerSlider,
+  FunctionController: FunctionController,
+  ColorController: ColorController
 };
 
 export const dom = { dom: domImport };

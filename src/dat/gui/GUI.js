@@ -47,7 +47,7 @@ const SUPPORTS_LOCAL_STORAGE = (function() {
   } catch (e) {
     return false;
   }
-}());
+})();
 
 let SAVE_DIALOGUE;
 
@@ -502,9 +502,9 @@ GUI.TEXT_OPEN = "Open Controls";
 
 GUI._keydownHandler = function(e) {
   if (
-    document.activeElement
-    && document.activeElement.type !== "text"
-    && (e.which === HIDE_KEY_CODE || e.keyCode === HIDE_KEY_CODE)
+    document.activeElement &&
+    document.activeElement.type !== "text" &&
+    (e.which === HIDE_KEY_CODE || e.keyCode === HIDE_KEY_CODE)
   ) {
     GUI.toggleHide();
   }
@@ -654,9 +654,9 @@ common.extend(
 
       // Do we have saved appearance data for this folder?
       if (
-        this.load // Anything loaded?
-        && this.load.folders // Was my parent a dead-end?
-        && this.load.folders[name]
+        this.load && // Anything loaded?
+        this.load.folders && // Was my parent a dead-end?
+        this.load.folders[name]
       ) {
         // Did daddy remember me?
         // Start me closed if I was closed
@@ -691,9 +691,9 @@ common.extend(
 
       // Do we have saved appearance data for this folder?
       if (
-        this.load // Anything loaded?
-        && this.load.folders // Was my parent a dead-end?
-        && this.load.folders[folder.name]
+        this.load && // Anything loaded?
+        this.load.folders && // Was my parent a dead-end?
+        this.load.folders[folder.name]
       ) {
         delete this.load.folders[folder.name];
       }

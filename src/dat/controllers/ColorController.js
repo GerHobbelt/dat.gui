@@ -254,9 +254,9 @@ class ColorController extends Controller {
         Color.COMPONENTS,
         function(component) {
           if (
-            !common.isUndefined(i[component])
-            && !common.isUndefined(this.__color.__state[component])
-            && i[component] !== this.__color.__state[component]
+            !common.isUndefined(i[component]) &&
+            !common.isUndefined(this.__color.__state[component]) &&
+            i[component] !== this.__color.__state[component]
           ) {
             mismatch = true;
             return {}; // break
@@ -314,16 +314,16 @@ function linearGradient(elem, x, a, b) {
 
 function hueGradient(elem) {
   elem.style.background = "";
-  elem.style.cssText
-    += "background: -moz-linear-gradient(top,  #ff0000 0%, #ff00ff 17%, #0000ff 34%, #00ffff 50%, #00ff00 67%, #ffff00 84%, #ff0000 100%);";
-  elem.style.cssText
-    += "background: -webkit-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
-  elem.style.cssText
-    += "background: -o-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
-  elem.style.cssText
-    += "background: -ms-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
-  elem.style.cssText
-    += "background: linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
+  elem.style.cssText +=
+    "background: -moz-linear-gradient(top,  #ff0000 0%, #ff00ff 17%, #0000ff 34%, #00ffff 50%, #00ff00 67%, #ffff00 84%, #ff0000 100%);";
+  elem.style.cssText +=
+    "background: -webkit-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
+  elem.style.cssText +=
+    "background: -o-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
+  elem.style.cssText +=
+    "background: -ms-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
+  elem.style.cssText +=
+    "background: linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
 }
 
 export default ColorController;

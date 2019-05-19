@@ -25,17 +25,16 @@ import NumberControllerSlider from "./controllers/NumberControllerSlider";
 import FunctionController from "./controllers/FunctionController";
 import ColorController from "./controllers/ColorController";
 
-import dom from "./dom/dom";
-import GUI from "./gui/GUI";
+import domImport from "./dom/dom";
+import GUIImport from "./gui/GUI";
 
-export default {
-  color: {
+export const color = {
     Color: Color,
     math: math,
     interpret: interpret
-  },
+};
 
-  controllers: {
+export const controllers = {
     Controller: Controller,
     BooleanController: BooleanController,
     OptionController: OptionController,
@@ -44,16 +43,19 @@ export default {
     NumberControllerBox: NumberControllerBox,
     NumberControllerSlider: NumberControllerSlider,
     FunctionController: FunctionController,
-    ColorController: ColorController
-  },
+    ColorController: ColorController,
+};
 
-  dom: {
-    dom: dom
-  },
+export const dom = { dom: domImport };
 
-  gui: {
-    GUI: GUI
-  },
+export const gui = { GUI: GUIImport };
 
-  GUI: GUI
+export const GUI = GUIImport;
+
+export default {
+  color,
+  controllers,
+  dom,
+  gui,
+  GUI
 };

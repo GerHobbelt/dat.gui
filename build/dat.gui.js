@@ -1490,27 +1490,8 @@
     }
   };
 
-  const saveDialogContents = `<div id="dg-save" class="dg dialogue">
-
-  Here's the new load parameter for your <code>GUI</code>'s constructor:
-
-  <textarea id="dg-new-constructor"></textarea>
-
-  <div id="dg-save-locally">
-
-    <input id="dg-local-storage" type="checkbox"/> Automatically save
-    values to <code>localStorage</code> on exit.
-
-    <div id="dg-local-explain">The values saved to <code>localStorage</code> will
-      override those passed to <code>dat.GUI</code>'s constructor. This makes it
-      easier to work incrementally, but <code>localStorage</code> is fragile,
-      and your friends may not see the same values you do.
-
-    </div>
-
-  </div>
-
-</div>`;
+  var saveDialogContents =
+    '<div id="dg-save" class="dg dialogue">\n\n  Here\'s the new load parameter for your <code>GUI</code>\'s constructor:\n\n  <textarea id="dg-new-constructor"></textarea>\n\n  <div id="dg-save-locally">\n\n    <input id="dg-local-storage" type="checkbox"/> Automatically save\n    values to <code>localStorage</code> on exit.\n\n    <div id="dg-local-explain">The values saved to <code>localStorage</code> will\n      override those passed to <code>dat.GUI</code>\'s constructor. This makes it\n      easier to work incrementally, but <code>localStorage</code> is fragile,\n      and your friends may not see the same values you do.\n\n    </div>\n\n  </div>\n\n</div>';
 
   var ControllerFactory = function ControllerFactory(object, property) {
     var initialValue = object[property];
@@ -2638,33 +2619,43 @@
     });
   }
 
-  var index = {
-    color: {
-      Color: Color,
-      math: ColorMath,
-      interpret: interpret
-    },
-    controllers: {
-      Controller: Controller,
-      BooleanController: BooleanController,
-      OptionController: OptionController,
-      StringController: StringController,
-      NumberController: NumberController,
-      NumberControllerBox: NumberControllerBox,
-      NumberControllerSlider: NumberControllerSlider,
-      FunctionController: FunctionController,
-      ColorController: ColorController
-    },
-    dom: {
-      dom: dom
-    },
-    gui: {
-      GUI: GUI
-    },
+  var color = {
+    Color: Color,
+    math: ColorMath,
+    interpret: interpret
+  };
+  var controllers = {
+    Controller: Controller,
+    BooleanController: BooleanController,
+    OptionController: OptionController,
+    StringController: StringController,
+    NumberController: NumberController,
+    NumberControllerBox: NumberControllerBox,
+    NumberControllerSlider: NumberControllerSlider,
+    FunctionController: FunctionController,
+    ColorController: ColorController
+  };
+  var dom$1 = {
+    dom: dom
+  };
+  var gui = {
     GUI: GUI
   };
+  var GUI$1 = GUI;
+  var index = {
+    color: color,
+    controllers: controllers,
+    dom: dom$1,
+    gui: gui,
+    GUI: GUI$1
+  };
 
+  exports.GUI = GUI$1;
+  exports.color = color;
+  exports.controllers = controllers;
   exports.default = index;
+  exports.dom = dom$1;
+  exports.gui = gui;
 
   Object.defineProperty(exports, "__esModule", { value: true });
 });

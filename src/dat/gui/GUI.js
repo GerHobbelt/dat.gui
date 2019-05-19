@@ -1,5 +1,5 @@
 /**
- * dat-gui JavaScript Controller Library
+ * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
  * Copyright 2011 Data Arts Team, Google Creative Lab
@@ -1048,7 +1048,14 @@ function augmentController(gui, li, controller) {
       step: controller.__step
     });
 
-    common.each(["updateDisplay", "onChange", "onFinishChange", "step", "min", "max"], function(method) {
+    common.each([
+    "updateDisplay", 
+    "onChange", 
+    "onFinishChange", 
+    "step", 
+    "min", 
+    "max"
+    ], function(method) {
       const pc = controller[method];
       const pb = box[method];
       controller[method] = box[method] = function() {

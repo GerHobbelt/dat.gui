@@ -1,10 +1,8 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-    "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html>
 <html>
 <head>
-
-  <link rel="stylesheet" href="qunit.css" type="text/css" media="screen"/>
-  <link rel="stylesheet" href="../build/dat.gui.css" type="text/css" media="screen"/>
+  <link rel="stylesheet" href="qunit.css" />
+  <link rel="stylesheet" href="../build/dat.gui.css" />
   <script type="text/javascript" src="qunit.js"></script>
   <script type="text/javascript" src="jquery.js"></script>
 
@@ -422,21 +420,21 @@
 
     });
 
-		function match(a, b, msg) {
+    function match(a, b, msg) {
 
-			for (var i in b) {
-				if (b[i] !== b[i]) {
-					ok(a[i] !== a[i], msg)
-				} else {
-					equal(b[i], a[i], msg);
-				}
-			}
+        for (var i in b) {
+            if (b[i] !== b[i]) {
+                ok(a[i] !== a[i], msg)
+            } else {
+                equal(b[i], a[i], msg);
+            }
+        }
 
-		}
+    }
 
-		function equalish(a, b, tolerance, label) {
-			return ok(Math.abs(a - b) < tolerance, label);
-		}
+    function equalish(a, b, tolerance, label) {
+        return ok(Math.abs(a - b) < tolerance, label);
+    }
 
 
 
@@ -860,7 +858,7 @@ console.log(c2.__checkbox.getAttribute('checked'));
 
       // click hue slider
 
-      equal(1,0, "TODO: add set color tests.");
+      equal(1, 0, "TODO: add set color tests.");
 
       document.body.removeChild(c1.domElement);
     });
@@ -1383,8 +1381,8 @@ console.log(c2.__checkbox.getAttribute('checked'));
       gui.destroy();
 
       gui = new GUI({
-            load: saveObject
-          });
+        load: saveObject
+      });
 
       gui.remember(object);
 
@@ -1399,9 +1397,9 @@ console.log(c2.__checkbox.getAttribute('checked'));
       gui.destroy();
 
       gui = new GUI({
-            preset: "Default",
-            load: saveObject
-          });
+        preset: "Default",
+        load: saveObject
+      });
 
       gui.remember(object);
 
@@ -1438,17 +1436,16 @@ console.log(c2.__checkbox.getAttribute('checked'));
 
 
 });
-</script>
-
+  </script>
 </head>
 <body>
-<h1 id="qunit-header"></h1>
+  <h1 id="qunit-header"></h1>
 
-<h2 id="qunit-banner"></h2>
+  <h2 id="qunit-banner"></h2>
 
-<div id="qunit-testrunner-toolbar"></div>
-<h2 id="qunit-userAgent"></h2>
-<ol id="qunit-tests"></ol>
-<div id="qunit-fixture">test markup, will be hidden</div>
+  <div id="qunit-testrunner-toolbar"></div>
+  <h2 id="qunit-userAgent"></h2>
+  <ol id="qunit-tests"></ol>
+  <div id="qunit-fixture">test markup, will be hidden</div>
 </body>
 </html>

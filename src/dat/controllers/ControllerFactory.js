@@ -25,7 +25,7 @@ const ControllerFactory = function(object, property) {
   const initialValue = object[property];
 
   // Providing options?
-  if (arguments.length <= 3 && (common.isArray(arguments[2]) || common.isObject(arguments[2]))) {
+  if (arguments.length <= 3 && arguments[2] != null && (common.isArray(arguments[2]) || common.isObject(arguments[2]))) {
     return new OptionController(object, property, arguments[2]);
   }
 

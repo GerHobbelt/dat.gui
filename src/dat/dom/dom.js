@@ -1,5 +1,5 @@
 /**
- * dat-gui JavaScript Controller Library
+ * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
  * Copyright 2011 Data Arts Team, Google Creative Lab
@@ -55,7 +55,9 @@ const dom = {
    * @param selectable
    */
   makeSelectable: function(elem, selectable) {
-    if (elem === undefined || elem.style === undefined) return;
+    if (elem === undefined || elem.style === undefined) {
+      return;
+    }
 
     elem.onselectstart = selectable
       ? function() {

@@ -1,5 +1,5 @@
 /**
- * dat-gui JavaScript Controller Library
+ * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
  * Copyright 2011 Data Arts Team, Google Creative Lab
@@ -11,7 +11,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import dom from "./dom";
+import dom from "../dom/dom";
 import common from "../utils/common";
 
 class CenteredDiv {

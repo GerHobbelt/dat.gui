@@ -1,6 +1,6 @@
 {
   "name": "@gerhobbelt/dat.GUI",
-  "version": "0.6.1-2",
+  "version": "0.6.5-2",
   "description": "A lightweight graphical user interface for changing variables in JavaScript.",
   "main": "./build/dat.gui.js",
   "module": "build/dat.gui.module.js",
@@ -62,7 +62,6 @@
     "serve": "^11.0.0",
     "uglify-js": "^3.5.13"
   },
-  "dependencies": {},
   "eslintConfig": {
     "extends": "airbnb-base",
     "rules": {

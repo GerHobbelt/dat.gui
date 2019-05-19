@@ -43,29 +43,27 @@ class BooleanController extends Controller {
     function onChange() {
       _this.setValue(!_this.__prev);
     }
+  }
 
-
-
-      setValue(v) {
-        var toReturn = super.setValue(v);
-        if (this.__onFinishChange) {
-          this.__onFinishChange.call(this, this.getValue());
-        }
-        this.__prev = this.getValue();
-        return toReturn;
-      }
-
-      updateDisplay() {
-        if (this.getValue() === true) {
-          this.__checkbox.setAttribute("checked", "checked");
-          this.__checkbox.checked = true;
-        } else {
-          this.__checkbox.checked = false;
-        }
-
-        return super.updateDisplay();
-      }
+  setValue(v) {
+    var toReturn = super.setValue(v);
+    if (this.__onFinishChange) {
+      this.__onFinishChange.call(this, this.getValue());
     }
-  );
+    this.__prev = this.getValue();
+    return toReturn;
+  }
+
+  updateDisplay() {
+    if (this.getValue() === true) {
+      this.__checkbox.setAttribute("checked", "checked");
+      this.__checkbox.checked = true;
+    } else {
+      this.__checkbox.checked = false;
+    }
+
+    return super.updateDisplay();
+  }
+}
 
 export default BooleanController;

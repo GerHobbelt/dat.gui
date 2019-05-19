@@ -14,30 +14,33 @@ In your `head` tag, include the following code:
 <script type="text/javascript" src="dat.gui.min.js"></script>
 ```
 
-----
+## Installing from npm
 
-## Using dat.GUI with require.js
+Install the module:
 
-Internally, dat.GUI uses [require.js](http://requirejs.org/) to handle dependency management. If you're making changes to the source and want to see the effects of your changes without building, use require js.
-
-In your `head` tag, include the following code:
-```
-<script data-main="path/to/main" src="path/to/requirejs/require.js"></script>
+```bash
+$ npm install --save dat.gui
 ```
 
-Then, in `path/to/main.js`:
-```
-require([
-  'path/to/gui/module/GUI'
-], function(GUI) {
+Use it:
 
-  // No namespace necessary 
-  var gui = new GUI();
+```js
+// CommonJS:
+const dat = require('dat.gui');
 
+// ES6:
+import * as dat from 'dat.gui';
+
+var obj = { x: 5 };
+var gui = new dat.GUI();
+
+gui.add(obj, 'x').onChange(function() {
+  // obj.x will now have updated value
 });
 ```
 
-----
+
+
 
 ## Directory Contents
 
@@ -52,41 +55,35 @@ require([
 
 In the terminal, enter the following:
 
+```bash
+$ npm install
+$ npm run build
 ```
-$ cd utils
-$ node build_gui.js
-```
 
-This will create a namespaced, unminified build of dat.GUI at `build/dat.gui.js`
-
-_To export minified source using Closure Compiler, open `utils/build_gui.js` and set the `minify` parameter to `true`._
-
-----
-
-## Change log
-
-### 0.5
- * Moved to requirejs for dependency management.
- * Changed global namespace from *DAT* to *dat* (lowercase).
- * Added support for color controllers. See [Color Controllers](http://workshop.chromeexperiments.com/examples/gui/#4--Color-Controllers).
- * Added support for folders. See [Folders](http://workshop.chromeexperiments.com/examples/gui/#3--Folders).
- * Added support for saving named presets.  See [Presets](http://workshop.chromeexperiments.com/examples/gui/examples/gui/#6--Presets).
- * Removed `height` parameter from GUI constructor. Scrollbar automatically induced when window is too short.
- * `dat.GUI.autoPlace` parameter removed. Use `new dat.GUI( { autoPlace: false } )`. See [Custom Placement](http://workshop.chromeexperiments.com/examples/gui/#9--Custom-Placement).
- * `gui.autoListen` and `gui.listenAll()` removed. See [Updating The Display Manually](http://workshop.chromeexperiments.com/examples/gui/#11--Updating-the-Display-Manually).
- * `dat.GUI.load` removed. See [Saving Values](http://workshop.chromeexperiments.com/examples/gui/#5--Saving-Values).
- * Made Controller code completely agnostic of GUI. Controllers can easily be created independent of a GUI panel.
+This will create a rolled-up build of dat.GUI at `build/dat.gui.js` and its
+minified version at `build/dat.gui.min.js`.
 
 
-# 0.4
+## npm scripts
 
- * Migrated from GitHub to Google Code.
+- npm run build - Build development and production version of scripts.
+- npm run dev - Build development version of script and watch for changes.
 
-----
+
+## Working with Content Security Policy
+
+If you're using a server with a Content Security Policy in place that blocks 'unsafe-inline', you will have problems when dat.gui.js tries to inject style information. To get around this, load 'build/dat.gui.css' as an external style sheet.
+
+
+## Changes
+View the [Change Log](CHANGELOG.md)
 
 ## Thanks
+
 The following libraries / open-source projects were used in the development of dat.GUI:
+
  * [Rollup](https://rollupjs.org)
  * [Sass](http://sass-lang.com/)
  * [Node.js](http://nodejs.org/)
  * [QUnit](https://github.com/jquery/qunit) / [jquery](http://jquery.com/)
+

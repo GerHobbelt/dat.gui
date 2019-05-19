@@ -5,17 +5,19 @@ Get started with dat.GUI by reading the tutorial at http://workshop.chromeexperi
 
 ----
 
-##Packaged Builds
+## Packaged Builds
+
 The easiest way to use dat.GUI in your code is by using the built source at `build/dat.gui.min.js`. These built JavaScript files bundle all the necessary dependencies to run dat.GUI.
 
 In your `head` tag, include the following code:
-```
+```html
 <script type="text/javascript" src="dat.gui.min.js"></script>
 ```
 
 ----
 
-##Using dat.GUI with require.js
+## Using dat.GUI with require.js
+
 Internally, dat.GUI uses [require.js](http://requirejs.org/) to handle dependency management. If you're making changes to the source and want to see the effects of your changes without building, use require js.
 
 In your `head` tag, include the following code:
@@ -37,7 +39,8 @@ require([
 
 ----
 
-##Directory Contents
+## Directory Contents
+
  * build: Concatenated source code.
  * src: Modular code in [require.js](http://requirejs.org/) format. Also includes css, [scss](http://sass-lang.com/), and html, some of which is included during build.
  * tests: [QUnit](https://github.com/jquery/qunit) test suite.
@@ -45,7 +48,7 @@ require([
 
 ----
 
-##Building your own dat.GUI
+## Building your own dat.GUI
 
 In the terminal, enter the following:
 
@@ -60,9 +63,9 @@ _To export minified source using Closure Compiler, open `utils/build_gui.js` and
 
 ----
 
-##Change log
+## Change log
 
-###0.5
+### 0.5
  * Moved to requirejs for dependency management.
  * Changed global namespace from *DAT* to *dat* (lowercase).
  * Added support for color controllers. See [Color Controllers](http://workshop.chromeexperiments.com/examples/gui/#4--Color-Controllers).
@@ -75,15 +78,15 @@ _To export minified source using Closure Compiler, open `utils/build_gui.js` and
  * Made Controller code completely agnostic of GUI. Controllers can easily be created independent of a GUI panel.
 
 
-#0.4
+# 0.4
 
  * Migrated from GitHub to Google Code.
 
 ----
 
-##Thanks
+## Thanks
 The following libraries / open-source projects were used in the development of dat.GUI:
- * [require.js](http://requirejs.org/)
+ * [Rollup](https://rollupjs.org)
  * [Sass](http://sass-lang.com/)
- * [node.js](http://nodejs.org/)
+ * [Node.js](http://nodejs.org/)
  * [QUnit](https://github.com/jquery/qunit) / [jquery](http://jquery.com/)

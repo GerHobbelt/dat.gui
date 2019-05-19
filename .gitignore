@@ -1,5 +1,7 @@
 .DS_Store
 .sass-cache
-.idea
-*.map
+.idea/
 node_modules/
+tmp/
+
+*.bak

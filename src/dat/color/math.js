@@ -11,10 +11,9 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define([], function() {
   var tmpComponent;
 
-  return {
+const ColorMath = {
     hsv_to_rgb: function(h, s, v) {
       var hi = Math.floor(h / 60) % 6;
 
@@ -82,4 +81,5 @@ define([], function() {
       return (value << (tmpComponent = componentIndex * 8)) | (hex & ~(0xff << tmpComponent));
     }
   };
-});
+
+export default ColorMath;

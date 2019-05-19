@@ -11,33 +11,8 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define(["dat/color/toString", "dat/utils/common"], function(toString, common) {
-  var result, toReturn;
-
-  var interpret = function() {
-    toReturn = false;
-
-    var original = arguments.length > 1 ? common.toArray(arguments) : arguments[0];
-
-    common.each(INTERPRETATIONS, function(family) {
-      if (family.litmus(original)) {
-        common.each(family.conversions, function(conversion, conversionName) {
-          result = conversion.read(original);
-
-          if (toReturn === false && result !== false) {
-            toReturn = result;
-            result.conversionName = conversionName;
-            result.conversion = conversion;
-            return common.BREAK;
-          }
-        });
-
-        return common.BREAK;
-      }
-    });
-
-    return toReturn;
-  };
+import toString from "./toString";
+import common from "../utils/common";
 
   var INTERPRETATIONS = [
     // Strings
@@ -287,5 +262,33 @@ define(["dat/color/toString", "dat/utils/common"], function(toString, common) {
     }
   ];
 
-  return interpret;
-});
+
+  var result, toReturn;
+
+
+  var interpret = function() {
+    toReturn = false;
+
+    var original = arguments.length > 1 ? common.toArray(arguments) : arguments[0];
+
+    common.each(INTERPRETATIONS, function(family) {
+      if (family.litmus(original)) {
+        common.each(family.conversions, function(conversion, conversionName) {
+          result = conversion.read(original);
+
+          if (toReturn === false && result !== false) {
+            toReturn = result;
+            result.conversionName = conversionName;
+            result.conversion = conversion;
+            return common.BREAK;
+          }
+        });
+
+        return common.BREAK;
+      }
+    });
+
+    return toReturn;
+  };
+
+export default interpret;

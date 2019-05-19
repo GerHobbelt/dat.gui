@@ -11,33 +11,32 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define(["dat/color/interpret", "dat/color/math", "dat/color/toString", "dat/utils/common"], function(
-  interpret,
-  math,
-  toString,
-  common
-) {
-  var Color = function() {
+import interpret from "./interpret";
+import math from "./math";
+import colorToString from "./toString";
+import common from "../utils/common";
+
+class Color {
+  constructor() {
     this.__state = interpret.apply(this, arguments);
 
     if (this.__state === false) {
-      throw "Failed to interpret color arguments";
+      throw new Error("Failed to interpret color arguments");
     }
 
     this.__state.a = this.__state.a || 1;
-  };
+  }
 
-  Color.COMPONENTS = ["r", "g", "b", "h", "s", "v", "hex", "a"];
+  COMPONENTS = ["r", "g", "b", "h", "s", "v", "hex", "a"];
 
-  common.extend(Color.prototype, {
-    toString: function() {
+    toString() {
       return toString(this);
-    },
+    }
 
-    toOriginal: function() {
+    toOriginal() {
       return this.__state.conversion.write(this);
     }
-  });
+  };
 
   defineRGBComponent(Color.prototype, "r", 2);
   defineRGBComponent(Color.prototype, "g", 1);
@@ -141,5 +140,5 @@ define(["dat/color/interpret", "dat/color/math", "dat/color/toString", "dat/util
     }
   }
 
-  return Color;
-});
+  
+export default Color;

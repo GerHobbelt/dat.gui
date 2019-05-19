@@ -148,13 +148,12 @@ class NumberControllerBox extends NumberController {
     this.domElement.appendChild(this.__input);
   }
 
-    updateDisplay() {
-      this.__input.value = this.__truncationSuspended
-        ? this.getValue()
-        : roundToDecimal(this.getValue(), this.__precision);
-      return super.updateDisplay();
-    }
-  };
-
+  updateDisplay() {
+    this.__input.value = this.__truncationSuspended
+      ? this.getValue()
+      : roundToDecimal(this.getValue(), this.__precision);
+    return super.updateDisplay();
+  }
+}
 
 export default NumberControllerBox;

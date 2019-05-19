@@ -1,7 +1,0 @@
-{
-  "directory": "examples/assets/",
-
-  "scripts": {
-    "postinstall": "grunt patch_requireJS"
-  }
-}

@@ -385,108 +385,108 @@ class ColorController extends Controller {
     }
   }
 
-    updateDisplay() {
-      const i = interpret(this.getValue());
+  updateDisplay() {
+    const i = interpret(this.getValue());
 
-      if (i !== false) {
-        let mismatch = false;
+    if (i !== false) {
+      let mismatch = false;
 
-        // Check for mismatch on the interpreted value.
+      // Check for mismatch on the interpreted value.
 
-        common.each(
-          Color.COMPONENTS,
-          function(component) {
-            if (
-              !common.isUndefined(i[component]) &&
-              !common.isUndefined(this.__color.__state[component]) &&
-              i[component] !== this.__color.__state[component]
-            ) {
-              mismatch = true;
-              return common.BREAK; // break
-            }
-          },
-          this
-        );
+      common.each(
+        Color.COMPONENTS,
+        function(component) {
+          if (
+            !common.isUndefined(i[component]) &&
+            !common.isUndefined(this.__color.__state[component]) &&
+            i[component] !== this.__color.__state[component]
+          ) {
+            mismatch = true;
+            return common.BREAK; // break
+          }
+        },
+        this
+      );
 
-        // If nothing diverges, we keep our previous values
-        // for statefulness, otherwise we recalculate fresh
-        if (mismatch) {
-          common.extend(this.__color.__state, i);
-        }
+      // If nothing diverges, we keep our previous values
+      // for statefulness, otherwise we recalculate fresh
+      if (mismatch) {
+        common.extend(this.__color.__state, i);
       }
-
-      common.extend(this.__temp.__state, this.__color.__state);
-
-      this.__temp.a = 1;
-
-      const flip = this.__color.v < 0.5 || this.__color.s > 0.5 ? 255 : 0;
-      const _flip = 255 - flip;
-
-      common.extend(this.__field_knob.style, {
-        marginLeft: 100 * this.__color.s - 7 + "px",
-        marginTop: 100 * (1 - this.__color.v) - 7 + "px",
-        backgroundColor: this.__temp.toString(),
-        border: this.__field_knob_border + "rgb(" + flip + "," + flip + "," + flip + ")"
-      });
-
-      this.__alpha_knob.style.marginTop = (1 - this.__color.a) * 100 + "px";
-      this.__hue_knob.style.marginTop = (1 - this.__color.h / 360) * 100 + "px";
-
-      this.__temp.s = 1;
-      this.__temp.v = 1;
-
-      linearGradient(this.__saturation_field, "left", "#fff", this.__temp.toString());
-
-      common.extend(this.__input.style, {
-        backgroundColor: (this.__input.value = this.__color.toString()),
-        color: "rgb(" + flip + "," + flip + "," + flip + ")",
-        textShadow: this.__input_textShadow
-          .map(function(d) {
-            return d + " rgba(" + _flip + "," + _flip + "," + _flip + ",0.7)";
-          })
-          .join(", ")
-      });
-
-      this.__input.disabled = this.getReadonly();
     }
-  };
 
-  const vendors = ["-moz-", "-o-", "-webkit-", "-ms-", ""];
+    common.extend(this.__temp.__state, this.__color.__state);
 
-  function linearGradient(elem, x, a, b) {
-    elem.style.background = "";
-    common.each(vendors, function(vendor) {
-      elem.style.cssText += "background: " + vendor + "linear-gradient(" + x + ", " + a + " 0%, " + b + " 100%); ";
+    this.__temp.a = 1;
+
+    const flip = this.__color.v < 0.5 || this.__color.s > 0.5 ? 255 : 0;
+    const _flip = 255 - flip;
+
+    common.extend(this.__field_knob.style, {
+      marginLeft: 100 * this.__color.s - 7 + "px",
+      marginTop: 100 * (1 - this.__color.v) - 7 + "px",
+      backgroundColor: this.__temp.toString(),
+      border: this.__field_knob_border + "rgb(" + flip + "," + flip + "," + flip + ")"
     });
-  }
 
-  function hueGradient(elem) {
-    elem.style.background = "";
-    elem.style.cssText +=
-      "background: -moz-linear-gradient(top,  #ff0000 0%, #ff00ff 17%, #0000ff 34%, #00ffff 50%, #00ff00 67%, #ffff00 84%, #ff0000 100%);";
-    elem.style.cssText +=
-      "background: -webkit-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
-    elem.style.cssText +=
-      "background: -o-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
-    elem.style.cssText +=
-      "background: -ms-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
-    elem.style.cssText +=
-      "background: linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
-  }
+    this.__alpha_knob.style.marginTop = (1 - this.__color.a) * 100 + "px";
+    this.__hue_knob.style.marginTop = (1 - this.__color.h / 360) * 100 + "px";
 
-  function alphaGradient(elem, color) {
-    elem.style.background = "";
+    this.__temp.s = 1;
+    this.__temp.v = 1;
 
-    const { rgb } = color;
-    const r = Math.floor(color.r);
-    const g = Math.floor(color.g);
-    const b = Math.floor(color.b);
-    const rgbaStart = "rgba(" + r + "," + g + "," + b + ",1)";
-    const rgbaEnd = "rgba(" + r + "," + g + "," + b + ",0)";
+    linearGradient(this.__saturation_field, "left", "#fff", this.__temp.toString());
 
-    common.each(vendors, function(vendor) {
-      elem.style.cssText += "background: " + vendor + "linear-gradient(top, " + rgbaStart + " , " + rgbaEnd + "); ";
+    common.extend(this.__input.style, {
+      backgroundColor: (this.__input.value = this.__color.toString()),
+      color: "rgb(" + flip + "," + flip + "," + flip + ")",
+      textShadow: this.__input_textShadow
+        .map(function(d) {
+          return d + " rgba(" + _flip + "," + _flip + "," + _flip + ",0.7)";
+        })
+        .join(", ")
     });
+
+    this.__input.disabled = this.getReadonly();
   }
+}
+
+const vendors = ["-moz-", "-o-", "-webkit-", "-ms-", ""];
+
+function linearGradient(elem, x, a, b) {
+  elem.style.background = "";
+  common.each(vendors, function(vendor) {
+    elem.style.cssText += "background: " + vendor + "linear-gradient(" + x + ", " + a + " 0%, " + b + " 100%); ";
+  });
+}
+
+function hueGradient(elem) {
+  elem.style.background = "";
+  elem.style.cssText +=
+    "background: -moz-linear-gradient(top,  #ff0000 0%, #ff00ff 17%, #0000ff 34%, #00ffff 50%, #00ff00 67%, #ffff00 84%, #ff0000 100%);";
+  elem.style.cssText +=
+    "background: -webkit-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
+  elem.style.cssText +=
+    "background: -o-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
+  elem.style.cssText +=
+    "background: -ms-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
+  elem.style.cssText +=
+    "background: linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
+}
+
+function alphaGradient(elem, color) {
+  elem.style.background = "";
+
+  const { rgb } = color;
+  const r = Math.floor(color.r);
+  const g = Math.floor(color.g);
+  const b = Math.floor(color.b);
+  const rgbaStart = "rgba(" + r + "," + g + "," + b + ",1)";
+  const rgbaEnd = "rgba(" + r + "," + g + "," + b + ",0)";
+
+  common.each(vendors, function(vendor) {
+    elem.style.cssText += "background: " + vendor + "linear-gradient(top, " + rgbaStart + " , " + rgbaEnd + "); ";
+  });
+}
 
 export default ColorController;

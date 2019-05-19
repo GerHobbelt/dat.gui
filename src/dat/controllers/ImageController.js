@@ -51,7 +51,6 @@ class ImageController extends Controller {
     this.domElement.appendChild(this.__label);
   }
 
-
   /**
    * Injects default stylesheet for slider elements.
    */
@@ -59,11 +58,10 @@ class ImageController extends Controller {
     css.inject(styleSheet);
   }
 
-    updateDisplay() {
-      this.__previewImage.src = this.getValue();
-      return ImageController.superclass.prototype.updateDisplay.call(this);
-    }
-  };
-
+  updateDisplay() {
+    this.__previewImage.src = this.getValue();
+    return ImageController.superclass.prototype.updateDisplay.call(this);
+  }
+}
 
 export default ImageController;

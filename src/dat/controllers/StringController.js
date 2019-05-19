@@ -14,16 +14,16 @@
 import Controller from "./Controller";
 import dom from "../dom/dom";
 
-  /**
-   * @class Provides a text input to alter the string property of an object.
-   *
-   * @extends dat.controllers.Controller
-   *
-   * @param {Object} object The object to be manipulated
-   * @param {string} property The name of the property to be manipulated
-   *
-   * @member dat.controllers
-   */
+/**
+ * @class Provides a text input to alter the string property of an object.
+ *
+ * @extends dat.controllers.Controller
+ *
+ * @param {Object} object The object to be manipulated
+ * @param {string} property The name of the property to be manipulated
+ *
+ * @member dat.controllers
+ */
 class StringController extends Controller {
   constructor(object, property, options) {
     super(object, property, "string", options);
@@ -61,15 +61,15 @@ class StringController extends Controller {
     this.domElement.appendChild(this.__input);
   }
 
-    updateDisplay() {
-      // Stops the caret from moving on account of:
-      // keyup -> setValue -> updateDisplay
-      if (!dom.isActive(this.__input)) {
-        this.__input.value = this.getValue();
-      }
-      this.__input.disabled = this.getReadonly();
-      return super.updateDisplay();
+  updateDisplay() {
+    // Stops the caret from moving on account of:
+    // keyup -> setValue -> updateDisplay
+    if (!dom.isActive(this.__input)) {
+      this.__input.value = this.getValue();
     }
-  };
+    this.__input.disabled = this.getReadonly();
+    return super.updateDisplay();
+  }
+}
 
 export default StringController;

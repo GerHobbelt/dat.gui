@@ -15,19 +15,19 @@ import Controller from "./Controller";
 import dom from "../dom/dom";
 import common from "../utils/common";
 
-  /**
-   * @class Provides a select input to alter the property of an object, using a
-   * list of accepted values.
-   *
-   * @extends dat.controllers.Controller
-   *
-   * @param {Object} object The object to be manipulated
-   * @param {string} property The name of the property to be manipulated
-   * @param {Object|string[]} options A map of labels to acceptable values, or
-   * a list of acceptable string values.
-   *
-   * @member dat.controllers
-   */
+/**
+ * @class Provides a select input to alter the property of an object, using a
+ * list of accepted values.
+ *
+ * @extends dat.controllers.Controller
+ *
+ * @param {Object} object The object to be manipulated
+ * @param {string} property The name of the property to be manipulated
+ * @param {Object|string[]} options A map of labels to acceptable values, or
+ * a list of acceptable string values.
+ *
+ * @member dat.controllers
+ */
 class OptionController extends Controller {
   constructor(object, property, params, options) {
     super(object, property, "option", options);
@@ -95,32 +95,32 @@ class OptionController extends Controller {
     }
   }
 
-    setValue(v) {
-      const toReturn = super.setValue(v);
-      return toReturn;
+  setValue(v) {
+    const toReturn = super.setValue(v);
+    return toReturn;
+  }
+
+  updateDisplay() {
+    const value = this.getValue();
+    let custom = true;
+    if (value !== this.CUSTOM_FLAG) {
+      common.each(this.__select.options, function(option) {
+        if (value == option.value) {
+          custom = false;
+        }
+      });
     }
 
-    updateDisplay() {
-      const value = this.getValue();
-      let custom = true;
-      if (value !== this.CUSTOM_FLAG) {
-        common.each(this.__select.options, function(option) {
-          if (value == option.value) {
-            custom = false;
-          }
-        });
-      }
+    this.__select.value = custom ? this.CUSTOM_FLAG : value;
+    this.__select.disabled = this.getReadonly();
 
-      this.__select.value = custom ? this.CUSTOM_FLAG : value;
-      this.__select.disabled = this.getReadonly();
-
-      if (this.__custom_controller) {
-        this.__custom_controller.el.style.display = custom ? "block" : "none";
-        this.__custom_controller.setReadonly(this.getReadonly());
-      }
-
-      return super.updateDisplay();
+    if (this.__custom_controller) {
+      this.__custom_controller.el.style.display = custom ? "block" : "none";
+      this.__custom_controller.setReadonly(this.getReadonly());
     }
-  };
+
+    return super.updateDisplay();
+  }
+}
 
 export default OptionController;

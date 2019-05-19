@@ -1,44 +1,53 @@
 {
-  "name": "dat.gui",
-  "version": "0.6.5",
+  "name": "@gerhobbelt/dat.GUI",
+  "version": "0.6.5-2",
   "description": "A lightweight graphical user interface for changing variables in JavaScript.",
   "main": "./build/dat.gui.js",
   "module": "build/dat.gui.module.js",
   "directories": {
+    "doc": "docs",
+    "example": "examples",
     "test": "tests"
   },
   "scripts": {
+    "test": "tests/index.html",
     "build": "rollup -c && prettier --print-width 120 --write build/**/*.js && rollup -c rollup.config.min.js",
     "build-docs": "jsdoc2md -f src/dat/gui/GUI.js src/dat/controllers/Controller.js src/dat/controllers/NumberController.js | replace-between --target API.md --token API",
     "lint": "eslint src",
     "fix": "eslint --fix src && prettier --print-width 120 --write src/**/*.js",
-    "prettier": "prettier --print-width 120 --write *.js **/*.js **/*.ts"
+    "prettier": "prettier --print-width 120 --write *.js **/*.js **/*.ts",
+    "pub": "npm publish --access public"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dataarts/dat.gui.git"
+    "url": "git@github.com:dataarts/dat.gui.git"
   },
+  "keywords": [
+    "data",
+    "binding",
+    "control",
+    "panel",
+    "data",
+    "GUI"
+  ],
   "author": "Data Arts Team, Google",
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/dataarts/dat.gui/issues"
   },
-  "homepage": "https://github.com/dataarts/dat.gui#readme",
+  "homepage": "https://github.com/dataarts/dat.gui",
   "devDependencies": {
     "@babel/core": "^7.4.4",
     "@babel/preset-env": "^7.4.4",
     "concurrently": "^4.1.0",
-    "css-loader": "^2.1.1",
     "eslint": "^5.16.0",
     "eslint-config-airbnb-base": "^13.1.0",
-    "eslint-loader": "^2.1.2",
     "eslint-plugin-import": "^2.17.2",
+    "qunit": "2.9.2",
     "extend": "^3.0.2",
-    "html-loader": "^0.5.5",
     "jsdoc-to-markdown": "^5.0.0",
     "node-sass": "^4.12.0",
     "prettier": "^1.17.1",
-    "sass-loader": "^7.1.0",
     "rollup": "^1.12.2",
     "rollup-plugin-babel": "^4.3.2",
     "rollup-plugin-cleanup": "^3.1.1",

@@ -47,7 +47,7 @@ const SUPPORTS_LOCAL_STORAGE = (function() {
   } catch (e) {
     return false;
   }
-})();
+}());
 
 let SAVE_DIALOGUE;
 
@@ -502,9 +502,9 @@ GUI.TEXT_OPEN = "Open Controls";
 
 GUI._keydownHandler = function(e) {
   if (
-    document.activeElement &&
-    document.activeElement.type !== "text" &&
-    (e.which === HIDE_KEY_CODE || e.keyCode === HIDE_KEY_CODE)
+    document.activeElement
+    && document.activeElement.type !== "text"
+    && (e.which === HIDE_KEY_CODE || e.keyCode === HIDE_KEY_CODE)
   ) {
     GUI.toggleHide();
   }
@@ -590,7 +590,7 @@ common.extend(
      * @instance
      */
     remove: function(controller) {
-      var lIndex = this.__listening.indexOf(controller);
+      const lIndex = this.__listening.indexOf(controller);
       if (lIndex != -1) {
         this.__listening.splice(lIndex, 1);
       }
@@ -607,7 +607,7 @@ common.extend(
      * @instance
      */
     destroy: function() {
-      var _this = this;
+      const _this = this;
 
       common.each(this.__folders, function(folder) {
         _this.removeFolder(folder);
@@ -624,7 +624,7 @@ common.extend(
         dom.unbind(window, "unload", this.saveToLocalStorageIfPossible);
       }
 
-      for (var i = this.__listening.length - 1; i >= 0; i--) {
+      for (let i = this.__listening.length - 1; i >= 0; i--) {
         this.__listening.splice(i, 1);
       }
     },
@@ -654,9 +654,9 @@ common.extend(
 
       // Do we have saved appearance data for this folder?
       if (
-        this.load && // Anything loaded?
-        this.load.folders && // Was my parent a dead-end?
-        this.load.folders[name]
+        this.load // Anything loaded?
+        && this.load.folders // Was my parent a dead-end?
+        && this.load.folders[name]
       ) {
         // Did daddy remember me?
         // Start me closed if I was closed
@@ -678,7 +678,7 @@ common.extend(
      * @param name
      */
     removeFolder: function(name) {
-      var folder = this.__folders[name];
+      const folder = this.__folders[name];
       if (!folder) {
         console.error('There is no folder in this GUI by the name "' + name + '"'); // eslint-disable-line no-console
         return;
@@ -691,9 +691,9 @@ common.extend(
 
       // Do we have saved appearance data for this folder?
       if (
-        this.load && // Anything loaded?
-        this.load.folders && // Was my parent a dead-end?
-        this.load.folders[folder.name]
+        this.load // Anything loaded?
+        && this.load.folders // Was my parent a dead-end?
+        && this.load.folders[folder.name]
       ) {
         delete this.load.folders[folder.name];
       }
@@ -719,7 +719,7 @@ common.extend(
       // we debounce this function to prevent performance issues when rotating on tablet/mobile
       const root = this.getRoot();
       if (root.scrollable) {
-        const top = dom.getOffset(root.__ul).top;
+        const { top } = dom.getOffset(root.__ul);
         let h = 0;
 
         common.each(root.__ul.childNodes, function(node) {

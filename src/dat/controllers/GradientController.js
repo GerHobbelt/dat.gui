@@ -45,7 +45,7 @@ class GradientController extends Controller {
     dom.bind(this.__input, "blur", onBlur);
 
     function onBlur() {
-      var value = JSON.parse(this.value);
+      const value = JSON.parse(this.value);
       _this.setValue(value);
     }
 
@@ -65,15 +65,15 @@ class GradientController extends Controller {
       boxShadow: "0px 1px 3px rgba(0,0,0,0.3)"
     });
 
-    for (var i = 0; i < params.length; i++) {
-      var item = document.createElement("canvas");
+    for (let i = 0; i < params.length; i++) {
+      const item = document.createElement("canvas");
       item.value = params[i];
       item.width = 150;
       item.height = 18;
-      var context = item.getContext("2d");
+      const context = item.getContext("2d");
 
-      var grd = context.createLinearGradient(0, 0, 150, 0);
-      for (var key in params[i]) {
+      const grd = context.createLinearGradient(0, 0, 150, 0);
+      for (const key in params[i]) {
         grd.addColorStop(key, params[i][key]);
       }
 
@@ -106,9 +106,9 @@ class GradientController extends Controller {
   }
 
   updateDisplay() {
-    var value = this.getValue();
-    var arr = [];
-    for (var key in value) {
+    const value = this.getValue();
+    const arr = [];
+    for (const key in value) {
       arr.push({
         percent: key,
         color: value[key]
@@ -119,9 +119,9 @@ class GradientController extends Controller {
     });
 
     this.__input.value = JSON.stringify(value);
-    var backgroundColor = "-webkit-linear-gradient(left";
-    for (var i = 0; i < arr.length; i++) {
-      backgroundColor += ", " + arr[i]["color"] + " " + arr[i]["percent"] * 100 + "%";
+    let backgroundColor = "-webkit-linear-gradient(left";
+    for (let i = 0; i < arr.length; i++) {
+      backgroundColor += ", " + arr[i].color + " " + arr[i].percent * 100 + "%";
     }
     backgroundColor += ")";
     common.extend(this.__input.style, {

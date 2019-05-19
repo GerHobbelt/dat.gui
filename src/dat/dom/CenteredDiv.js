@@ -11,7 +11,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import dom from "../dom/dom";
+import dom from "./dom";
 import common from "../utils/common";
 
 class CenteredDiv {

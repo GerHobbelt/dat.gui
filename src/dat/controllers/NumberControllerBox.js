@@ -16,7 +16,7 @@ import dom from "../dom/dom";
 import common from "../utils/common";
 
 function roundToDecimal(value, decimals) {
-  const tenTo = Math.pow(10, decimals);
+  const tenTo = 10 ** decimals;
   return Math.round(value * tenTo) / tenTo;
 }
 
@@ -52,7 +52,7 @@ class NumberControllerBox extends NumberController {
     let prevY;
 
     function onChange() {
-      var value = _this.__input.value;
+      let { value } = _this.__input;
       if (params && params.suffix) {
         value = value.replace(params.suffix, "");
       }
@@ -117,7 +117,7 @@ class NumberControllerBox extends NumberController {
   updateDisplay() {
     // if (dom.isActive(this.__input)) return this; // prevent number from updating if user is trying to manually update
 
-    var suffix = params && params.suffix ? params.suffix : "";
+    const suffix = params && params.suffix ? params.suffix : "";
     this.__input.value = this.__truncationSuspended
       ? this.getValue()
       : roundToDecimal(this.getValue(), this.__precision) + suffix;

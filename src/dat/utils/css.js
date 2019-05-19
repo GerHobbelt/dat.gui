@@ -11,7 +11,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-module.exports = {
+const css = {
   load: function(url, indoc) {
     const doc = indoc || document;
     const link = doc.createElement("link");
@@ -34,3 +34,5 @@ module.exports = {
     }
   }
 };
+
+export default css;

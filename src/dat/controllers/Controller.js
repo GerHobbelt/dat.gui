@@ -1,65 +1,3 @@
-// GUI.Controller = function() {
-
-// 	this.parent = arguments[0];
-//     this.object = arguments[1];
-//     this.propertyName = arguments[2];
-//     this.changeListeners = [];
-
-// 	if (arguments.length > 0) this.initialValue = this.propertyName[this.object];
-
-//     this.domElement = document.createElement('div');
-//     this.domElement.setAttribute('class', 'guidat-controller ' + this.type);
-
-//     this.propertyNameElement = document.createElement('span');
-//     this.propertyNameElement.setAttribute('class', 'guidat-propertyname');
-//     this.name(this.propertyName);
-//     this.domElement.appendChild(this.propertyNameElement);
-
-//     GUI.makeUnselectable(this.domElement);
-
-// };
-
-// GUI.Controller.prototype.name = function(n) {
-// 	this.propertyNameElement.innerHTML = n;
-// 	return this;
-// };
-
-// GUI.Controller.prototype.reset = function() {
-// 	this.setValue(this.initialValue);
-// 	return this;
-// };
-
-// GUI.Controller.prototype.listen = function() {
-// 	this.parent.listenTo(this);
-// 	return this;
-// }
-
-// GUI.Controller.prototype.unlisten = function() {
-// 	this.parent.unlistenTo(this); // <--- hasn't been tested yet
-// 	return this;
-// }
-
-// GUI.Controller.prototype.setValue = function(n) {
-
-// 	this.object[this.propertyName] = n;
-// 	for (var i in this.changeListeners) {
-// 		this.changeListeners[i].call(this, n);
-// 	}
-// 	// Whenever you call setValue, the display will be updated automatically.
-// 	// This reduces some clutter in subclasses. We can also use this method for listen().
-// 	this.updateDisplay();
-// 	return this;
-// }
-
-// GUI.Controller.prototype.addChangeListener = function(fnc) {
-// 	this.changeListeners.push(fnc);
-// 	return this;
-// }
-
-//
-// EOF
-//
-
 /**
  * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
@@ -73,16 +11,16 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define(["dat/utils/common"], function(common) {
-  /**
-   * @class An "abstract" class that represents a given property of an object.
-   *
-   * @param {Object} object The object to be manipulated
-   * @param {string} property The name of the property to be manipulated
-   *
-   * @member dat.controllers
-   */
-  const Controller = function(object, property, type, options) {
+/**
+ * @class An "abstract" class that represents a given property of an object.
+ *
+ * @param {Object} object The object to be manipulated
+ * @param {string} property The name of the property to be manipulated
+ *
+ * @member dat.controllers
+ */
+class Controller {
+  constructor(object, property, type, options) {
     /**
      * The dynamic property info chunk, if applicable. Carries the getter and setter for this object/property.
      * @type {Object}
@@ -146,13 +84,8 @@ define(["dat/utils/common"], function(common) {
      * @ignore
      */
     this.__onFinishChange = undefined;
-  };
+  }
 
-  common.extend(
-    Controller.prototype,
-
-    /** @lends dat.controllers.Controller.prototype */
-    {
       /**
        * Specify a function which fires every time someone has changed the value with
        * this Controller.
@@ -161,10 +94,10 @@ define(["dat/utils/common"], function(common) {
        * has been modified via this Controller.
        * @returns {dat.controllers.Controller} this
        */
-      onChange: function(fnc) {
+      onChange(fnc) {
         this.__onChange = fnc;
         return this;
-      },
+      }
 
       /**
        * Specify a function which fires every time when someone is about to change the value with
@@ -174,10 +107,10 @@ define(["dat/utils/common"], function(common) {
        * is going to be modified via this Controller.
        * @returns {dat.controllers.Controller} this
        */
-      onBeforeChange: function(fnc) {
+      onBeforeChange(fnc) {
         this.__onBeforeChange = fnc;
         return this;
-      },
+      }
 
       /**
        * Specify a function which fires every time someone "finishes" changing
@@ -188,10 +121,10 @@ define(["dat/utils/common"], function(common) {
        * someone "finishes" changing the value via this Controller.
        * @returns {dat.controllers.Controller} this
        */
-      onFinishChange: function(fnc) {
+      onFinishChange(fnc) {
         this.__onFinishChange = fnc;
         return this;
-      },
+      }
 
       /**
        * Fire the registered onChange function if it exists. The first argument will be the current
@@ -201,12 +134,12 @@ define(["dat/utils/common"], function(common) {
        *
        * @returns {dat.controllers.Controller} this
        */
-      fireChange: function(event_info) {
+      fireChange(event_info) {
         if (this.__onChange) {
           this.__onChange(this.getValue(), event_info);
         }
         return this;
-      },
+      }
 
       /**
        * Fire the registered onBeforeChange function if it exists. The first argument will be the current
@@ -217,12 +150,12 @@ define(["dat/utils/common"], function(common) {
        * @returns {boolean} A truthy return value signals us to *not* apply the change; a falsey return
        * value permits the change to happen.
        */
-      fireBeforeChange: function(event_info) {
+      fireBeforeChange(event_info) {
         if (this.__onBeforeChange) {
           return this.__onBeforeChange(this.getValue(), event_info);
         }
         return false; // default: you are cleared to apply the change.
-      },
+      }
 
       /**
        * Fire the registered onFinishChange function if it exists. The first argument will be the current
@@ -232,12 +165,12 @@ define(["dat/utils/common"], function(common) {
        *
        * @returns {dat.controllers.Controller} this
        */
-      fireFinishChange: function(event_info) {
+      fireFinishChange(event_info) {
         if (this.__onFinishChange) {
           this.__onFinishChange(this.getValue(), event_info);
         }
         return this;
-      },
+      }
 
       /**
        * @internal
@@ -246,7 +179,7 @@ define(["dat/utils/common"], function(common) {
        *
        * @param {Object} newValue The new value of <code>object[property]</code>
        */
-      __setValue: function(newValue) {
+      __setValue(newValue) {
         if (!this.__dyninfo) {
           this.object[this.property] = newValue;
         } else if (this.__dyninfo.setter) {
@@ -257,7 +190,7 @@ define(["dat/utils/common"], function(common) {
           );
         }
         return this;
-      },
+      }
 
       /**
        * Change the value of <code>object[property]</code>
@@ -266,7 +199,7 @@ define(["dat/utils/common"], function(common) {
        *
        * @param {Boolean} silent If true, don't call the onChange handler
        */
-      setValue: function(newValue, silent) {
+      setValue(newValue, silent) {
         const readonly = this.getReadonly();
         const oldValue = this.getValue();
         const changed = oldValue !== newValue;
@@ -296,55 +229,54 @@ define(["dat/utils/common"], function(common) {
         // This reduces some clutter in subclasses.
         this.updateDisplay();
         return this;
-      },
+      }
 
       /**
        * Gets the value of <code>object[property]</code>
        *
        * @returns {Object} The current value of <code>object[property]</code>
        */
-      getValue: function() {
+      getValue() {
         return !this.__dyninfo ? this.object[this.property] : this.__dyninfo.getter.call(this.object);
-      },
+      }
 
-      getOption: function(name) {
+      getOption(name) {
         return this.__options[name];
-      },
+      }
 
-      setOption: function(name, value) {
+      setOption(name, value) {
         this.__options[name] = value;
-      },
+      }
 
-      getReadonly: function() {
+      getReadonly() {
         // flag a read-only dynamic property irrespective of the actual option setting:
         if (this.__dyninfo && !this.__dyninfo.setter) {
           return true;
         }
         return this.getOption("readonly");
-      },
+      }
 
-      setReadonly: function(value) {
+      setReadonly(value) {
         this.setOption("readonly", value);
         this.updateDisplay();
-      },
+      }
 
       /**
        * Refreshes the visual display of a Controller in order to keep sync
        * with the object's current value.
        * @returns {dat.controllers.Controller} this
        */
-      updateDisplay: function() {
+      updateDisplay() {
         return this;
-      },
+      }
 
       /**
        * @returns {Boolean} true if the value has deviated from initialValue
        */
-      isModified: function() {
+      isModified() {
         return this.initialValue !== this.getValue();
       }
     }
   );
 
-  return Controller;
-});
+export default Controller;

@@ -36,14 +36,19 @@ In your `head` tag, include the following code:
 
 Install the module:
 
-```
-npm install dat.gui
+```bash
+$ npm install --save dat.gui
 ```
 
 Use it:
 
 ``` js
-var dat = require('dat.gui');
+// CommonJS:
+const dat = require('dat.gui');
+
+// ES6:
+import * as dat from 'dat.gui';
+
 var obj = { x: 5 };
 var gui = new dat.GUI();
 
@@ -70,11 +75,12 @@ gui.add(obj, 'x').onChange(function() {
 
 In the terminal, enter the following:
 
-```sh
-npm start
+```bash
+$ npm install
+$ npm run build
 ```
 
-This will create a browserified build of dat.GUI at `build/dat.gui.js` and its
+This will create a rolled-up build of dat.GUI at `build/dat.gui.js` and its
 minified version at `build/dat.gui.min.js`.
 
 ## Change log
@@ -106,8 +112,8 @@ minified version at `build/dat.gui.min.js`.
 
 The following libraries / open-source projects were used in the development of dat.GUI:
 
-* [browserify](http://browserify.org/)
-* [Sass](http://sass-lang.com/)
-* [node.js](http://nodejs.org/)
-* [QUnit](https://github.com/jquery/qunit) / [jquery](http://jquery.com/)
+ * [Rollup](https://rollupjs.org)
+ * [Sass](http://sass-lang.com/)
+ * [Node.js](http://nodejs.org/)
+ * [QUnit](https://github.com/jquery/qunit) / [jquery](http://jquery.com/)
 

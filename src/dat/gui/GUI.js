@@ -11,84 +11,43 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
+import css from "../utils/css";
+import saveDialogueContents from "./saveDialogue.html";
+import ControllerFactory from "../controllers/ControllerFactory";
+import Controller from "../controllers/Controller";
+import BooleanController from "../controllers/BooleanController";
+import VectorController from "../controllers/VectorController";
+import FunctionController from "../controllers/FunctionController";
+import TabbedController from "../controllers/TabbedController";
+import NumberControllerBox from "../controllers/NumberControllerBox";
+import NumberControllerSlider from "../controllers/NumberControllerSlider";
+import NumberControllerAnimator from "../controllers/NumberControllerAnimator";
+import ColorController from "../controllers/ColorController";
+import ImageController from "../controllers/ImageController";
+import requestAnimationFrame from "../utils/requestAnimationFrame";
+import CenteredDiv from "../dom/CenteredDiv";
+import dom from "../dom/dom";
+import common from "../utils/common";
+
+import styleSheet from "./style.scss"; // CSS to embed in build
+
+//  "text!dat/gui/saveDialogue.html",
+//  "text!dat/gui/style.css",
 //
-// OBSOLETE STUFF?
+//  "dat/controllers/NumberController",
+//  "dat/controllers/OptionController",
+//  "dat/controllers/StringController",
+//  "dat/controllers/ObjectController",
+//  // 'dat/controllers/NullController',
+//  // 'dat/controllers/UndefinedController',
 //
-// old v0.4 code which needs to be integrated or otherwise thrown away
 //
-
-// var css = require('../utils/css');
-// var Controller = require('../controllers/Controller');
-// var BooleanController = require('../controllers/BooleanController');
-// var StringController = require('../controllers/StringController');
-// var FunctionController = require('../controllers/FunctionController');
-// var NumberControllerBox = require('../controllers/NumberControllerBox');
-// var NumberControllerSlider = require('../controllers/NumberControllerSlider');
-// var OptionController = require('../controllers/OptionController');
-// var ColorController = require('../controllers/ColorController');
-// var NullController = require('../controllers/NullController');
-// var UndefinedController = require('../controllers/UndefinedController');
-
-// var requestAnimationFrame = require('../utils/requestAnimationFrame');
-// var CenteredDiv = require('../dom/CenteredDiv');
-// var dom = require('../dom/dom');
-// var common = require('../utils/common');
-// var styleSheet = require('./style.css.js');
-// var saveDialogueContents = require('./saveDialogue.html.js');
-// var sniff = require('../controllers/sniff');
-
-//
-// EOF
-//
-
-define([
-  "dat/utils/css",
-
-  "text!dat/gui/saveDialogue.html",
-  "text!dat/gui/style.css",
-
-  "dat/controllers/factory",
-  "dat/controllers/Controller",
-  "dat/controllers/BooleanController",
-  "dat/controllers/FunctionController",
-  "dat/controllers/NumberController",
-  "dat/controllers/NumberControllerBox",
-  "dat/controllers/NumberControllerSlider",
-  "dat/controllers/OptionController",
-  "dat/controllers/StringController",
-  "dat/controllers/ImageController",
-  "dat/controllers/ColorController",
-  "dat/controllers/ObjectController",
-  // 'dat/controllers/NullController',
-  // 'dat/controllers/UndefinedController',
-
-  "dat/utils/requestAnimationFrame",
-
-  "dat/dom/CenteredDiv",
-  "dat/dom/dom",
-
-  "dat/utils/common"
-], function(
-  css,
-  saveDialogueContents,
-  styleSheet,
-  controllerFactory,
-  Controller,
-  BooleanController,
-  FunctionController,
-  NumberController,
-  NumberControllerBox,
-  NumberControllerSlider,
-  OptionController,
-  StringController,
-  ImageController,
-  ColorController,
-  ObjectController,
-  /* NullController, UndefinedController, */ requestAnimationFrame,
-  CenteredDiv,
-  dom,
-  common
-) {
+//  NumberController,
+//  OptionController,
+//  StringController,
+//  ObjectController,
+//  /* NullController, UndefinedController, */ 
+  
   // var ARR_EACH = Array.prototype.forEach;
   const ARR_SLICE = Array.prototype.slice;
 
@@ -1429,5 +1388,4 @@ define([
     });
   }
 
-  return GUI;
-});
+export default GUI;

@@ -11,18 +11,21 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], function(Controller, dom, common) {
-  /**
-   * @class Provides a checkbox input to alter the boolean property of an object.
-   * @extends dat.controllers.Controller
-   *
-   * @param {Object} object The object to be manipulated
-   * @param {string} property The name of the property to be manipulated
-   *
-   * @member dat.controllers
-   */
-  var BooleanController = function(object, property, options) {
-    BooleanController.superclass.call(this, object, property, "boolean", options);
+import Controller from "./Controller";
+import dom from "../dom/dom";
+
+/**
+ * @class Provides a checkbox input to alter the boolean property of an object.
+ * @extends dat.controllers.Controller
+ *
+ * @param {Object} object The object to be manipulated
+ * @param {string} property The name of the property to be manipulated
+ *
+ * @member dat.controllers
+ */
+class BooleanController extends Controller {
+  constructor(object, property, options) {
+    super(object, property, "boolean", options);
 
     const _this = this;
     this.__prev = this.getValue();
@@ -40,18 +43,15 @@ define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], functi
     function onChange() {
       _this.setValue(!_this.__prev);
     }
-  };
+  }
 
-  BooleanController.superclass = Controller;
-
-  common.extend(BooleanController.prototype, Controller.prototype, {
     setValue: function(v) {
-      const toReturn = BooleanController.superclass.prototype.setValue.call(this, v);
+      const toReturn = super.setValue(v);
       this.__prev = this.getValue();
       return toReturn;
-    },
+    }
 
-    updateDisplay: function() {
+    updateDisplay() {
       if (this.getValue() === true) {
         this.__checkbox.setAttribute("checked", "checked");
         this.__checkbox.checked = true;
@@ -61,9 +61,8 @@ define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], functi
 
       this.__checkbox.disabled = this.getReadonly();
 
-      return BooleanController.superclass.prototype.updateDisplay.call(this);
+      return super.updateDisplay();
     }
-  });
+  };
 
-  return BooleanController;
-});
+export default BooleanController;

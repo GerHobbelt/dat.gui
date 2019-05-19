@@ -11,25 +11,28 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], function(Controller, dom, common) {
-  /**
-   * @class Provides a GUI interface to fire a specified method, a property of an object.
-   *
-   * @extends dat.controllers.Controller
-   *
-   * @param {Object} object The object to be manipulated
-   * @param {string} property The name of the property to be manipulated
-   * @param {string} text The text displayed in the button which will invoke the specified method.
-   * @param {Array} user_data Optional set of user-specified datums to be passed to the specified method as its parameters (using JavaScript `.apply()`)
-   *
-   * @member dat.controllers
-   */
-  var FunctionController = function(object, property, text, user_data) {
+import Controller from "./Controller";
+import dom from "../dom/dom";
+
+/**
+ * @class Provides a GUI interface to fire a specified method, a property of an object.
+ *
+ * @extends dat.controllers.Controller
+ *
+ * @param {Object} object The object to be manipulated
+ * @param {string} property The name of the property to be manipulated
+ * @param {string} text The text displayed in the button which will invoke the specified method.
+ * @param {Array} user_data Optional set of user-specified datums to be passed to the specified method as its parameters (using JavaScript `.apply()`)
+ *
+ * @member dat.controllers
+ */
+class FunctionController extends Controller {
+  constructor(object, property, text, user_data) {
     if (!common.isUndefined(user_data) && !common.isArray(user_data)) {
       user_data = [user_data];
     }
 
-    FunctionController.superclass.call(this, object, property);
+    super(object, property);
 
     const _this = this;
 
@@ -45,11 +48,8 @@ define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], functi
     dom.addClass(this.__button, "button");
 
     this.domElement.appendChild(this.__button);
-  };
+  }
 
-  FunctionController.superclass = Controller;
-
-  common.extend(FunctionController.prototype, Controller.prototype, {
     /**
      * Invoke the function (property of the object), passing the `user_data` array as function
      * arguments.
@@ -65,7 +65,7 @@ define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], functi
      *
      * @return {Controller}           This controller.
      */
-    fire: function(user_data, silent) {
+    fire(user_data, silent) {
       if (!common.isUndefined(user_data) && !common.isArray(user_data)) {
         user_data = [user_data];
       }
@@ -98,7 +98,6 @@ define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], functi
       this.updateDisplay();
       return this;
     }
-  });
+  };
 
-  return FunctionController;
-});
+export default FunctionController;

@@ -11,7 +11,10 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], function(Controller, dom, common) {
+import Controller from "./Controller";
+import dom from "../dom/dom";
+import common from "../utils/common";
+
   /**
    * @class Provides a select input to alter the property of an object, using a
    * list of accepted values.
@@ -25,8 +28,9 @@ define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], functi
    *
    * @member dat.controllers
    */
-  var OptionController = function(object, property, params, options) {
-    OptionController.superclass.call(this, object, property, "option", options);
+class OptionController extends Controller {
+  constructor(object, property, params, options) {
+    super(object, property, "option", options);
 
     const _this = this;
     this.CUSTOM_FLAG = "";
@@ -89,17 +93,14 @@ define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], functi
     if (this.__custom_controller) {
       this.domElement.appendChild(this.__custom_controller.el);
     }
-  };
+  }
 
-  OptionController.superclass = Controller;
-
-  common.extend(OptionController.prototype, Controller.prototype, {
-    setValue: function(v) {
-      const toReturn = OptionController.superclass.prototype.setValue.call(this, v);
+    setValue(v) {
+      const toReturn = super.setValue(v);
       return toReturn;
-    },
+    }
 
-    updateDisplay: function() {
+    updateDisplay() {
       const value = this.getValue();
       let custom = true;
       if (value !== this.CUSTOM_FLAG) {
@@ -118,9 +119,8 @@ define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], functi
         this.__custom_controller.setReadonly(this.getReadonly());
       }
 
-      return OptionController.superclass.prototype.updateDisplay.call(this);
+      return super.updateDisplay();
     }
-  });
+  };
 
-  return OptionController;
-});
+export default OptionController;

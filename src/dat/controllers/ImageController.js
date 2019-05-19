@@ -2,25 +2,24 @@
  * Created by pery on 16/08/14.
  */
 
-define([
-  "dat/controllers/Controller",
-  "dat/dom/dom",
-  "dat/utils/css",
-  "dat/utils/common",
-  "text!dat/controllers/ImageController.css"
-], function(Controller, dom, css, common, styleSheet) {
-  /**
-   * @class Provides a image/file input to alter the url property on an object
-   *
-   * @extends dat.controllers.Controller
-   *
-   * @param {Object} object The object to be manipulated
-   * @param {string} property The name of the property to be manipulated
-   *
-   * @member dat.controllers
-   */
-  function ImageController(Object, property) {
-    ImageController.superclass.call(this, Object, property);
+import Controller from "./Controller";
+import dom from "../dom/dom";
+
+import "./ImageController.css";
+
+/**
+ * @class Provides a image/file input to alter the url property on an object
+ *
+ * @extends dat.controllers.Controller
+ *
+ * @param {Object} object The object to be manipulated
+ * @param {string} property The name of the property to be manipulated
+ *
+ * @member dat.controllers
+ */
+class ImageController extends Controller {
+  constructor(Object, property) {
+    super(Object, property);
 
     const _this = this;
 
@@ -52,21 +51,19 @@ define([
     this.domElement.appendChild(this.__label);
   }
 
-  ImageController.superclass = Controller;
 
   /**
    * Injects default stylesheet for slider elements.
    */
-  ImageController.useDefaultStyles = function() {
+  useDefaultStyles() {
     css.inject(styleSheet);
-  };
+  }
 
-  common.extend(ImageController.prototype, Controller.prototype, {
-    updateDisplay: function() {
+    updateDisplay() {
       this.__previewImage.src = this.getValue();
       return ImageController.superclass.prototype.updateDisplay.call(this);
     }
-  });
+  };
 
-  return ImageController;
-});
+
+export default ImageController;

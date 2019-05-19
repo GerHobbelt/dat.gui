@@ -11,6 +11,7 @@
   "scripts": {
     "test": "tests/index.html",
     "build": "rollup -c && prettier --print-width 120 --write build/**/*.js && rollup -c rollup.config.min.js",
+    "build-docs": "jsdoc2md -f src/dat/gui/GUI.js src/dat/controllers/Controller.js src/dat/controllers/NumberController.js | replace-between --target API.md --token API",
     "lint": "eslint src",
     "fix": "eslint --fix src && prettier --print-width 120 --write src/**/*.js",
     "prettier": "prettier --print-width 120 --write *.js **/*.js **/*.ts",
@@ -28,28 +29,36 @@
     "data",
     "GUI"
   ],
-  "author": "Google Data Arts Team",
-  "license": "Apache License, Version 2.0",
+  "author": "Data Arts Team, Google",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/dataarts/dat.gui/issues"
   },
   "homepage": "https://github.com/dataarts/dat.gui",
   "devDependencies": {
+    "@babel/core": "^7.4.4",
+    "@babel/preset-env": "^7.4.4",
+    "concurrently": "^4.1.0",
     "eslint": "^5.16.0",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.17.2",
     "qunit": "2.9.2",
     "sass": "1.20.1",
     "less": "3.9.0",
+    "extend": "^3.0.2",
+    "jsdoc-to-markdown": "^5.0.0",
     "prettier": "^1.17.1",
-    "requirejs": "2.3.6",
-    "grunt": "1.0.4",
-    "@gerhobbelt/grunt-contrib-jshint": "0.0.0",
     "autoprefixer": "9.5.1",
-    "grunt-contrib-concat": "1.0.1",
-    "amdclean": "2.7.0",
-    "@gerhobbelt/grunt-contrib-requirejs": "0.0.0",
-    "load-grunt-tasks": "4.0.0"
+    "replace-between": "0.0.8",
+    "rollup": "^1.12.2",
+    "rollup-plugin-babel": "^4.3.2",
+    "rollup-plugin-cleanup": "^3.1.1",
+    "rollup-plugin-commonjs": "^10.0.0",
+    "rollup-plugin-node-resolve": "^5.0.0",
+    "rollup-plugin-sass": "^1.2.2",
+    "rollup-plugin-uglify": "^6.0.2",
+    "serve": "^11.0.0",
+    "uglify-js": "^3.5.13"
   },
     "eslintConfig": {
     "extends": "airbnb-base",

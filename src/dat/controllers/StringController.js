@@ -11,7 +11,9 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], function(Controller, dom, common) {
+import Controller from "./Controller";
+import dom from "../dom/dom";
+
   /**
    * @class Provides a text input to alter the string property of an object.
    *
@@ -22,8 +24,9 @@ define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], functi
    *
    * @member dat.controllers
    */
-  var StringController = function(object, property, options) {
-    StringController.superclass.call(this, object, property, "string", options);
+class StringController extends Controller {
+  constructor(object, property, options) {
+    super(object, property, "string", options);
 
     const _this = this;
 
@@ -56,21 +59,17 @@ define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], functi
     this.updateDisplay();
 
     this.domElement.appendChild(this.__input);
-  };
+  }
 
-  StringController.superclass = Controller;
-
-  common.extend(StringController.prototype, Controller.prototype, {
-    updateDisplay: function() {
+    updateDisplay() {
       // Stops the caret from moving on account of:
       // keyup -> setValue -> updateDisplay
       if (!dom.isActive(this.__input)) {
         this.__input.value = this.getValue();
       }
       this.__input.disabled = this.getReadonly();
-      return StringController.superclass.prototype.updateDisplay.call(this);
+      return super.updateDisplay();
     }
-  });
+  };
 
-  return StringController;
-});
+export default StringController;

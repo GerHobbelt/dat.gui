@@ -11,7 +11,8 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define(["dat/utils/common"], function(common) {
+import common from "../utils/common";
+
   const EVENT_MAP = {
     HTMLEvents: ["change"],
     MouseEvents: ["click", "mousemove", "mousedown", "mouseup", "mouseover"],
@@ -130,6 +131,7 @@ define(["dat/utils/common"], function(common) {
             null
           );
           break;
+
         case "KeyboardEvents":
           var init = evt.initKeyboardEvent || evt.initKeyEvent; // webkit || moz
           common.defaults(params, {
@@ -154,6 +156,7 @@ define(["dat/utils/common"], function(common) {
             params.charCode
           );
           break;
+
         default:
           evt.initEvent(eventType, params.bubbles || false, params.cancelable || true);
           break;
@@ -305,5 +308,4 @@ define(["dat/utils/common"], function(common) {
     }
   };
 
-  return dom;
-});
+export default dom;

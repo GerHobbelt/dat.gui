@@ -11,21 +11,19 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define([], function() {
-  /**
-   * requirejs version of Paul Irish's RequestAnimationFrame
-   * http://paulirish.com/2011/requestanimationframe-for-smart-animating/
-   */
+/* jshint unused: false */
+function requestAnimationFrame(callback, element) {
+  setTimeout(callback, 1000 / 60);
+}
 
-  return (
-    window.requestAnimationFrame ||
-    window.webkitRequestAnimationFrame ||
-    window.mozRequestAnimationFrame ||
-    window.oRequestAnimationFrame ||
-    window.msRequestAnimationFrame ||
-    /* jshint unused: false */
-    function(callback, element) {
-      window.setTimeout(callback, 1000 / 60);
-    }
-  );
-});
+/**
+ * requirejs version of Paul Irish's RequestAnimationFrame
+ * http://paulirish.com/2011/requestanimationframe-for-smart-animating/
+ */
+
+export default window.requestAnimationFrame ||
+  window.webkitRequestAnimationFrame ||
+  window.mozRequestAnimationFrame ||
+  window.oRequestAnimationFrame ||
+  window.msRequestAnimationFrame ||
+  requestAnimationFrame;

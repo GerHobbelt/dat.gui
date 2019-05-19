@@ -11,7 +11,20 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define(["dat/controllers/Controller", "dat/utils/common"], function(Controller, common) {
+import Controller from "./Controller";
+import common from "../utils/common";
+
+
+
+  function numDecimals(x) {
+    x = x.toString();
+    if (x.indexOf(".") > -1) {
+      return x.length - x.indexOf(".") - 1;
+    }
+    return 0;
+  }
+
+
   /**
    * When the user didn't specify a sane step size, infer a suitable stepsize from the initialValue.
    */
@@ -46,8 +59,9 @@ define(["dat/controllers/Controller", "dat/utils/common"], function(Controller, 
    *
    * @member dat.controllers
    */
-  var NumberController = function(object, property, params, options) {
-    NumberController.superclass.call(this, object, property, "number", options);
+  class NumberController extends Controller {
+  constructor(object, property, params, options) {
+    super(object, property, "number", options);
 
     if (typeof this.getValue() !== "number") {
       throw "Provided value is not a number";
@@ -70,17 +84,10 @@ define(["dat/controllers/Controller", "dat/utils/common"], function(Controller, 
     );
 
     this.__precision = numDecimals(this.__impliedStep);
-  };
+  }
 
-  NumberController.superclass = Controller;
 
-  common.extend(
-    NumberController.prototype,
-    Controller.prototype,
-
-    /** @lends dat.controllers.NumberController.prototype */
-    {
-      setValue: function(v) {
+      setValue(v) {
         if (this.__min !== undefined && v < this.__min) {
           v = this.__min;
         } else if (this.__max !== undefined && v > this.__max) {
@@ -115,7 +122,7 @@ define(["dat/controllers/Controller", "dat/utils/common"], function(Controller, 
        * <code>object[property]</code>
        * @returns {dat.controllers.NumberController} this
        */
-      min: function(v) {
+      min(v) {
         this.__min = common.isFiniteNumber(v) ? v : undefined;
         return this;
       },
@@ -127,7 +134,7 @@ define(["dat/controllers/Controller", "dat/utils/common"], function(Controller, 
        * <code>object[property]</code>
        * @returns {dat.controllers.NumberController} this
        */
-      max: function(v) {
+      max(v) {
         this.__max = common.isFiniteNumber(v) ? v : undefined;
         return this;
       },
@@ -142,7 +149,7 @@ define(["dat/controllers/Controller", "dat/utils/common"], function(Controller, 
        * difference otherwise stepValue is 1  (TODO: INCORRECT; stepsize is ~10% of the current value)
        * @returns {dat.controllers.NumberController} this
        */
-      step: function(v) {
+      step(v) {
         this.__step = common.isFiniteNumber(v) ? v : undefined;
 
         this.__impliedStep = guestimateImpliedStep(
@@ -157,13 +164,13 @@ define(["dat/controllers/Controller", "dat/utils/common"], function(Controller, 
         return this;
       },
 
-      mode: function(m) {
+      mode(m) {
         this.__mode = m || "linear";
 
         return this;
       },
 
-      getMetaInfo: function() {
+      getMetaInfo() {
         return {
           min: this.__min,
           max: this.__max,
@@ -177,15 +184,7 @@ define(["dat/controllers/Controller", "dat/utils/common"], function(Controller, 
         };
       }
     }
-  );
 
-  function numDecimals(x) {
-    x = x.toString();
-    if (x.indexOf(".") > -1) {
-      return x.length - x.indexOf(".") - 1;
-    }
-    return 0;
-  }
 
-  return NumberController;
-});
+
+export default NumberController;

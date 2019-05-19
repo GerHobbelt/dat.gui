@@ -11,15 +11,20 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define([
-  "dat/controllers/Controller",
-  "dat/dom/dom",
-  "dat/color/Color",
-  "dat/color/interpret",
-  "dat/utils/common"
-], function(Controller, dom, Color, interpret, common) {
-  var ColorController = function(object, property, options) {
-    ColorController.superclass.call(this, object, property, "color", options);
+import Controller from "./Controller";
+import dom from "../dom/dom";
+import Color from "../color/Color";
+import interpret from "../color/interpret";
+import common from "../utils/common";
+
+/**
+ * @class Represents a given property of an object that is a color.
+ * @param {Object} object
+ * @param {string} property
+ */
+class ColorController extends Controller {
+  constructor(object, property, options) {
+    super(object, property, "color", options);
 
     this.__color = new Color(this.getValue());
     this.__temp = new Color(0);
@@ -378,12 +383,9 @@ define([
       }
       return scroll;
     }
-  };
+  }
 
-  ColorController.superclass = Controller;
-
-  common.extend(ColorController.prototype, Controller.prototype, {
-    updateDisplay: function() {
+    updateDisplay() {
       const i = interpret(this.getValue());
 
       if (i !== false) {
@@ -447,7 +449,7 @@ define([
 
       this.__input.disabled = this.getReadonly();
     }
-  });
+  };
 
   const vendors = ["-moz-", "-o-", "-webkit-", "-ms-", ""];
 
@@ -487,5 +489,4 @@ define([
     });
   }
 
-  return ColorController;
-});
+export default ColorController;

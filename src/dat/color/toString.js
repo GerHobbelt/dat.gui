@@ -1,5 +1,5 @@
 /**
- * dat-gui JavaScript Controller Library
+ * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
  * Copyright 2011 Data Arts Team, Google Creative Lab
@@ -28,32 +28,23 @@ export default function(color, forceCSSHex) {
       str = "0" + str;
     }
     return "#" + str;
-  }
-  if (colorFormat === "CSS_RGB") {
+  } else if (colorFormat === "CSS_RGB") {
     return "rgb(" + r + "," + g + "," + b + ")";
-  }
-  if (colorFormat === "CSS_RGBA") {
+  } else if (colorFormat === "CSS_RGBA") {
     return "rgba(" + r + "," + g + "," + b + "," + a + ")";
-  }
-  if (colorFormat === "HEX") {
+  } else if (colorFormat === "HEX") {
     return "0x" + color.hex.toString(16);
-  }
-  if (colorFormat === "RGB_ARRAY") {
+  } else if (colorFormat === "RGB_ARRAY") {
     return "[" + r + "," + g + "," + b + "]";
-  }
-  if (colorFormat === "RGBA_ARRAY") {
+  } else if (colorFormat === "RGBA_ARRAY") {
     return "[" + r + "," + g + "," + b + "," + a + "]";
-  }
-  if (colorFormat === "RGB_OBJ") {
+  } else if (colorFormat === "RGB_OBJ") {
     return "{r:" + r + ",g:" + g + ",b:" + b + "}";
-  }
-  if (colorFormat === "RGBA_OBJ") {
+  } else if (colorFormat === "RGBA_OBJ") {
     return "{r:" + r + ",g:" + g + ",b:" + b + ",a:" + a + "}";
-  }
-  if (colorFormat === "HSV_OBJ") {
+  } else if (colorFormat === "HSV_OBJ") {
     return "{h:" + h + ",s:" + s + ",v:" + v + "}";
-  }
-  if (colorFormat === "HSVA_OBJ") {
+  } else if (colorFormat === "HSVA_OBJ") {
     return "{h:" + h + ",s:" + s + ",v:" + v + ",a:" + a + "}";
   }
 

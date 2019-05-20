@@ -33,7 +33,7 @@ class GradientController extends Controller {
 
     this.__input = document.createElement("input");
     this.__input.type = "text";
-    this.__input_textShadow = "0 1px 1px ";
+    this.__input_textShadow = "1px 1px 2px";
 
     dom.bind(this.__input, "keydown", function(e) {
       if (e.keyCode === 13) {
@@ -127,7 +127,10 @@ class GradientController extends Controller {
     common.extend(this.__input.style, {
       background: backgroundColor,
       color: "#fff",
-      textShadow: this.__input_textShadow + " #fff"
+      // maximum contrast shadow below and around the text, so it will work like
+      // and 'outline' for the text and keep it readable on top of all gradient
+      // backgrounds / colors:
+      textShadow: this.__input_textShadow + " #000"
     });
   }
 }

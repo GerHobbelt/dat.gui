@@ -37,19 +37,19 @@ globby(['src/**/*.js', 'build/**/*.js']).then(paths => {
     	// console.log('path: ', path);
 
     	var src = fs.readFileSync(path, 'utf8');
-    	src = src.replace(/\/\*\*[^]+?Licensed under the Apache License[^]+?\*\//, function repl(s) {
+    	src = src.replace(/\/\*\*[^]+?Licensed under the Apache License[^]+?\*\/\s*/, function repl(s) {
             // console.log("checking existing comment vs banner:", s);
-    		if (s !== licenseBanner) {
+    		if (s !== licenseBanner + '\n\n') {
     			updated = true;
     		}
-    		return licenseBanner + '\n\n\n';
+    		return licenseBanner + '\n\n';
     	});
 
         // inject the header when it doesn't exist yet:
         if (src.indexOf('Licensed under the Apache License') === -1) {
             updated = true;
             console.log('ADDING license banner: ', path);
-            src = licenseBanner + '\n\n\n' + src;
+            src = licenseBanner + '\n\n' + src;
         }
 
     	if (updated) {

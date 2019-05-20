@@ -609,8 +609,8 @@ common.extend(
     destroy: function() {
       const _this = this;
 
-      common.each(this.__folders, function(folder) {
-        _this.removeFolder(folder);
+      common.each(this.__folders, function(folder, name) {
+        _this.removeFolder(name);
       });
 
       if (this.autoPlace) {

@@ -16,12 +16,18 @@ $button-height: 20px;
 
   /* Auto-place container */
   &.ac {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 0;
-    z-index: 0;
+   position: fixed;
+   top: 0;
+   left: 0;
+   right: 0;
+   height: 0;
+   // we make sure the dat.gui sits in its own layer for repaint purposes:
+   // see http://benfrain.com/improving-css-performance-fixed-position-elements/
+   // Note that the backface style here comes from that article but is not 
+   // really necessary any more now that we have our layer. 
+   // Compare: https://developers.google.com/web/updates/2012/09/Stacking-Changes-Coming-to-position-fixed-elements?hl=en
+   z-index: 0;
+   // backface-visibility: hidden;
   }
 
   &:not(.ac) .main {
@@ -117,7 +123,6 @@ $button-height: 20px;
   li.folder {
     padding: 0;
     border-left: $nest-margin solid rgba(0, 0, 0, 0);
-
   }
 
   /** Folder names */

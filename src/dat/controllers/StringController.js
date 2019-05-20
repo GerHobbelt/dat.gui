@@ -1,5 +1,5 @@
 /**
- * dat-gui JavaScript Controller Library
+ * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
  * Copyright 2011 Data Arts Team, Google Creative Lab
@@ -46,11 +46,13 @@ class StringController extends Controller {
     dom.bind(this.__input, "keyup", onChange);
     dom.bind(this.__input, "change", onChange);
     dom.bind(this.__input, "blur", onBlur);
-    dom.bind(this.__input, "keydown", function(e) {
+    dom.bind(this.__input, "keydown", onKeyDown);
+
+    function onKeyDown(e) {
       if (e.keyCode === 13) {
         this.blur();
       }
-    });
+    }
 
     this.updateDisplay();
 

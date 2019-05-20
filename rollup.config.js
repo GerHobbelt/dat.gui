@@ -30,13 +30,13 @@ export default {
       file: "./build/dat.gui.js",
       format: "umd",
       name: "dat",
-      sourcemap: true,
+      sourcemap: false,
       banner: banner
     },
     {
       file: "./build/dat.gui.module.js",
       format: "es",
-      sourcemap: true,
+      sourcemap: false,
       banner: banner
     }
   ],

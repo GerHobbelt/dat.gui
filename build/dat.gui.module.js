@@ -1063,13 +1063,15 @@ var NumberControllerBox = (function(_NumberController) {
   function NumberControllerBox(object, property, params) {
     var _this2;
     _this2 = _NumberController.call(this, object, property, params) || this;
+    var _params = params || {};
+    _this2.__suffix = _params.suffix ? _params.suffix : "";
     _this2.__truncationSuspended = false;
     var _this = _assertThisInitialized(_this2);
     var prevY;
     function onChange() {
       var value = _this.__input.value;
-      if (params && params.suffix) {
-        value = value.replace(params.suffix, "");
+      if (params && _this.__suffix) {
+        value = value.replace(_this.__suffix, "");
       }
       var attempted = parseFloat(value);
       if (!Common.isNaN(attempted)) {
@@ -1118,10 +1120,9 @@ var NumberControllerBox = (function(_NumberController) {
   }
   var _proto = NumberControllerBox.prototype;
   _proto.updateDisplay = function updateDisplay() {
-    var suffix = params && params.suffix ? params.suffix : "";
     this.__input.value = this.__truncationSuspended
       ? this.getValue()
-      : roundToDecimal(this.getValue(), this.__precision) + suffix;
+      : roundToDecimal(this.getValue(), this.__precision) + this.__suffix;
     return _NumberController.prototype.updateDisplay.call(this);
   };
   return NumberControllerBox;
@@ -1547,7 +1548,7 @@ var GradientController = (function(_Controller) {
     _this2.__saturation_field.className = "saturation-field";
     _this2.__input = document.createElement("input");
     _this2.__input.type = "text";
-    _this2.__input_textShadow = "0 1px 1px ";
+    _this2.__input_textShadow = "1px 1px 2px";
     dom.bind(_this2.__input, "keydown", function(e) {
       if (e.keyCode === 13) {
         onBlur.call(this);
@@ -1626,7 +1627,7 @@ var GradientController = (function(_Controller) {
     Common.extend(this.__input.style, {
       background: backgroundColor,
       color: "#fff",
-      textShadow: this.__input_textShadow + " #fff"
+      textShadow: this.__input_textShadow + " #000"
     });
   };
   return GradientController;
@@ -2033,8 +2034,8 @@ Common.extend(GUI.prototype, {
   },
   destroy: function destroy() {
     var _this = this;
-    Common.each(this.__folders, function(folder) {
-      _this.removeFolder(folder);
+    Common.each(this.__folders, function(folder, name) {
+      _this.removeFolder(name);
     });
     if (this.autoPlace) {
       autoPlaceContainer.removeChild(this.domElement);
@@ -2655,4 +2656,3 @@ var index = {
 
 export default index;
 export { GUI$1 as GUI, color, controllers, dom$1 as dom, gui };
-//# sourceMappingURL=dat.gui.module.js.map

@@ -1482,11 +1482,11 @@ var css = {
     link.href = url;
     doc.getElementsByTagName("head")[0].appendChild(link);
   },
-  inject: function inject(css, indoc) {
+  inject: function inject(cssContent, indoc) {
     var doc = indoc || document;
     var injected = document.createElement("style");
     injected.type = "text/css";
-    injected.innerHTML = css;
+    injected.innerHTML = cssContent;
     var head = doc.getElementsByTagName("head")[0];
     try {
       head.appendChild(injected);
@@ -1494,8 +1494,8 @@ var css = {
   }
 };
 
-var saveDialogContents =
-  '<div id="dg-save" class="dg dialogue">\n\n  Here\'s the new load parameter for your <code>GUI</code>\'s constructor:\n\n  <textarea id="dg-new-constructor"></textarea>\n\n  <div id="dg-save-locally">\n\n    <input id="dg-local-storage" type="checkbox"/> Automatically save\n    values to <code>localStorage</code> on exit.\n\n    <div id="dg-local-explain">The values saved to <code>localStorage</code> will\n      override those passed to <code>dat.GUI</code>\'s constructor. This makes it\n      easier to work incrementally, but <code>localStorage</code> is fragile,\n      and your friends may not see the same values you do.\n\n    </div>\n\n  </div>\n\n</div>';
+var saveDialogueContents =
+  '<div id="dg-save" class="dg dialogue">\n\n  Here\'s the new load parameter for your <code>GUI</code>\'s constructor:\n\n  <textarea id="dg-new-constructor"></textarea>\n\n  <div id="dg-save-locally">\n\n    <input id="dg-local-storage" type="checkbox"> Automatically save\n    values to <code>localStorage</code> on exit.\n\n    <div id="dg-local-explain">The values saved to <code>localStorage</code> will\n      override those passed to <code>dat.GUI</code>\'s constructor. This makes it\n      easier to work incrementally, but <code>localStorage</code> is fragile,\n      and your friends may not see the same values you do.\n\n    </div>\n\n  </div>\n\n</div>';
 
 var ControllerFactory = function ControllerFactory(object, property) {
   var initialValue = object[property];
@@ -1632,7 +1632,7 @@ var GradientController = (function(_Controller) {
   return GradientController;
 })(Controller);
 
-function requestAnimationFrame(callback) {
+function requestAnimationFrame(callback, element) {
   setTimeout(callback, 1000 / 60);
 }
 var requestAnimationFrame$1 =
@@ -2021,7 +2021,7 @@ Common.extend(GUI.prototype, {
   },
   remove: function remove(controller) {
     var lIndex = this.__listening.indexOf(controller);
-    if (lIndex != -1) {
+    if (lIndex !== -1) {
       this.__listening.splice(lIndex, 1);
     }
     this.__ul.removeChild(controller.__li);
@@ -2050,7 +2050,7 @@ Common.extend(GUI.prototype, {
   },
   addFolder: function addFolder(name, title) {
     if (this.__folders[name] !== undefined) {
-      throw new Error("You already have a folder in this GUI by the" + ' name "' + name + '"');
+      throw new Error('You already have a folder in this GUI by the name "' + name + '"');
     }
     var newGuiParams = {
       name: name,
@@ -2125,7 +2125,7 @@ Common.extend(GUI.prototype, {
   remember: function remember() {
     if (Common.isUndefined(SAVE_DIALOGUE)) {
       SAVE_DIALOGUE = new CenteredDiv();
-      SAVE_DIALOGUE.domElement.innerHTML = saveDialogContents;
+      SAVE_DIALOGUE.domElement.innerHTML = saveDialogueContents;
     }
     if (this.parent) {
       throw new Error("You can only call remember on a top level GUI.");

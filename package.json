@@ -14,6 +14,7 @@
     "build-docs": "jsdoc2md -f src/dat/gui/GUI.js src/dat/controllers/Controller.js src/dat/controllers/NumberController.js | replace-between --target API.md --token API",
     "lint": "eslint src",
     "fix": "eslint --fix src && prettier --print-width 120 --write src/**/*.js",
+    "update-banner": "node util/__patch_licenseBanner_in_js.js",
     "postversion": "git push && git push --tags && npm publish",
     "prettier": "prettier --print-width 120 --write *.js **/*.js **/*.ts",
     "pub": "npm publish --access public"
@@ -43,11 +44,12 @@
     "eslint": "^5.16.0",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.17.2",
-    "qunit": "2.9.2",
     "extend": "^3.0.2",
+    "globby": "^9.2.0",
     "jsdoc-to-markdown": "^5.0.0",
     "node-sass": "^4.12.0",
     "prettier": "^1.17.1",
+    "qunit": "2.9.2",
     "replace-between": "0.0.8",
     "rollup": "^1.12.2",
     "rollup-plugin-babel": "^4.3.2",
@@ -86,7 +88,13 @@
       "no-restricted-globals": 0,
       "no-bitwise": 0,
       "no-plusplus": 0,
-      "quotes": ["error", "double", { "avoidEscape": true }]
+      "quotes": [
+        "error",
+        "double",
+        {
+          "avoidEscape": true
+        }
+      ]
     }
   }
 }

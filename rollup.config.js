@@ -17,6 +17,7 @@ import resolve from "rollup-plugin-node-resolve";
 import cleanup from "rollup-plugin-cleanup";
 import babel from "rollup-plugin-babel";
 import sass from "rollup-plugin-sass";
+import html from 'rollup-plugin-html';
 
 const banner = fs.readFileSync(path.join(__dirname, "licenseBanner.txt"));
 
@@ -44,6 +45,9 @@ export default {
   },
   plugins: [
     resolve(),
+    html({
+        include: '**/*.html'
+    }),
     sass({
       // insert: true makes dat.gui automatically append the styles when just the JS is included,
       // with insert: false both the JS and CSS need to explicitly be included

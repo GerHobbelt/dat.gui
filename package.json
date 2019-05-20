@@ -10,7 +10,7 @@
     "test": "tests"
   },
   "scripts": {
-    "build": "rollup -c && prettier --print-width 120 --write build/**/*.js && rollup -c rollup.config.min.js",
+    "build": "rollup -c && prettier --print-width 120 --write build/**/*.js && rollup -c rollup.config.min.js && npm run update-banner",
     "build-docs": "jsdoc2md -f src/dat/gui/GUI.js src/dat/controllers/Controller.js src/dat/controllers/NumberController.js | replace-between --target API.md --token API",
     "lint": "eslint src",
     "fix": "eslint --fix src && prettier --print-width 120 --write src/**/*.js",
@@ -51,15 +51,16 @@
     "prettier": "^1.17.1",
     "qunit": "2.9.2",
     "replace-between": "0.0.8",
-    "rollup": "^1.12.2",
+    "rollup": "^1.12.3",
     "rollup-plugin-babel": "^4.3.2",
     "rollup-plugin-cleanup": "^3.1.1",
     "rollup-plugin-commonjs": "^10.0.0",
+    "rollup-plugin-html": "^0.2.1",
     "rollup-plugin-node-resolve": "^5.0.0",
     "rollup-plugin-sass": "^1.2.2",
     "rollup-plugin-uglify": "^6.0.2",
     "serve": "^11.0.0",
-    "uglify-js": "^3.5.13"
+    "uglify-js": "^3.5.14"
   },
   "eslintConfig": {
     "extends": "airbnb-base",
@@ -95,7 +96,13 @@
           "avoidEscape": true
         }
       ],
-      "eqeqeq": [ "error", "always", {"null": "ignore"} ],
+      "eqeqeq": [
+        "error",
+        "always",
+        {
+          "null": "ignore"
+        }
+      ],
       "guard-for-in": "warn"
     }
   }

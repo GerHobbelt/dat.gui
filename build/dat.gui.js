@@ -1698,7 +1698,7 @@
   var DEFAULT_DEFAULT_PRESET_NAME = "Default";
   var SUPPORTS_LOCAL_STORAGE = (function() {
     try {
-      return "localStorage" in window && window.localStorage !== null;
+      return "localStorage" in window && window.localStorage != null;
     } catch (e) {
       return false;
     }

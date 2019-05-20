@@ -81,6 +81,7 @@ If you're using a server with a Content Security Policy in place that blocks 'un
 
 View the [Change Log](CHANGELOG.md)
 
+
 ## Thanks
 
 The following libraries / open-source projects were used in the development of dat.GUI:

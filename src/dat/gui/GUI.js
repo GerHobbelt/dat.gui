@@ -30,19 +30,19 @@ import styleSheet from "./style.scss"; // CSS to embed in build
 
 css.inject(styleSheet);
 
-/** @ignore Outer-most className for GUI's */
+/** Outer-most className for GUI's */
 const CSS_NAMESPACE = "dg";
 
 const HIDE_KEY_CODE = 72;
 
-/** @ignore The only value shared between the JS and SCSS. Use caution. */
+/** The only value shared between the JS and SCSS. Use caution. */
 const CLOSE_BUTTON_HEIGHT = 20;
 
 const DEFAULT_DEFAULT_PRESET_NAME = "Default";
 
 const SUPPORTS_LOCAL_STORAGE = (function() {
   try {
-    return "localStorage" in window && window.localStorage !== null;
+    return "localStorage" in window && window.localStorage != null;
   } catch (e) {
     return false;
   }
@@ -102,7 +102,7 @@ const GUI = function(pars) {
 
   /**
    * Nested GUI's by name
-   * @ignore
+   * @private
    */
   this.__folders = {};
 
@@ -110,7 +110,7 @@ const GUI = function(pars) {
 
   /**
    * List of objects I'm remembering for save, only used in top level GUI
-   * @ignore
+   * @private
    */
   this.__rememberedObjects = [];
 
@@ -119,7 +119,6 @@ const GUI = function(pars) {
    * in top level GUI.
    *
    * @private
-   * @ignore
    *
    * @example
    * [

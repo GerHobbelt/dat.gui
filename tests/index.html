@@ -586,16 +586,16 @@
           const object = initObject();
           const c1 = new ArrayController(object, "arrayProperty");
 
-          var a = [];
-          $(c1.__inputs).map(function (idx) {
-            var el = $(c1.__inputs)[idx];
-            var v = $(el).val();
+          const a = [];
+          $(c1.__inputs).each(function(idx) {
+            const el = $(c1.__inputs)[idx];
+            let v = $(el).val();
             if (!Number.isNaN(parseFloat(v))) {
               v = parseFloat(v);
             }
             a.push(v);
           });
-          console.log({a, b: object.arrayProperty});
+          console.log({ a, b: object.arrayProperty });
           deepEqual(a, object.arrayProperty);
         });
 
@@ -603,14 +603,14 @@
           const object = initObject();
           const c1 = new ArrayController(object, "arrayProperty");
 
-          const newVal = [1,"a",true];
+          const newVal = [1, "a", true];
 
-          $(c1.__inputs).map(function (idx) {
-            var el = $(c1.__inputs)[idx];
-            let elem = $(el).val(newVal[idx])[0];
-            //dom.fakeEvent(elem, "change");
+          $(c1.__inputs).each(function(idx) {
+            const el = $(c1.__inputs)[idx];
+            const elem = $(el).val(newVal[idx])[0];
+            // dom.fakeEvent(elem, "change");
           });
-          let elem = $(c1.__inputs)[0];
+          const elem = $(c1.__inputs)[0];
           dom.fakeEvent(elem, "change");
 
           // WARNING: ArrayController does not detect 'value type': everything is produced as string value:

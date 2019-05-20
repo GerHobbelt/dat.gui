@@ -697,7 +697,9 @@
   }
   var dom = {
     makeSelectable: function makeSelectable(elem, selectable) {
-      if (elem === undefined || elem.style === undefined) return;
+      if (elem === undefined || elem.style === undefined) {
+        return;
+      }
       elem.onselectstart = selectable
         ? function() {
             return false;
@@ -986,11 +988,12 @@
       dom.bind(_this2.__input, "keyup", onChange);
       dom.bind(_this2.__input, "change", onChange);
       dom.bind(_this2.__input, "blur", onBlur);
-      dom.bind(_this2.__input, "keydown", function(e) {
+      dom.bind(_this2.__input, "keydown", onKeyDown);
+      function onKeyDown(e) {
         if (e.keyCode === 13) {
           this.blur();
         }
-      });
+      }
       _this2.updateDisplay();
       _this2.domElement.appendChild(_this2.__input);
       return _this2;
@@ -1115,14 +1118,15 @@
       dom.bind(_this2.__input, "change", onChange);
       dom.bind(_this2.__input, "blur", onBlur);
       dom.bind(_this2.__input, "mousedown", onMouseDown);
-      dom.bind(_this2.__input, "keydown", function(e) {
+      dom.bind(_this2.__input, "keydown", onKeyDown);
+      function onKeyDown(e) {
         if (e.keyCode === 13) {
           _this.__truncationSuspended = true;
           this.blur();
           _this.__truncationSuspended = false;
           onFinish();
         }
-      });
+      }
       _this2.updateDisplay();
       _this2.domElement.appendChild(_this2.__input);
       return _this2;

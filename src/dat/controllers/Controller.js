@@ -42,14 +42,14 @@ class Controller {
     /**
      * The function to be called on change.
      * @type {Function}
-     * @ignore
+     * @private
      */
     this.__onChange = undefined;
 
     /**
      * The function to be called on finishing change.
      * @type {Function}
-     * @ignore
+     * @private
      */
     this.__onFinishChange = undefined;
   }

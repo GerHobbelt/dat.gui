@@ -36,7 +36,7 @@ class OptionController extends Controller {
 
     /**
      * The drop down menu
-     * @ignore
+     * @private
      */
     this.__select = document.createElement("select");
 

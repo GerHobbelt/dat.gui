@@ -102,15 +102,17 @@ class NumberControllerBox extends NumberController {
     dom.bind(this.__input, "change", onChange);
     dom.bind(this.__input, "blur", onBlur);
     dom.bind(this.__input, "mousedown", onMouseDown);
-    dom.bind(this.__input, "keydown", function(e) {
-      // When pressing enter, you can be as precise as you want.
+    dom.bind(this.__input, "keydown", onKeyDown);
+
+    function onKeyDown(e) {
+      // When pressing ENTER key, you can be as precise as you want.
       if (e.keyCode === 13) {
         _this.__truncationSuspended = true;
         this.blur();
         _this.__truncationSuspended = false;
         onFinish();
       }
-    });
+    }
 
     this.updateDisplay();
 

@@ -101,7 +101,10 @@ const Common = {
     setTimeout(fnc, 0);
   },
 
-  // if the function is called repeatedly, wait until threshold passes until we execute the function
+  /**
+   * If the function is called repeatedly, wait until threshold passes
+   * until we execute the function.
+   */
   debounce: function(func, threshold, callImmediately) {
     let timeout;
 

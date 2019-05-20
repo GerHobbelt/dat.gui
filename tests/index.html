@@ -41,6 +41,12 @@
           return ok(Math.abs(a - b) < tolerance, label);
         }
 
+        // disabled tests are renamed to xxxtest():
+        function xxxtest(description, f) {
+          console.warn("Disabled test: ", description);
+        }
+        
+
         module("Color Math");
 
         test("rgb_to_hex", function() {

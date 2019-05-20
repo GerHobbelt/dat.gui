@@ -2,7 +2,7 @@
  * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2019 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,12 +30,12 @@ import styleSheet from "./style.scss"; // CSS to embed in build
 
 css.inject(styleSheet);
 
-/** Outer-most className for GUI's */
+/** @ignore Outer-most className for GUI's */
 const CSS_NAMESPACE = "dg";
 
 const HIDE_KEY_CODE = 72;
 
-/** The only value shared between the JS and SCSS. Use caution. */
+/** @ignore The only value shared between the JS and SCSS. Use caution. */
 const CLOSE_BUTTON_HEIGHT = 20;
 
 const DEFAULT_DEFAULT_PRESET_NAME = "Default";
@@ -59,15 +59,23 @@ let autoPlaceContainer;
 /** Are we hiding the GUI's ? */
 let hide = false;
 
-/** GUI's which should be hidden */
+/** @private GUI's which should be hidden */
 const hideableGuis = [];
 
 /**
- * A lightweight controller library for JavaScript. It allows you to easily
+ * @class A lightweight controller library for JavaScript. It allows you to easily
  * manipulate variables and fire functions on the fly.
- * @class
  *
- * @member dat.gui
+ * @typicalname gui
+ *
+ * @example
+ * // Creating a GUI with options.
+ * var gui = new dat.GUI({name: 'My GUI'});
+ *
+ * @example
+ * // Creating a GUI and a subfolder.
+ * var gui = new dat.GUI();
+ * var folder1 = gui.addFolder('Flow Field');
  *
  * @param {Object} [params]
  * @param {String} [params.name] The name of this GUI.
@@ -84,7 +92,7 @@ const GUI = function(pars) {
 
   /**
    * Outermost DOM Element
-   * @type DOMElement
+   * @type {DOMElement}
    */
   this.domElement = document.createElement("div");
   this.__ul = document.createElement("ul");
@@ -447,7 +455,11 @@ GUI.TEXT_CLOSED = "Close Controls";
 GUI.TEXT_OPEN = "Open Controls";
 
 GUI._keydownHandler = function(e) {
-  if (document.activeElement.type !== "text" && (e.which === HIDE_KEY_CODE || e.keyCode === HIDE_KEY_CODE)) {
+  if (
+    document.activeElement &&
+    document.activeElement.type !== "text" &&
+    (e.which === HIDE_KEY_CODE || e.keyCode === HIDE_KEY_CODE)
+  ) {
     GUI.toggleHide();
   }
 };
@@ -456,13 +468,30 @@ dom.bind(window, "keydown", GUI._keydownHandler, false);
 common.extend(
   GUI.prototype,
 
-  /** @lends dat.gui.GUI */
+  /** @lends GUI.prototype */
   {
     /**
-     * @param object
-     * @param property
-     * @returns {dat.controllers.Controller} The new controller that was added.
+     * Adds a new {@link Controller} to the GUI. The type of controller created
+     * is inferred from the initial value of <code>object[property]</code>. For
+     * color properties, see {@link addColor}.
+     *
+     * @param {Object} object The object to be manipulated
+     * @param {String} property The name of the property to be manipulated
+     * @param {Number} [min] Minimum allowed value
+     * @param {Number} [max] Maximum allowed value
+     * @param {Number} [step] Increment by which to change value
+     * @returns {Controller} The controller that was added to the GUI.
      * @instance
+     *
+     * @example
+     * // Add a string controller.
+     * var person = {name: 'Sam'};
+     * gui.add(person, 'name');
+     *
+     * @example
+     * // Add a number controller slider.
+     * var person = {age: 45};
+     * gui.add(person, 'age', 0, 100);
      */
     add: function(object, property) {
       return add(this, object, property, {
@@ -471,10 +500,24 @@ common.extend(
     },
 
     /**
+     * Adds a new color controller to the GUI.
+     *
      * @param object
      * @param property
-     * @returns {dat.controllers.ColorController} The new controller that was added.
+     * @returns {Controller} The controller that was added to the GUI.
      * @instance
+     *
+     * @example
+     * var palette = {
+     *   color1: '#FF0000', // CSS string
+     *   color2: [ 0, 128, 255 ], // RGB array
+     *   color3: [ 0, 128, 255, 0.3 ], // RGB with alpha
+     *   color4: { h: 350, s: 0.9, v: 0.3 } // Hue, saturation, value
+     * };
+     * gui.addColor(palette, 'color1');
+     * gui.addColor(palette, 'color2');
+     * gui.addColor(palette, 'color3');
+     * gui.addColor(palette, 'color4');
      */
     addColor: function(object, property) {
       return add(this, object, property, {
@@ -483,7 +526,8 @@ common.extend(
     },
 
     /**
-     * @param controller
+     * Removes the given controller from the GUI.
+     * @param {Controller} controller
      * @instance
      */
     remove: function(controller) {
@@ -496,6 +540,10 @@ common.extend(
       });
     },
 
+    /**
+     * Removes the GUI from the document and unbinds all event listeners.
+     * @instance
+     */
     destroy: function() {
       if (this.autoPlace) {
         autoPlaceContainer.removeChild(this.domElement);
@@ -510,6 +558,7 @@ common.extend(
     },
 
     /**
+     * Creates a new subfolder GUI instance.
      * @param name
      * @returns {dat.gui.GUI} The new folder.
      * @throws {Error} if this GUI already has a folder by the specified
@@ -520,7 +569,7 @@ common.extend(
       // We have to prevent collisions on names in order to have a key
       // by which to remember saved values
       if (this.__folders[name] !== undefined) {
-        throw new Error("You already have a folder in this GUI by the" + ' name "' + name + '"');
+        throw new Error('You already have a folder in this GUI by the name "' + name + '"');
       }
 
       const newGuiParams = { name: name, parent: this };
@@ -532,8 +581,10 @@ common.extend(
 
       // Do we have saved appearance data for this folder?
       if (
-        this.load && // Anything loaded?
-        this.load.folders && // Was my parent a dead-end?
+        // Anything loaded?
+        this.load &&
+        // Was my parent a dead-end?
+        this.load.folders &&
         this.load.folders[name]
       ) {
         // Did daddy remember me?
@@ -556,6 +607,9 @@ common.extend(
       this.closed = false;
     },
 
+    /**
+     * Closes the GUI.
+     */
     close: function() {
       this.closed = true;
     },
@@ -569,7 +623,7 @@ common.extend(
       // we debounce this function to prevent performance issues when rotating on tablet/mobile
       const root = this.getRoot();
       if (root.scrollable) {
-        const top = dom.getOffset(root.__ul).top;
+        const { top } = dom.getOffset(root.__ul);
         let h = 0;
 
         common.each(root.__ul.childNodes, function(node) {
@@ -607,7 +661,7 @@ common.extend(
      * the GUI grows. When remembering new objects, append them to the end
      * of the list.
      *
-     * @param {Object...} objects
+     * @param {...Object} objects
      * @throws {Error} if not called on a top level GUI.
      * @instance
      */

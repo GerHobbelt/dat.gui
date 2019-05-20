@@ -2,7 +2,7 @@
  * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2019 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ class NumberController extends Controller {
         this.__impliedStep = 1; // What are we, psychics?
       } else {
         // Hey Doug, check this out.
-        this.__impliedStep = Math.pow(10, Math.floor(Math.log(Math.abs(this.initialValue)) / Math.LN10)) / 10;
+        this.__impliedStep = 10 ** Math.floor(Math.log(Math.abs(this.initialValue)) / Math.LN10) / 10;
       }
     } else {
       this.__impliedStep = this.__step;
@@ -84,8 +84,8 @@ class NumberController extends Controller {
    * <code>object[property]</code>
    * @returns {dat.controllers.NumberController} this
    */
-  min(v) {
-    this.__min = v;
+  min(minValue) {
+    this.__min = minValue;
     return this;
   }
 
@@ -96,8 +96,8 @@ class NumberController extends Controller {
    * <code>object[property]</code>
    * @returns {dat.controllers.NumberController} this
    */
-  max(v) {
-    this.__max = v;
+  max(maxValue) {
+    this.__max = maxValue;
     return this;
   }
 
@@ -111,10 +111,10 @@ class NumberController extends Controller {
    * difference otherwise stepValue is 1
    * @returns {dat.controllers.NumberController} this
    */
-  step(v) {
-    this.__step = v;
-    this.__impliedStep = v;
-    this.__precision = numDecimals(v);
+  step(stepValue) {
+    this.__step = stepValue;
+    this.__impliedStep = stepValue;
+    this.__precision = numDecimals(stepValue);
     return this;
   }
 }

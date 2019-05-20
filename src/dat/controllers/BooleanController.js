@@ -2,7 +2,7 @@
  * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2019 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@ import dom from "../dom/dom";
 
 /**
  * @class Provides a checkbox input to alter the boolean property of an object.
+ *
  * @extends dat.controllers.Controller
  *
  * @param {Object} object The object to be manipulated

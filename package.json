@@ -1,8 +1,8 @@
 {
   "name": "@gerhobbelt/dat.GUI",
-  "version": "0.6.5-2",
+  "version": "0.7.6-3",
   "description": "A lightweight graphical user interface for changing variables in JavaScript.",
-  "main": "./build/dat.gui.js",
+  "main": "build/dat.gui.js",
   "module": "build/dat.gui.module.js",
   "directories": {
     "doc": "docs",
@@ -10,12 +10,13 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "tests/index.html",
-    "build": "rollup -c && prettier --print-width 120 --write build/**/*.js && rollup -c rollup.config.min.js",
+    "build": "rollup -c && prettier --print-width 120 --write build/**/*.js && rollup -c rollup.config.min.js && npm run update-banner",
     "build-docs": "jsdoc2md -f src/dat/gui/GUI.js src/dat/controllers/Controller.js src/dat/controllers/NumberController.js | replace-between --target API.md --token API",
-    "lint": "eslint src",
-    "fix": "eslint --fix src && prettier --print-width 120 --write src/**/*.js",
-    "prettier": "prettier --print-width 120 --write *.js **/*.js **/*.ts",
+    "lint": "eslint src tests/*.html example.html",
+    "fix": "eslint --fix src tests/*.html example.html && npm run prettier",
+    "update-banner": "node util/__patch_licenseBanner_in_js.js",
+    "postversion": "git push && git push --tags && npm publish",
+    "prettier": "prettier --print-width 120 --write *.js **/*.js **/*.ts tests/*.html example.html",
     "pub": "npm publish --access public"
   },
   "repository": {
@@ -37,29 +38,36 @@
   },
   "homepage": "https://github.com/dataarts/dat.gui",
   "devDependencies": {
-    "@babel/core": "^7.4.4",
-    "@babel/preset-env": "^7.4.4",
-    "concurrently": "^4.1.0",
-    "eslint": "^5.16.0",
-    "eslint-config-airbnb-base": "^13.1.0",
-    "eslint-plugin-import": "^2.17.2",
+    "@babel/core": "7.4.4",
+    "@babel/preset-env": "7.4.4",
+    "concurrently": "4.1.0",
+    "eslint": "5.16.0",
+    "eslint-config-airbnb-base": "13.1.0",
+    "eslint-plugin-import": "2.17.2",
+    "eslint-plugin-html": "5.0.5",
+    "extend": "3.0.2",
+    "globby": "9.2.0",
+    "jsdoc-to-markdown": "5.0.0",
+    "node-sass": "4.12.0",
+    "prettier": "1.17.1",
     "qunit": "2.9.2",
-    "extend": "^3.0.2",
-    "jsdoc-to-markdown": "^5.0.0",
-    "node-sass": "^4.12.0",
-    "prettier": "^1.17.1",
-    "rollup": "^1.12.2",
-    "rollup-plugin-babel": "^4.3.2",
-    "rollup-plugin-cleanup": "^3.1.1",
-    "rollup-plugin-commonjs": "^10.0.0",
-    "rollup-plugin-node-resolve": "^5.0.0",
-    "rollup-plugin-sass": "^1.2.2",
-    "rollup-plugin-uglify": "^6.0.2",
-    "serve": "^11.0.0",
-    "uglify-js": "^3.5.13"
+    "replace-between": "0.0.8",
+    "rollup": "1.12.3",
+    "rollup-plugin-babel": "4.3.2",
+    "rollup-plugin-cleanup": "3.1.1",
+    "rollup-plugin-commonjs": "10.0.0",
+    "rollup-plugin-html": "0.2.1",
+    "rollup-plugin-node-resolve": "5.0.0",
+    "rollup-plugin-sass": "1.2.2",
+    "rollup-plugin-uglify": "6.0.2",
+    "serve": "11.0.0",
+    "uglify-js": "3.5.14"
   },
   "eslintConfig": {
     "extends": "airbnb-base",
+    "plugins": [
+      "html"
+    ],
     "rules": {
       "comma-dangle": 0,
       "func-names": 0,
@@ -85,7 +93,21 @@
       "no-restricted-globals": 0,
       "no-bitwise": 0,
       "no-plusplus": 0,
-      "quotes": ["error", "double", { "avoidEscape": true }]
+      "quotes": [
+        "error",
+        "double",
+        {
+          "avoidEscape": true
+        }
+      ],
+      "eqeqeq": [
+        "error",
+        "always",
+        {
+          "null": "ignore"
+        }
+      ],
+      "guard-for-in": "warn"
     }
   }
 }

@@ -11,49 +11,27 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define([
-  "dat/gui/settings",
-  "dat/utils/css",
+import css from "../utils/css";
+import saveDialogueContents from "./saveDialogue.html";
+import ControllerFactory from "../controllers/ControllerFactory";
+import Controller from "../controllers/Controller";
+import BooleanController from "../controllers/BooleanController";
+import FunctionController from "../controllers/FunctionController";
+import NumberControllerBox from "../controllers/NumberControllerBox";
+import NumberControllerSlider from "../controllers/NumberControllerSlider";
+import ColorController from "../controllers/ColorController";
+import OptionController from "../controllers/OptionController";
+import EasingFunctionController from "../controllers/EasingFunctionController";
+import TextAreaController from "../controllers/TextAreaController";
+import requestAnimationFrame from "../utils/requestAnimationFrame";
+import CenteredDiv from "../dom/CenteredDiv";
+import dom from "../dom/dom";
+import common from "../utils/common";
 
-  "text!dat/gui/saveDialogue.html",
-  "text!dat/gui/style.css",
+import styleSheet from "./style.scss"; // CSS to embed in build
 
-  "dat/controllers/factory",
-  "dat/controllers/Controller",
-  "dat/controllers/BooleanController",
-  "dat/controllers/FunctionController",
-  "dat/controllers/NumberControllerBox",
-  "dat/controllers/NumberControllerSlider",
-  "dat/controllers/OptionController",
-  "dat/controllers/ColorController",
-  "dat/controllers/EasingFunctionController",
-  "dat/controllers/TextAreaController",
 
-  "dat/utils/requestAnimationFrame",
 
-  "dat/dom/CenteredDiv",
-  "dat/dom/dom",
-
-  "dat/utils/common"
-], function(
-  settings,
-  css,
-  saveDialogueContents,
-  styleSheet,
-  controllerFactory,
-  Controller,
-  BooleanController,
-  FunctionController,
-  NumberControllerBox,
-  NumberControllerSlider,
-  OptionController,
-  ColorController,
-  EasingFunctionController,
-  requestAnimationFrame,
-  CenteredDiv,
-  dom,
-  common
-) {
   css.inject(styleSheet);
 
   /** Outer-most className for GUI's */
@@ -118,7 +96,7 @@ define([
 
     /**
      * Nested GUI's by name
-     * @ignore
+   * @private
      */
     this.__folders = {};
 
@@ -127,7 +105,7 @@ define([
 
     /**
      * List of objects I'm remembering for save, only used in top level GUI
-     * @ignore
+   * @private
      */
     this.__rememberedObjects = [];
 
@@ -136,7 +114,6 @@ define([
      * in top level GUI.
      *
      * @private
-     * @ignore
      *
      * @example
      * [
@@ -168,7 +145,9 @@ define([
 
     if (!common.isUndefined(params.load)) {
       // Explicit preset
-      if (params.preset) params.load.preset = params.preset;
+    if (params.preset) {
+      params.load.preset = params.preset;
+    }
     } else {
       params.load = { preset: DEFAULT_DEFAULT_PRESET_NAME };
     }
@@ -418,18 +397,15 @@ define([
       if (!this.parent) setWidth(_this, params.width);
     }
 
-    dom.bind(settings.WINDOW, "resize", function() {
-      _this.onResize();
-    });
-    dom.bind(this.__ul, "webkitTransitionEnd", function() {
-      _this.onResize();
-    });
-    dom.bind(this.__ul, "transitionend", function() {
-      _this.onResize();
-    });
-    dom.bind(this.__ul, "oTransitionEnd", function() {
-      _this.onResize();
-    });
+  this.__resizeHandler = function() {
+    _this.onResize();
+  };
+
+
+    dom.bind(settings.WINDOW, "resize", this.__resizeHandler);
+    dom.bind(this.__ul, "webkitTransitionEnd", this.__resizeHandler);
+    dom.bind(this.__ul, "transitionend", this.__resizeHandler);
+    dom.bind(this.__ul, "oTransitionEnd", this.__resizeHandler);
     this.onResize();
 
     if (params.resizable) {
@@ -551,10 +527,7 @@ define([
   GUI.TEXT_CLOSED = "Close Controls";
   GUI.TEXT_OPEN = "Open Controls";
 
-  dom.bind(
-    settings.WINDOW,
-    "keydown",
-    function(e) {
+GUI._keydownHandler = function(e) {
       if (
         settings.DOCUMENT.activeElement.type !== "text" &&
         settings.DOCUMENT.activeElement.nodeName.toString().toLowerCase() !== "textarea" &&
@@ -562,14 +535,18 @@ define([
       ) {
         GUI.toggleHide();
       }
-    },
+    };
+  dom.bind(
+    settings.WINDOW,
+    "keydown",
+    GUI._keydownHandler, 
     false
   );
 
   common.extend(
     GUI.prototype,
 
-    /** @lends dat.gui.GUI */
+  /** @lends GUI.prototype */
     {
       /**
        * @param object
@@ -669,7 +646,7 @@ define([
         // We have to prevent collisions on names in order to have a key
         // by which to remember saved values
         if (this.__folders[name] !== undefined) {
-          throw new Error("You already have a folder in this GUI by the" + ' name "' + name + '"');
+        throw new Error('You already have a folder in this GUI by the name "' + name + '"');
         }
 
         var new_gui_params = { name: name, parent: this };
@@ -682,9 +659,11 @@ define([
         // Do we have saved appearance data for this folder?
 
         if (
-          this.load && // Anything loaded?
-          this.load.folders && // Was my parent a dead-end?
-          this.load.folders[name]
+        // Anything loaded?
+        this.load &&
+        // Was my parent a dead-end?
+        this.load.folders &&
+        this.load.folders[name]
         ) {
           // Did daddy remember me?
 
@@ -711,6 +690,9 @@ define([
         this.closed = false;
       },
 
+    /**
+     * Closes the GUI.
+     */
       close: function() {
         this.closed = true;
       },
@@ -952,19 +934,21 @@ define([
     common.extend(controller, {
       options: function(options) {
         if (arguments.length > 1) {
-          controller.remove();
+        const nextSibling = controller.__li.nextElementSibling;
+        controller.remove();
 
-          return add(gui, controller.object, controller.property, {
-            before: controller.__li.nextElementSibling,
+        return add(gui, controller.object, controller.property, {
+          before: nextSibling,
             factoryArgs: [common.toArray(arguments)]
           });
         }
 
         if (common.isArray(options) || common.isObject(options)) {
-          controller.remove();
+        const nextSibling = controller.__li.nextElementSibling;
+        controller.remove();
 
-          return add(gui, controller.object, controller.property, {
-            before: controller.__li.nextElementSibling,
+        return add(gui, controller.object, controller.property, {
+          before: nextSibling,
             factoryArgs: [options]
           });
         }

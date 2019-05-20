@@ -11,35 +11,39 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define([
-  "dat/gui/settings",
-  "dat/controllers/NumberController",
-  "dat/dom/dom",
-  "dat/utils/css",
-  "dat/utils/common",
-  "text!dat/controllers/NumberControllerSlider.css"
-], function(settings, NumberController, dom, css, common, styleSheet) {
-  /**
-   * @class Represents a given property of an object that is a number, contains
-   * a minimum and maximum, and provides a slider element with which to
-   * manipulate it. It should be noted that the slider element is made up of
-   * <code>&lt;div&gt;</code> tags, <strong>not</strong> the html5
-   * <code>&lt;slider&gt;</code> element.
-   *
-   * @extends dat.controllers.Controller
-   * @extends dat.controllers.NumberController
-   *
-   * @param {Object} object The object to be manipulated
-   * @param {string} property The name of the property to be manipulated
-   * @param {Number} minValue Minimum allowed value
-   * @param {Number} maxValue Maximum allowed value
-   * @param {Number} stepValue Increment by which to change value
-   * @param {Object} enumeration Dynamic object of key value pairs for enumerable values/ranges
-   *
-   * @member dat.controllers
-   */
-  var NumberControllerSlider = function(object, property, min, max, step, enumeration) {
-    NumberControllerSlider.superclass.call(this, object, property, { min: min, max: max, step: step });
+import NumberController from "./NumberController";
+import dom from "../dom/dom";
+
+
+
+
+  function map(v, i1, i2, o1, o2) {
+    return o1 + (o2 - o1) * ((v - i1) / (i2 - i1));
+  }
+
+
+/**
+ * @class Represents a given property of an object that is a number, contains
+ * a minimum and maximum, and provides a slider element with which to
+ * manipulate it. It should be noted that the slider element is made up of
+ * <code>&lt;div&gt;</code> tags, <strong>not</strong> the html5
+ * <code>&lt;slider&gt;</code> element.
+ *
+ * @extends dat.controllers.Controller
+ * @extends dat.controllers.NumberController
+ *
+ * @param {Object} object The object to be manipulated
+ * @param {string} property The name of the property to be manipulated
+ * @param {Number} minValue Minimum allowed value
+ * @param {Number} maxValue Maximum allowed value
+ * @param {Number} stepValue Increment by which to change value
+ * @param {Object} enumeration Dynamic object of key value pairs for enumerable values/ranges
+ *
+ * @member dat.controllers
+ */
+class NumberControllerSlider extends NumberController {
+  constructor(object, property, min, max, step, enumeration) {
+    super(object, property, { min: min, max: max, step: step });
 
     var _this = this;
 
@@ -104,23 +108,17 @@ define([
     this.__background.appendChild(this.__foreground);
     this.__background.appendChild(this.__label);
     this.domElement.appendChild(this.__background);
-  };
+  }
 
-  NumberControllerSlider.superclass = NumberController;
 
   /**
    * Injects default stylesheet for slider elements.
    */
-  NumberControllerSlider.useDefaultStyles = function() {
+  useDefaultStyles() {
     css.inject(styleSheet);
-  };
+  }
 
-  common.extend(
-    NumberControllerSlider.prototype,
-    NumberController.prototype,
-
-    {
-      updateDisplay: function() {
+      updateDisplay() {
         var value = this.getValue();
         var pct = (value - this.__min) / (this.__max - this.__min);
         this.__foreground.style.width = pct * 100 + "%";
@@ -146,14 +144,10 @@ define([
           this.__label.innerHTML = chosenValue;
         }
 
-        return NumberControllerSlider.superclass.prototype.updateDisplay.call(this);
+        return super.updateDisplay();
       }
     }
-  );
 
-  function map(v, i1, i2, o1, o2) {
-    return o1 + (o2 - o1) * ((v - i1) / (i2 - i1));
-  }
 
-  return NumberControllerSlider;
-});
+
+export default NumberControllerSlider;

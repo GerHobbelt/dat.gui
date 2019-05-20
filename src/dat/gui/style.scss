@@ -54,7 +54,6 @@ $row-easing-height: 80px;
 /** Main type */
 .dg {
 
-
   color: #eee;
   font: 11px 'Lucida Grande', sans-serif;
   text-shadow: 0 -1px 0 #111;
@@ -98,7 +97,6 @@ $row-easing-height: 80px;
     &:not(.folder) {
       background: $background-color;
       border-bottom: 1px solid $border-color;
-	  
     }
 
     &.save-row {
@@ -184,13 +182,12 @@ $row-easing-height: 80px;
       line-height: $row-easing-height;
     }
 
-    &.function:hover ,
+    &.function:hover,
     &.boolean:hover {
       background: #111;
     }
 
   }
-
 
   /** Controllers */
   .c {
@@ -208,7 +205,6 @@ $row-easing-height: 80px;
       }
 
     }
-	
 
     .slider {
       background: $input-color;

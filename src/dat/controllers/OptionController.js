@@ -11,33 +11,32 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define(["dat/gui/settings", "dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], function(
-  settings,
-  Controller,
-  dom,
-  common
-) {
-  /**
-   * @class Provides a select input to alter the property of an object, using a
-   * list of accepted values.
-   *
-   * @extends dat.controllers.Controller
-   *
-   * @param {Object} object The object to be manipulated
-   * @param {string} property The name of the property to be manipulated
-   * @param {Object|string[]} options A map of labels to acceptable values, or
-   * a list of acceptable string values.
-   *
-   * @member dat.controllers
-   */
-  var OptionController = function(object, property, options) {
-    OptionController.superclass.call(this, object, property);
+import Controller from "./Controller";
+import dom from "../dom/dom";
+import common from "../utils/common";
+
+/**
+ * @class Provides a select input to alter the property of an object, using a
+ * list of accepted values.
+ *
+ * @extends dat.controllers.Controller
+ *
+ * @param {Object} object The object to be manipulated
+ * @param {string} property The name of the property to be manipulated
+ * @param {Object|string[]} options A map of labels to acceptable values, or
+ * a list of acceptable string values.
+ *
+ * @member dat.controllers
+ */
+class OptionController extends Controller {
+  constructor(object, property, options) {
+    super(object, property);
 
     var _this = this;
 
     /**
      * The drop down menu
-     * @ignore
+     * @private
      */
     this.__select = settings.DOCUMENT.createElement("select");
 
@@ -65,29 +64,22 @@ define(["dat/gui/settings", "dat/controllers/Controller", "dat/dom/dom", "dat/ut
     });
 
     this.domElement.appendChild(this.__select);
-  };
+  }
 
-  OptionController.superclass = Controller;
 
-  common.extend(
-    OptionController.prototype,
-    Controller.prototype,
-
-    {
-      setValue: function(v) {
-        var toReturn = OptionController.superclass.prototype.setValue.call(this, v);
+      setValue(v) {
+        var toReturn = super.setValue(v);
         if (this.__onFinishChange) {
           this.__onFinishChange.call(this, this.getValue());
         }
         return toReturn;
-      },
+      }
 
-      updateDisplay: function() {
+      updateDisplay() {
         this.__select.value = this.getValue();
-        return OptionController.superclass.prototype.updateDisplay.call(this);
+        return super.updateDisplay();
       }
     }
-  );
+  
 
-  return OptionController;
-});
+export default OptionController;

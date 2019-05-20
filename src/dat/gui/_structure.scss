@@ -1,5 +1,6 @@
 $nest-margin: 4px;
-$row-height: 27px; 
+$row-height: 27px;
+
 $button-height: 20px;
 
 .dg {
@@ -15,12 +16,18 @@ $button-height: 20px;
 
   /* Auto-place container */
   &.ac {
-   position: fixed;
-   top: 0;
-   left: 0;
-   right: 0;
-   height: 0;
-   z-index: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 0;
+    // we make sure the dat.gui sits in its own layer for repaint purposes:
+    // see http://benfrain.com/improving-css-performance-fixed-position-elements/
+    // Note that the backface style here comes from that article but is not 
+    // really necessary any more now that we have our layer. 
+    // Compare: https://developers.google.com/web/updates/2012/09/Stacking-Changes-Coming-to-position-fixed-elements?hl=en
+    z-index: 0;
+    // backface-visibility: hidden;
   }
 
   &:not(.ac) .main {
@@ -31,7 +38,7 @@ $button-height: 20px;
   &.main {
 
     @include transition(opacity, 0.1s, linear);
-	overflow:visible;
+	overflow: visible;
 
     &.taller-than-window {
 
@@ -48,7 +55,7 @@ $button-height: 20px;
       }
 	  
 	  > ul {
-		 overflow:auto;
+		 overflow: auto;
 		 overflow-y: auto;
 		 overflow-x: hidden;
 	  }
@@ -74,7 +81,7 @@ $button-height: 20px;
       line-height: $button-height - 1;
       height: $button-height;
 
-        /* TODO, these are style notes */
+      /* TODO, these are style notes */
       cursor: pointer;
       text-align: center;
       background-color: #000;
@@ -100,8 +107,6 @@ $button-height: 20px;
       }
     }
 
-
-
     .save-row {
       position: fixed;
       top: 0;
@@ -115,14 +120,14 @@ $button-height: 20px;
   }
   
   li.cr > div {
-	  position:relative;
+	  position: relative;
   }
 
 
   /* Line items that don't contain folders. */
   li:not(.folder) {
     cursor: auto;
-	height:auto;
+	height: auto;
     //min-height: $row-height;
     line-height: $row-height;
 	
@@ -131,9 +136,8 @@ $button-height: 20px;
   }
 
   li.folder {
-      padding: 0;
-      border-left: $nest-margin solid rgba(0,0,0,0);
-
+    padding: 0;
+    border-left: $nest-margin solid rgba(0, 0, 0, 0);
   }
 
   /** Folder names */
@@ -155,7 +159,7 @@ $button-height: 20px;
   .cr {
     clear: both;
     padding-left: 3px;
-	//min-height:$row-height;
+	//min-height: $row-height;
     height: auto;
   }
 
@@ -170,7 +174,7 @@ $button-height: 20px;
   }
 
   /** Controller-half (right) */
-  .c  {
+  .c {
     float: left;
     width: 60%;
   }
@@ -190,8 +194,8 @@ $button-height: 20px;
     padding: 3px;
    // width: 100%;
     float: right;
-	max-width:100%;
-	width:100% !important;
+	max-width: 100%;
+	width: 100% !important;
 	
   }
 
@@ -211,7 +215,6 @@ $button-height: 20px;
     /*display: none;*/
     margin-left: 0;
   }
-  
 
   .slider {
     float: left;
@@ -220,8 +223,8 @@ $button-height: 20px;
     margin-right: 0;
     height: 19px;
     margin-top: 4px;
-	position:relative;
-	overflow:hidden;
+	position: relative;
+	overflow: hidden;
   }
 
   .slider-fg {
@@ -229,8 +232,18 @@ $button-height: 20px;
   }
   
   .slider .label {
-	  pointer-events: none; text-align: center; position: absolute; width: 100%; height: 100%; vertical-align: middle; margin: 0px; padding: 0px; top: 0px; line-height: 22px;
-	  white-space:nowrap;
+	  pointer-events: none; 
+	  text-align: center; 
+	  position: absolute; 
+	  width: 100%; 
+	  height: 100%; 
+	  vertical-align: middle; 
+	  margin: 0px; 
+	  padding: 0px; 
+	  top: 0px; 
+	  line-height: 22px;
+	  
+	  white-space: nowrap;
   }
 
   .c input[type=checkbox] {
@@ -241,7 +254,7 @@ $button-height: 20px;
     margin-top: 5px;
   }
 
-	/** Ensure the entire boolean and function row shows a hand */
+  /** Ensure the entire boolean and function row shows a hand */
   .cr.function,
   .cr.function .property-name, /* Don't know why I need to be this explicit */
   .cr.function *,
@@ -249,7 +262,6 @@ $button-height: 20px;
   .cr.boolean * {
     cursor: pointer;
   }
-
 
   .selector {
     display: none;
@@ -263,7 +275,6 @@ $button-height: 20px;
   .selector.drag {
     display: block;
   }
-
 
   li.save-row {
 
@@ -283,7 +294,6 @@ $button-height: 20px;
     font-size: 13px;
     line-height: 15px;
   }
-
 
 }
 
@@ -315,7 +325,7 @@ $button-height: 20px;
   margin-top: 10px;
   code {
     font-size: 10px;
-    }
+  }
 }
 
 #dat-gui-save-locally {

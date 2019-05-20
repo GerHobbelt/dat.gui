@@ -11,8 +11,20 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define(["dat/gui/settings", "dat/dom/dom", "dat/utils/common"], function(settings, dom, common) {
-  var CenteredDiv = function() {
+import dom from "./dom";
+import common from "../utils/common";
+
+
+
+
+  function lockScroll(e) {
+    console.log(e);
+  }
+
+
+
+class CenteredDiv {
+  constructor() {
     this.backgroundElement = settings.DOCUMENT.createElement("div");
     common.extend(this.backgroundElement.style, {
       backgroundColor: "rgba(0,0,0,0.8)",
@@ -45,9 +57,9 @@ define(["dat/gui/settings", "dat/dom/dom", "dat/utils/common"], function(setting
     dom.bind(this.backgroundElement, "click", function() {
       _this.hide();
     });
-  };
+  }
 
-  CenteredDiv.prototype.show = function() {
+  show() {
     var _this = this;
 
     this.backgroundElement.style.display = "block";
@@ -64,9 +76,9 @@ define(["dat/gui/settings", "dat/dom/dom", "dat/utils/common"], function(setting
       _this.domElement.style.opacity = 1;
       _this.domElement.style.webkitTransform = "scale(1)";
     });
-  };
+  }
 
-  CenteredDiv.prototype.hide = function() {
+  hide() {
     var _this = this;
 
     var hide = function() {
@@ -86,16 +98,14 @@ define(["dat/gui/settings", "dat/dom/dom", "dat/utils/common"], function(setting
     //    this.domElement.style.top = '48%';
     this.domElement.style.opacity = 0;
     this.domElement.style.webkitTransform = "scale(1.1)";
-  };
-
-  CenteredDiv.prototype.layout = function() {
-    this.domElement.style.left = settings.WINDOW.innerWidth / 2 - dom.getWidth(this.domElement) / 2 + "px";
-    this.domElement.style.top = settings.WINDOW.innerHeight / 2 - dom.getHeight(this.domElement) / 2 + "px";
-  };
-
-  function lockScroll(e) {
-    console.log(e);
   }
 
-  return CenteredDiv;
-});
+  layout() {
+    this.domElement.style.left = settings.WINDOW.innerWidth / 2 - dom.getWidth(this.domElement) / 2 + "px";
+    this.domElement.style.top = settings.WINDOW.innerHeight / 2 - dom.getHeight(this.domElement) / 2 + "px";
+  }
+}
+
+
+
+export default CenteredDiv;

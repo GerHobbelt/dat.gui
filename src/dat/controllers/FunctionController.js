@@ -11,29 +11,28 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define(["dat/gui/settings", "dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], function(
-  settings,
-  Controller,
-  dom,
-  common
-) {
-  /**
-   * @class Provides a GUI interface to fire a specified method, a property of an object.
-   *
-   * @extends dat.controllers.Controller
-   *
-   * @param {Object} object The object to be manipulated
-   * @param {string} property The name of the property to be manipulated
-   *
-   * @member dat.controllers
-   */
-  var FunctionController = function(object, property, text) {
-    FunctionController.superclass.call(this, object, property);
+import Controller from "./Controller";
+import dom from "../dom/dom";
+
+/**
+ * @class Provides a GUI interface to fire a specified method, a property of an object.
+ *
+ * @extends dat.controllers.Controller
+ *
+ * @param {Object} object The object to be manipulated
+ * @param {string} property The name of the property to be manipulated
+ *
+ * @member dat.controllers
+ */
+class FunctionController extends Controller {
+  constructor(object, property, text) {
+    super(object, property);
 
     var _this = this;
 
     this.__button = settings.DOCUMENT.createElement("div");
     this.__button.innerHTML = text === undefined ? "Fire" : text;
+
     dom.bind(this.__button, "click", function(e) {
       e.preventDefault();
       _this.fire();
@@ -43,12 +42,9 @@ define(["dat/gui/settings", "dat/controllers/Controller", "dat/dom/dom", "dat/ut
     dom.addClass(this.__button, "button");
 
     this.domElement.appendChild(this.__button);
-  };
+  }
 
-  FunctionController.superclass = Controller;
-
-  common.extend(FunctionController.prototype, Controller.prototype, {
-    fire: function() {
+    fire() {
       if (this.__onChange) {
         this.__onChange.call(this);
       }
@@ -57,7 +53,6 @@ define(["dat/gui/settings", "dat/controllers/Controller", "dat/dom/dom", "dat/ut
         this.__onFinishChange.call(this, this.getValue());
       }
     }
-  });
+  }
 
-  return FunctionController;
-});
+export default FunctionController;

@@ -11,7 +11,8 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define(["dat/gui/settings", "dat/utils/common"], function(settings, common) {
+import common from "../utils/common";
+
   var EVENT_MAP = {
     HTMLEvents: ["change"],
     MouseEvents: ["click", "mousemove", "mousedown", "mouseup", "mouseover"],
@@ -28,7 +29,9 @@ define(["dat/gui/settings", "dat/utils/common"], function(settings, common) {
   var CSS_VALUE_PIXELS = /(\d+(\.\d+)?)px/;
 
   function cssValueToPixels(val) {
-    if (val === "0" || common.isUndefined(val)) return 0;
+  if (val === "0" || common.isUndefined(val)) {
+    return 0;
+  }
 
     var match = val.match(CSS_VALUE_PIXELS);
 
@@ -52,7 +55,9 @@ define(["dat/gui/settings", "dat/utils/common"], function(settings, common) {
      * @param selectable
      */
     makeSelectable: function(elem, selectable) {
-      if (elem === undefined || elem.style === undefined) return;
+    if (elem === undefined || elem.style === undefined) {
+      return;
+    }
 
       elem.onselectstart = selectable
         ? function() {
@@ -101,7 +106,7 @@ define(["dat/gui/settings", "dat/utils/common"], function(settings, common) {
       }
       var evt = settings.DOCUMENT.createEvent(className);
       switch (className) {
-        case "MouseEvents":
+      case "MouseEvents": {
           var clientX = params.x || params.clientX || 0;
           var clientY = params.y || params.clientY || 0;
           evt.initMouseEvent(
@@ -122,7 +127,8 @@ define(["dat/gui/settings", "dat/utils/common"], function(settings, common) {
             null
           );
           break;
-        case "KeyboardEvents":
+      }
+      case "KeyboardEvents": {
           var init = evt.initKeyboardEvent || evt.initKeyEvent; // webkit || moz
           common.defaults(params, {
             cancelable: true,
@@ -146,10 +152,12 @@ define(["dat/gui/settings", "dat/utils/common"], function(settings, common) {
             params.charCode
           );
           break;
-        default:
+      }
+      default: {
           evt.initEvent(eventType, params.bubbles || false, params.cancelable || true);
           break;
       }
+    }
       common.defaults(evt, aux);
       elem.dispatchEvent(evt);
     },
@@ -175,11 +183,14 @@ define(["dat/gui/settings", "dat/utils/common"], function(settings, common) {
      * @param func
      * @param bool
      */
-    unbind: function(elem, event, func, bool) {
-      bool = bool || false;
-      if (elem.removeEventListener) elem.removeEventListener(event, func, bool);
-      else if (elem.detachEvent) elem.detachEvent("on" + event, func);
-      return dom;
+  unbind: function(elem, event, func, newBool) {
+    const bool = newBool || false;
+    if (elem.removeEventListener) {
+      elem.removeEventListener(event, func, bool);
+    } else if (elem.detachEvent) {
+      elem.detachEvent("on" + event, func);
+    }
+    return dom;
     },
 
     /**
@@ -192,7 +203,7 @@ define(["dat/gui/settings", "dat/utils/common"], function(settings, common) {
         elem.className = className;
       } else if (elem.className !== className) {
         var classes = elem.className.split(/ +/);
-        if (classes.indexOf(className) == -1) {
+      if (classes.indexOf(className) === -1) {
           classes.push(className);
           elem.className = classes
             .join(" ")
@@ -217,7 +228,7 @@ define(["dat/gui/settings", "dat/utils/common"], function(settings, common) {
         } else {
           var classes = elem.className.split(/ +/);
           var index = classes.indexOf(className);
-          if (index != -1) {
+        if (index !== -1) {
             classes.splice(index, 1);
             elem.className = classes.join(" ");
           }
@@ -274,7 +285,8 @@ define(["dat/gui/settings", "dat/utils/common"], function(settings, common) {
         do {
           offset.left += elem.offsetLeft;
           offset.top += elem.offsetTop;
-        } while ((elem = elem.offsetParent));
+        elem = elem.offsetParent;
+      } while (elem);
       }
       return offset;
     },
@@ -289,5 +301,4 @@ define(["dat/gui/settings", "dat/utils/common"], function(settings, common) {
     }
   };
 
-  return dom;
-});
+export default dom;

@@ -11,16 +11,20 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define([
-  "dat/gui/settings",
-  "dat/controllers/Controller",
-  "dat/dom/dom",
-  "dat/color/Color",
-  "dat/color/interpret",
-  "dat/utils/common"
-], function(settings, Controller, dom, Color, interpret, common) {
-  var ColorController = function(object, property) {
-    ColorController.superclass.call(this, object, property);
+import Controller from "./Controller";
+import dom from "../dom/dom";
+import Color from "../color/Color";
+import interpret from "../color/interpret";
+import common from "../utils/common";
+
+/**
+ * @class Represents a given property of an object that is a color.
+ * @param {Object} object
+ * @param {string} property
+ */
+class ColorController extends Controller {
+  constructor(object, property) {
+    super(object, property);
 
     this.__color = new Color(this.getValue());
     this.__temp = new Color(0);
@@ -219,16 +223,10 @@ define([
 
       return false;
     }
-  };
+  }
 
-  ColorController.superclass = Controller;
 
-  common.extend(
-    ColorController.prototype,
-    Controller.prototype,
-
-    {
-      updateDisplay: function() {
+      updateDisplay() {
         var i = interpret(this.getValue());
 
         if (i !== false) {
@@ -286,7 +284,6 @@ define([
         });
       }
     }
-  );
 
   var vendors = ["-moz-", "-o-", "-webkit-", "-ms-", ""];
 
@@ -311,5 +308,4 @@ define([
       "background: linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
   }
 
-  return ColorController;
-});
+export default ColorController;

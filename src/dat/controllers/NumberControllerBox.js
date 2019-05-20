@@ -11,33 +11,37 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define(["dat/gui/settings", "dat/controllers/NumberController", "dat/dom/dom", "dat/utils/common"], function(
-  settings,
-  NumberController,
-  dom,
-  common
-) {
-  /**
-   * @class Represents a given property of an object that is a number and
-   * provides an input element with which to manipulate it.
-   *
-   * @extends dat.controllers.Controller
-   * @extends dat.controllers.NumberController
-   *
-   * @param {Object} object The object to be manipulated
-   * @param {string} property The name of the property to be manipulated
-   * @param {Object} [params] Optional parameters
-   * @param {Number} [params.min] Minimum allowed value
-   * @param {Number} [params.max] Maximum allowed value
-   * @param {Number} [params.step] Increment by which to change value
-   *
-   * @member dat.controllers
-   */
-  var NumberControllerBox = function(object, property, params) {
+import NumberController from "./NumberController";
+import dom from "../dom/dom";
+import common from "../utils/common";
+
+  function roundToDecimal(value, decimals) {
+  const tenTo = 10 ** decimals;
+    return Math.round(value * tenTo) / tenTo;
+  }
+
+/**
+ * @class Represents a given property of an object that is a number and
+ * provides an input element with which to manipulate it.
+ *
+ * @extends dat.controllers.Controller
+ * @extends dat.controllers.NumberController
+ *
+ * @param {Object} object The object to be manipulated
+ * @param {string} property The name of the property to be manipulated
+ * @param {Object} [params] Optional parameters
+ * @param {Number} [params.min] Minimum allowed value
+ * @param {Number} [params.max] Maximum allowed value
+ * @param {Number} [params.step] Increment by which to change value
+ *
+ * @member dat.controllers
+ */
+class NumberControllerBox extends NumberController {
+  constructor(object, property, params) {
     this.__truncationSuspended = false;
     this.__mouseIsDown = false;
 
-    NumberControllerBox.superclass.call(this, object, property, params);
+    super(object, property, params);
 
     var _this = this;
 
@@ -126,33 +130,23 @@ define(["dat/gui/settings", "dat/controllers/NumberController", "dat/dom/dom", "
     this.updateDisplay();
 
     this.domElement.appendChild(this.__input);
-  };
+  }
 
-  NumberControllerBox.superclass = NumberController;
 
-  common.extend(
-    NumberControllerBox.prototype,
-    NumberController.prototype,
-
-    {
-      updateDisplay: function() {
+      updateDisplay() {
         this.__input.value = this.__truncationSuspended
           ? this.getValue()
           : roundToDecimal(this.getValue(), this.__precision);
         return NumberControllerBox.superclass.prototype.updateDisplay.call(this);
-      },
-      step: function(v) {
+      }
+      
+      step(v) {
         if (this.__input.getAttribute("type") != "number") this.__input.setAttribute("type", "number");
         this.__input.setAttribute("step", v);
         return NumberControllerBox.superclass.prototype.step.apply(this, arguments);
       }
     }
-  );
+  
 
-  function roundToDecimal(value, decimals) {
-    var tenTo = Math.pow(10, decimals);
-    return Math.round(value * tenTo) / tenTo;
-  }
 
-  return NumberControllerBox;
-});
+export default NumberControllerBox;

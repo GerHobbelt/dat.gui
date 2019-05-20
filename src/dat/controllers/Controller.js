@@ -11,16 +11,16 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define(["dat/gui/settings", "dat/utils/common"], function(settings, common) {
-  /**
-   * @class An "abstract" class that represents a given property of an object.
-   *
-   * @param {Object} object The object to be manipulated
-   * @param {string} property The name of the property to be manipulated
-   *
-   * @member dat.controllers
-   */
-  var Controller = function(object, property) {
+/**
+ * @class An "abstract" class that represents a given property of an object.
+ *
+ * @param {Object} object The object to be manipulated
+ * @param {string} property The name of the property to be manipulated
+ *
+ * @member dat.controllers
+ */
+class Controller {
+  constructor(object, property) {
     this.initialValue = object[property];
 
     /**
@@ -44,35 +44,31 @@ define(["dat/gui/settings", "dat/utils/common"], function(settings, common) {
     /**
      * The function to be called on change.
      * @type {Function}
-     * @ignore
+     * @private
      */
     this.__onChange = undefined;
 
     /**
      * The function to be called on finishing change.
      * @type {Function}
-     * @ignore
+     * @private
      */
     this.__onFinishChange = undefined;
-  };
+  }
 
-  common.extend(
-    Controller.prototype,
 
-    /** @lends dat.controllers.Controller.prototype */
-    {
       /**
        * Specify that a function fire every time someone changes the value with
        * this Controller.
        *
        * @param {Function} fnc This function will be called whenever the value
        * is modified via this Controller.
-       * @returns {dat.controllers.Controller} this
+       * @returns {Controller} this
        */
-      onChange: function(fnc) {
+      onChange(fnc) {
         this.__onChange = fnc;
         return this;
-      },
+      }
 
       /**
        * Specify that a function fire every time someone "finishes" changing
@@ -81,19 +77,19 @@ define(["dat/gui/settings", "dat/utils/common"], function(settings, common) {
        *
        * @param {Function} fnc This function will be called whenever
        * someone "finishes" changing the value via this Controller.
-       * @returns {dat.controllers.Controller} this
+       * @returns {Controller} this
        */
-      onFinishChange: function(fnc) {
+      onFinishChange(fnc) {
         this.__onFinishChange = fnc;
         return this;
-      },
+      }
 
       /**
        * Change the value of <code>object[property]</code>
        *
        * @param {Object} newValue The new value of <code>object[property]</code>
        */
-      setValue: function(newValue) {
+      setValue(newValue) {
         this.object[this.property] = newValue;
         if (this.__onChange) {
           this.__onChange.call(this, newValue);
@@ -102,23 +98,23 @@ define(["dat/gui/settings", "dat/utils/common"], function(settings, common) {
         }
         this.updateDisplay();
         return this;
-      },
+      }
 
       /**
        * Gets the value of <code>object[property]</code>
        *
        * @returns {Object} The current value of <code>object[property]</code>
        */
-      getValue: function() {
+      getValue() {
         return this.object[this.property];
-      },
+      }
 
       /**
        * Set the drop handler
        *
        * @param {function} handler
        */
-      setDropHandler: function(handler) {
+      setDropHandler(handler) {
         this.domElement.ondragover = function(event) {
           event.preventDefault();
         };
@@ -128,25 +124,24 @@ define(["dat/gui/settings", "dat/utils/common"], function(settings, common) {
         };
 
         return this;
-      },
+      }
 
       /**
        * Refreshes the visual display of a Controller in order to keep sync
        * with the object's current value.
-       * @returns {dat.controllers.Controller} this
+       * @returns {Controller} this
        */
-      updateDisplay: function() {
+      updateDisplay() {
         return this;
-      },
+      }
 
       /**
        * @returns {Boolean} true if the value has deviated from initialValue
        */
-      isModified: function() {
+      isModified() {
         return this.initialValue !== this.getValue();
       }
     }
-  );
+  
 
-  return Controller;
-});
+export default Controller;

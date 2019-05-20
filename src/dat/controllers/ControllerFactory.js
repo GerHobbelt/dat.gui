@@ -11,28 +11,19 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define([
-  "dat/controllers/OptionController",
-  "dat/controllers/NumberControllerBox",
-  "dat/controllers/NumberControllerSlider",
-  "dat/controllers/StringController",
-  "dat/controllers/TextAreaController",
-  "dat/controllers/ArrayController",
-  "dat/controllers/FunctionController",
-  "dat/controllers/BooleanController",
-  "dat/utils/common"
-], function(
-  OptionController,
-  NumberControllerBox,
-  NumberControllerSlider,
-  StringController,
-  TextAreaController,
-  FunctionController,
-  BooleanController,
-  common
-) {
-  return function(object, property) {
-    var initialValue = object[property];
+import OptionController from "./OptionController";
+import NumberControllerBox from "./NumberControllerBox";
+import NumberControllerSlider from "./NumberControllerSlider";
+import StringController from "./StringController";
+import TextAreaController from "./TextAreaController";
+import ArrayController from "./ArrayController";
+import FunctionController from "./FunctionController";
+import BooleanController from "./BooleanController";
+import ArrayController from "./ArrayController";
+import common from "../utils/common";
+
+const ControllerFactory = function(object, property) {
+  const initialValue = object[property];
 
     // Providing options?
     if (common.isArray(arguments[2]) || common.isObject(arguments[2])) {
@@ -66,4 +57,5 @@ define([
       return new ArrayController(object, property);
     }
   };
-});
+
+export default ControllerFactory;

@@ -13,20 +13,27 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], function(Controller, dom, common) {
-  /**
-   * @class Provides a text input to alter the array property of an object.
-   *        Automatically converts strings to numbers and boolean values if appropriate.
-   *
-   * @extends dat.controllers.Controller
-   *
-   * @param {Object} object The object to be manipulated
-   * @param {string} property The name of the property to be manipulated
-   *
-   * @member dat.controllers
-   */
-  var ArrayController = function(object, property) {
-    ArrayController.superclass.call(this, object, property);
+// (ArrayController is based on StringController and was created by Ulysses Popple)
+
+
+import Controller from "./Controller";
+import dom from "../dom/dom";
+import common from "../utils/common";
+
+/**
+ * @class Provides a text input to alter the array property of an object.
+ *        Automatically converts strings to numbers and boolean values if appropriate.
+ *
+ * @extends dat.controllers.Controller
+ *
+ * @param {Object} object The object to be manipulated
+ * @param {string} property The name of the property to be manipulated
+ *
+ * @member dat.controllers
+ */
+class ArrayController extends Controller {
+  constructor(object, property) {
+    super(object, property);
 
     var _this = this;
 
@@ -69,16 +76,9 @@ define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], functi
     this.updateDisplay();
 
     this.domElement.appendChild(this.__input);
-  };
+  }
 
-  ArrayController.superclass = Controller;
-
-  common.extend(
-    ArrayController.prototype,
-    Controller.prototype,
-
-    {
-      updateDisplay: function() {
+      updateDisplay() {
         // Stops the caret from moving on account of:
         // keyup -> setValue -> updateDisplay
         if (!dom.isActive(this.__input)) {
@@ -87,7 +87,6 @@ define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], functi
         return ArrayController.superclass.prototype.updateDisplay.call(this);
       }
     }
-  );
 
-  return ArrayController;
-});
+
+export default ArrayController;

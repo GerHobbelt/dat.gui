@@ -1,15 +1,18 @@
-#dat.GUI
-A lightweight graphical user interface for changing variables in JavaScript. 
+# dat.GUI
 
-Get started with dat.GUI by reading the tutorial at http://workshop.chromeexperiments.com/examples/gui.
+A lightweight graphical user interface for changing variables in JavaScript.
 
-----
+Get started with dat.GUI by reading the [tutorial](http://workshop.chromeexperiments.com/examples/gui)
+or the [API documentation](API.md).
+
+
 
 ## Packaged Builds
 
 The easiest way to use dat.GUI in your code is by using the built source at `build/dat.gui.min.js`. These built JavaScript files bundle all the necessary dependencies to run dat.GUI.
 
 In your `head` tag, include the following code:
+
 ```html
 <script type="text/javascript" src="dat.gui.min.js"></script>
 ```
@@ -44,12 +47,13 @@ gui.add(obj, 'x').onChange(function() {
 
 ## Directory Contents
 
- * build: Concatenated source code.
- * src: Modular code in [require.js](http://requirejs.org/) format. Also includes css, [scss](http://sass-lang.com/), and html, some of which is included during build.
- * tests: [QUnit](https://github.com/jquery/qunit) test suite.
- * utils: [node.js](http://nodejs.org/) utility scripts for compiling source.
+```
++-- build - Concatenated source code for browsers.
++-- src - source code in commonjs format.
++-- tests - [QUnit](https://github.com/jquery/qunit) test suite.
++-- utils - [node.js](http://nodejs.org/) utility scripts for compiling source.
+```
 
-----
 
 ## Building your own dat.GUI
 
@@ -76,7 +80,9 @@ If you're using a server with a Content Security Policy in place that blocks 'un
 
 
 ## Changes
+
 View the [Change Log](CHANGELOG.md)
+
 
 ## Thanks
 

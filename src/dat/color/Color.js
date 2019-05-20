@@ -97,7 +97,9 @@ function defineRGBComponent(target, component, componentHexIndex) {
 function defineHSVComponent(target, component) {
   Object.defineProperty(target, component, {
     get: function() {
-      if (this.__state.space === "HSV") return this.__state[component];
+      if (this.__state.space === "HSV") {
+        return this.__state[component];
+      }
 
       recalculateHSV(this);
 
@@ -121,7 +123,7 @@ function recalculateRGB(color, component, componentHexIndex) {
   } else if (color.__state.space === "HSV") {
     common.extend(color.__state, math.hsv_to_rgb(color.__state.h, color.__state.s, color.__state.v));
   } else {
-    throw "Corrupted color state";
+    throw new Error("Corrupted color state");
   }
 }
 

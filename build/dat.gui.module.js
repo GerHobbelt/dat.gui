@@ -1,3 +1,16 @@
+/**
+ * dat.GUI JavaScript Controller Library
+ * http://code.google.com/p/dat-gui
+ *
+ * Copyright 2011-2019 Data Arts Team, Google Creative Lab
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 function colorToString(color, forceCSSHex) {
   var colorFormat = color.__state.conversionName.toString();
   var r = Math.round(color.r);
@@ -668,7 +681,9 @@ function cssValueToPixels(val) {
 }
 var dom = {
   makeSelectable: function makeSelectable(elem, selectable) {
-    if (elem === undefined || elem.style === undefined) return;
+    if (elem === undefined || elem.style === undefined) {
+      return;
+    }
     elem.onselectstart = selectable
       ? function() {
           return false;
@@ -957,11 +972,12 @@ var StringController = (function(_Controller) {
     dom.bind(_this2.__input, "keyup", onChange);
     dom.bind(_this2.__input, "change", onChange);
     dom.bind(_this2.__input, "blur", onBlur);
-    dom.bind(_this2.__input, "keydown", function(e) {
+    dom.bind(_this2.__input, "keydown", onKeyDown);
+    function onKeyDown(e) {
       if (e.keyCode === 13) {
         this.blur();
       }
-    });
+    }
     _this2.updateDisplay();
     _this2.domElement.appendChild(_this2.__input);
     return _this2;
@@ -1090,14 +1106,15 @@ var NumberControllerBox = (function(_NumberController) {
     dom.bind(_this2.__input, "blur", onBlur);
     dom.bind(_this2.__input, "mousedown", onMouseDown);
     dom.bind(_this2.__input, mousewheelevt, onMouseWheel);
-    dom.bind(_this2.__input, "keydown", function(e) {
+    dom.bind(_this2.__input, "keydown", onKeyDown);
+    function onKeyDown(e) {
       if (e.keyCode === 13) {
         _this.__truncationSuspended = true;
         this.blur();
         _this.__truncationSuspended = false;
         onFinish();
       }
-    });
+    }
     _this2.updateDisplay();
     _this2.domElement.appendChild(_this2.__input);
     return _this2;
@@ -2670,8 +2687,8 @@ var css = {
   }
 };
 
-var saveDialogContents =
-  '<div id="dg-save" class="dg dialogue">\n\n  Here\'s the new load parameter for your <code>GUI</code>\'s constructor:\n\n  <textarea id="dg-new-constructor"></textarea>\n\n  <div id="dg-save-locally">\n\n    <input id="dg-local-storage" type="checkbox"/> Automatically save\n    values to <code>localStorage</code> on exit.\n\n    <div id="dg-local-explain">The values saved to <code>localStorage</code> will\n      override those passed to <code>dat.GUI</code>\'s constructor. This makes it\n      easier to work incrementally, but <code>localStorage</code> is fragile,\n      and your friends may not see the same values you do.\n\n    </div>\n\n  </div>\n\n</div>';
+var saveDialogueContents =
+  'const saveDialogContents = `<div id="dg-save" class="dg dialogue">\n\n  Here\'s the new load parameter for your <code>GUI</code>\'s constructor:\n\n  <textarea id="dg-new-constructor"></textarea>\n\n  <div id="dg-save-locally">\n\n    <input id="dg-local-storage" type="checkbox"> Automatically save\n    values to <code>localStorage</code> on exit.\n\n    <div id="dg-local-explain">The values saved to <code>localStorage</code> will\n      override those passed to <code>dat.GUI</code>\'s constructor. This makes it\n      easier to work incrementally, but <code>localStorage</code> is fragile,\n      and your friends may not see the same values you do.\n\n    </div>\n\n  </div>\n\n</div>`;\n\nexport default saveDialogContents;\n';
 
 function pos2vec(pos, min, max) {
   return [pos[0] * (max[0] - min[0]) + min[0], pos[1] * (max[1] - min[1]) + min[1]];
@@ -2807,7 +2824,11 @@ var VectorController = (function(_Controller) {
 
 var ControllerFactory = function ControllerFactory(object, property) {
   var initialValue = object[property];
-  if (arguments.length <= 3 && (Common.isArray(arguments[2]) || Common.isObject(arguments[2]))) {
+  if (
+    arguments.length <= 3 &&
+    arguments[2] != null &&
+    (Common.isArray(arguments[2]) || Common.isObject(arguments[2]))
+  ) {
     return new OptionController(object, property, arguments[2]);
   }
   if (Common.isNumber(initialValue)) {
@@ -2920,7 +2941,7 @@ var NumberControllerAnimator = (function(_NumberController) {
   return NumberControllerAnimator;
 })(NumberController);
 
-function requestAnimationFrame$1(callback) {
+function requestAnimationFrame$1(callback, element) {
   setTimeout(callback, 1000 / 60);
 }
 var requestAnimationFrame$2 =
@@ -3293,7 +3314,11 @@ GUI.DEFAULT_WIDTH = 245;
 GUI.TEXT_CLOSED = "Close View Controls";
 GUI.TEXT_OPEN = "Open View Controls";
 GUI._keydownHandler = function(e) {
-  if (document.activeElement.type !== "text" && (e.which === HIDE_KEY_CODE || e.keyCode === HIDE_KEY_CODE)) {
+  if (
+    document.activeElement &&
+    document.activeElement.type !== "text" &&
+    (e.which === HIDE_KEY_CODE || e.keyCode === HIDE_KEY_CODE)
+  ) {
     GUI.toggleHide();
   }
 };
@@ -3421,7 +3446,7 @@ Common.extend(GUI.prototype, {
   remember: function remember() {
     if (Common.isUndefined(SAVE_DIALOGUE)) {
       SAVE_DIALOGUE = new CenteredDiv();
-      SAVE_DIALOGUE.domElement.innerHTML = saveDialogContents;
+      SAVE_DIALOGUE.domElement.innerHTML = saveDialogueContents;
     }
     if (this.parent) {
       throw new Error("You can only call remember on a top level GUI.");
@@ -3947,4 +3972,3 @@ var index = {
 
 export default index;
 export { GUI$1 as GUI, color, controllers, dom$1 as dom, gui };
-//# sourceMappingURL=dat.gui.module.js.map

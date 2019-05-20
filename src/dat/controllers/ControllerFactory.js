@@ -1,8 +1,8 @@
 /**
- * dat-gui JavaScript Controller Library
+ * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2019 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,11 @@ const ControllerFactory = function(object, property) {
   const initialValue = object[property];
 
   // Providing options?
-  if (arguments.length <= 3 && arguments[2] != null && (common.isArray(arguments[2]) || common.isObject(arguments[2]))) {
+  if (
+    arguments.length <= 3 &&
+    arguments[2] != null &&
+    (common.isArray(arguments[2]) || common.isObject(arguments[2]))
+  ) {
     return new OptionController(object, property, arguments[2]);
   }
 

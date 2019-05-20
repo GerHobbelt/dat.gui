@@ -1,5 +1,6 @@
 # dat.GUI
-A lightweight graphical user interface for changing variables in JavaScript. 
+
+A lightweight graphical user interface for changing variables in JavaScript.
 
 Get started with dat.GUI by reading the [tutorial](http://workshop.chromeexperiments.com/examples/gui)
 or the [API documentation](API.md).
@@ -21,9 +22,11 @@ This is because, when `insert` is set to `true`, the built dat.gui file appends 
 
 
 ## Packaged Builds
+
 The easiest way to use dat.GUI in your code is by using the built source at `build/dat.gui.min.js`. These built JavaScript files bundle all the necessary dependencies to run dat.GUI.
 
 In your `head` tag, include the following code:
+
 ```html
 <script type="text/javascript" src="dat.gui.min.js"></script>
 ```

@@ -20,6 +20,39 @@ manipulate variables and fire functions on the fly.</p>
 </dd>
 </dl>
 
+## Members
+
+<dl>
+<dt><a href="#autoPlaceVirgin">autoPlaceVirgin</a></dt>
+<dd><p>Have we yet to create an autoPlace GUI?</p>
+</dd>
+<dt><a href="#autoPlaceContainer">autoPlaceContainer</a></dt>
+<dd><p>Fixed position div that auto place GUI&#39;s go inside</p>
+</dd>
+<dt><a href="#hide">hide</a></dt>
+<dd><p>Are we hiding the GUI&#39;s ?</p>
+</dd>
+</dl>
+
+## Constants
+
+<dl>
+<dt><a href="#CSS_NAMESPACE">CSS_NAMESPACE</a></dt>
+<dd><p>Outer-most className for GUI&#39;s</p>
+</dd>
+<dt><a href="#CLOSE_BUTTON_HEIGHT">CLOSE_BUTTON_HEIGHT</a></dt>
+<dd><p>The only value shared between the JS and SCSS. Use caution.</p>
+</dd>
+</dl>
+
+## Functions
+
+<dl>
+<dt><a href="#addRow">addRow(gui, [newDom], [liBefore])</a></dt>
+<dd><p>Add a row to the end of the GUI or before another row.</p>
+</dd>
+</dl>
+
 <a name="GUI"></a>
 
 ## GUI
@@ -31,6 +64,8 @@ manipulate variables and fire functions on the fly.
 * [GUI](#GUI)
     * [new GUI([params])](#new_GUI_new)
     * [.domElement](#GUI+domElement) : <code>DOMElement</code>
+    * [.lightTheme](#GUI+lightTheme) : <code>Boolean</code>
+    * [.showCloseButton](#GUI+showCloseButton) : <code>Boolean</code>
     * [.parent](#GUI+parent) : <code>dat.gui.GUI</code>
     * [.autoPlace](#GUI+autoPlace) : <code>Boolean</code>
     * [.closeOnTop](#GUI+closeOnTop) : <code>Boolean</code>
@@ -40,8 +75,9 @@ manipulate variables and fire functions on the fly.
     * [.closed](#GUI+closed) : <code>Boolean</code>
     * [.load](#GUI+load) : <code>Object</code>
     * [.useLocalStorage](#GUI+useLocalStorage) : <code>Boolean</code>
-    * [.add(object, property, [min], [max], [step])](#GUI+add) ⇒ [<code>Controller</code>](#Controller)
+    * [.add(object, property, label, [min], [max], [step])](#GUI+add) ⇒ [<code>Controller</code>](#Controller)
     * [.addColor(object, property)](#GUI+addColor) ⇒ [<code>Controller</code>](#Controller)
+    * [.addImage(object, property)](#GUI+addImage) ⇒ <code>dat.controllers.ImageController</code>
     * [.remove(controller)](#GUI+remove)
     * [.destroy()](#GUI+destroy)
     * [.addFolder(name)](#GUI+addFolder) ⇒ <code>dat.gui.GUI</code>
@@ -50,6 +86,7 @@ manipulate variables and fire functions on the fly.
     * [.close()](#GUI+close)
     * [.hide()](#GUI+hide)
     * [.show()](#GUI+show)
+    * [.remember(...objects)](#GUI+remember)
     * [.getRoot()](#GUI+getRoot) ⇒ <code>dat.gui.GUI</code>
     * [.getSaveObject()](#GUI+getSaveObject) ⇒ <code>Object</code>
 
@@ -83,6 +120,18 @@ var folder1 = gui.addFolder('Flow Field');
 
 ### gui.domElement : <code>DOMElement</code>
 Outermost DOM Element
+
+**Kind**: instance property of [<code>GUI</code>](#GUI)  
+<a name="GUI+lightTheme"></a>
+
+### gui.lightTheme : <code>Boolean</code>
+Toggles light theme
+
+**Kind**: instance property of [<code>GUI</code>](#GUI)  
+<a name="GUI+showCloseButton"></a>
+
+### gui.showCloseButton : <code>Boolean</code>
+Toggles open/close button
 
 **Kind**: instance property of [<code>GUI</code>](#GUI)  
 <a name="GUI+parent"></a>
@@ -143,7 +192,7 @@ Determines whether or not to use <a href="https://developer.mozilla.org/en/DOM/S
 **Kind**: instance property of [<code>GUI</code>](#GUI)  
 <a name="GUI+add"></a>
 
-### gui.add(object, property, [min], [max], [step]) ⇒ [<code>Controller</code>](#Controller)
+### gui.add(object, property, label, [min], [max], [step]) ⇒ [<code>Controller</code>](#Controller)
 Adds a new [Controller](#Controller) to the GUI. The type of controller created
 is inferred from the initial value of <code>object[property]</code>. For
 color properties, see [addColor](addColor).
@@ -155,6 +204,7 @@ color properties, see [addColor](addColor).
 | --- | --- | --- |
 | object | <code>Object</code> | The object to be manipulated |
 | property | <code>String</code> | The name of the property to be manipulated |
+| label | <code>String</code> | The label to display for the object controller |
 | [min] | <code>Number</code> | Minimum allowed value |
 | [max] | <code>Number</code> | Maximum allowed value |
 | [step] | <code>Number</code> | Increment by which to change value |
@@ -197,6 +247,17 @@ gui.addColor(palette, 'color2');
 gui.addColor(palette, 'color3');
 gui.addColor(palette, 'color4');
 ```
+<a name="GUI+addImage"></a>
+
+### gui.addImage(object, property) ⇒ <code>dat.controllers.ImageController</code>
+**Kind**: instance method of [<code>GUI</code>](#GUI)  
+**Returns**: <code>dat.controllers.ImageController</code> - THe new controller that was added.  
+
+| Param |
+| --- |
+| object | 
+| property | 
+
 <a name="GUI+remove"></a>
 
 ### gui.remove(controller)
@@ -267,6 +328,23 @@ Hides the GUI.
 Shows the GUI.
 
 **Kind**: instance method of [<code>GUI</code>](#GUI)  
+<a name="GUI+remember"></a>
+
+### gui.remember(...objects)
+Mark objects for saving. The order of these objects cannot change as
+the GUI grows. When remembering new objects, append them to the end
+of the list.
+
+**Kind**: instance method of [<code>GUI</code>](#GUI)  
+**Throws**:
+
+- <code>Error</code> if not called on a top level GUI.
+
+
+| Param | Type |
+| --- | --- |
+| ...objects | <code>Object</code> | 
+
 <a name="GUI+getRoot"></a>
 
 ### gui.getRoot() ⇒ <code>dat.gui.GUI</code>
@@ -483,5 +561,48 @@ difference otherwise stepValue is 1</code>
 | Param | Type | Description |
 | --- | --- | --- |
 | stepValue | <code>Number</code> | The step value for dat.controllers.NumberController |
+
+<a name="autoPlaceVirgin"></a>
+
+## autoPlaceVirgin
+Have we yet to create an autoPlace GUI?
+
+**Kind**: global variable  
+<a name="autoPlaceContainer"></a>
+
+## autoPlaceContainer
+Fixed position div that auto place GUI's go inside
+
+**Kind**: global variable  
+<a name="hide"></a>
+
+## hide
+Are we hiding the GUI's ?
+
+**Kind**: global variable  
+<a name="CSS_NAMESPACE"></a>
+
+## CSS\_NAMESPACE
+Outer-most className for GUI's
+
+**Kind**: global constant  
+<a name="CLOSE_BUTTON_HEIGHT"></a>
+
+## CLOSE\_BUTTON\_HEIGHT
+The only value shared between the JS and SCSS. Use caution.
+
+**Kind**: global constant  
+<a name="addRow"></a>
+
+## addRow(gui, [newDom], [liBefore])
+Add a row to the end of the GUI or before another row.
+
+**Kind**: global function  
+
+| Param | Description |
+| --- | --- |
+| gui |  |
+| [newDom] | If specified, inserts the dom content in the new row |
+| [liBefore] | If specified, places the new row before another row |
 
 <!--- API END --->

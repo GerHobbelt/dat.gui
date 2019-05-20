@@ -2,7 +2,7 @@
  * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2019 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -591,7 +591,7 @@ common.extend(
      */
     remove: function(controller) {
       const lIndex = this.__listening.indexOf(controller);
-      if (lIndex != -1) {
+      if (lIndex !== -1) {
         this.__listening.splice(lIndex, 1);
       }
       this.__ul.removeChild(controller.__li);
@@ -642,7 +642,7 @@ common.extend(
       // We have to prevent collisions on names in order to have a key
       // by which to remember saved values
       if (this.__folders[name] !== undefined) {
-        throw new Error("You already have a folder in this GUI by the" + ' name "' + name + '"');
+        throw new Error('You already have a folder in this GUI by the name "' + name + '"');
       }
 
       const newGuiParams = { name: name, parent: this, title: title };

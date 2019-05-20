@@ -41,6 +41,9 @@ class NumberControllerBox extends NumberController {
   constructor(object, property, params) {
     super(object, property, params);
 
+    const _params = params || {};
+
+    this.__suffix = _params.suffix ? _params.suffix : "";
     this.__truncationSuspended = false;
 
     const _this = this;
@@ -53,8 +56,8 @@ class NumberControllerBox extends NumberController {
 
     function onChange() {
       let { value } = _this.__input;
-      if (params && params.suffix) {
-        value = value.replace(params.suffix, "");
+      if (params && _this.__suffix) {
+        value = value.replace(_this.__suffix, "");
       }
       const attempted = parseFloat(value);
       if (!common.isNaN(attempted)) {
@@ -117,10 +120,9 @@ class NumberControllerBox extends NumberController {
   updateDisplay() {
     // if (dom.isActive(this.__input)) return this; // prevent number from updating if user is trying to manually update
 
-    const suffix = params && params.suffix ? params.suffix : "";
     this.__input.value = this.__truncationSuspended
       ? this.getValue()
-      : roundToDecimal(this.getValue(), this.__precision) + suffix;
+      : roundToDecimal(this.getValue(), this.__precision) + this.__suffix;
     return super.updateDisplay();
   }
 }

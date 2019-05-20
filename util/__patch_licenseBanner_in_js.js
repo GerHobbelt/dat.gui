@@ -21,7 +21,7 @@ licenseBanner = licenseBanner.replace(/^(\s*version )([0-9.-]+[0-9.a-z-]*)/gm, f
     }
     return m1 + version;
 });
-console.log("license banner:", licenseBanner);
+// console.log("license banner:", licenseBanner);
 
  
 var count;
@@ -29,12 +29,12 @@ var count;
 globby(['src/**/*.js', 'build/**/*.js']).then(paths => {
 	count = 0;
 
-    console.log(paths);
+    // console.log(paths);
 
     paths.forEach(path => {
     	var updated = false;
 
-    	console.log('path: ', path);
+    	// console.log('path: ', path);
 
     	var src = fs.readFileSync(path, 'utf8');
     	src = src.replace(/\/\*\*[^\/]+?Licensed under the Apache License[^\/]+?\*\/\s*/, function repl(s) {
@@ -54,7 +54,6 @@ globby(['src/**/*.js', 'build/**/*.js']).then(paths => {
     	if (updated) {
     		count++;
     		console.log('updated: ', path);
-            return;
 	    	fs.writeFileSync(path, src, {
                 encoding: 'utf8',
                 flags: 'w'

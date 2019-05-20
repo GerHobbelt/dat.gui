@@ -21,11 +21,11 @@ const css = {
     doc.getElementsByTagName("head")[0].appendChild(link);
   },
 
-  inject: function(css, indoc) {
+  inject: function(cssContent, indoc) {
     const doc = indoc || document;
     const injected = document.createElement("style");
     injected.type = "text/css";
-    injected.innerHTML = css;
+    injected.innerHTML = cssContent;
     const head = doc.getElementsByTagName("head")[0];
     try {
       head.appendChild(injected);

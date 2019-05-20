@@ -31,21 +31,13 @@ manipulate variables and fire functions on the fly.
 * [GUI](#GUI)
     * [new GUI([params])](#new_GUI_new)
     * [.domElement](#GUI+domElement) : <code>DOMElement</code>
-    * [.parent](#GUI+parent) : <code>dat.gui.GUI</code>
-    * [.autoPlace](#GUI+autoPlace) : <code>Boolean</code>
-    * [.closeOnTop](#GUI+closeOnTop) : <code>Boolean</code>
-    * [.preset](#GUI+preset) : <code>String</code>
-    * [.width](#GUI+width) : <code>Number</code>
-    * [.name](#GUI+name) : <code>String</code>
-    * [.closed](#GUI+closed) : <code>Boolean</code>
-    * [.load](#GUI+load) : <code>Object</code>
-    * [.useLocalStorage](#GUI+useLocalStorage) : <code>Boolean</code>
     * [.add(object, property, [min], [max], [step])](#GUI+add) ⇒ [<code>Controller</code>](#Controller)
     * [.addColor(object, property)](#GUI+addColor) ⇒ [<code>Controller</code>](#Controller)
+    * [.addGradient(object, property)](#GUI+addGradient) ⇒ <code>dat.controllers.ColorController</code>
     * [.remove(controller)](#GUI+remove)
     * [.destroy()](#GUI+destroy)
-    * [.addFolder(name)](#GUI+addFolder) ⇒ <code>dat.gui.GUI</code>
-    * [.open()](#GUI+open)
+    * [.addFolder(name, [title])](#GUI+addFolder) ⇒ <code>dat.gui.GUI</code>
+    * [.removeFolder(name)](#GUI+removeFolder)
     * [.close()](#GUI+close)
     * [.getRoot()](#GUI+getRoot) ⇒ <code>dat.gui.GUI</code>
     * [.getSaveObject()](#GUI+getSaveObject) ⇒ <code>Object</code>
@@ -79,62 +71,6 @@ var folder1 = gui.addFolder('Flow Field');
 
 ### gui.domElement : <code>DOMElement</code>
 Outermost DOM Element
-
-**Kind**: instance property of [<code>GUI</code>](#GUI)  
-<a name="GUI+parent"></a>
-
-### gui.parent : <code>dat.gui.GUI</code>
-The parent <code>GUI</code>
-
-**Kind**: instance property of [<code>GUI</code>](#GUI)  
-<a name="GUI+autoPlace"></a>
-
-### gui.autoPlace : <code>Boolean</code>
-Handles <code>GUI</code>'s element placement for you
-
-**Kind**: instance property of [<code>GUI</code>](#GUI)  
-<a name="GUI+closeOnTop"></a>
-
-### gui.closeOnTop : <code>Boolean</code>
-Handles <code>GUI</code>'s position of open/close button
-
-**Kind**: instance property of [<code>GUI</code>](#GUI)  
-<a name="GUI+preset"></a>
-
-### gui.preset : <code>String</code>
-The identifier for a set of saved values
-
-**Kind**: instance property of [<code>GUI</code>](#GUI)  
-<a name="GUI+width"></a>
-
-### gui.width : <code>Number</code>
-The width of <code>GUI</code> element
-
-**Kind**: instance property of [<code>GUI</code>](#GUI)  
-<a name="GUI+name"></a>
-
-### gui.name : <code>String</code>
-The name of <code>GUI</code>. Used for folders. i.e
-a folder's name
-
-**Kind**: instance property of [<code>GUI</code>](#GUI)  
-<a name="GUI+closed"></a>
-
-### gui.closed : <code>Boolean</code>
-Whether the <code>GUI</code> is collapsed or not
-
-**Kind**: instance property of [<code>GUI</code>](#GUI)  
-<a name="GUI+load"></a>
-
-### gui.load : <code>Object</code>
-Contains all presets
-
-**Kind**: instance property of [<code>GUI</code>](#GUI)  
-<a name="GUI+useLocalStorage"></a>
-
-### gui.useLocalStorage : <code>Boolean</code>
-Determines whether or not to use <a href="https://developer.mozilla.org/en/DOM/Storage#localStorage">localStorage</a> as the means for
-<code>remember</code>ing
 
 **Kind**: instance property of [<code>GUI</code>](#GUI)  
 <a name="GUI+add"></a>
@@ -193,6 +129,17 @@ gui.addColor(palette, 'color2');
 gui.addColor(palette, 'color3');
 gui.addColor(palette, 'color4');
 ```
+<a name="GUI+addGradient"></a>
+
+### gui.addGradient(object, property) ⇒ <code>dat.controllers.ColorController</code>
+**Kind**: instance method of [<code>GUI</code>](#GUI)  
+**Returns**: <code>dat.controllers.ColorController</code> - The new controller that was added.  
+
+| Param |
+| --- |
+| object | 
+| property | 
+
 <a name="GUI+remove"></a>
 
 ### gui.remove(controller)
@@ -212,7 +159,7 @@ Removes the GUI from the document and unbinds all event listeners.
 **Kind**: instance method of [<code>GUI</code>](#GUI)  
 <a name="GUI+addFolder"></a>
 
-### gui.addFolder(name) ⇒ <code>dat.gui.GUI</code>
+### gui.addFolder(name, [title]) ⇒ <code>dat.gui.GUI</code>
 Creates a new subfolder GUI instance.
 
 **Kind**: instance method of [<code>GUI</code>](#GUI)  
@@ -226,13 +173,17 @@ name
 | Param |
 | --- |
 | name | 
+| [title] | 
 
-<a name="GUI+open"></a>
+<a name="GUI+removeFolder"></a>
 
-### gui.open()
-Opens the GUI.
-
+### gui.removeFolder(name)
 **Kind**: instance method of [<code>GUI</code>](#GUI)  
+
+| Param |
+| --- |
+| name | 
+
 <a name="GUI+close"></a>
 
 ### gui.close()

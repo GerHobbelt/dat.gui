@@ -94,7 +94,9 @@
         {
           "avoidEscape": true
         }
-      ]
+      ],
+      "eqeqeq": [ "error", "always", {"null": "ignore"} ],
+      "guard-for-in": "warn"
     }
   }
 }

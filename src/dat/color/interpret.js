@@ -1,8 +1,8 @@
 /**
- * dat-gui JavaScript Controller Library
+ * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2019 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,12 +12,13 @@
  */
 
 define(["dat/color/toString", "dat/utils/common"], function(toString, common) {
-  var result, toReturn;
+  let result; let
+    toReturn;
 
-  var interpret = function() {
+  const interpret = function() {
     toReturn = false;
 
-    var original = arguments.length > 1 ? common.toArray(arguments) : arguments[0];
+    const original = arguments.length > 1 ? common.toArray(arguments) : arguments[0];
 
     common.each(INTERPRETATIONS, function(family) {
       if (family.litmus(original)) {
@@ -47,19 +48,22 @@ define(["dat/color/toString", "dat/utils/common"], function(toString, common) {
       conversions: {
         THREE_CHAR_HEX: {
           read: function(original) {
-            var test = original.match(/^#([A-F0-9])([A-F0-9])([A-F0-9])$/i);
-            if (test === null) return false;
+            const test = original.match(/^#([A-F0-9])([A-F0-9])([A-F0-9])$/i);
+            if (test === null) {
+              return false;
+            }
 
             return {
               space: "HEX",
               hex: parseInt(
-                "0x" +
-                  test[1].toString() +
-                  test[1].toString() +
-                  test[2].toString() +
-                  test[2].toString() +
-                  test[3].toString() +
-                  test[3].toString()
+                "0x"
+                  + test[1].toString()
+                  + test[1].toString()
+                  + test[2].toString()
+                  + test[2].toString()
+                  + test[3].toString()
+                  + test[3].toString(),
+                0
               )
             };
           },
@@ -69,12 +73,14 @@ define(["dat/color/toString", "dat/utils/common"], function(toString, common) {
 
         SIX_CHAR_HEX: {
           read: function(original) {
-            var test = original.match(/^#([A-F0-9]{6})$/i);
-            if (test === null) return false;
+            const test = original.match(/^#([A-F0-9]{6})$/i);
+            if (test === null) {
+              return false;
+            }
 
             return {
               space: "HEX",
-              hex: parseInt("0x" + test[1].toString())
+              hex: parseInt("0x" + test[1].toString(), 0)
             };
           },
 
@@ -83,7 +89,7 @@ define(["dat/color/toString", "dat/utils/common"], function(toString, common) {
 
         CSS_RGB: {
           read: function(original) {
-            var test = original.match(/^rgb\(\s*(.+)\s*,\s*(.+)\s*,\s*(.+)\s*\)/);
+            const test = original.match(/^rgb\(\s*(.+)\s*,\s*(.+)\s*,\s*(.+)\s*\)/);
             if (test === null) return false;
 
             return {
@@ -99,8 +105,10 @@ define(["dat/color/toString", "dat/utils/common"], function(toString, common) {
 
         CSS_RGBA: {
           read: function(original) {
-            var test = original.match(/^rgba\(\s*(.+)\s*,\s*(.+)\s*,\s*(.+)\s*\,\s*(.+)\s*\)/);
-            if (test === null) return false;
+            const test = original.match(/^rgba\(\s*(.+)\s*,\s*(.+)\s*,\s*(.+)\s*,\s*(.+)\s*\)/);
+            if (test === null) {
+              return false;
+            }
 
             return {
               space: "RGB",
@@ -144,7 +152,9 @@ define(["dat/color/toString", "dat/utils/common"], function(toString, common) {
       conversions: {
         RGB_ARRAY: {
           read: function(original) {
-            if (original.length != 3) return false;
+            if (original.length !== 3) {
+              return false;
+            }
             return {
               space: "RGB",
               r: original[0],
@@ -160,7 +170,7 @@ define(["dat/color/toString", "dat/utils/common"], function(toString, common) {
 
         RGBA_ARRAY: {
           read: function(original) {
-            if (original.length != 4) return false;
+            if (original.length !== 4) return false;
             return {
               space: "RGB",
               r: original[0],
@@ -185,10 +195,10 @@ define(["dat/color/toString", "dat/utils/common"], function(toString, common) {
         RGBA_OBJ: {
           read: function(original) {
             if (
-              common.isNumber(original.r) &&
-              common.isNumber(original.g) &&
-              common.isNumber(original.b) &&
-              common.isNumber(original.a)
+              common.isNumber(original.r)
+              && common.isNumber(original.g)
+              && common.isNumber(original.b)
+              && common.isNumber(original.a)
             ) {
               return {
                 space: "RGB",
@@ -236,10 +246,10 @@ define(["dat/color/toString", "dat/utils/common"], function(toString, common) {
         HSVA_OBJ: {
           read: function(original) {
             if (
-              common.isNumber(original.h) &&
-              common.isNumber(original.s) &&
-              common.isNumber(original.v) &&
-              common.isNumber(original.a)
+              common.isNumber(original.h)
+              && common.isNumber(original.s)
+              && common.isNumber(original.v)
+              && common.isNumber(original.a)
             ) {
               return {
                 space: "HSV",

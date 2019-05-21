@@ -1,8 +1,8 @@
 /**
- * dat-gui JavaScript Controller Library
+ * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2019 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,13 +37,13 @@ define(["dat/controllers/NumberController", "dat/dom/dom", "dat/utils/common"], 
 
     NumberControllerBox.superclass.call(this, object, property, params);
 
-    var _this = this;
+    const _this = this;
 
     /**
      * {Number} Previous mouse y position
      * @ignore
      */
-    var prev_y;
+    let prev_y;
 
     this.__input = document.createElement("input");
     this.__input.setAttribute("type", "text");
@@ -63,7 +63,7 @@ define(["dat/controllers/NumberController", "dat/dom/dom", "dat/utils/common"], 
     });
 
     function onChange() {
-      var attempted = parseFloat(_this.__input.value);
+      const attempted = parseFloat(_this.__input.value);
       if (!common.isNaN(attempted)) _this.setValue(attempted);
     }
 
@@ -81,7 +81,7 @@ define(["dat/controllers/NumberController", "dat/dom/dom", "dat/utils/common"], 
     }
 
     function onMouseDrag(e) {
-      var diff = prev_y - e.clientY;
+      const diff = prev_y - e.clientY;
       _this.setValue(_this.getValue() + diff * _this.__impliedStep);
 
       prev_y = e.clientY;
@@ -118,7 +118,7 @@ define(["dat/controllers/NumberController", "dat/dom/dom", "dat/utils/common"], 
   );
 
   function roundToDecimal(value, decimals) {
-    var tenTo = Math.pow(10, decimals);
+    const tenTo = Math.pow(10, decimals);
     return Math.round(value * tenTo) / tenTo;
   }
 

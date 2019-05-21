@@ -1,8 +1,8 @@
 /**
- * dat-gui JavaScript Controller Library
+ * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2019 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,25 +12,25 @@
  */
 
 define(["dat/utils/common"], function(common) {
-  var EVENT_MAP = {
+  const EVENT_MAP = {
     HTMLEvents: ["change"],
     MouseEvents: ["click", "mousemove", "mousedown", "mouseup", "mouseover"],
     KeyboardEvents: ["keydown"]
   };
 
-  var EVENT_MAP_INV = {};
+  const EVENT_MAP_INV = {};
   common.each(EVENT_MAP, function(v, k) {
     common.each(v, function(e) {
       EVENT_MAP_INV[e] = k;
     });
   });
 
-  var CSS_VALUE_PIXELS = /(\d+(\.\d+)?)px/;
+  const CSS_VALUE_PIXELS = /(\d+(\.\d+)?)px/;
 
   function cssValueToPixels(val) {
     if (val === "0" || common.isUndefined(val)) return 0;
 
-    var match = val.match(CSS_VALUE_PIXELS);
+    const match = val.match(CSS_VALUE_PIXELS);
 
     if (!common.isNull(match)) {
       return parseFloat(match[1]);
@@ -56,8 +56,8 @@ define(["dat/utils/common"], function(common) {
 
       elem.onselectstart = selectable
         ? function() {
-            return false;
-          }
+          return false;
+        }
         : function() {};
 
       elem.style.MozUserSelect = selectable ? "auto" : "none";
@@ -95,11 +95,11 @@ define(["dat/utils/common"], function(common) {
      */
     fakeEvent: function(elem, eventType, params, aux) {
       params = params || {};
-      var className = EVENT_MAP_INV[eventType];
+      const className = EVENT_MAP_INV[eventType];
       if (!className) {
         throw new Error("Event type " + eventType + " not supported.");
       }
-      var evt = document.createEvent(className);
+      const evt = document.createEvent(className);
       switch (className) {
         case "MouseEvents":
           var clientX = params.x || params.clientX || 0;
@@ -110,10 +110,10 @@ define(["dat/utils/common"], function(common) {
             params.cancelable || true,
             window,
             params.clickCount || 1,
-            0, //screen X
-            0, //screen Y
-            clientX, //client X
-            clientY, //client Y
+            0, // screen X
+            0, // screen Y
+            clientX, // client X
+            clientY, // client Y
             false,
             false,
             false,
@@ -191,7 +191,7 @@ define(["dat/utils/common"], function(common) {
       if (elem.className === undefined) {
         elem.className = className;
       } else if (elem.className !== className) {
-        var classes = elem.className.split(/ +/);
+        const classes = elem.className.split(/ +/);
         if (classes.indexOf(className) == -1) {
           classes.push(className);
           elem.className = classes
@@ -215,8 +215,8 @@ define(["dat/utils/common"], function(common) {
         } else if (elem.className === className) {
           elem.removeAttribute("class");
         } else {
-          var classes = elem.className.split(/ +/);
-          var index = classes.indexOf(className);
+          const classes = elem.className.split(/ +/);
+          const index = classes.indexOf(className);
           if (index != -1) {
             classes.splice(index, 1);
             elem.className = classes.join(" ");
@@ -237,14 +237,14 @@ define(["dat/utils/common"], function(common) {
      * @param elem
      */
     getWidth: function(elem) {
-      var style = getComputedStyle(elem);
+      const style = getComputedStyle(elem);
 
       return (
-        cssValueToPixels(style["border-left-width"]) +
-        cssValueToPixels(style["border-right-width"]) +
-        cssValueToPixels(style["padding-left"]) +
-        cssValueToPixels(style["padding-right"]) +
-        cssValueToPixels(style["width"])
+        cssValueToPixels(style["border-left-width"])
+        + cssValueToPixels(style["border-right-width"])
+        + cssValueToPixels(style["padding-left"])
+        + cssValueToPixels(style["padding-right"])
+        + cssValueToPixels(style.width)
       );
     },
 
@@ -253,14 +253,14 @@ define(["dat/utils/common"], function(common) {
      * @param elem
      */
     getHeight: function(elem) {
-      var style = getComputedStyle(elem);
+      const style = getComputedStyle(elem);
 
       return (
-        cssValueToPixels(style["border-top-width"]) +
-        cssValueToPixels(style["border-bottom-width"]) +
-        cssValueToPixels(style["padding-top"]) +
-        cssValueToPixels(style["padding-bottom"]) +
-        cssValueToPixels(style["height"])
+        cssValueToPixels(style["border-top-width"])
+        + cssValueToPixels(style["border-bottom-width"])
+        + cssValueToPixels(style["padding-top"])
+        + cssValueToPixels(style["padding-bottom"])
+        + cssValueToPixels(style.height)
       );
     },
 
@@ -269,7 +269,7 @@ define(["dat/utils/common"], function(common) {
      * @param elem
      */
     getOffset: function(elem) {
-      var offset = {
+      const offset = {
         left: 0,
         top: 0
       };

@@ -1,8 +1,8 @@
 /**
- * dat-gui JavaScript Controller Library
+ * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2019 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ define([
       step: step
     });
 
-    var _this = this;
+    const _this = this;
 
     this.__background = document.createElement("div");
     this.__foreground = document.createElement("div");
@@ -63,8 +63,8 @@ define([
     function onMouseDrag(e) {
       e.preventDefault();
 
-      var offset = dom.getOffset(_this.__background);
-      var width = dom.getWidth(_this.__background);
+      const offset = dom.getOffset(_this.__background);
+      const width = dom.getWidth(_this.__background);
 
       _this.setValue(map(e.clientX, offset.left, offset.left + width, _this.__min, _this.__max));
 
@@ -100,7 +100,7 @@ define([
 
     {
       updateDisplay: function() {
-        var pct = (this.getValue() - this.__min) / (this.__max - this.__min);
+        const pct = (this.getValue() - this.__min) / (this.__max - this.__min);
         this.__foreground.style.width = pct * 100 + "%";
         return NumberControllerSlider.superclass.prototype.updateDisplay.call(this);
       }

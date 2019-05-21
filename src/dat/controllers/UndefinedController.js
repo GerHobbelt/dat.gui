@@ -1,10 +1,8 @@
 /**
- * dat-gui JavaScript Controller Library
+ * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
- *
- * UndefinedController (an adapted StringController) by mikenon
+ * Copyright 2011-2019 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +28,7 @@ define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], functi
   var UndefinedController = function(object, property) {
     UndefinedController.superclass.call(this, object, property);
 
-    var _this = this;
+    const _this = this;
 
     this.__input = document.createElement("input");
     this.__input.setAttribute("type", "text");

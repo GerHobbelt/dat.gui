@@ -1,8 +1,8 @@
 /**
- * dat-gui JavaScript Controller Library
+ * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2019 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
  */
 
 define([], function() {
-  var ARR_EACH = Array.prototype.forEach;
-  var ARR_SLICE = Array.prototype.slice;
+  const ARR_EACH = Array.prototype.forEach;
+  const ARR_SLICE = Array.prototype.slice;
 
   /**
    * Band-aid methods for things that should be a lot easier in JavaScript.
@@ -28,7 +28,7 @@ define([], function() {
       this.each(
         ARR_SLICE.call(arguments, 1),
         function(obj) {
-          for (var key in obj) if (!this.isUndefined(obj[key])) target[key] = obj[key];
+          for (const key in obj) if (!this.isUndefined(obj[key])) target[key] = obj[key];
         },
         this
       );
@@ -40,7 +40,7 @@ define([], function() {
       this.each(
         ARR_SLICE.call(arguments, 1),
         function(obj) {
-          for (var key in obj) if (this.isUndefined(target[key])) target[key] = obj[key];
+          for (const key in obj) if (this.isUndefined(target[key])) target[key] = obj[key];
         },
         this
       );
@@ -49,10 +49,10 @@ define([], function() {
     },
 
     compose: function() {
-      var toCall = ARR_SLICE.call(arguments);
+      const toCall = ARR_SLICE.call(arguments);
       return function() {
-        var args = ARR_SLICE.call(arguments);
-        for (var i = toCall.length - 1; i >= 0; i--) {
+        let args = ARR_SLICE.call(arguments);
+        for (let i = toCall.length - 1; i >= 0; i--) {
           args = [toCall[i].apply(this, args)];
         }
         return args[0];
@@ -67,8 +67,7 @@ define([], function() {
       } else if (obj.length === obj.length + 0) {
         // Is number but not NaN
 
-        for (var key = 0, l = obj.length; key < l; key++)
-          if (key in obj && itr.call(scope, obj[key], key) === this.BREAK) return;
+        for (var key = 0, l = obj.length; key < l; key++) if (key in obj && itr.call(scope, obj[key], key) === this.BREAK) return;
       } else {
         for (var key in obj) if (itr.call(scope, obj[key], key) === this.BREAK) return;
       }
@@ -96,8 +95,8 @@ define([], function() {
     },
 
     isArray:
-      Array.isArray ||
-      function(obj) {
+      Array.isArray
+      || function(obj) {
         return obj.constructor === Array;
       },
 
@@ -122,8 +121,8 @@ define([], function() {
     },
 
     hasOwnProperty: function(obj, prop) {
-      var proto = obj.__proto__ || obj.constructor.prototype;
-      var proto_prop = undefined;
+      const proto = obj.__proto__ || obj.constructor.prototype;
+      let proto_prop;
       try {
         proto_prop = proto[prop];
       } catch (err) {

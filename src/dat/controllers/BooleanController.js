@@ -1,8 +1,8 @@
 /**
- * dat-gui JavaScript Controller Library
+ * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2019 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], functi
   var BooleanController = function(object, property) {
     BooleanController.superclass.call(this, object, property);
 
-    var _this = this;
+    const _this = this;
     this.__prev = this.getValue();
 
     this.__checkbox = document.createElement("input");
@@ -50,7 +50,7 @@ define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], functi
 
     {
       setValue: function(v) {
-        var toReturn = BooleanController.superclass.prototype.setValue.call(this, v);
+        const toReturn = BooleanController.superclass.prototype.setValue.call(this, v);
         if (this.__onFinishChange) {
           this.__onFinishChange.call(this, this.getValue());
         }

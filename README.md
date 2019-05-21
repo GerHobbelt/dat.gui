@@ -24,12 +24,12 @@ or the [API documentation](API.md).
 
 ## Packaged Builds
 
-The easiest way to use dat.GUI in your code is by using the built source at `build/dat.GUI.min.js`. These built JavaScript files bundle all the necessary dependencies to run dat.GUI.
+The easiest way to use dat.GUI in your code is by using the built source at `build/dat.gui.min.js`. These built JavaScript files bundle all the necessary dependencies to run dat.GUI.
 
 In your `head` tag, include the following code:
 
 ```html
-<script type="text/javascript" src="dat.GUI.min.js"></script>
+<script type="text/javascript" src="dat.gui.min.js"></script>
 ```
 
 ## Installing from npm
@@ -65,8 +65,8 @@ gui.add(obj, 'x').onChange(function() {
 ```
 ├── build - Concatenated source code for browsers.
 ├── src - source code in commonjs format.
-└── tests - [QUnit](https://github.com/jquery/qunit) test suite.
-* utils: [node.js](http://nodejs.org/) utility scripts for compiling source.
+├── tests - [QUnit](https://github.com/jquery/qunit) test suite.
+└── util: [node.js](http://nodejs.org/) utility scripts for compiling source.
 ```
 
 ## Building your own dat.GUI

@@ -2,7 +2,7 @@
  * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2019 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,7 +65,7 @@ const DEFAULT_DEFAULT_PRESET_NAME = "Default";
 
 const SUPPORTS_LOCAL_STORAGE = (function() {
   try {
-    return "localStorage" in window && window.localStorage !== null;
+    return "localStorage" in window && window.localStorage != null;
   } catch (e) {
     return false;
   }
@@ -132,7 +132,7 @@ var GUI = function(params) {
 
   /**
    * Nested GUI's by name
-   * @ignore
+   * @private
    */
   this.__folders = {};
 
@@ -140,7 +140,7 @@ var GUI = function(params) {
 
   /**
    * List of objects I'm remembering for save, only used in top level GUI
-   * @ignore
+   * @private
    */
   this.__rememberedObjects = [];
 
@@ -149,7 +149,6 @@ var GUI = function(params) {
    * in top level GUI.
    *
    * @private
-   * @ignore
    *
    * @example
    * [
@@ -253,6 +252,7 @@ var GUI = function(params) {
           if (_this.parent) {
             return _this.getRoot().preset;
           }
+
           return params.load.preset;
         },
 
@@ -641,7 +641,7 @@ common.extend(
       // We have to prevent collisions on names in order to have a key
       // by which to remember saved values
       if (this.__folders[name] !== undefined) {
-        throw new Error("You already have a folder in this GUI by the" + ' name "' + name + '"');
+        throw new Error('You already have a folder in this GUI by the name "' + name + '"');
       }
 
       const new_gui_params = { name: name, parent: this };
@@ -652,10 +652,11 @@ common.extend(
       new_gui_params.autoPlace = this.autoPlace;
 
       // Do we have saved appearance data for this folder?
-
       if (
-        this.load && // Anything loaded?
-        this.load.folders && // Was my parent a dead-end?
+        // Anything loaded?
+        this.load &&
+        // Was my parent a dead-end?
+        this.load.folders &&
         this.load.folders[name]
       ) {
         // Did daddy remember me?
@@ -679,6 +680,9 @@ common.extend(
       return this;
     },
 
+    /**
+     * Closes the GUI.
+     */
     close: function() {
       this.closed = true;
       return this;
@@ -722,7 +726,7 @@ common.extend(
      * the GUI grows. When remembering new objects, append them to the end
      * of the list.
      *
-     * @param {Object...} objects
+     * @param {...Object} objects
      * @throws {Error} if not called on a top level GUI.
      * @instance
      */
@@ -944,6 +948,7 @@ function addRow(gui, dom, liBefore) {
   if (dom) {
     li.appendChild(dom);
   }
+
   if (liBefore) {
     gui.__ul.insertBefore(li, liBefore);
   } else {
@@ -1089,6 +1094,7 @@ function augmentController(gui, li, controller) {
       if (gui.getRoot().__preset_select && controller.isModified()) {
         markPresetModified(gui.getRoot(), true);
       }
+
       return r;
     },
     controller.setValue

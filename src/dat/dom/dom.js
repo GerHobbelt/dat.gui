@@ -2,7 +2,7 @@
  * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2019 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -287,13 +287,15 @@ var dom = {
    *
    * @param elem
    */
-  getOffset: function(elem) {
+  getOffset: function(el) {
+    let elem = el;
     const offset = { left: 0, top: 0 };
     if (elem.offsetParent) {
       do {
         offset.left += elem.offsetLeft;
         offset.top += elem.offsetTop;
-      } while ((elem = elem.offsetParent));
+        elem = elem.offsetParent;
+      } while (elem);
     }
     return offset;
   },

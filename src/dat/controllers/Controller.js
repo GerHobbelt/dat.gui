@@ -25,7 +25,7 @@ class Controller {
      * Those who extend this class will put their DOM elements in here.
      * @type {DOMElement}
      */
-    this.domElement = document.createElement('div');
+    this.domElement = document.createElement("div");
 
     /**
      * The object to manipulate
@@ -52,6 +52,11 @@ class Controller {
      * @ignore
      */
     this.__onFinishChange = undefined;
+
+    this.__transformInput = x => x;
+
+    this.__transformOutput = x => x;
+
 
     /**
     * Whether to force update a display, even when input is active.
@@ -109,9 +114,11 @@ class Controller {
    * @param {Object} newValue The new value of <code>object[property]</code>
    */
   setValue(newValue) {
-    this.object[this.property] = newValue;
+    const __newValue = this.__transformOutput(newValue);
+
+    this.object[this.property] = __newValue;
     if (this.__onChange) {
-      this.__onChange.call(this, newValue);
+      this.__onChange.call(this, __newValue);
     }
 
     this.updateDisplay();
@@ -124,7 +131,7 @@ class Controller {
    * @returns {Object} The current value of <code>object[property]</code>
    */
   getValue() {
-    return this.object[this.property];
+    return this.__transformInput(this.object[this.property]);
   }
 
   /**
@@ -141,6 +148,15 @@ class Controller {
    */
   isModified() {
     return this.initialValue !== this.getValue();
+  }
+
+  transform(transformInput = x => x, transformOutput = x => x) {
+    this.__transformInput = transformInput;
+    this.__transformOutput = transformOutput;
+
+    this.updateDisplay();
+
+    return this;
   }
 }
 

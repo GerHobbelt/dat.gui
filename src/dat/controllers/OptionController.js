@@ -1,8 +1,8 @@
 /**
- * dat-gui JavaScript Controller Library
+ * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2019 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ class OptionController extends Controller {
   constructor(object, property, options) {
     super(object, property);
 
-    var _this = this;
+    const _this = this;
 
     /**
      * The drop down menu
@@ -41,7 +41,7 @@ class OptionController extends Controller {
     this.__select = settings.DOCUMENT.createElement("select");
 
     if (common.isArray(options)) {
-      var map = {};
+      const map = {};
       common.each(options, function(element) {
         map[element] = element;
       });
@@ -49,7 +49,7 @@ class OptionController extends Controller {
     }
 
     common.each(options, function(value, key) {
-      var opt = settings.DOCUMENT.createElement("option");
+      const opt = settings.DOCUMENT.createElement("option");
       opt.innerHTML = key;
       opt.setAttribute("value", value);
       _this.__select.appendChild(opt);
@@ -59,27 +59,25 @@ class OptionController extends Controller {
     this.updateDisplay();
 
     dom.bind(this.__select, "change", function() {
-      var desiredValue = this.options[this.selectedIndex].value;
+      const desiredValue = this.options[this.selectedIndex].value;
       _this.setValue(desiredValue);
     });
 
     this.domElement.appendChild(this.__select);
   }
 
-
-      setValue(v) {
-        var toReturn = super.setValue(v);
-        if (this.__onFinishChange) {
-          this.__onFinishChange.call(this, this.getValue());
-        }
-        return toReturn;
-      }
-
-      updateDisplay() {
-        this.__select.value = this.getValue();
-        return super.updateDisplay();
-      }
+  setValue(v) {
+    const toReturn = super.setValue(v);
+    if (this.__onFinishChange) {
+      this.__onFinishChange.call(this, this.getValue());
     }
-  
+    return toReturn;
+  }
+
+  updateDisplay() {
+    this.__select.value = this.getValue();
+    return super.updateDisplay();
+  }
+}
 
 export default OptionController;

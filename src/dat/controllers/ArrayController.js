@@ -1,10 +1,8 @@
 /**
- * dat-gui JavaScript Controller Library
+ * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
- *
- * ArrayController is based on StringController and was created by Ulysses Popple
+ * Copyright 2011-2019 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +12,6 @@
  */
 
 // (ArrayController is based on StringController and was created by Ulysses Popple)
-
 
 import Controller from "./Controller";
 import dom from "../dom/dom";
@@ -35,7 +32,7 @@ class ArrayController extends Controller {
   constructor(object, property) {
     super(object, property);
 
-    var _this = this;
+    const _this = this;
 
     this.__input = document.createElement("input");
     this.__input.setAttribute("type", "text");
@@ -50,14 +47,13 @@ class ArrayController extends Controller {
     });
 
     function onChange() {
-      var arr = _this.__input.value.replace(/^\s*|\s*$/g, "").split(/\s*,\s*/);
+      const arr = _this.__input.value.replace(/^\s*|\s*$/g, "").split(/\s*,\s*/);
 
       // The resulting values will all be strings, so convert them here to actual data types
-      for (var i = 0; i < arr.length; i++) {
-        var value = arr[i];
+      for (let i = 0; i < arr.length; i++) {
+        const value = arr[i];
         if (!isNaN(value)) {
           arr[i] = +value;
-          continue;
         } else if (value === "true") {
           arr[i] = true;
         } else if (value === "false") {
@@ -78,15 +74,14 @@ class ArrayController extends Controller {
     this.domElement.appendChild(this.__input);
   }
 
-      updateDisplay() {
-        // Stops the caret from moving on account of:
-        // keyup -> setValue -> updateDisplay
-        if (!dom.isActive(this.__input)) {
-          this.__input.value = this.getValue();
-        }
-        return ArrayController.superclass.prototype.updateDisplay.call(this);
-      }
+  updateDisplay() {
+    // Stops the caret from moving on account of:
+    // keyup -> setValue -> updateDisplay
+    if (!dom.isActive(this.__input)) {
+      this.__input.value = this.getValue();
     }
-
+    return ArrayController.superclass.prototype.updateDisplay.call(this);
+  }
+}
 
 export default ArrayController;

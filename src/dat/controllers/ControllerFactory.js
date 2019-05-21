@@ -1,8 +1,8 @@
 /**
- * dat-gui JavaScript Controller Library
+ * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2019 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,43 +19,42 @@ import TextAreaController from "./TextAreaController";
 import ArrayController from "./ArrayController";
 import FunctionController from "./FunctionController";
 import BooleanController from "./BooleanController";
-import ArrayController from "./ArrayController";
+import Vec3Controller from "./Vec3Controller";
 import common from "../utils/common";
 
 const ControllerFactory = function(object, property) {
   const initialValue = object[property];
 
-    // Providing options?
-    if (common.isArray(arguments[2]) || common.isObject(arguments[2])) {
-      return new OptionController(object, property, arguments[2]);
-    }
+  // Providing options?
+  if (common.isArray(arguments[2]) || common.isObject(arguments[2])) {
+    return new OptionController(object, property, arguments[2]);
+  }
 
-    // Providing a map?
+  // Providing a map?
 
-    if (common.isNumber(initialValue)) {
-      if (common.isNumber(arguments[2]) && common.isNumber(arguments[3])) {
-        // Has min and max.
-        return new NumberControllerSlider(object, property, arguments[2], arguments[3], arguments[4], arguments[5]);
-      } else {
-        return new NumberControllerBox(object, property, { min: arguments[2], max: arguments[3], step: arguments[4] });
-      }
+  if (common.isNumber(initialValue)) {
+    if (common.isNumber(arguments[2]) && common.isNumber(arguments[3])) {
+      // Has min and max.
+      return new NumberControllerSlider(object, property, arguments[2], arguments[3], arguments[4], arguments[5]);
     }
+    return new NumberControllerBox(object, property, { min: arguments[2], max: arguments[3], step: arguments[4] });
+  }
 
-    if (common.isString(initialValue)) {
-      return new StringController(object, property);
-    }
+  if (common.isString(initialValue)) {
+    return new StringController(object, property);
+  }
 
-    if (common.isFunction(initialValue)) {
-      return new FunctionController(object, property, "");
-    }
+  if (common.isFunction(initialValue)) {
+    return new FunctionController(object, property, "");
+  }
 
-    if (common.isBoolean(initialValue)) {
-      return new BooleanController(object, property);
-    }
+  if (common.isBoolean(initialValue)) {
+    return new BooleanController(object, property);
+  }
 
-    if (common.isArray(initialValue)) {
-      return new ArrayController(object, property);
-    }
-  };
+  if (common.isArray(initialValue)) {
+    return new ArrayController(object, property);
+  }
+};
 
 export default ControllerFactory;

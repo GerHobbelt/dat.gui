@@ -1,8 +1,8 @@
 /**
- * dat-gui JavaScript Controller Library
+ * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2019 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,8 +27,6 @@ class Color {
     this.__state.a = this.__state.a || 1;
   }
 
-  COMPONENTS = ["r", "g", "b", "h", "s", "v", "hex", "a"];
-
   toString() {
     return toString(this);
   }
@@ -37,6 +35,8 @@ class Color {
     return this.__state.conversion.write(this);
   }
 }
+
+Color.COMPONENTS = ["r", "g", "b", "h", "s", "v", "hex", "a"];
 
 defineRGBComponent(Color.prototype, "r", 2);
 defineRGBComponent(Color.prototype, "g", 1);
@@ -128,7 +128,7 @@ function recalculateRGB(color, component, componentHexIndex) {
 }
 
 function recalculateHSV(color) {
-  var result = math.rgb_to_hsv(color.r, color.g, color.b);
+  const result = math.rgb_to_hsv(color.r, color.g, color.b);
 
   common.extend(color.__state, {
     s: result.s,

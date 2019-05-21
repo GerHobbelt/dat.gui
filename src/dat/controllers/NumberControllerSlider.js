@@ -1,8 +1,8 @@
 /**
- * dat-gui JavaScript Controller Library
+ * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2019 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,9 @@
 import NumberController from "./NumberController";
 import dom from "../dom/dom";
 
-
-
-
-  function map(v, i1, i2, o1, o2) {
-    return o1 + (o2 - o1) * ((v - i1) / (i2 - i1));
-  }
-
+function map(v, i1, i2, o1, o2) {
+  return o1 + (o2 - o1) * ((v - i1) / (i2 - i1));
+}
 
 /**
  * @class Represents a given property of an object that is a number, contains
@@ -45,20 +41,20 @@ class NumberControllerSlider extends NumberController {
   constructor(object, property, min, max, step, enumeration) {
     super(object, property, { min: min, max: max, step: step });
 
-    var _this = this;
+    const _this = this;
 
     this.__background = document.createElement("div");
     this.__label = document.createElement("div");
     this.__foreground = document.createElement("div");
 
     function getEnumArr(hash) {
-      var arr = [];
-      var k;
+      let arr = [];
+      let k;
       for (k in hash) {
         arr.push({ key: k, value: hash[k] });
       }
       arr = arr.sort(function(a, b) {
-        var result = true ? a["value"] < b["value"] : a["value"] > b["value"];
+        const result = true ? a.value < b.value : a.value > b.value;
         return result ? 1 : -1;
       });
 
@@ -87,8 +83,8 @@ class NumberControllerSlider extends NumberController {
     function onMouseDrag(e) {
       e.preventDefault();
 
-      var offset = dom.getOffset(_this.__background);
-      var width = dom.getWidth(_this.__background);
+      const offset = dom.getOffset(_this.__background);
+      const width = dom.getWidth(_this.__background);
 
       _this.setValue(map(e.clientX, offset.left, offset.left + width, _this.__min, _this.__max));
 
@@ -110,7 +106,6 @@ class NumberControllerSlider extends NumberController {
     this.domElement.appendChild(this.__background);
   }
 
-
   /**
    * Injects default stylesheet for slider elements.
    */
@@ -118,36 +113,34 @@ class NumberControllerSlider extends NumberController {
     css.inject(styleSheet);
   }
 
-      updateDisplay() {
-        var value = this.getValue();
-        var pct = (value - this.__min) / (this.__max - this.__min);
-        this.__foreground.style.width = pct * 100 + "%";
+  updateDisplay() {
+    const value = this.getValue();
+    const pct = (value - this.__min) / (this.__max - this.__min);
+    this.__foreground.style.width = pct * 100 + "%";
 
-        this.__label.innerHTML = value;
+    this.__label.innerHTML = value;
 
-        if (this.enumeration) {
-          var chosenValue = null;
-          var chosenIndex = null;
-          var i = this.enumeration.length;
-          while (--i > -1) {
-            chosenValue = this.enumeration[i].value;
-            if (value < chosenValue) {
-              break;
-            }
-            chosenIndex = i;
-          }
-
-          if (chosenIndex == null) {
-            chosenValue = "";
-          } else chosenValue = this.enumeration[chosenIndex].key;
-
-          this.__label.innerHTML = chosenValue;
+    if (this.enumeration) {
+      let chosenValue = null;
+      let chosenIndex = null;
+      let i = this.enumeration.length;
+      while (--i > -1) {
+        chosenValue = this.enumeration[i].value;
+        if (value < chosenValue) {
+          break;
         }
-
-        return super.updateDisplay();
+        chosenIndex = i;
       }
+
+      if (chosenIndex == null) {
+        chosenValue = "";
+      } else chosenValue = this.enumeration[chosenIndex].key;
+
+      this.__label.innerHTML = chosenValue;
     }
 
-
+    return super.updateDisplay();
+  }
+}
 
 export default NumberControllerSlider;

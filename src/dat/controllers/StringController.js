@@ -1,8 +1,8 @@
 /**
- * dat-gui JavaScript Controller Library
+ * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2019 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ class StringController extends Controller {
   constructor(object, property) {
     super(object, property);
 
-    var _this = this;
+    const _this = this;
 
     this.__input = settings.DOCUMENT.createElement("input");
     this.__input.setAttribute("type", "text");
@@ -57,16 +57,14 @@ class StringController extends Controller {
     this.domElement.appendChild(this.__input);
   }
 
-
-      updateDisplay() {
-        // Stops the caret from moving on account of:
-        // keyup -> setValue -> updateDisplay
-        if (!dom.isActive(this.__input)) {
-          this.__input.value = this.getValue();
-        }
-        return super.updateDisplay();
-      }
+  updateDisplay() {
+    // Stops the caret from moving on account of:
+    // keyup -> setValue -> updateDisplay
+    if (!dom.isActive(this.__input)) {
+      this.__input.value = this.getValue();
     }
-  
+    return super.updateDisplay();
+  }
+}
 
 export default StringController;

@@ -1,8 +1,8 @@
 /**
- * dat-gui JavaScript Controller Library
+ * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2019 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 import toString from "./toString";
 import common from "../utils/common";
 
-var INTERPRETATIONS = [
+const INTERPRETATIONS = [
   // Strings
   {
     litmus: common.isString,
@@ -22,7 +22,7 @@ var INTERPRETATIONS = [
     conversions: {
       THREE_CHAR_HEX: {
         read: function(original) {
-          var test = original.match(/^#([A-F0-9])([A-F0-9])([A-F0-9])$/i);
+          const test = original.match(/^#([A-F0-9])([A-F0-9])([A-F0-9])$/i);
           if (test === null) {
             return false;
           }
@@ -36,7 +36,8 @@ var INTERPRETATIONS = [
                 test[2].toString() +
                 test[2].toString() +
                 test[3].toString() +
-                test[3].toString()
+                test[3].toString(),
+              0
             )
           };
         },
@@ -46,14 +47,14 @@ var INTERPRETATIONS = [
 
       SIX_CHAR_HEX: {
         read: function(original) {
-          var test = original.match(/^#([A-F0-9]{6})$/i);
+          const test = original.match(/^#([A-F0-9]{6})$/i);
           if (test === null) {
             return false;
           }
 
           return {
             space: "HEX",
-            hex: parseInt("0x" + test[1].toString())
+            hex: parseInt("0x" + test[1].toString(), 0)
           };
         },
 
@@ -62,7 +63,7 @@ var INTERPRETATIONS = [
 
       CSS_RGB: {
         read: function(original) {
-          var test = original.match(/^rgb\(\s*(.+)\s*,\s*(.+)\s*,\s*(.+)\s*\)/);
+          const test = original.match(/^rgb\(\s*(.+)\s*,\s*(.+)\s*,\s*(.+)\s*\)/);
           if (test === null) {
             return false;
           }
@@ -80,7 +81,7 @@ var INTERPRETATIONS = [
 
       CSS_RGBA: {
         read: function(original) {
-          var test = original.match(/^rgba\(\s*(.+)\s*,\s*(.+)\s*,\s*(.+)\s*\,\s*(.+)\s*\)/);
+          const test = original.match(/^rgba\(\s*(.+)\s*,\s*(.+)\s*,\s*(.+)\s*,\s*(.+)\s*\)/);
           if (test === null) {
             return false;
           }
@@ -273,12 +274,13 @@ var INTERPRETATIONS = [
   }
 ];
 
-var result, toReturn;
+let result;
+let toReturn;
 
-var interpret = function() {
+const interpret = function() {
   toReturn = false;
 
-  var original = arguments.length > 1 ? common.toArray(arguments) : arguments[0];
+  const original = arguments.length > 1 ? common.toArray(arguments) : arguments[0];
 
   common.each(INTERPRETATIONS, function(family) {
     if (family.litmus(original)) {

@@ -1,14 +1,16 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-</head>
-<body>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="build/dat.gui.css" />
+  </head>
+  <body>
+    <canvas id="canvas"></canvas>
 
-  <canvas id="canvas"></canvas>
+    <script type="text/javascript" src="build/dat.gui.js"></script>
+    <script type="text/javascript">
+      /* eslint-disable no-console, camelcase */
 
-  <!-- <script type="text/javascript" src="build/dat.gui.min.js"></script> -->
-  <script type="text/javascript" src="build/dat.gui.js"></script>
-  <script type="text/javascript">
     var TestEasing = function() {
       this.status = "playing"
       this.duration = 1.0;
@@ -104,6 +106,6 @@
     }
     window.requestAnimationFrame(animation);
 
-  </script>
-</body>
+    </script>
+  </body>
 </html>

@@ -1,8 +1,8 @@
 /**
- * dat-gui JavaScript Controller Library
+ * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2019 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -11,41 +11,40 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define(["dat/controllers/NumberController", "dat/dom/dom", "dat/utils/common"], function(
-  NumberController,
-  dom,
-  common
-) {
-  /**
-   * @class Represents a given property of an object that is a number and
-   * provides an input element with which to manipulate it.
-   *
-   * @extends dat.controllers.Controller
-   * @extends dat.controllers.NumberController
-   *
-   * @param {Object} object The object to be manipulated
-   * @param {string} property The name of the property to be manipulated
-   * @param {Object} [params] Optional parameters
-   * @param {Number} [params.min] Minimum allowed value
-   * @param {Number} [params.max] Maximum allowed value
-   * @param {Number} [params.step] Increment by which to change value
-   *
-   * @member dat.controllers
-   */
-  var Vec3Controller = function(object, property, params) {
+import Controller from "./Controller";
+import dom from "../dom/dom";
+
+/**
+ * @class Represents a given property of an object that is a number and
+ * provides an input element with which to manipulate it.
+ *
+ * @extends dat.controllers.Controller
+ * @extends dat.controllers.NumberController
+ *
+ * @param {Object} object The object to be manipulated
+ * @param {string} property The name of the property to be manipulated
+ * @param {Object} [params] Optional parameters
+ * @param {Number} [params.min] Minimum allowed value
+ * @param {Number} [params.max] Maximum allowed value
+ * @param {Number} [params.step] Increment by which to change value
+ *
+ * @member dat.controllers
+ */
+class Vec3Controller extends NumberController {
+  constructor(object, property, params) {
     this.__truncationSuspended = false;
 
-    Vec3Controller.superclass.call(this, object, property, params);
+    super(object, property, params);
 
-    var _this = this;
+    const _this = this;
 
     /**
      * {Number} Previous mouse y position
      * @ignore
      */
-    var prev_y;
+    let prev_y;
 
-    var vec3 = {
+    const vec3 = {
       x: 0,
       y: 0,
       z: 0
@@ -99,7 +98,7 @@ define(["dat/controllers/NumberController", "dat/dom/dom", "dat/utils/common"], 
     });
 
     function onChange(whichInput) {
-      var attempted = parseFloat(_this[whichInput].value);
+      const attempted = parseFloat(_this[whichInput].value);
       if (!common.isNaN(attempted)) _this.setValue(attempted);
     }
 
@@ -117,7 +116,7 @@ define(["dat/controllers/NumberController", "dat/dom/dom", "dat/utils/common"], 
     }
 
     function onMouseDrag(e) {
-      var diff = prev_y - e.clientY;
+      const diff = prev_y - e.clientY;
       _this.setValue(_this.getValue() + diff * _this.__impliedStep);
 
       prev_y = e.clientY;
@@ -135,28 +134,19 @@ define(["dat/controllers/NumberController", "dat/dom/dom", "dat/utils/common"], 
     this.domElement.appendChild(this.xInput);
     this.domElement.appendChild(this.yInput);
     this.domElement.appendChild(this.zInput);
-  };
-
-  Vec3Controller.superclass = NumberController;
-
-  common.extend(
-    Vec3Controller.prototype,
-    NumberController.prototype,
-
-    {
-      updateDisplay: function(whichInput) {
-        this[whichInput].value = this.__truncationSuspended
-          ? this.getValue()
-          : roundToDecimal(this.getValue(), this.__precision);
-        return Vec3Controller.superclass.prototype.updateDisplay.call(this);
-      }
-    }
-  );
-
-  function roundToDecimal(value, decimals) {
-    var tenTo = Math.pow(10, decimals);
-    return Math.round(value * tenTo) / tenTo;
   }
 
-  return Vec3Controller;
-});
+  updateDisplay(whichInput) {
+    this[whichInput].value = this.__truncationSuspended
+      ? this.getValue()
+      : roundToDecimal(this.getValue(), this.__precision);
+    return Vec3Controller.superclass.prototype.updateDisplay.call(this);
+  }
+}
+
+function roundToDecimal(value, decimals) {
+  const tenTo = Math.pow(10, decimals);
+  return Math.round(value * tenTo) / tenTo;
+}
+
+export default Vec3Controller;

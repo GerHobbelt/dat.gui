@@ -1,8 +1,8 @@
 /**
- * dat-gui JavaScript Controller Library
+ * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2019 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -11,22 +11,22 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define(["dat/gui/settings"], function(settings) {
-  return {
-    load: function(url, doc) {
-      doc = doc || settings.DOCUMENT;
-      var link = doc.createElement("link");
-      link.type = "text/css";
-      link.rel = "stylesheet";
-      link.href = url;
-      doc.getElementsByTagName("head")[0].appendChild(link);
-    },
-    inject: function(css, doc) {
-      doc = doc || settings.DOCUMENT;
-      var injected = settings.DOCUMENT.createElement("style");
-      injected.type = "text/css";
-      injected.innerHTML = css;
-      doc.getElementsByTagName("head")[0].appendChild(injected);
-    }
-  };
-});
+const css = {
+  load: function(url, doc) {
+    doc = doc || settings.DOCUMENT;
+    const link = doc.createElement("link");
+    link.type = "text/css";
+    link.rel = "stylesheet";
+    link.href = url;
+    doc.getElementsByTagName("head")[0].appendChild(link);
+  },
+  inject: function(css, doc) {
+    doc = doc || settings.DOCUMENT;
+    const injected = settings.DOCUMENT.createElement("style");
+    injected.type = "text/css";
+    injected.innerHTML = css;
+    doc.getElementsByTagName("head")[0].appendChild(injected);
+  }
+};
+
+export default css;

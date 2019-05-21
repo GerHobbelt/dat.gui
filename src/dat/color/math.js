@@ -1,8 +1,8 @@
 /**
- * dat-gui JavaScript Controller Library
+ * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2019 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -11,17 +11,17 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-var tmpComponent;
+let tmpComponent;
 
 const ColorMath = {
   hsv_to_rgb: function(h, s, v) {
-    var hi = Math.floor(h / 60) % 6;
+    const hi = Math.floor(h / 60) % 6;
 
-    var f = h / 60 - Math.floor(h / 60);
-    var p = v * (1.0 - s);
-    var q = v * (1.0 - f * s);
-    var t = v * (1.0 - (1.0 - f) * s);
-    var c = [[v, t, p], [q, v, p], [p, v, t], [p, q, v], [t, p, v], [v, p, q]][hi];
+    const f = h / 60 - Math.floor(h / 60);
+    const p = v * (1.0 - s);
+    const q = v * (1.0 - f * s);
+    const t = v * (1.0 - (1.0 - f) * s);
+    const c = [[v, t, p], [q, v, p], [p, v, t], [p, q, v], [t, p, v], [v, p, q]][hi];
 
     return {
       r: c[0] * 255,
@@ -31,13 +31,13 @@ const ColorMath = {
   },
 
   rgb_to_hsv: function(r, g, b) {
-    var min = Math.min(r, g, b),
-      max = Math.max(r, g, b),
-      delta = max - min,
-      h,
-      s;
+    const min = Math.min(r, g, b);
+    const max = Math.max(r, g, b);
+    const delta = max - min;
+    let h;
+    let s;
 
-    if (max != 0) {
+    if (max !== 0) {
       s = delta / max;
     } else {
       return {
@@ -47,9 +47,9 @@ const ColorMath = {
       };
     }
 
-    if (r == max) {
+    if (r === max) {
       h = (g - b) / delta;
-    } else if (g == max) {
+    } else if (g === max) {
       h = 2 + (b - r) / delta;
     } else {
       h = 4 + (r - g) / delta;
@@ -67,7 +67,7 @@ const ColorMath = {
   },
 
   rgb_to_hex: function(r, g, b) {
-    var hex = this.hex_with_component(0, 2, r);
+    let hex = this.hex_with_component(0, 2, r);
     hex = this.hex_with_component(hex, 1, g);
     hex = this.hex_with_component(hex, 0, b);
     return hex;

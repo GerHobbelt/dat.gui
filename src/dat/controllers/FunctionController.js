@@ -1,8 +1,8 @@
 /**
- * dat-gui JavaScript Controller Library
+ * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2019 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ class FunctionController extends Controller {
   constructor(object, property, text) {
     super(object, property);
 
-    var _this = this;
+    const _this = this;
 
     this.__button = settings.DOCUMENT.createElement("div");
     this.__button.innerHTML = text === undefined ? "Fire" : text;
@@ -44,15 +44,15 @@ class FunctionController extends Controller {
     this.domElement.appendChild(this.__button);
   }
 
-    fire() {
-      if (this.__onChange) {
-        this.__onChange.call(this);
-      }
-      this.getValue().call(this.object);
-      if (this.__onFinishChange) {
-        this.__onFinishChange.call(this, this.getValue());
-      }
+  fire() {
+    if (this.__onChange) {
+      this.__onChange.call(this);
+    }
+    this.getValue().call(this.object);
+    if (this.__onFinishChange) {
+      this.__onFinishChange.call(this, this.getValue());
     }
   }
+}
 
 export default FunctionController;

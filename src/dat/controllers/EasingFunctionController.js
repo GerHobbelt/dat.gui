@@ -1,9 +1,8 @@
 /**
- * dat-gui JavaScript Controller Library
+ * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
- *           2016 unikko <chino.coffee.1204@gmail.com>
+ * Copyright 2011-2019 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,16 +11,15 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define(["dat/controllers/Controller", "dat/dom/dom", "dat/easing/Easing", "dat/utils/common"], function(
-  Controller,
-  dom,
-  EasingFunction,
-  common
-) {
-  var EasingFunctionController = function(object, property) {
-    EasingFunctionController.superclass.call(this, object, property);
+import Controller from "./Controller";
+import dom from "../dom/dom";
+import EasingFunction from "../easing/Easing";
 
-    var _this = this;
+class EasingFunctionController extends Controller {
+  constructor(object, property) {
+    super(object, property);
+
+    const _this = this;
     this.domElement = document.createElement("div");
     dom.makeSelectable(this.domElement, false);
 
@@ -34,10 +32,15 @@ define(["dat/controllers/Controller", "dat/dom/dom", "dat/easing/Easing", "dat/u
     this.__point_selected_type = null;
     this.__point_moving = false;
 
-    var width = 146,
-      height = 80;
-    var rectView = { top: 1, left: 3, width: width - 2, height: height - 16 };
-    var rV = rectView;
+    const width = 146;
+    const height = 80;
+    const rectView = {
+      top: 1,
+      left: 3,
+      width: width - 2,
+      height: height - 16
+    };
+    const rV = rectView;
 
     this.__thumbnail = document.createElement("canvas");
     this.__thumbnail.width = width * 2;
@@ -61,8 +64,8 @@ define(["dat/controllers/Controller", "dat/dom/dom", "dat/easing/Easing", "dat/u
       return [rV.top + x * rV.width, rV.left + (1 - y) * rV.height];
     }
     function toNorm(elem, e) {
-      var mouseX = e.pageX - elem.offsetLeft;
-      var mouseY = e.pageY - elem.offsetTop;
+      const mouseX = e.pageX - elem.offsetLeft;
+      const mouseY = e.pageY - elem.offsetTop;
       return [0 + (mouseX - rV.left + 1) / (rV.width - 2), 1 - (mouseY - rV.top - 2) / rV.height];
     }
     function moveTo(x, y) {
@@ -94,166 +97,37 @@ define(["dat/controllers/Controller", "dat/dom/dom", "dat/easing/Easing", "dat/u
       _this.__ctx.fill();
     }
     function circle(x, y, r) {
-      var p = toCoord(x, y);
+      const p = toCoord(x, y);
       _this.__ctx.arc(p[0], p[1], r, 0, Math.PI * 2);
     }
     function square(x, y, r) {
-      var p = toCoord(x, y);
+      const p = toCoord(x, y);
       _this.__ctx.rect(p[0] - r, p[1] - r, r * 2, r * 2);
     }
 
-    // --- main ---
-    this.clear = function() {
-      _this.__ctx.clearRect(0, 0, width, height);
-    };
-    this.drawRuler = function() {
-      var ctx = _this.__ctx;
-
-      ctx.lineWidth = 1;
-      ctx.strokeStyle = "#930";
-      beginPath();
-      moveTo(0, 0);
-      lineTo(1, 0);
-      moveTo(0, 1);
-      lineTo(1, 1);
-      stroke();
-
-      for (var i = 0; i <= 4; i++) {
-        var x = i / 4.01; // dirty hack
-        ctx.strokeStyle = "#c97";
-        beginPath();
-        moveTo(x, 0);
-        lineTo(x, -0.04);
-        stroke();
-        ctx.strokeStyle = "#333";
-        beginPath();
-        moveTo(x, 0.01);
-        lineTo(x, 0.99);
-        stroke();
-      }
-
-      ctx.font = "10px";
-      ctx.fillStyle = "#977";
-      p = toCoord(0, -0.17);
-      ctx.fillText("0.0", p[0], p[1]);
-      p = toCoord(0.25, -0.17);
-      ctx.fillText(".25", p[0] - 8, p[1]);
-      p = toCoord(0.5, -0.17);
-      ctx.fillText(".50", p[0] - 8, p[1]);
-      p = toCoord(0.75, -0.17);
-      ctx.fillText(".75", p[0] - 8, p[1]);
-      p = toCoord(1, -0.17);
-      ctx.fillText("1.0", p[0] - 14, p[1]);
-    };
-
-    this.drawEasingFunction = function(easing_func) {
-      var ctx = _this.__ctx;
-      ctx.strokeStyle = "#fff";
-      ctx.lineWidth = 1;
-
-      beginPath();
-      easing_func.getSegments().forEach(function(s, i) {
-        moveTo.apply(null, s.slice(0, 2));
-        curveTo.apply(null, s.slice(2));
-      });
-      stroke();
-
-      // Display points and handles
-      if (!_this.__mouse_over) {
-        return;
-      }
-
-      ctx.fillStyle = "#fff";
-      ctx.strokeStyle = "#f90";
-      ctx.lineWidth = 2;
-      easing_func.points.forEach(function(p, i) {
-        if (_this.__mouseo_over && i == _this.__point_over) {
-          return;
-        }
-        if (i == _this.__point_selected) {
-          return;
-        }
-        beginPath();
-        circle(p.x, p.y, 3);
-        closePath();
-        fill();
-        stroke();
-      });
-
-      var p;
-      if (Number.isInteger(_this.__point_over)) {
-        p = easing_func.points[_this.__point_over];
-        ctx.strokeStyle = "#f3d";
-        beginPath();
-        circle(p.x, p.y, 3);
-        closePath();
-        fill();
-        stroke();
-      }
-      if (Number.isInteger(_this.__point_selected)) {
-        p = easing_func.points[_this.__point_selected];
-        ctx.strokeStyle = "#f3d";
-        ctx.fillStyle = "#fff";
-
-        // handle
-        beginPath();
-        moveTo(p.x + p.l + 0.01, p.y);
-        lineTo(p.x + p.r - 0.01, p.y);
-        stroke();
-
-        // knobs
-        ["l", "r"].forEach(function(dir) {
-          beginPath();
-          circle(p.x + p[dir], p.y, 2);
-          fill();
-          stroke();
-        });
-
-        // anchor
-        beginPath();
-        square(p.x, p.y, 3);
-        fill();
-        stroke();
-      }
-    };
-
-    this.setCursor = function(x) {
-      var y = _this.__func.calculateY(x);
-
-      _this.__ctx.fillStyle = "#ff0";
-      _this.__ctx.strokeStyle = "#ff0";
-      _this.__ctx.lineWidth = 1;
-      beginPath();
-      circle(x, y, 3);
-      closePath();
-      fill();
-      beginPath();
-      moveTo(x, 0);
-      lineTo(x, 1);
-      closePath();
-      stroke();
-
-      return y;
-    };
+    // ----
 
     function onMouseDown(e) {
       e.preventDefault();
 
-      var coord = toNorm(this, e);
-      var point, index, type;
+      const coord = toNorm(this, e);
+      let point;
+      let index;
+      let type;
 
       if (Number.isInteger(_this.__point_selected)) {
         point = _this.__func.findPointWithHandle(coord[0], coord[1]);
       } else {
         point = _this.__func.findPoint(coord[0], coord[1]);
       }
-      //console.log(point);
-      (index = point.index), (type = point.type);
+      // console.log(point);
+      index = point.index;
+      type = point.type;
 
       if (index !== undefined) {
         if (e.button == 2 && type == "ANCHOR") {
           // right click
-          var delete_successful = _this.__func.deletePoint(index);
+          const delete_successful = _this.__func.deletePoint(index);
           if (delete_successful) {
             index = undefined;
           }
@@ -278,11 +152,13 @@ define(["dat/controllers/Controller", "dat/dom/dom", "dat/easing/Easing", "dat/u
       _this.updateDisplay();
     }
 
+    // ----
+
     function onDoubleClick(e) {
       e.preventDefault();
 
-      var coord = toNorm(this, e);
-      var point = _this.__func.addPoint(coord[0], coord[1]);
+      const coord = toNorm(this, e);
+      const point = _this.__func.addPoint(coord[0], coord[1]);
       _this.__point_selected = point.index;
       _this.__point_selected_type = point.type;
       _this.__point_moving = true;
@@ -301,12 +177,12 @@ define(["dat/controllers/Controller", "dat/dom/dom", "dat/easing/Easing", "dat/u
     }
     function onMouseMove(e) {
       e.preventDefault();
-      var coord = toNorm(this, e);
+      const coord = toNorm(this, e);
 
       if (Number.isInteger(_this.__point_selected) && _this.__point_moving) {
         _this.__func.movePoint(_this.__point_selected, _this.__point_selected_type, coord[0], coord[1]);
       } else {
-        var index = _this.__func.findPoint(coord[0], coord[1]).index;
+        const { index } = _this.__func.findPoint(coord[0], coord[1]);
         if (index !== undefined) {
           _this.__point_over = index;
         } else {
@@ -316,7 +192,7 @@ define(["dat/controllers/Controller", "dat/dom/dom", "dat/easing/Easing", "dat/u
 
       _this.updateDisplay();
 
-      //setCursor(coord[0]);   // [DEBUG]
+      // setCursor(coord[0]);   // [DEBUG]
     }
 
     function onMouseUp(e) {
@@ -329,39 +205,165 @@ define(["dat/controllers/Controller", "dat/dom/dom", "dat/easing/Easing", "dat/u
       width: width + "px",
       height: height + "px",
       cursor: "crosshair"
-      //cursor: 'ew-resize'
-      //cursor: 'move'
+      // cursor: 'ew-resize'
+      // cursor: 'move'
     });
 
     // Acknowledge original value
     this.updateDisplay();
 
     this.domElement.appendChild(this.__thumbnail);
-  };
+  }
 
-  EasingFunctionController.superclass = Controller;
+  // --- main ---
+  clear() {
+    _this.__ctx.clearRect(0, 0, width, height);
+  }
 
-  common.extend(
-    EasingFunctionController.prototype,
-    Controller.prototype,
+  drawRuler() {
+    const ctx = _this.__ctx;
 
-    {
-      setValue: function(v) {
-        var toReturn = EasingFunctionController.superclass.prototype.setValue.call(this, v);
-        if (this.__onFinishChange) {
-          this.__onFinishChange.call(this, this.getValue());
-        }
-        return toReturn;
-      },
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = "#930";
+    beginPath();
+    moveTo(0, 0);
+    lineTo(1, 0);
+    moveTo(0, 1);
+    lineTo(1, 1);
+    stroke();
 
-      updateDisplay: function() {
-        //this.__select.value = this.getValue();
-        this.clear();
-        this.drawRuler();
-        this.drawEasingFunction(this.__func);
-      }
+    for (let i = 0; i <= 4; i++) {
+      const x = i / 4.01; // dirty hack
+      ctx.strokeStyle = "#c97";
+      beginPath();
+      moveTo(x, 0);
+      lineTo(x, -0.04);
+      stroke();
+      ctx.strokeStyle = "#333";
+      beginPath();
+      moveTo(x, 0.01);
+      lineTo(x, 0.99);
+      stroke();
     }
-  );
 
-  return EasingFunctionController;
-});
+    ctx.font = "10px";
+    ctx.fillStyle = "#977";
+    p = toCoord(0, -0.17);
+    ctx.fillText("0.0", p[0], p[1]);
+    p = toCoord(0.25, -0.17);
+    ctx.fillText(".25", p[0] - 8, p[1]);
+    p = toCoord(0.5, -0.17);
+    ctx.fillText(".50", p[0] - 8, p[1]);
+    p = toCoord(0.75, -0.17);
+    ctx.fillText(".75", p[0] - 8, p[1]);
+    p = toCoord(1, -0.17);
+    ctx.fillText("1.0", p[0] - 14, p[1]);
+  }
+
+  drawEasingFunction(easing_func) {
+    const ctx = _this.__ctx;
+    ctx.strokeStyle = "#fff";
+    ctx.lineWidth = 1;
+
+    beginPath();
+    easing_func.getSegments().forEach(function(s, i) {
+      moveTo.apply(null, s.slice(0, 2));
+      curveTo.apply(null, s.slice(2));
+    });
+    stroke();
+
+    // Display points and handles
+    if (!_this.__mouse_over) {
+      return;
+    }
+
+    ctx.fillStyle = "#fff";
+    ctx.strokeStyle = "#f90";
+    ctx.lineWidth = 2;
+    easing_func.points.forEach(function(p, i) {
+      if (_this.__mouseo_over && i === _this.__point_over) {
+        return;
+      }
+      if (i === _this.__point_selected) {
+        return;
+      }
+      beginPath();
+      circle(p.x, p.y, 3);
+      closePath();
+      fill();
+      stroke();
+    });
+
+    let p;
+    if (Number.isInteger(_this.__point_over)) {
+      p = easing_func.points[_this.__point_over];
+      ctx.strokeStyle = "#f3d";
+      beginPath();
+      circle(p.x, p.y, 3);
+      closePath();
+      fill();
+      stroke();
+    }
+    if (Number.isInteger(_this.__point_selected)) {
+      p = easing_func.points[_this.__point_selected];
+      ctx.strokeStyle = "#f3d";
+      ctx.fillStyle = "#fff";
+
+      // handle
+      beginPath();
+      moveTo(p.x + p.l + 0.01, p.y);
+      lineTo(p.x + p.r - 0.01, p.y);
+      stroke();
+
+      // knobs
+      ["l", "r"].forEach(function(dir) {
+        beginPath();
+        circle(p.x + p[dir], p.y, 2);
+        fill();
+        stroke();
+      });
+
+      // anchor
+      beginPath();
+      square(p.x, p.y, 3);
+      fill();
+      stroke();
+    }
+  }
+
+  setCursor(x) {
+    const y = _this.__func.calculateY(x);
+
+    _this.__ctx.fillStyle = "#ff0";
+    _this.__ctx.strokeStyle = "#ff0";
+    _this.__ctx.lineWidth = 1;
+    beginPath();
+    circle(x, y, 3);
+    closePath();
+    fill();
+    beginPath();
+    moveTo(x, 0);
+    lineTo(x, 1);
+    closePath();
+    stroke();
+
+    return y;
+  }
+
+  setValue(v) {
+    const toReturn = EasingFunctionController.superclass.prototype.setValue.call(this, v);
+    if (this.__onFinishChange) {
+      this.__onFinishChange.call(this, this.getValue());
+    }
+    return toReturn;
+  }
+
+  updateDisplay() {
+    // this.__select.value = this.getValue();
+    this.clear();
+    this.drawRuler();
+    this.drawEasingFunction(this.__func);
+  }
+}
+
+export default EasingFunctionController;

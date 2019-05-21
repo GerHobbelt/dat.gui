@@ -1,8 +1,8 @@
 /**
- * dat-gui JavaScript Controller Library
+ * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2019 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -11,24 +11,27 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], function(Controller, dom, common) {
-  /**
-   * @class Provides a text area to alter the text property of an object.
-   *
-   * @extends dat.controllers.Controller
-   *
-   * @param {Object} object The object to be manipulated
-   * @param {string} property The name of the property to be manipulated
-   *
-   * @member dat.controllers
-   */
-  var TextAreaController = function(object, property) {
-    TextAreaController.superclass.call(this, object, property);
+import Controller from "./Controller";
+import dom from "../dom/dom";
 
-    var _this = this;
+/**
+ * @class Provides a text area to alter the text property of an object.
+ *
+ * @extends dat.controllers.Controller
+ *
+ * @param {Object} object The object to be manipulated
+ * @param {string} property The name of the property to be manipulated
+ *
+ * @member dat.controllers
+ */
+class TextAreaController extends Controller {
+  constructor(object, property) {
+    super(object, property);
+
+    const _this = this;
 
     this.__input = document.createElement("textarea");
-    //this.__input.setAttribute('type', 'text');
+    // this.__input.setAttribute('type', 'text');
 
     dom.bind(this.__input, "keyup", onChange);
     dom.bind(this.__input, "change", onChange);
@@ -54,25 +57,16 @@ define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], functi
     this.updateDisplay();
 
     this.domElement.appendChild(this.__input);
-  };
+  }
 
-  TextAreaController.superclass = Controller;
-
-  common.extend(
-    TextAreaController.prototype,
-    Controller.prototype,
-
-    {
-      updateDisplay: function() {
-        // Stops the caret from moving on account of:
-        // keyup -> setValue -> updateDisplay
-        if (!dom.isActive(this.__input)) {
-          this.__input.value = this.getValue();
-        }
-        return TextAreaController.superclass.prototype.updateDisplay.call(this);
-      }
+  updateDisplay() {
+    // Stops the caret from moving on account of:
+    // keyup -> setValue -> updateDisplay
+    if (!dom.isActive(this.__input)) {
+      this.__input.value = this.getValue();
     }
-  );
+    return super.updateDisplay();
+  }
+}
 
-  return TextAreaController;
-});
+export default TextAreaController;

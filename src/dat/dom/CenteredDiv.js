@@ -1,8 +1,8 @@
 /**
- * dat-gui JavaScript Controller Library
+ * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2019 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,9 @@
 import dom from "./dom";
 import common from "../utils/common";
 
-
-
-
-  function lockScroll(e) {
-    console.log(e);
-  }
-
-
+function lockScroll(e) {
+  console.log(e);
+}
 
 class CenteredDiv {
   constructor() {
@@ -53,14 +48,14 @@ class CenteredDiv {
     settings.DOCUMENT.body.appendChild(this.backgroundElement);
     settings.DOCUMENT.body.appendChild(this.domElement);
 
-    var _this = this;
+    const _this = this;
     dom.bind(this.backgroundElement, "click", function() {
       _this.hide();
     });
   }
 
   show() {
-    var _this = this;
+    const _this = this;
 
     this.backgroundElement.style.display = "block";
 
@@ -79,7 +74,7 @@ class CenteredDiv {
   }
 
   hide() {
-    var _this = this;
+    const _this = this;
 
     var hide = function() {
       _this.domElement.style.display = "none";
@@ -105,7 +100,5 @@ class CenteredDiv {
     this.domElement.style.top = settings.WINDOW.innerHeight / 2 - dom.getHeight(this.domElement) / 2 + "px";
   }
 }
-
-
 
 export default CenteredDiv;

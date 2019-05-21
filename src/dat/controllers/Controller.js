@@ -1,8 +1,8 @@
 /**
- * dat-gui JavaScript Controller Library
+ * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2019 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,92 +56,90 @@ class Controller {
     this.__onFinishChange = undefined;
   }
 
+  /**
+   * Specify that a function fire every time someone changes the value with
+   * this Controller.
+   *
+   * @param {Function} fnc This function will be called whenever the value
+   * is modified via this Controller.
+   * @returns {Controller} this
+   */
+  onChange(fnc) {
+    this.__onChange = fnc;
+    return this;
+  }
 
-      /**
-       * Specify that a function fire every time someone changes the value with
-       * this Controller.
-       *
-       * @param {Function} fnc This function will be called whenever the value
-       * is modified via this Controller.
-       * @returns {Controller} this
-       */
-      onChange(fnc) {
-        this.__onChange = fnc;
-        return this;
-      }
+  /**
+   * Specify that a function fire every time someone "finishes" changing
+   * the value wih this Controller. Useful for values that change
+   * incrementally like numbers or strings.
+   *
+   * @param {Function} fnc This function will be called whenever
+   * someone "finishes" changing the value via this Controller.
+   * @returns {Controller} this
+   */
+  onFinishChange(fnc) {
+    this.__onFinishChange = fnc;
+    return this;
+  }
 
-      /**
-       * Specify that a function fire every time someone "finishes" changing
-       * the value wih this Controller. Useful for values that change
-       * incrementally like numbers or strings.
-       *
-       * @param {Function} fnc This function will be called whenever
-       * someone "finishes" changing the value via this Controller.
-       * @returns {Controller} this
-       */
-      onFinishChange(fnc) {
-        this.__onFinishChange = fnc;
-        return this;
-      }
-
-      /**
-       * Change the value of <code>object[property]</code>
-       *
-       * @param {Object} newValue The new value of <code>object[property]</code>
-       */
-      setValue(newValue) {
-        this.object[this.property] = newValue;
-        if (this.__onChange) {
-          this.__onChange.call(this, newValue);
-        } else if (this.__onFinishChange) {
-          this.__onFinishChange.call(this, newValue);
-        }
-        this.updateDisplay();
-        return this;
-      }
-
-      /**
-       * Gets the value of <code>object[property]</code>
-       *
-       * @returns {Object} The current value of <code>object[property]</code>
-       */
-      getValue() {
-        return this.object[this.property];
-      }
-
-      /**
-       * Set the drop handler
-       *
-       * @param {function} handler
-       */
-      setDropHandler(handler) {
-        this.domElement.ondragover = function(event) {
-          event.preventDefault();
-        };
-        this.domElement.ondrop = function(event) {
-          event.preventDefault();
-          handler.call(this, event.dataTransfer.getData("text"));
-        };
-
-        return this;
-      }
-
-      /**
-       * Refreshes the visual display of a Controller in order to keep sync
-       * with the object's current value.
-       * @returns {Controller} this
-       */
-      updateDisplay() {
-        return this;
-      }
-
-      /**
-       * @returns {Boolean} true if the value has deviated from initialValue
-       */
-      isModified() {
-        return this.initialValue !== this.getValue();
-      }
+  /**
+   * Change the value of <code>object[property]</code>
+   *
+   * @param {Object} newValue The new value of <code>object[property]</code>
+   */
+  setValue(newValue) {
+    this.object[this.property] = newValue;
+    if (this.__onChange) {
+      this.__onChange.call(this, newValue);
+    } else if (this.__onFinishChange) {
+      this.__onFinishChange.call(this, newValue);
     }
-  
+    this.updateDisplay();
+    return this;
+  }
+
+  /**
+   * Gets the value of <code>object[property]</code>
+   *
+   * @returns {Object} The current value of <code>object[property]</code>
+   */
+  getValue() {
+    return this.object[this.property];
+  }
+
+  /**
+   * Set the drop handler
+   *
+   * @param {function} handler
+   */
+  setDropHandler(handler) {
+    this.domElement.ondragover = function(event) {
+      event.preventDefault();
+    };
+    this.domElement.ondrop = function(event) {
+      event.preventDefault();
+      handler.call(this, event.dataTransfer.getData("text"));
+    };
+
+    return this;
+  }
+
+  /**
+   * Refreshes the visual display of a Controller in order to keep sync
+   * with the object's current value.
+   * @returns {Controller} this
+   */
+  updateDisplay() {
+    return this;
+  }
+
+  /**
+   * @returns {Boolean} true if the value has deviated from initialValue
+   */
+  isModified() {
+    return this.initialValue !== this.getValue();
+  }
+}
 
 export default Controller;

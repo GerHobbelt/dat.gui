@@ -1,8 +1,8 @@
 /**
- * dat-gui JavaScript Controller Library
+ * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2019 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,176 +13,176 @@
 
 import common from "../utils/common";
 
-  var EVENT_MAP = {
-    HTMLEvents: ["change"],
-    MouseEvents: ["click", "mousemove", "mousedown", "mouseup", "mouseover"],
-    KeyboardEvents: ["keydown"]
-  };
+const EVENT_MAP = {
+  HTMLEvents: ["change"],
+  MouseEvents: ["click", "mousemove", "mousedown", "mouseup", "mouseover"],
+  KeyboardEvents: ["keydown"]
+};
 
-  var EVENT_MAP_INV = {};
-  common.each(EVENT_MAP, function(v, k) {
-    common.each(v, function(e) {
-      EVENT_MAP_INV[e] = k;
-    });
+const EVENT_MAP_INV = {};
+common.each(EVENT_MAP, function(v, k) {
+  common.each(v, function(e) {
+    EVENT_MAP_INV[e] = k;
   });
+});
 
-  var CSS_VALUE_PIXELS = /(\d+(\.\d+)?)px/;
+const CSS_VALUE_PIXELS = /(\d+(\.\d+)?)px/;
 
-  function cssValueToPixels(val) {
+function cssValueToPixels(val) {
   if (val === "0" || common.isUndefined(val)) {
     return 0;
   }
 
-    var match = val.match(CSS_VALUE_PIXELS);
+  const match = val.match(CSS_VALUE_PIXELS);
 
-    if (!common.isNull(match)) {
-      return parseFloat(match[1]);
-    }
-
-    // TODO ...ems? %?
-
-    return 0;
+  if (!common.isNull(match)) {
+    return parseFloat(match[1]);
   }
 
+  // TODO ...ems? %?
+
+  return 0;
+}
+
+/**
+ * @namespace
+ * @member dat.dom
+ */
+var dom = {
   /**
-   * @namespace
-   * @member dat.dom
+   *
+   * @param elem
+   * @param selectable
    */
-  var dom = {
-    /**
-     *
-     * @param elem
-     * @param selectable
-     */
-    makeSelectable: function(elem, selectable) {
+  makeSelectable: function(elem, selectable) {
     if (elem === undefined || elem.style === undefined) {
       return;
     }
 
-      elem.onselectstart = selectable
-        ? function() {
-            return false;
-          }
-        : function() {};
+    elem.onselectstart = selectable
+      ? function() {
+          return false;
+        }
+      : function() {};
 
-      elem.style.MozUserSelect = selectable ? "auto" : "none";
-      elem.style.KhtmlUserSelect = selectable ? "auto" : "none";
-      elem.unselectable = selectable ? "on" : "off";
-    },
+    elem.style.MozUserSelect = selectable ? "auto" : "none";
+    elem.style.KhtmlUserSelect = selectable ? "auto" : "none";
+    elem.unselectable = selectable ? "on" : "off";
+  },
 
-    /**
-     *
-     * @param elem
-     * @param horizontal
-     * @param vertical
-     */
-    makeFullscreen: function(elem, horizontal, vertical) {
-      if (common.isUndefined(horizontal)) horizontal = true;
-      if (common.isUndefined(vertical)) vertical = true;
+  /**
+   *
+   * @param elem
+   * @param horizontal
+   * @param vertical
+   */
+  makeFullscreen: function(elem, horizontal, vertical) {
+    if (common.isUndefined(horizontal)) horizontal = true;
+    if (common.isUndefined(vertical)) vertical = true;
 
-      elem.style.position = "absolute";
+    elem.style.position = "absolute";
 
-      if (horizontal) {
-        elem.style.left = 0;
-        elem.style.right = 0;
-      }
-      if (vertical) {
-        elem.style.top = 0;
-        elem.style.bottom = 0;
-      }
-    },
+    if (horizontal) {
+      elem.style.left = 0;
+      elem.style.right = 0;
+    }
+    if (vertical) {
+      elem.style.top = 0;
+      elem.style.bottom = 0;
+    }
+  },
 
-    /**
-     *
-     * @param elem
-     * @param eventType
-     * @param params
-     */
-    fakeEvent: function(elem, eventType, params, aux) {
-      params = params || {};
-      var className = EVENT_MAP_INV[eventType];
-      if (!className) {
-        throw new Error("Event type " + eventType + " not supported.");
-      }
-      var evt = settings.DOCUMENT.createEvent(className);
-      switch (className) {
+  /**
+   *
+   * @param elem
+   * @param eventType
+   * @param params
+   */
+  fakeEvent: function(elem, eventType, params, aux) {
+    params = params || {};
+    const className = EVENT_MAP_INV[eventType];
+    if (!className) {
+      throw new Error("Event type " + eventType + " not supported.");
+    }
+    const evt = settings.DOCUMENT.createEvent(className);
+    switch (className) {
       case "MouseEvents": {
-          var clientX = params.x || params.clientX || 0;
-          var clientY = params.y || params.clientY || 0;
-          evt.initMouseEvent(
-            eventType,
-            params.bubbles || false,
-            params.cancelable || true,
-            settings.WINDOW,
-            params.clickCount || 1,
-            0, //screen X
-            0, //screen Y
-            clientX, //client X
-            clientY, //client Y
-            false,
-            false,
-            false,
-            false,
-            0,
-            null
-          );
-          break;
+        const clientX = params.x || params.clientX || 0;
+        const clientY = params.y || params.clientY || 0;
+        evt.initMouseEvent(
+          eventType,
+          params.bubbles || false,
+          params.cancelable || true,
+          settings.WINDOW,
+          params.clickCount || 1,
+          0, // screen X
+          0, // screen Y
+          clientX, // client X
+          clientY, // client Y
+          false,
+          false,
+          false,
+          false,
+          0,
+          null
+        );
+        break;
       }
       case "KeyboardEvents": {
-          var init = evt.initKeyboardEvent || evt.initKeyEvent; // webkit || moz
-          common.defaults(params, {
-            cancelable: true,
-            ctrlKey: false,
-            altKey: false,
-            shiftKey: false,
-            metaKey: false,
-            keyCode: undefined,
-            charCode: undefined
-          });
-          init(
-            eventType,
-            params.bubbles || false,
-            params.cancelable,
-            settings.WINDOW,
-            params.ctrlKey,
-            params.altKey,
-            params.shiftKey,
-            params.metaKey,
-            params.keyCode,
-            params.charCode
-          );
-          break;
+        const init = evt.initKeyboardEvent || evt.initKeyEvent; // webkit || moz
+        common.defaults(params, {
+          cancelable: true,
+          ctrlKey: false,
+          altKey: false,
+          shiftKey: false,
+          metaKey: false,
+          keyCode: undefined,
+          charCode: undefined
+        });
+        init(
+          eventType,
+          params.bubbles || false,
+          params.cancelable,
+          settings.WINDOW,
+          params.ctrlKey,
+          params.altKey,
+          params.shiftKey,
+          params.metaKey,
+          params.keyCode,
+          params.charCode
+        );
+        break;
       }
       default: {
-          evt.initEvent(eventType, params.bubbles || false, params.cancelable || true);
-          break;
+        evt.initEvent(eventType, params.bubbles || false, params.cancelable || true);
+        break;
       }
     }
-      common.defaults(evt, aux);
-      elem.dispatchEvent(evt);
-    },
+    common.defaults(evt, aux);
+    elem.dispatchEvent(evt);
+  },
 
-    /**
-     *
-     * @param elem
-     * @param event
-     * @param func
-     * @param bool
-     */
-    bind: function(elem, event, func, bool) {
-      bool = bool || false;
-      if (elem.addEventListener) elem.addEventListener(event, func, bool);
-      else if (elem.attachEvent) elem.attachEvent("on" + event, func);
-      return dom;
-    },
+  /**
+   *
+   * @param elem
+   * @param event
+   * @param func
+   * @param bool
+   */
+  bind: function(elem, event, func, bool) {
+    bool = bool || false;
+    if (elem.addEventListener) elem.addEventListener(event, func, bool);
+    else if (elem.attachEvent) elem.attachEvent("on" + event, func);
+    return dom;
+  },
 
-    /**
-     *
-     * @param elem
-     * @param event
-     * @param func
-     * @param bool
-     */
+  /**
+   *
+   * @param elem
+   * @param event
+   * @param func
+   * @param bool
+   */
   unbind: function(elem, event, func, newBool) {
     const bool = newBool || false;
     if (elem.removeEventListener) {
@@ -191,114 +191,114 @@ import common from "../utils/common";
       elem.detachEvent("on" + event, func);
     }
     return dom;
-    },
+  },
 
-    /**
-     *
-     * @param elem
-     * @param className
-     */
-    addClass: function(elem, className) {
-      if (elem.className === undefined) {
-        elem.className = className;
-      } else if (elem.className !== className) {
-        var classes = elem.className.split(/ +/);
+  /**
+   *
+   * @param elem
+   * @param className
+   */
+  addClass: function(elem, className) {
+    if (elem.className === undefined) {
+      elem.className = className;
+    } else if (elem.className !== className) {
+      const classes = elem.className.split(/ +/);
       if (classes.indexOf(className) === -1) {
-          classes.push(className);
-          elem.className = classes
-            .join(" ")
-            .replace(/^\s+/, "")
-            .replace(/\s+$/, "");
-        }
+        classes.push(className);
+        elem.className = classes
+          .join(" ")
+          .replace(/^\s+/, "")
+          .replace(/\s+$/, "");
       }
-      return dom;
-    },
+    }
+    return dom;
+  },
 
-    /**
-     *
-     * @param elem
-     * @param className
-     */
-    removeClass: function(elem, className) {
-      if (className) {
-        if (elem.className === undefined) {
-          // elem.className = className;
-        } else if (elem.className === className) {
-          elem.removeAttribute("class");
-        } else {
-          var classes = elem.className.split(/ +/);
-          var index = classes.indexOf(className);
-        if (index !== -1) {
-            classes.splice(index, 1);
-            elem.className = classes.join(" ");
-          }
-        }
+  /**
+   *
+   * @param elem
+   * @param className
+   */
+  removeClass: function(elem, className) {
+    if (className) {
+      if (elem.className === undefined) {
+        // elem.className = className;
+      } else if (elem.className === className) {
+        elem.removeAttribute("class");
       } else {
-        elem.className = undefined;
+        const classes = elem.className.split(/ +/);
+        const index = classes.indexOf(className);
+        if (index !== -1) {
+          classes.splice(index, 1);
+          elem.className = classes.join(" ");
+        }
       }
-      return dom;
-    },
+    } else {
+      elem.className = undefined;
+    }
+    return dom;
+  },
 
-    hasClass: function(elem, className) {
-      return new RegExp("(?:^|\\s+)" + className + "(?:\\s+|$)").test(elem.className) || false;
-    },
+  hasClass: function(elem, className) {
+    return new RegExp("(?:^|\\s+)" + className + "(?:\\s+|$)").test(elem.className) || false;
+  },
 
-    /**
-     *
-     * @param elem
-     */
-    getWidth: function(elem) {
-      var style = getComputedStyle(elem);
+  /**
+   *
+   * @param elem
+   */
+  getWidth: function(elem) {
+    const style = getComputedStyle(elem);
 
-      return (
-        cssValueToPixels(style["border-left-width"]) +
-        cssValueToPixels(style["border-right-width"]) +
-        cssValueToPixels(style["padding-left"]) +
-        cssValueToPixels(style["padding-right"]) +
-        cssValueToPixels(style["width"])
-      );
-    },
+    return (
+      cssValueToPixels(style["border-left-width"]) +
+      cssValueToPixels(style["border-right-width"]) +
+      cssValueToPixels(style["padding-left"]) +
+      cssValueToPixels(style["padding-right"]) +
+      cssValueToPixels(style.width)
+    );
+  },
 
-    /**
-     *
-     * @param elem
-     */
-    getHeight: function(elem) {
-      var style = getComputedStyle(elem);
+  /**
+   *
+   * @param elem
+   */
+  getHeight: function(elem) {
+    const style = getComputedStyle(elem);
 
-      return (
-        cssValueToPixels(style["border-top-width"]) +
-        cssValueToPixels(style["border-bottom-width"]) +
-        cssValueToPixels(style["padding-top"]) +
-        cssValueToPixels(style["padding-bottom"]) +
-        cssValueToPixels(style["height"])
-      );
-    },
+    return (
+      cssValueToPixels(style["border-top-width"]) +
+      cssValueToPixels(style["border-bottom-width"]) +
+      cssValueToPixels(style["padding-top"]) +
+      cssValueToPixels(style["padding-bottom"]) +
+      cssValueToPixels(style.height)
+    );
+  },
 
-    /**
-     *
-     * @param elem
-     */
-    getOffset: function(elem) {
-      var offset = { left: 0, top: 0 };
-      if (elem.offsetParent) {
-        do {
-          offset.left += elem.offsetLeft;
-          offset.top += elem.offsetTop;
+  /**
+   *
+   * @param elem
+   */
+  getOffset: function(elem) {
+    const offset = { left: 0, top: 0 };
+    if (elem.offsetParent) {
+      do {
+        offset.left += elem.offsetLeft;
+        offset.top += elem.offsetTop;
         elem = elem.offsetParent;
       } while (elem);
-      }
-      return offset;
-    },
-
-    // http://stackoverflow.com/posts/2684561/revisions
-    /**
-     *
-     * @param elem
-     */
-    isActive: function(elem) {
-      return elem === settings.DOCUMENT.activeElement && (elem.type || elem.href);
     }
-  };
+    return offset;
+  },
+
+  // http://stackoverflow.com/posts/2684561/revisions
+  /**
+   *
+   * @param elem
+   */
+  isActive: function(elem) {
+    return elem === settings.DOCUMENT.activeElement && (elem.type || elem.href);
+  }
+};
 
 export default dom;

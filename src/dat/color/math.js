@@ -19,6 +19,7 @@ const ColorMath = {
     const p = v * (1.0 - s);
     const q = v * (1.0 - f * s);
     const t = v * (1.0 - (1.0 - f) * s);
+
     const c = [[v, t, p], [q, v, p], [p, v, t], [p, q, v], [t, p, v], [v, p, q]][hi];
 
     return {

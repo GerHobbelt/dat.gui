@@ -1,7 +1,10 @@
 $nest-margin: 4px;
 $row-height: 27px;
+
 $button-height: 20px;
+
 .dg {
+
   /** Clear list styles */
   ul {
     list-style: none;
@@ -10,6 +13,7 @@ $button-height: 20px;
     width: 100%;
     clear: both;
   }
+
   /* Auto-place container */
   &.ac {
     position: fixed;
@@ -17,37 +21,53 @@ $button-height: 20px;
     left: 0;
     right: 0;
     height: 0;
+    // we make sure the dat.gui sits in its own layer for repaint purposes:
+    // see http://benfrain.com/improving-css-performance-fixed-position-elements/
+    // Note that the backface style here comes from that article but is not 
+    // really necessary any more now that we have our layer. 
+    // Compare: https://developers.google.com/web/updates/2012/09/Stacking-Changes-Coming-to-position-fixed-elements?hl=en
     z-index: 0;
+    // backface-visibility: hidden;
   }
+
   &:not(.ac) .main {
     /** Exclude mains in ac so that we don't hide close button */
     overflow: hidden;
   }
+
   &.main {
     @include transition(opacity, 0.1s, linear);
+
     &.taller-than-window {
       overflow-y: auto;
+
       .close-button {
         opacity: 1;
+
         /* TODO, these are style notes */
         margin-top: -1px;
         border-top: 1px solid $border-color;
       }
     }
+
     ul.closed .close-button {
       opacity: 1 !important;
     }
+
     &:hover .close-button,
     .close-button.drag {
       opacity: 1;
     }
+
     .close-button {
       /*opacity: 0;*/
       @include transition(opacity, 0.1s, linear);
       border: 0;
       position: absolute;
+
       line-height: $button-height - 1;
       height: $button-height;
+
       /* TODO, these are style notes */
       cursor: pointer;
       text-align: center;
@@ -57,26 +77,31 @@ $button-height: 20px;
       }
     }
   }
+
   /* Auto-placed GUI's */
   &.a {
     float: right;
     margin-right: 15px;
     overflow-x: hidden;
-    &.has-save> ul {
+
+    &.has-save > ul {
       margin-top: $row-height;
       &.closed {
         margin-top: 0;
       }
     }
+
     .save-row {
       position: fixed;
       top: 0;
       z-index: 1002;
     }
   }
+
   li {
     @include transition(height, 0.1s, ease-out);
   }
+
   /* Line items that don't contain folders. */
   li:not(.folder) {
     cursor: auto;
@@ -85,29 +110,34 @@ $button-height: 20px;
     overflow: hidden;
     padding: 0 4px 0 5px;
   }
+
   li.folder {
     padding: 0;
     border-left: $nest-margin solid rgba(0, 0, 0, 0);
   }
+
   /** Folder names */
   li.title {
     cursor: pointer;
     margin-left: -$nest-margin;
   }
+
   /** Hides closed items */
   .closed li:not(.title),
   .closed ul li,
-  .closed ul li> * {
+  .closed ul li > * {
     height: 0;
     overflow: hidden;
     border: 0;
   }
+
   /** Controller row */
   .cr {
     clear: both;
     padding-left: 3px;
     height: $row-height;
   }
+
   /** Name-half (left) */
   .property-name {
     cursor: default;
@@ -117,11 +147,13 @@ $button-height: 20px;
     overflow: hidden;
     text-overflow: ellipsis;
   }
+
   /** Controller-half (right) */
   .c {
     float: left;
     width: 60%;
   }
+
   /** Controller placement */
   .c input[type=text] {
     border: 0;
@@ -130,12 +162,14 @@ $button-height: 20px;
     width: 100%;
     float: right;
   }
+
   /** Shorter number boxes when slider is present. */
   .has-slider input[type=text] {
     width: 30%;
     /*display: none;*/
     margin-left: 0;
   }
+
   .slider {
     float: left;
     width: 66%;
@@ -144,15 +178,19 @@ $button-height: 20px;
     height: 19px;
     margin-top: 4px;
   }
+
   .slider-fg {
     height: 100%;
   }
+
   .c input[type=checkbox] {
     margin-top: 9px;
   }
+
   .c select {
     margin-top: 5px;
   }
+
   /** Ensure the entire boolean and function row shows a hand */
   .cr.function,
   .cr.function .property-name,
@@ -162,6 +200,7 @@ $button-height: 20px;
   .cr.boolean * {
     cursor: pointer;
   }
+
   .selector {
     display: none;
     position: absolute;
@@ -169,17 +208,21 @@ $button-height: 20px;
     margin-top: 23px;
     z-index: 10;
   }
+
   .c:hover .selector,
   .selector.drag {
     display: block;
   }
+
   li.save-row {
     padding: 0;
+
     .button {
       display: inline-block;
       padding: 0px 6px;
     }
   }
+
   &.dialogue {
     background-color: #222;
     width: 460px;

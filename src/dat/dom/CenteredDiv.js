@@ -11,8 +11,15 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define(["dat/dom/dom", "dat/utils/common"], function(dom, common) {
-  const CenteredDiv = function() {
+import dom from "./dom";
+import common from "../utils/common";
+
+function lockScroll(e) {
+  console.log(e);
+}
+
+class CenteredDiv {
+  constructor() {
     this.backgroundElement = document.createElement("div");
     common.extend(this.backgroundElement.style, {
       backgroundColor: "rgba(0,0,0,0.8)",
@@ -45,9 +52,9 @@ define(["dat/dom/dom", "dat/utils/common"], function(dom, common) {
     dom.bind(this.backgroundElement, "click", function() {
       _this.hide();
     });
-  };
+  }
 
-  CenteredDiv.prototype.show = function() {
+  show() {
     const _this = this;
 
     this.backgroundElement.style.display = "block";
@@ -64,12 +71,15 @@ define(["dat/dom/dom", "dat/utils/common"], function(dom, common) {
       _this.domElement.style.opacity = 1;
       _this.domElement.style.webkitTransform = "scale(1)";
     });
-  };
+  }
 
-  CenteredDiv.prototype.hide = function() {
+  /**
+   * Hide centered div
+   */
+  hide() {
     const _this = this;
 
-    var hide = function() {
+    const hide = function() {
       _this.domElement.style.display = "none";
       _this.backgroundElement.style.display = "none";
 
@@ -86,16 +96,12 @@ define(["dat/dom/dom", "dat/utils/common"], function(dom, common) {
     //    this.domElement.style.top = '48%';
     this.domElement.style.opacity = 0;
     this.domElement.style.webkitTransform = "scale(1.1)";
-  };
-
-  CenteredDiv.prototype.layout = function() {
-    this.domElement.style.left = window.innerWidth / 2 - dom.getWidth(this.domElement) / 2 + "px";
-    this.domElement.style.top = window.innerHeight / 2 - dom.getHeight(this.domElement) / 2 + "px";
-  };
-
-  function lockScroll(e) {
-    console.log(e);
   }
 
-  return CenteredDiv;
-});
+  layout() {
+    this.domElement.style.left = window.innerWidth / 2 - dom.getWidth(this.domElement) / 2 + "px";
+    this.domElement.style.top = window.innerHeight / 2 - dom.getHeight(this.domElement) / 2 + "px";
+  }
+}
+
+export default CenteredDiv;

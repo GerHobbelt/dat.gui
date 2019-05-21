@@ -12,8 +12,8 @@
  */
 
 define(["dat/color/toString", "dat/utils/common"], function(toString, common) {
-  let result; let
-    toReturn;
+  let result;
+  let toReturn;
 
   const interpret = function() {
     toReturn = false;

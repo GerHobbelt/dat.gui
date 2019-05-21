@@ -21,8 +21,6 @@ define(["dat/utils/common"], function(common) {
 
       return "#" + s;
     }
-    return (
-      "rgba(" + Math.round(color.r) + "," + Math.round(color.g) + "," + Math.round(color.b) + "," + color.a + ")"
-    );
+    return "rgba(" + Math.round(color.r) + "," + Math.round(color.g) + "," + Math.round(color.b) + "," + color.a + ")";
   };
 });

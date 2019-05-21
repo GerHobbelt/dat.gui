@@ -2,7 +2,7 @@
  * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2019 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,14 +42,14 @@ class Controller {
     /**
      * The function to be called on change.
      * @type {Function}
-     * @ignore
+     * @private
      */
     this.__onChange = undefined;
 
     /**
      * The function to be called on finishing change.
      * @type {Function}
-     * @ignore
+     * @private
      */
     this.__onFinishChange = undefined;
   }

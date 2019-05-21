@@ -2,7 +2,7 @@
  * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2019 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,12 +29,12 @@ import styleSheet from "./style.scss"; // CSS to embed in build
 
 css.inject(styleSheet);
 
-/** @ignore Outer-most className for GUI's */
+/** Outer-most className for GUI's */
 const CSS_NAMESPACE = "dg";
 
 const HIDE_KEY_CODE = 72;
 
-/** @ignore The only value shared between the JS and SCSS. Use caution. */
+/** The only value shared between the JS and SCSS. Use caution. */
 const CLOSE_BUTTON_HEIGHT = 20;
 
 const DEFAULT_DEFAULT_PRESET_NAME = "Default";
@@ -49,13 +49,13 @@ const SUPPORTS_LOCAL_STORAGE = (function() {
 
 let SAVE_DIALOGUE;
 
-/** @ignore Have we yet to create an autoPlace GUI? */
+/** Have we yet to create an autoPlace GUI? */
 let autoPlaceVirgin = true;
 
-/** @ignore Fixed position div that auto place GUI's go inside */
+/** Fixed position div that auto place GUI's go inside */
 let autoPlaceContainer;
 
-/** @ignore Are we hiding the GUI's ? */
+/** Are we hiding the GUI's ? */
 let hide = false;
 
 /** @private GUI's which should be hidden */
@@ -103,7 +103,7 @@ const GUI = function(pars) {
 
   /**
    * Nested GUI's by name
-   * @ignore
+   * @private
    */
   this.__folders = {};
 
@@ -111,7 +111,7 @@ const GUI = function(pars) {
 
   /**
    * List of objects I'm remembering for save, only used in top level GUI
-   * @ignore
+   * @private
    */
   this.__rememberedObjects = [];
 
@@ -120,7 +120,6 @@ const GUI = function(pars) {
    * in top level GUI.
    *
    * @private
-   * @ignore
    *
    * @example
    * [
@@ -608,8 +607,10 @@ common.extend(
 
       // Do we have saved appearance data for this folder?
       if (
-        this.load && // Anything loaded?
-        this.load.folders && // Was my parent a dead-end?
+        // Anything loaded?
+        this.load &&
+        // Was my parent a dead-end?
+        this.load.folders &&
         this.load.folders[name]
       ) {
         // Did daddy remember me?
@@ -732,7 +733,6 @@ common.extend(
      * @param {...Object} objects
      * @throws {Error} if not called on a top level GUI.
      * @instance
-     * @ignore
      */
     remember: function() {
       if (common.isUndefined(SAVE_DIALOGUE)) {
@@ -877,8 +877,6 @@ common.extend(
  * @param gui
  * @param [newDom] If specified, inserts the dom content in the new row
  * @param [liBefore] If specified, places the new row before another row
- *
- * @ignore
  */
 function addRow(gui, newDom, liBefore) {
   const li = document.createElement("li");

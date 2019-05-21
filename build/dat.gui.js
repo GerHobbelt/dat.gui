@@ -1,3 +1,16 @@
+/**
+ * dat.GUI JavaScript Controller Library
+ * http://code.google.com/p/dat-gui
+ *
+ * Copyright 2011-2019 Data Arts Team, Google Creative Lab
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 (function(global, factory) {
   typeof exports === "object" && typeof module !== "undefined"
     ? factory(exports)
@@ -676,7 +689,9 @@
   }
   var dom = {
     makeSelectable: function makeSelectable(elem, selectable) {
-      if (elem === undefined || elem.style === undefined) return;
+      if (elem === undefined || elem.style === undefined) {
+        return;
+      }
       elem.onselectstart = selectable
         ? function() {
             return false;
@@ -965,11 +980,12 @@
       dom.bind(_this2.__input, "keyup", onChange);
       dom.bind(_this2.__input, "change", onChange);
       dom.bind(_this2.__input, "blur", onBlur);
-      dom.bind(_this2.__input, "keydown", function(e) {
+      dom.bind(_this2.__input, "keydown", onKeyDown);
+      function onKeyDown(e) {
         if (e.keyCode === 13) {
           this.blur();
         }
-      });
+      }
       _this2.updateDisplay();
       _this2.domElement.appendChild(_this2.__input);
       return _this2;
@@ -1088,14 +1104,15 @@
       dom.bind(_this2.__input, "change", onChange);
       dom.bind(_this2.__input, "blur", onBlur);
       dom.bind(_this2.__input, "mousedown", onMouseDown);
-      dom.bind(_this2.__input, "keydown", function(e) {
+      dom.bind(_this2.__input, "keydown", onKeyDown);
+      function onKeyDown(e) {
         if (e.keyCode === 13) {
           _this.__truncationSuspended = true;
           this.blur();
           _this.__truncationSuspended = false;
           onFinish();
         }
-      });
+      }
       _this2.updateDisplay();
       _this2.domElement.appendChild(_this2.__input);
       return _this2;
@@ -1497,8 +1514,8 @@
     }
   };
 
-  var saveDialogContents =
-    '<div id="dg-save" class="dg dialogue">\n\n  Here\'s the new load parameter for your <code>GUI</code>\'s constructor:\n\n  <textarea id="dg-new-constructor"></textarea>\n\n  <div id="dg-save-locally">\n\n    <input id="dg-local-storage" type="checkbox"/> Automatically save\n    values to <code>localStorage</code> on exit.\n\n    <div id="dg-local-explain">The values saved to <code>localStorage</code> will\n      override those passed to <code>dat.GUI</code>\'s constructor. This makes it\n      easier to work incrementally, but <code>localStorage</code> is fragile,\n      and your friends may not see the same values you do.\n\n    </div>\n\n  </div>\n\n</div>';
+  var saveDialogueContents =
+    '<div id="dg-save" class="dg dialogue">\n\n  Here\'s the new load parameter for your <code>GUI</code>\'s constructor:\n\n  <textarea id="dg-new-constructor"></textarea>\n\n  <div id="dg-save-locally">\n\n    <input id="dg-local-storage" type="checkbox"> Automatically save\n    values to <code>localStorage</code> on exit.\n\n    <div id="dg-local-explain">The values saved to <code>localStorage</code> will\n      override those passed to <code>dat.GUI</code>\'s constructor. This makes it\n      easier to work incrementally, but <code>localStorage</code> is fragile,\n      and your friends may not see the same values you do.\n\n    </div>\n\n  </div>\n\n</div>';
 
   var ControllerFactory = function ControllerFactory(object, property) {
     var initialValue = object[property];
@@ -1536,7 +1553,7 @@
     return null;
   };
 
-  function requestAnimationFrame(callback) {
+  function requestAnimationFrame(callback, element) {
     setTimeout(callback, 1000 / 60);
   }
   var requestAnimationFrame$1 =
@@ -2000,7 +2017,7 @@
     remember: function remember() {
       if (Common.isUndefined(SAVE_DIALOGUE)) {
         SAVE_DIALOGUE = new CenteredDiv();
-        SAVE_DIALOGUE.domElement.innerHTML = saveDialogContents;
+        SAVE_DIALOGUE.domElement.innerHTML = saveDialogueContents;
       }
       if (this.parent) {
         throw new Error("You can only call remember on a top level GUI.");
@@ -2505,4 +2522,3 @@
 
   Object.defineProperty(exports, "__esModule", { value: true });
 });
-//# sourceMappingURL=dat.gui.js.map

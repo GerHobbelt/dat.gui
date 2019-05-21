@@ -1,8 +1,8 @@
 /**
- * dat-gui JavaScript Controller Library
+ * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2019 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,8 @@ function map(v, i1, i2, o1, o2) {
  * @param {Number} minValue Minimum allowed value
  * @param {Number} maxValue Maximum allowed value
  * @param {Number} stepValue Increment by which to change value
+ *
+ * @member dat.controllers
  */
 class NumberControllerSlider extends NumberController {
   constructor(object, property, min, max, step) {

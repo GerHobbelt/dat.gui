@@ -284,9 +284,22 @@ $button-height: 20px;
   word-wrap: break-word;
   margin: 12px 0;
   display: block;
+  //background-color: #0d3349;
   width: 440px;
   overflow-y: scroll;
   height: 100px;
+  position: relative;
+}
+
+#dg-new-editor {
+  padding: 10px;
+  resize: none;
+  box-shadow: inset 1px 1px 1px #888;
+  margin: 12px 0;
+  display: block;
+  //background-color: #0d3349;
+  width: 440px;
+  height: 350px;
   position: relative;
 }
 

@@ -25,6 +25,7 @@ import requestAnimationFrame from '../utils/requestAnimationFrame';
 import CenteredDiv from '../dom/CenteredDiv';
 import dom from '../dom/dom';
 import common from '../utils/common';
+import autocomplete from '../dom/autocomplete';
 
 import styleSheet from './style.scss'; // CSS to embed in build
 
@@ -52,6 +53,10 @@ let SAVE_DIALOGUE;
 
 /** @ignore Have we yet to create an autoPlace GUI? */
 let autoPlaceVirgin = true;
+
+let Editor;
+
+let modalTitle;
 
 /** @ignore Fixed position div that auto place GUI's go inside */
 let autoPlaceContainer;
@@ -529,6 +534,34 @@ common.extend(
           factoryArgs: Array.prototype.slice.call(arguments, 2)
         }
       );
+    },
+
+    openExportWindow: function (title, content) {
+      if (common.isUndefined(SAVE_DIALOGUE)) {
+        SAVE_DIALOGUE = new CenteredDiv();
+        SAVE_DIALOGUE.domElement.innerHTML = saveDialogueContents;
+
+        modalTitle = document.getElementById('dg-title');
+
+        const JsonMode = ace.require('ace/mode/json').Mode;
+        Editor = ace.edit('dg-new-editor');
+        Editor.setTheme('ace/theme/solarized_dark');
+        Editor.session.setMode(new JsonMode());
+        Editor.setReadOnly(true);
+      }
+
+      if (this.autoPlace) {
+        setWidth(this, this.width);
+      }
+
+      modalTitle.innerHTML = title;
+      Editor.setValue(JSON.stringify(content, undefined, 2));
+      SAVE_DIALOGUE.show();
+      Editor.focus();
+    },
+
+    plugins: {
+      autocomplete: autocomplete
     },
 
     /**

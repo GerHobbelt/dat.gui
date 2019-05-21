@@ -11,7 +11,8 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import css from '../utils/css';
+import './style.scss';
+
 import saveDialogueContents from './saveDialogue.html';
 import ControllerFactory from '../controllers/ControllerFactory';
 import Controller from '../controllers/Controller';
@@ -20,6 +21,7 @@ import FunctionController from '../controllers/FunctionController';
 import NumberControllerBox from '../controllers/NumberControllerBox';
 import NumberControllerSlider from '../controllers/NumberControllerSlider';
 import ColorController from '../controllers/ColorController';
+import FileController from '../controllers/FileController';
 import PlotterController from '../controllers/PlotterController';
 import requestAnimationFrame from '../utils/requestAnimationFrame';
 import CenteredDiv from '../dom/CenteredDiv';
@@ -27,9 +29,8 @@ import dom from '../dom/dom';
 import common from '../utils/common';
 import autocomplete from '../dom/autocomplete';
 
-import styleSheet from './style.scss'; // CSS to embed in build
 
-css.inject(styleSheet);
+
 
 /** @ignore Outer-most className for GUI's */
 const CSS_NAMESPACE = 'dg';
@@ -505,8 +506,9 @@ common.extend(
 
     /**
      * Adds a new {@link Controller} to the GUI. The type of controller created
-     * is inferred from the initial value of <code>object[property]</code>. For
-     * color properties, see {@link addColor}.
+     * is inferred from the initial value of <code>object[property]</code>.
+     * For color properties, see {@link addColor}.
+     * For file properties, see {@link addFile}.
      *
      * @param {Object} object The object to be manipulated
      * @param {String} property The name of the property to be manipulated
@@ -628,6 +630,35 @@ common.extend(
         }
       );
     },
+
+
+    /**
+     * Adds a new file controller to the GUI.
+     *
+     * @param object
+     * @param property
+     * @returns {Controller} The controller that was added to the GUI.
+     * @instance
+     *
+     * @example
+     * var instance = {
+     *  onLoad: function(dataURL) {
+     *    document.getElementById('img').src = dataURL
+     *  }
+     * };
+     * gui.addFile(instance, 'onLoad');
+     */
+    addFile: function(object, property) {
+      return add(
+        this,
+        object,
+        property,
+        {
+          file: true
+        }
+      );
+    },
+
 
     /**
      * Removes the given controller from the GUI.
@@ -1148,6 +1179,8 @@ function augmentController(gui, li, controller) {
     }, controller.updateDisplay);
 
     controller.updateDisplay();
+  } else if (controller instanceof FileController) {
+    dom.addClass(li, 'file');
   }
 
   controller.setValue = common.compose(function(val) {
@@ -1226,6 +1259,8 @@ function add(gui, object, property, params) {
   } else if (params.plotter) {
     controller = new PlotterController(object, property, params);
     gui.listen(controller);
+  } else if (params.file) {
+    controller = new FileController(object, property);
   } else {
     const factoryArgs = [object, property].concat(params.factoryArgs);
     controller = ControllerFactory.apply(gui, factoryArgs);
@@ -1254,6 +1289,8 @@ function add(gui, object, property, params) {
     dom.addClass(li, 'color');
   } else if (controller instanceof PlotterController) {
     dom.addClass(li, 'plotter');
+  } else if (controller instanceof FileController) {
+    dom.addClass(li, 'file');
   } else {
     dom.addClass(li, typeof controller.getValue());
   }

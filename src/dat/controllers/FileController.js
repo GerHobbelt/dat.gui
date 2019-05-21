@@ -15,42 +15,46 @@ import Controller from './Controller';
 import dom from '../dom/dom';
 
 /**
- * @class Provides a GUI interface to fire a specified method, a property of an object.
+ * @class Provides a file input.
  *
  * @extends dat.controllers.Controller
  *
  * @param {Object} object The object to be manipulated
  * @param {string} property The name of the property to be manipulated
  */
-class FunctionController extends Controller {
-  constructor(object, property, text) {
+class FileController extends Controller {
+  constructor(object, property) {
     super(object, property);
 
     const _this = this;
 
-    this.__button = document.createElement('div');
-    this.__button.innerHTML = text === undefined ? 'Fire' : text;
+    function onChange(e) {
+      const fileReader = new FileReader()
+      fileReader.addEventListener('load', function(file) {
+        _this.fire(fileReader.result);
+      })
 
-    dom.bind(this.__button, 'click', function(e) {
-      e.preventDefault();
-      _this.fire();
-      return false;
-    });
+      const file = e.target.files[0]
+      fileReader.readAsDataURL(file)
+    }
 
-    dom.addClass(this.__button, 'button');
+    this.__input = document.createElement('input');
+    this.__input.setAttribute('type', 'file');
 
-    this.domElement.appendChild(this.__button);
+    dom.bind(this.__input, 'change', onChange);
+
+    this.domElement.appendChild(this.__input);
   }
 
-  fire() {
+  fire(dataURL) {
     if (this.__onChange) {
-      this.__onChange.call(this, this.getValue());
+      this.__onChange.call(this, dataURL);
     }
-    this.getValue().call(this.object);
+    this.getValue().call(this.object, dataURL);
     if (this.__onFinishChange) {
-      this.__onFinishChange.call(this, this.getValue());
+      this.__onFinishChange.call(this, dataURL);
     }
   }
 }
 
-export default FunctionController;
+export default FileController;

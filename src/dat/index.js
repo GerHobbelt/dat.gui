@@ -24,6 +24,7 @@ import NumberControllerBox from './controllers/NumberControllerBox';
 import NumberControllerSlider from './controllers/NumberControllerSlider';
 import FunctionController from './controllers/FunctionController';
 import ColorController from './controllers/ColorController';
+import FileController from './controllers/FileController';
 import PlotterController from './controllers/PlotterController';
 
 import domImport from './dom/dom';
@@ -45,7 +46,8 @@ export const controllers = {
   NumberControllerSlider: NumberControllerSlider,
   FunctionController: FunctionController,
   ColorController: ColorController,
-  PlotterController: PlotterController
+  FileController: FileController,
+  PlotterController: PlotterController,
 };
 
 export const dom = { dom: domImport };

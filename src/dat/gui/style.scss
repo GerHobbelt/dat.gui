@@ -1,17 +1,18 @@
-$background-color: #1a1a1a;
+$background-color: #fafafa; // #1a1a1a;
 
-$hover-lighten: 5%;
-$border-lighten: 7%;
-$active-lighten: 10%;
+$hover-darken: 5%;
+$border-darken: 7%;
+$active-darken: 10%;
 
 $number-color: #2FA1D6;
 $boolean-color: #806787;
 $string-color: #1ed36f;
 $function-color: #e61d5f;
+$file-color: #e6d21d;
 $save-row-color: #dad5cb;
 $button-color: darken($save-row-color, 10%);
-$border-color: lighten($background-color, $border-lighten);
-$input-color: lighten($background-color, 8.5%);
+$border-color: darken($background-color, $border-darken);
+$input-color: darken($background-color, 8.5%);
 
 @mixin transition($prop, $time, $curve) {
   -webkit-transition: $prop $time $curve;
@@ -51,27 +52,29 @@ $input-color: lighten($background-color, 8.5%);
 /** Main type */
 .dg {
 
-  color: #eee;
+  color: #555; // #eee;
   font: 11px 'Lucida Grande', sans-serif;
-  text-shadow: 0 -1px 0 #111;
+  text-shadow: none; // 0 -1px 0 #111;
 
   /** Auto place */
   &.main {
 
-    /** Scrollbar */
-    &::-webkit-scrollbar {
-      width: 5px;
-      background: $background-color;
-    }
-    &::-webkit-scrollbar-corner {
-      height: 0;
-      display: none;
-    }
-    &::-webkit-scrollbar-thumb {
-      border-radius: 5px;
-      background: lighten($background-color, 30%);
-    }
+    ul {
+      /** Scrollbar */
+      &::-webkit-scrollbar {
+        width: 5px;
+        background: $background-color;
+      }
+      &::-webkit-scrollbar-corner {
+        height: 0;
+        display: none;
+      }
+      &::-webkit-scrollbar-thumb {
+        border-radius: 5px;
+        background: darken($background-color, 30%);
+      }
 
+    }
   }
 
   li {
@@ -94,6 +97,7 @@ $input-color: lighten($background-color, 8.5%);
       }
 
       .button {
+        text-shadow: none;
 
         &.gears {
           @include gears;
@@ -116,16 +120,16 @@ $input-color: lighten($background-color, 8.5%);
 
     &.title {
       padding-left: 16px;
-      background: #000 url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlI+hKgFxoCgAOw==) 6px 10px no-repeat;
+      background: #e8e8e8; // #000 url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlI+hKgFxoCgAOw==) 6px 10px no-repeat;
       cursor: pointer;
       border-bottom: 1px solid rgba(255, 255, 255, 0.2);
     }
 
   }
 
-  .closed li.title {
-    background-image: url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlGIWqMCbWAEAOw==);
-  }
+  // .closed li.title {
+  //   background-image: url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlGIWqMCbWAEAOw==);
+  // }
 
   /* Controller row, <li> */
   .cr {
@@ -146,6 +150,10 @@ $input-color: lighten($background-color, 8.5%);
       border-left: 3px solid $function-color;
     }
 
+    &.file {
+      border-left: 3px solid $file-color;
+    }
+
     &.number {
       border-left: 3px solid $number-color;
       input[type=number] {
@@ -162,7 +170,7 @@ $input-color: lighten($background-color, 8.5%);
 
     &.function:hover,
     &.boolean:hover {
-      background: #111;
+      background: #eee; // #111;
     }
 
   }
@@ -175,11 +183,11 @@ $input-color: lighten($background-color, 8.5%);
       background: $input-color;
       outline: none;
       &:hover {
-        background: lighten($input-color, $hover-lighten);
+        background: darken($input-color, $hover-darken);
       }
       &:focus {
-        background: lighten($input-color, $active-lighten);
-        color: #fff;
+        background: darken($input-color, $active-darken);
+        color: #555; // #fff;
       }
 
     }
@@ -195,9 +203,9 @@ $input-color: lighten($background-color, 8.5%);
     }
 
     .slider:hover {
-      background: lighten($input-color, $hover-lighten);
+      background: darken($input-color, $hover-darken);
       .slider-fg {
-        background: lighten($number-color, $hover-lighten);
+        background: darken($number-color, $hover-darken);
       }
     }
 

@@ -867,16 +867,22 @@ console.log(c2.__checkbox.getAttribute('checked'));
 
     module( "CustomController" );
 
-    test( "Get Custom", function () {
-    	var object = initObject();
-    	var c1 = new CustomController( object, 'colorProperty' );
-    	document.body.appendChild( c1.domElement );
+    test("Get Custom", function () {
+        var value = 'value',
+            c1 = new CustomController({
+            constructor: function (controller) {
+                var input = document.createElement('input');
+                input.value = value;
+                controller.domElement.appendChild(input);
+            }
+        });
+        document.body.appendChild(c1.domElement);
 
-    	var input = c1.domElement.getElementsByTagName( "input" )[0];
-    	equal( input.value, object.colorProperty, "Input value is the same as the colorProperty" );
+        var input = c1.domElement.getElementsByTagName("input")[0];
+        equal(input.value, value , "Input value is the same as the " + value);
 
     	document.body.removeChild( c1.domElement );
-    } );
+    });
 
     module( "Controller Events" );
 

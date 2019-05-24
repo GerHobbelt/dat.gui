@@ -1587,18 +1587,18 @@ var ColorController = function (_Controller) {
 }(Controller);
 var vendors = ['-moz-', '-o-', '-webkit-', '-ms-', ''];
 function linearGradient(elem, x, a, b) {
-  elem.style.background = '';
-  Common.each(vendors, function (vendor) {
-    elem.style.cssText += 'background: ' + vendor + 'linear-gradient(' + x + ', ' + a + ' 0%, ' + b + ' 100%); ';
-  });
+    elem.style.background = '';
+    Common.each(vendors, function (vendor) {
+        elem.style.cssText += 'background: ' + vendor + 'linear-gradient(' + x + ', ' + a + ' 0%, ' + b + ' 100%); ';
+    });
 }
 function hueGradient(elem) {
-  elem.style.background = '';
-  elem.style.cssText += 'background: -moz-linear-gradient(top,  #ff0000 0%, #ff00ff 17%, #0000ff 34%, #00ffff 50%, #00ff00 67%, #ffff00 84%, #ff0000 100%);';
-  elem.style.cssText += 'background: -webkit-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);';
-  elem.style.cssText += 'background: -o-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);';
-  elem.style.cssText += 'background: -ms-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);';
-  elem.style.cssText += 'background: linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);';
+    elem.style.background = '';
+    elem.style.cssText += 'background: -moz-linear-gradient(top,  #ff0000 0%, #ff00ff 17%, #0000ff 34%, #00ffff 50%, #00ff00 67%, #ffff00 84%, #ff0000 100%);';
+    elem.style.cssText += 'background: -webkit-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);';
+    elem.style.cssText += 'background: -o-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);';
+    elem.style.cssText += 'background: -ms-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);';
+    elem.style.cssText += 'background: linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);';
 }
 
 var FileController = function (_Controller) {
@@ -1635,6 +1635,39 @@ var FileController = function (_Controller) {
   }]);
   return FileController;
 }(Controller);
+
+var CustomController = function (_Controller) {
+  inherits(CustomController, _Controller);
+  function CustomController(object, property) {
+    classCallCheck(this, CustomController);
+    var _this = possibleConstructorReturn(this, (CustomController.__proto__ || Object.getPrototypeOf(CustomController)).call(this, object, property));
+    object.constructor(_this);
+    return _this;
+  }
+  return CustomController;
+}(Controller);
+
+var css = {
+  load: function load(url, indoc) {
+    var doc = indoc || document;
+    var link = doc.createElement('link');
+    link.type = 'text/css';
+    link.rel = 'stylesheet';
+    link.href = url;
+    doc.getElementsByTagName('head')[0].appendChild(link);
+  },
+  inject: function inject(cssContent, indoc) {
+    var doc = indoc || document;
+    var injected = document.createElement('style');
+    injected.type = 'text/css';
+    injected.innerHTML = cssContent;
+    var head = doc.getElementsByTagName('head')[0];
+    try {
+      head.appendChild(injected);
+    } catch (e) {
+    }
+  }
+};
 
 ___$insertStyle(".dg ul{list-style:none;margin:0;padding:0;width:100%;overflow:auto;clear:both}.dg.ac{position:fixed;top:0;left:0;right:0;height:0;z-index:0}.dg:not(.ac) .main{overflow:hidden}.dg.main{-webkit-transition:opacity .1s linear;-o-transition:opacity .1s linear;-moz-transition:opacity .1s linear;transition:opacity .1s linear}.dg.main ul.closed .close-button{opacity:1 !important}.dg.main:hover .close-button,.dg.main .close-button.drag{opacity:1}.dg.main .close-button{-webkit-transition:opacity .1s linear;-o-transition:opacity .1s linear;-moz-transition:opacity .1s linear;transition:opacity .1s linear;border:0;line-height:19px;height:20px;cursor:pointer;text-align:center;background-color:#ccc}.dg.main .close-button.close-top{position:relative}.dg.main .close-button.close-bottom{position:absolute}.dg.main .close-button:hover{background-color:#ddd}.dg.a{float:right;margin-right:15px;overflow-y:visible}.dg.a.has-save>ul.close-top{margin-top:0}.dg.a.has-save>ul.close-bottom{margin-top:27px}.dg.a.has-save>ul.closed{margin-top:0}.dg.a .save-row{top:0;z-index:1002}.dg.a .save-row.close-top{position:relative}.dg.a .save-row.close-bottom{position:fixed}.dg li{-webkit-transition:height .1s ease-out;-o-transition:height .1s ease-out;-moz-transition:height .1s ease-out;transition:height .1s ease-out;-webkit-transition:overflow .1s linear;-o-transition:overflow .1s linear;-moz-transition:overflow .1s linear;transition:overflow .1s linear}.dg li:not(.folder){cursor:auto;height:27px;line-height:27px;padding:0 4px 0 5px}.dg li.folder{padding:0;border-left:4px solid rgba(0,0,0,0)}.dg li.title{cursor:pointer;margin-left:-4px}.dg .closed li:not(.title),.dg .closed ul li,.dg .closed ul li>*{height:0;overflow:hidden;border:0}.dg .cr{clear:both;padding-left:3px;height:27px;overflow:hidden}.dg .property-name{cursor:default;float:left;clear:left;width:40%;overflow:hidden;text-overflow:ellipsis}.dg .c{float:left;width:60%;position:relative}.dg .c input[type=text]{border:0;margin-top:4px;padding:3px;width:100%;float:right}.dg .has-slider input[type=text]{width:30%;margin-left:0}.dg .slider{float:left;width:66%;margin-left:-5px;margin-right:0;height:19px;margin-top:4px}.dg .slider-fg{height:100%}.dg .c input[type=checkbox]{margin-top:7px}.dg .c select{margin-top:5px}.dg .cr.function,.dg .cr.function .property-name,.dg .cr.function *,.dg .cr.boolean,.dg .cr.boolean *{cursor:pointer}.dg .cr.color{overflow:visible}.dg .selector{display:none;position:absolute;margin-left:-9px;margin-top:23px;z-index:10}.dg .c:hover .selector,.dg .selector.drag{display:block}.dg li.save-row{padding:0}.dg li.save-row .button{display:inline-block;padding:0px 6px}.dg.dialogue{background-color:#222;width:460px;padding:15px;font-size:13px;line-height:15px}#dg-new-constructor{padding:10px;color:#222;font-family:Monaco, monospace;font-size:10px;border:0;resize:none;box-shadow:inset 1px 1px 1px #888;word-wrap:break-word;margin:12px 0;display:block;width:440px;overflow-y:scroll;height:100px;position:relative}#dg-local-explain{display:none;font-size:11px;line-height:17px;border-radius:3px;background-color:#333;padding:8px;margin-top:10px}#dg-local-explain code{font-size:10px}#dat-gui-save-locally{display:none}.dg{color:#555;font:11px 'Lucida Grande', sans-serif;text-shadow:none}.dg.main ul::-webkit-scrollbar{width:5px;background:#fafafa}.dg.main ul::-webkit-scrollbar-corner{height:0;display:none}.dg.main ul::-webkit-scrollbar-thumb{border-radius:5px;background:#aeaeae}.dg li:not(.folder){background:#fafafa;border-bottom:1px solid #e8e8e8}.dg li.save-row{line-height:25px;background:#dad5cb;border:0}.dg li.save-row select{margin-left:5px;width:108px}.dg li.save-row .button{text-shadow:none;margin-left:5px;margin-top:1px;border-radius:2px;font-size:9px;line-height:7px;padding:4px 4px 5px 4px;background:#c5bdad;color:#fff;text-shadow:0 1px 0 #b0a58f;box-shadow:0 -1px 0 #b0a58f;cursor:pointer}.dg li.save-row .button.gears{background:#c5bdad url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAANCAYAAAB/9ZQ7AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAQJJREFUeNpiYKAU/P//PwGIC/ApCABiBSAW+I8AClAcgKxQ4T9hoMAEUrxx2QSGN6+egDX+/vWT4e7N82AMYoPAx/evwWoYoSYbACX2s7KxCxzcsezDh3evFoDEBYTEEqycggWAzA9AuUSQQgeYPa9fPv6/YWm/Acx5IPb7ty/fw+QZblw67vDs8R0YHyQhgObx+yAJkBqmG5dPPDh1aPOGR/eugW0G4vlIoTIfyFcA+QekhhHJhPdQxbiAIguMBTQZrPD7108M6roWYDFQiIAAv6Aow/1bFwXgis+f2LUAynwoIaNcz8XNx3Dl7MEJUDGQpx9gtQ8YCueB+D26OECAAQDadt7e46D42QAAAABJRU5ErkJggg==) 2px 1px no-repeat;height:7px;width:8px}.dg li.save-row .button:hover{background-color:#bab19e;box-shadow:0 -1px 0 #b0a58f}.dg li.folder{border-bottom:0}.dg li.title{padding-left:16px;background:#e8e8e8;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.2)}.dg .cr.boolean{border-left:3px solid #806787}.dg .cr.color{border-left:3px solid}.dg .cr.function{border-left:3px solid #e61d5f}.dg .cr.file{border-left:3px solid #e6d21d}.dg .cr.number{border-left:3px solid #2FA1D6}.dg .cr.number input[type=text]{color:#2FA1D6}.dg .cr.string{border-left:3px solid #1ed36f}.dg .cr.string input[type=text]{color:#1ed36f}.dg .cr.function:hover,.dg .cr.boolean:hover{background:#eee}.dg .c input[type=text]{background:#e4e4e4;outline:none}.dg .c input[type=text]:hover{background:#d8d8d8}.dg .c input[type=text]:focus{background:#cbcbcb;color:#555}.dg .c .slider{background:#e4e4e4;cursor:ew-resize}.dg .c .slider-fg{background:#2FA1D6;max-width:100%}.dg .c .slider:hover{background:#d8d8d8}.dg .c .slider:hover .slider-fg{background:#2793c5}\n");
 
@@ -2062,6 +2095,7 @@ var GUI = function GUI(pars) {
     resetWidth();
   }
 };
+GUI.CustomController = CustomController;
 GUI.toggleHide = function () {
   hide = !hide;
   Common.each(hideableGuis, function (gui) {
@@ -2091,12 +2125,19 @@ Common.extend(GUI.prototype,
 {
   add: function add(object, property) {
     return _add(this, object, property, {
+      custom: object instanceof CustomController,
       factoryArgs: Array.prototype.slice.call(arguments, 2)
     });
   },
   addColor: function addColor(object, property) {
     return _add(this, object, property, {
       color: true
+    });
+  },
+  addCustomController: function addCustomController(object, property) {
+    return _add(this, object, property, {
+      custom: true,
+      factoryArgs: Array.prototype.slice.call(arguments, 2)
     });
   },
   addPlotter: function addPlotter(object, property, max, period, type, fgColor, bgColor) {
@@ -2470,12 +2511,19 @@ function recallSavedValue(gui, controller) {
   }
 }
 function _add(gui, object, property, params) {
-  if (object[property] === undefined) {
+  if (!object instanceof CustomController && !params.custom && object[property] === undefined) {
     throw new Error('Object "' + object + '" has no property "' + property + '"');
   }
   var controller = void 0;
   if (params.color) {
     controller = new ColorController(object, property);
+  } else if (object instanceof CustomController && property === undefined) {
+    controller = object;
+  } else if (!(object instanceof CustomController) && params.custom && object[property] === undefined) {
+    controller = new CustomController(object, property);
+  } else {
+    var factoryArgs = object instanceof CustomController ? [property].concat(params.factoryArgs) : [object, property].concat(params.factoryArgs);
+    controller = ControllerFactory.apply(gui, factoryArgs);
   } else if (params.plotter) {
     controller = new PlotterController(object, property, params);
     gui.listen(controller);
@@ -2488,10 +2536,10 @@ function _add(gui, object, property, params) {
   }
   recallSavedValue(gui, controller);
   dom.addClass(controller.domElement, 'c');
-  var name = document.createElement('span');
-  dom.addClass(name, 'property-name');
-  name.innerHTML = controller.property;
   var container = document.createElement('div');
+  var name = params.custom && controller instanceof CustomController === false ? object instanceof CustomController ? object.domElement : new CustomController(object).domElement : document.createElement('span');
+  if (!params.custom) name.innerHTML = controller.property;
+  dom.addClass(name, 'property-name');
   container.appendChild(name);
   container.appendChild(controller.domElement);
   var li = addRow(gui, container, params.before);
@@ -2700,7 +2748,8 @@ var controllers = {
   NumberControllerSlider: NumberControllerSlider,
   FunctionController: FunctionController,
   ColorController: ColorController,
-  FileController: FileController
+  FileController: FileController,
+  CustomController: CustomController,
 };
 var dom$1 = { dom: dom };
 var gui = { GUI: GUI };

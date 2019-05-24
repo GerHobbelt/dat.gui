@@ -469,6 +469,8 @@ const GUI = function(pars) {
   }
 };
 
+GUI.CustomController = CustomController;
+
 GUI.toggleHide = function() {
   hide = !hide;
   common.each(hideableGuis, function(gui) {
@@ -534,6 +536,7 @@ common.extend(
         this,
         object,
         property, {
+          custom: object instanceof CustomController,
           factoryArgs: Array.prototype.slice.call(arguments, 2)
         }
       );
@@ -661,7 +664,7 @@ common.extend(
     },
 
 
-  	/**
+    /**
      * Adds a new custom controller to the GUI.
      *
      * @param object
@@ -1269,7 +1272,7 @@ function recallSavedValue(gui, controller) {
 }
 
 function add(gui, object, property, params) {
-  if (!params.custom && (object[property] === undefined)) {
+  if (!(object instanceof CustomController) && !params.custom && (object[property] === undefined)) {
     throw new Error(`Object "${object}" has no property "${property}"`);
   }
 
@@ -1283,10 +1286,13 @@ function add(gui, object, property, params) {
     gui.listen(controller);
   } else if (params.file) {
     controller = new FileController(object, property);
-  } else if (params.custom && (object[property] === undefined)) {
+  } else if(object instanceof CustomController && ( property === undefined )){
+  	controller = object;
+  } else if (!(object instanceof CustomController) && params.custom && (object[property] === undefined)) {
   	controller = new CustomController(object, property);
   } else {
-    const factoryArgs = [object, property].concat(params.factoryArgs);
+  	const factoryArgs = object instanceof CustomController ?
+      [property].concat(params.factoryArgs) : [object, property].concat(params.factoryArgs);
     controller = ControllerFactory.apply(gui, factoryArgs);
   }
 
@@ -1300,7 +1306,8 @@ function add(gui, object, property, params) {
 
   const container = document.createElement('div');
 
-  const name = params.custom && ( controller instanceof CustomController === false ) ? new CustomController(object).domElement : document.createElement('span');
+  const name = params.custom && ( controller instanceof CustomController === false ) ?
+    ( object instanceof CustomController ? object.domElement : new CustomController(object).domElement ) : document.createElement('span');
   if (!params.custom)
   	name.innerHTML = controller.property;
   dom.addClass(name, 'property-name');

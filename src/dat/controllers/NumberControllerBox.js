@@ -59,7 +59,7 @@ class NumberControllerBox extends NumberController {
 
     function onChange() {
       const attempted = parseFloat(_this.__input.value);
-      if (!common.isNaN(attempted)) {
+      if (!common.isNaN(attempted) && !_this._readonly) {
         _this.setValue(attempted);
       }
     }

@@ -40,6 +40,12 @@ class Controller {
     this.property = property;
 
     /**
+     * Readonly field
+     * @type {Object}
+     */
+    this._readonly = false;
+
+    /**
      * The function to be called on change.
      * @type {Function}
      * @ignore
@@ -156,6 +162,18 @@ class Controller {
 
     this.updateDisplay();
 
+    return this;
+  }
+
+  /**
+   * Set readonly mode
+   *
+   * @param {Number} ro 
+   * @default false
+   * @returns {dat.controllers.StringController} this
+   */
+  readonly(ro) {
+    this._readonly = ro;
     return this;
   }
 }

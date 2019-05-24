@@ -67,6 +67,7 @@ class OptionController extends Controller {
   }
 
   setValue(v) {
+    if (this._readonly) return this.getValue();
     const toReturn = super.setValue(v);
 
     if (this.__onFinishChange) {

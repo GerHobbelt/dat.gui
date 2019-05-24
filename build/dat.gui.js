@@ -715,6 +715,7 @@ var Controller = function () {
     this.domElement = document.createElement('div');
     this.object = object;
     this.property = property;
+    this._readonly = false;
     this.__onChange = undefined;
     this.__onFinishChange = undefined;
     this.forceUpdateDisplay = false;
@@ -767,6 +768,12 @@ var Controller = function () {
     key: 'isModified',
     value: function isModified() {
       return this.initialValue !== this.getValue();
+    }
+  }, {
+    key: 'readonly',
+    value: function readonly(ro) {
+      this._readonly = ro;
+      return this;
     }
   }]);
   return Controller;
@@ -953,7 +960,7 @@ var BooleanController = function (_Controller) {
     _this2.__checkbox = document.createElement('input');
     _this2.__checkbox.setAttribute('type', 'checkbox');
     function onChange() {
-      _this.setValue(!_this.__prev);
+      if (!_this._readonly) _this.setValue(!_this.__prev);
     }
     dom.bind(_this2.__checkbox, 'change', onChange, false, true);
     _this2.domElement.appendChild(_this2.__checkbox);
@@ -1019,6 +1026,7 @@ var OptionController = function (_Controller) {
   createClass(OptionController, [{
     key: 'setValue',
     value: function setValue(v) {
+      if (_this._readonly) return this.getValue();
       var toReturn = get(OptionController.prototype.__proto__ || Object.getPrototypeOf(OptionController.prototype), 'setValue', this).call(this, v);
       if (this.__onFinishChange) {
         this.__onFinishChange.call(this, this.getValue());
@@ -1043,7 +1051,7 @@ var StringController = function (_Controller) {
     var _this2 = possibleConstructorReturn(this, (StringController.__proto__ || Object.getPrototypeOf(StringController)).call(this, object, property));
     var _this = _this2;
     function onChange() {
-      _this.setValue(_this.__input.value);
+      if (!_this._readonly) _this.setValue(_this.__input.value);
     }
     function onBlur() {
       if (_this.__onFinishChange) {
@@ -1163,7 +1171,7 @@ var NumberControllerBox = function (_NumberController) {
     dom.bind(_this2.__input, 'keydown', onKeyDown, false, true);
     function onChange() {
       var attempted = parseFloat(_this.__input.value);
-      if (!Common.isNaN(attempted)) {
+      if (!Common.isNaN(attempted) && !_this._readonly) {
         _this.setValue(attempted);
       }
     }
@@ -1263,7 +1271,7 @@ var NumberControllerSlider = function (_NumberController) {
     function onMouseDrag(e) {
       e.preventDefault();
       var bgRect = _this.__background.getBoundingClientRect();
-      _this.setValue(map(e.clientX, bgRect.left, bgRect.right, _this.__min, _this.__max));
+      if (!_this._readonly) _this.setValue(map(e.clientX, bgRect.left, bgRect.right, _this.__min, _this.__max));
       return false;
     }
     function onMouseUp() {
@@ -1284,7 +1292,7 @@ var NumberControllerSlider = function (_NumberController) {
     function onTouchMove(e) {
       var clientX = e.touches[0].clientX;
       var bgRect = _this.__background.getBoundingClientRect();
-      _this.setValue(map(clientX, bgRect.left, bgRect.right, _this.__min, _this.__max));
+      if (!_this._readonly) _this.setValue(map(clientX, bgRect.left, bgRect.right, _this.__min, _this.__max));
     }
     function onTouchEnd() {
       dom.unbind(window, 'touchmove', onTouchMove);

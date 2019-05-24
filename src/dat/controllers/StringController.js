@@ -29,7 +29,8 @@ class StringController extends Controller {
     const _this = this;
 
     function onChange() {
-      _this.setValue(_this.__input.value);
+      if (!_this._readonly)
+        _this.setValue(_this.__input.value);
     }
 
     function onBlur() {
@@ -63,6 +64,7 @@ class StringController extends Controller {
     }
     return super.updateDisplay();
   }
+
 }
 
 export default StringController;

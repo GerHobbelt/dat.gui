@@ -1,8 +1,8 @@
 /**
- * dat-gui JavaScript Controller Library
+ * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2019 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -11,7 +11,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import "./style.scss";
+import css from "../utils/css";
 
 import saveDialogueContents from "./saveDialogue.html";
 import ControllerFactory from "../controllers/ControllerFactory";
@@ -29,6 +29,10 @@ import CenteredDiv from "../dom/CenteredDiv";
 import dom from "../dom/dom";
 import common from "../utils/common";
 import autocomplete from "../dom/autocomplete";
+
+import styleSheet from "./style.scss"; // CSS to embed in build
+
+//css.inject(styleSheet);
 
 /** @ignore Outer-most className for GUI's */
 const CSS_NAMESPACE = "dg";
@@ -712,7 +716,7 @@ common.extend(
       // We have to prevent collisions on names in order to have a key
       // by which to remember saved values
       if (this.__folders[name] !== undefined) {
-        throw new Error("You already have a folder in this GUI by the" + ' name "' + name + '"');
+        throw new Error('You already have a folder in this GUI by the name "' + name + '"');
       }
 
       const newGuiParams = { name: name, parent: this };
@@ -724,8 +728,10 @@ common.extend(
 
       // Do we have saved appearance data for this folder?
       if (
-        this.load && // Anything loaded?
-        this.load.folders && // Was my parent a dead-end?
+        // Anything loaded?
+        this.load &&
+        // Was my parent a dead-end?
+        this.load.folders &&
         this.load.folders[name]
       ) {
         // Did daddy remember me?
@@ -756,8 +762,10 @@ common.extend(
 
       // Do we have saved appearance data for this folder?
       if (
-        this.load && // Anything loaded?
-        this.load.folders && // Was my parent a dead-end?
+        // Anything loaded?
+        this.load &&
+        // Was my parent a dead-end?
+        this.load.folders &&
         this.load.folders[folder.name]
       ) {
         delete this.load.folders[folder.name];
@@ -1295,8 +1303,6 @@ function add(gui, object, property, params) {
 
   dom.addClass(controller.domElement, "c");
 
-  const container = document.createElement("div");
-
   const name =
     params.custom && controller instanceof CustomController === false
       ? object instanceof CustomController
@@ -1307,6 +1313,8 @@ function add(gui, object, property, params) {
     name.innerHTML = controller.property;
   }
   dom.addClass(name, "property-name");
+
+  const container = document.createElement("div");
   container.appendChild(name);
 
   container.appendChild(controller.domElement);

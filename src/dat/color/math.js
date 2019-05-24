@@ -1,8 +1,8 @@
 /**
- * dat-gui JavaScript Controller Library
+ * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2019 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,7 +79,8 @@ const ColorMath = {
   },
 
   hex_with_component: function(hex, componentIndex, value) {
-    return (value << (tmpComponent = componentIndex * 8)) | (hex & ~(0xff << tmpComponent));
+    value = (value << (tmpComponent = componentIndex * 8)) | (hex & ~(0xff << tmpComponent));
+    return value;
   }
 };
 

@@ -28,6 +28,25 @@
         const { CustomController } = dat.controllers;
         const { GUI } = dat.gui;
 
+        function match(a, b, msg) {
+          for (const i in b) {
+            if (Number.isNaN(b[i])) {
+              ok(Number.isNaN(a[i]), msg);
+            } else {
+              equal(b[i], a[i], msg);
+            }
+          }
+        }
+
+        function equalish(a, b, tolerance, label) {
+          return ok(Math.abs(a - b) < tolerance, label);
+        }
+
+        // disabled tests are renamed to xxxtest():
+        function xxxtest(description, f) {
+          console.warn("Disabled test: ", description);
+        }
+
         module("Color Math");
 
         test("rgb_to_hex", function() {
@@ -360,20 +379,6 @@
 
           equal(c.h, prevHue, "black, hue intact");
         });
-
-        function match(a, b, msg) {
-          for (const i in b) {
-            if (b[i] !== b[i]) {
-              ok(a[i] !== a[i], msg);
-            } else {
-              equal(b[i], a[i], msg);
-            }
-          }
-        }
-
-        function equalish(a, b, tolerance, label) {
-          return ok(Math.abs(a - b) < tolerance, label);
-        }
 
         function initObject() {
           return {
@@ -742,30 +747,28 @@
           document.body.removeChild(c1.domElement);
         });
 
-        /*
-    test("Set Color", function() {
-      // get from click, get from hover
-      var object = initObject();
-      var c1 = new ColorController(object, 'colorProperty');
+        xxxtest("Set Color", function() {
+          // get from click, get from hover
+          const object = initObject();
+          const c1 = new ColorController(object, "colorProperty");
 
-      document.body.appendChild(c1.domElement);
-      var input = c1.domElement.getElementsByTagName("input")[0];
+          document.body.appendChild(c1.domElement);
+          const input = c1.domElement.getElementsByTagName("input")[0];
 
-      // type in color
-      input.value = "#ff0";
+          // type in color
+          input.value = "#ff0";
 
-      // TODO fake events for keys not working
-      dom.fakeEvent(input, 'keydown', { keyCode: 13 });
+          // TODO fake events for keys not working
+          dom.fakeEvent(input, "keydown", { keyCode: 13 });
 
-      // click sv field
+          // click sv field
 
-      // click hue slider
+          // click hue slider
 
-      equal(1,0, "TODO: add set color tests.");
+          equal(1, 0, "TODO: add set color tests.");
 
-      document.body.removeChild(c1.domElement);
-    });
-*/
+          document.body.removeChild(c1.domElement);
+        });
 
         module("CustomController");
 
@@ -921,10 +924,6 @@
 
           ok(c2_changed, "StringController fires when needed.");
         });
-
-        function equalish(a, b, tolerance, label) {
-          return ok(Math.abs(a - b) < tolerance, label);
-        }
 
         module("GUI Appearance");
 
@@ -1263,11 +1262,11 @@
           let gui = new GUI();
           gui.remember(object);
 
-          for (var i in object) {
+          for (const i in object) {
             controllers[i] = gui.add(object, i);
           }
 
-          for (i in controllers) {
+          for (const i in controllers) {
             controllers[i].setValue(changed[i]);
           }
 
@@ -1281,7 +1280,7 @@
 
           gui.remember(object);
 
-          for (i in object) {
+          for (const i in object) {
             controllers[i] = gui.add(object, i);
             equal(object[i], changed[i]);
           }
@@ -1302,7 +1301,7 @@
 
           const original = {};
 
-          for (var i in object) {
+          for (const i in object) {
             original[i] = object[i];
           }
 
@@ -1317,11 +1316,11 @@
           let gui = new GUI();
           gui.remember(object);
 
-          for (i in object) {
+          for (const i in object) {
             controllers[i] = gui.add(object, i);
           }
 
-          for (i in controllers) {
+          for (const i in controllers) {
             controllers[i].setValue(changed[i]);
           }
 
@@ -1342,7 +1341,7 @@
 
           gui.remember(object);
 
-          for (i in object) {
+          for (const i in object) {
             controllers[i] = gui.add(object, i);
             equal(object[i], changed[i], "Uses last defined preset");
           }
@@ -1359,7 +1358,7 @@
 
           gui.remember(object);
 
-          for (i in object) {
+          for (const i in object) {
             controllers[i] = gui.add(object, i);
             equal(object[i], original[i], "Loads with explicitly set preset");
           }
@@ -1369,14 +1368,14 @@
 
           gui.preset = presetName;
 
-          for (i in object) {
+          for (const i in object) {
             equal(object[i], changed[i], "Changes via gui.preset property");
           }
 
           $(gui.__preset_select).val("Default");
           dom.fakeEvent(gui.__preset_select, "change");
 
-          for (i in object) {
+          for (const i in object) {
             equal(object[i], original[i], "Changes via dropdown");
           }
 

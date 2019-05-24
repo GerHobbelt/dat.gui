@@ -43,6 +43,8 @@ manipulate variables and fire functions on the fly.
     * [.add(object, property, [min], [max], [step])](#GUI+add) ⇒ [<code>Controller</code>](#Controller)
     * [.addColor(object, property)](#GUI+addColor) ⇒ [<code>Controller</code>](#Controller)
     * [.addPlotter(object, property, max, period, type, fgColor, bgColor)](#GUI+addPlotter) ⇒ [<code>Controller</code>](#Controller)
+    * [.addFile(object, property)](#GUI+addFile) ⇒ [<code>Controller</code>](#Controller)
+    * [.addCustomController(object, property)](#GUI+addCustomController) ⇒ [<code>Controller</code>](#Controller)
     * [.remove(controller)](#GUI+remove)
     * [.destroy()](#GUI+destroy)
     * [.addFolder(name)](#GUI+addFolder) ⇒ <code>dat.gui.GUI</code>
@@ -63,6 +65,7 @@ manipulate variables and fire functions on the fly.
 | [params] | <code>Object</code> |  |  |
 | [params.name] | <code>String</code> |  | The name of this GUI. |
 | [params.load] | <code>Object</code> |  | JSON object representing the saved state of this GUI. |
+| [params.object] | <code>Object</code> |  | Providing your object will create a controller for each property automatically |
 | [params.parent] | <code>dat.gui.GUI</code> |  | The GUI I'm nested in. |
 | [params.autoPlace] | <code>Boolean</code> | <code>true</code> |  |
 | [params.hideable] | <code>Boolean</code> | <code>true</code> | If true, GUI is shown/hidden by <kbd>h</kbd> keypress. |
@@ -146,8 +149,9 @@ Determines whether or not to use <a href="https://developer.mozilla.org/en/DOM/S
 
 ### gui.add(object, property, [min], [max], [step]) ⇒ [<code>Controller</code>](#Controller)
 Adds a new [Controller](#Controller) to the GUI. The type of controller created
-is inferred from the initial value of <code>object[property]</code>. For
-color properties, see [addColor](addColor).
+is inferred from the initial value of <code>object[property]</code>.
+For color properties, see [addColor](addColor).
+For file properties, see [addFile](addFile).
 
 **Kind**: instance method of [<code>GUI</code>](#GUI)  
 **Returns**: [<code>Controller</code>](#Controller) - The controller that was added to the GUI.  
@@ -224,6 +228,41 @@ var obj = {
 gui.addPlotter(obj, 'value', 10, 100);
 gui.addPlotter(obj, 'value', 10, 0);
 ```
+<a name="GUI+addFile"></a>
+
+### gui.addFile(object, property) ⇒ [<code>Controller</code>](#Controller)
+Adds a new file controller to the GUI.
+
+**Kind**: instance method of [<code>GUI</code>](#GUI)  
+**Returns**: [<code>Controller</code>](#Controller) - The controller that was added to the GUI.  
+
+| Param |
+| --- |
+| object | 
+| property | 
+
+**Example**  
+```js
+var instance = {
+ onLoad: function(dataURL) {
+   document.getElementById('img').src = dataURL
+ }
+};
+gui.addFile(instance, 'onLoad');
+```
+<a name="GUI+addCustomController"></a>
+
+### gui.addCustomController(object, property) ⇒ [<code>Controller</code>](#Controller)
+Adds a new custom controller to the GUI.
+
+**Kind**: instance method of [<code>GUI</code>](#GUI)  
+**Returns**: [<code>Controller</code>](#Controller) - The controller that was added to the GUI.  
+
+| Param |
+| --- |
+| object | 
+| property | 
+
 <a name="GUI+remove"></a>
 
 ### gui.remove(controller)
@@ -317,6 +356,7 @@ An "abstract" class that represents a given property of an object.
     * [.domElement](#Controller+domElement) : <code>DOMElement</code>
     * [.object](#Controller+object) : <code>Object</code>
     * [.property](#Controller+property) : <code>String</code>
+    * [._readonly](#Controller+_readonly) : <code>Object</code>
     * [.forceUpdateDisplay](#Controller+forceUpdateDisplay) : <code>boolean</code>
     * [.options(options)](#Controller+options) ⇒ [<code>Controller</code>](#Controller)
     * [.name(name)](#Controller+name) ⇒ [<code>Controller</code>](#Controller)
@@ -330,6 +370,7 @@ An "abstract" class that represents a given property of an object.
     * [.getValue()](#Controller+getValue) ⇒ <code>Object</code>
     * [.updateDisplay()](#Controller+updateDisplay) ⇒ [<code>Controller</code>](#Controller)
     * [.isModified()](#Controller+isModified) ⇒ <code>Boolean</code>
+    * [.readonly(ro)](#Controller+readonly) ⇒ <code>dat.controllers.StringController</code>
 
 <a name="new_Controller_new"></a>
 
@@ -356,6 +397,12 @@ The object to manipulate
 
 ### controller.property : <code>String</code>
 The name of the property to manipulate
+
+**Kind**: instance property of [<code>Controller</code>](#Controller)  
+<a name="Controller+_readonly"></a>
+
+### controller.\_readonly : <code>Object</code>
+Readonly field
 
 **Kind**: instance property of [<code>Controller</code>](#Controller)  
 <a name="Controller+forceUpdateDisplay"></a>
@@ -471,6 +518,19 @@ with the object's current value.
 ### controller.isModified() ⇒ <code>Boolean</code>
 **Kind**: instance method of [<code>Controller</code>](#Controller)  
 **Returns**: <code>Boolean</code> - true if the value has deviated from initialValue  
+<a name="Controller+readonly"></a>
+
+### controller.readonly(ro) ⇒ <code>dat.controllers.StringController</code>
+Set readonly mode
+
+**Kind**: instance method of [<code>Controller</code>](#Controller)  
+**Default**: <code>false</code>  
+**Returns**: <code>dat.controllers.StringController</code> - this  
+
+| Param | Type |
+| --- | --- |
+| ro | <code>Number</code> | 
+
 <a name="NumberController"></a>
 
 ## NumberController ⇐ <code>dat.controllers.Controller</code>

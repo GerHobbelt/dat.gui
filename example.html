@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-</head>
-<body>
-  <script type="text/javascript" src="build/dat.gui.js"></script>
-  <script type="text/javascript">
-    var obj = {
-        message: 'Hello World',
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <link rel="stylesheet" href="build/dat.gui.css" />
+  </head>
+  <body>
+    <script type="text/javascript" src="build/dat.gui.js"></script>
+    <script type="text/javascript">
+      /* eslint-disable no-console, camelcase */
+
+      const obj = {
+        message: "Hello World",
         displayOutline: false,
 
         maxSize: 6.0,
@@ -59,6 +62,6 @@
     var f3 = f2.addFolder('Nested Folder');
     f3.add(obj, 'growthSpeed');
 
-  </script>
-</body>
+    </script>
+  </body>
 </html>

@@ -41,9 +41,13 @@ See `tests/manual.html` for an example of each type of controller.
 
 ## Installing from npm
 
+Install the module:
+
 ```bash
-$ npm install --save @macroman/dat.gui
+$ npm install --save dat.gui
 ```
+
+Use it:
 
 ```js
 // CommonJS:
@@ -52,16 +56,23 @@ const dat = require('dat.gui');
 // ES6:
 import * as dat from 'dat.gui';
 
-const gui = new dat.GUI();
+var obj = { x: 5 };
+var gui = new dat.GUI();
+
+gui.add(obj, 'x').onChange(function() {
+  // obj.x will now have updated value
+});
 ```
+
+
 
 
 ## Directory Contents
 
 ```
-├── build - Compiled source code.
-├── src - Source files.
-└── tests - Tests.
+├── build - Concatenated source code for browsers.
+├── src - source code in commonjs format.
+└── tests - [QUnit](https://github.com/jquery/qunit) test suite.
 ```
 
 
@@ -69,10 +80,14 @@ const gui = new dat.GUI();
 
 In the terminal, enter the following:
 
-```
+```bash
 $ npm install
 $ npm run build
 ```
+
+This will create a rolled-up build of dat.GUI at `build/dat.gui.js` and its
+minified version at `build/dat.gui.min.js`.
+
 
 
 ## Running tests
@@ -110,3 +125,4 @@ The following libraries / open-source projects were used in the development of d
  * [Node.js](http://nodejs.org/)
  * [QUnit](https://github.com/jquery/qunit) / [jquery](http://jquery.com/)
  * [stats.js](http://mrdoob.github.io/stats.js/)
+

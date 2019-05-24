@@ -1,63 +1,88 @@
 {
-  "name": "@macroman/dat.gui",
-  "version": "1.2.0+dataarts-0.7.6",
+  "name": "@gerhobbelt/dat.GUI",
+  "version": "0.7.6-3",
   "description": "A lightweight graphical user interface for changing variables in JavaScript (fork with extra features).",
   "main": "build/dat.gui.js",
   "module": "build/dat.gui.module.js",
   "directories": {
+    "doc": "docs",
+    "example": "examples",
     "test": "tests"
   },
   "scripts": {
     "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"serve -l 8080\"",
-    "build": "rollup -c && rollup -c rollup.config.min.js",
+    "build": "rollup -c && prettier --print-width 120 --write build/**/*.js && rollup -c rollup.config.min.js && npm run update-banner",
+    "watch": "rollup --watch -c && rollup --watch -c rollup.config.js",
     "build-docs": "jsdoc2md -f src/dat/gui/GUI.js src/dat/controllers/Controller.js src/dat/controllers/NumberController.js | replace-between --target API.md --token API",
-    "lint": "eslint src",
+    "lint": "eslint src tests/*.html example.html",
+    "fix": "eslint --fix src tests/*.html example.html && npm run prettier",
+    "update-banner": "node util/__patch_licenseBanner_in_js.js",
     "preversion": "npm run lint",
     "version": "npm run build && git add -A build",
-    "postversion": "git push && git push --tags && npm publish"
+    "postversion": "git push && git push --tags && npm publish",
+    "prettier": "prettier --print-width 120 --write *.js **/*.js **/*.ts tests/*.html example.html",
+    "pub": "npm publish --access public"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/MacroMan/dat.gui.git"
+    "url": "git@github.com:dataarts/dat.gui.git"
   },
-  "author": "Data Arts Team, Google, MacroMan",
+  "keywords": [
+    "data",
+    "binding",
+    "control",
+    "panel",
+    "data",
+    "GUI"
+  ],
+  "author": "Data Arts Team, Google",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/MacroMan/dat.gui/issues"
+    "url": "https://github.com/dataarts/dat.gui/issues"
   },
-  "homepage": "https://github.com/MacroMan/dat.gui#readme",
+  "homepage": "https://github.com/dataarts/dat.gui",
   "devDependencies": {
-    "@babel/core": "^7.4.3",
-    "ajv": "^6.10.0",
-    "babel-core": "^6.26.3",
-    "babel-plugin-external-helpers": "^6.22.0",
-    "babel-preset-env": "^1.7.0",
-    "concurrently": "^3.5.1",
-    "eslint": "^3.5.0",
-    "eslint-config-airbnb-base": "^7.1.0",
-    "eslint-loader": "^1.5.0",
-    "eslint-plugin-import": "^1.15.0",
-    "extend": "^3.0.0",
-    "jsdoc-to-markdown": "^4.0.1",
+    "@babel/core": "7.4.4",
+    "@babel/preset-env": "7.4.4",
+    "concurrently": "4.1.0",
+    "eslint": "5.16.0",
+    "eslint-config-airbnb-base": "13.1.0",
+    "eslint-plugin-import": "2.17.2",
+    "eslint-plugin-html": "5.0.5",
+    "extend": "3.0.2",
+    "globby": "9.2.0",
+    "jsdoc-to-markdown": "5.0.0",
+    "node-sass": "4.12.0",
+    "prettier": "1.17.1",
+    "qunit": "2.9.2",
     "replace-between": "0.0.8",
-    "rollup": "^0.54.1",
-    "rollup-plugin-babel": "^3.0.4",
-    "rollup-plugin-cleanup": "^2.0.1",
-    "rollup-plugin-node-resolve": "^3.3.0",
-    "rollup-plugin-sass": "^1.2.2",
-    "rollup-plugin-uglify": "^2.0.1",
-    "serve": "^11.0.0"
+    "rollup": "1.12.3",
+    "rollup-plugin-babel": "4.3.2",
+    "rollup-plugin-cleanup": "3.1.1",
+    "rollup-plugin-commonjs": "10.0.0",
+    "rollup-plugin-html": "0.2.1",
+    "rollup-plugin-node-resolve": "5.0.0",
+    "rollup-plugin-sass": "1.2.2",
+    "rollup-plugin-uglify": "6.0.2",
+    "serve": "11.0.0",
+    "uglify-js": "3.5.14"
   },
   "eslintConfig": {
     "extends": "airbnb-base",
+    "plugins": [
+      "html"
+    ],
     "rules": {
       "comma-dangle": 0,
       "func-names": 0,
       "no-alert": 0,
       "no-console": 1,
+      "no-unused-vars": 0,
+      "no-multi-assign": 0,
       "no-use-before-define": 0,
       "prefer-rest-params": 0,
       "prefer-template": 0,
+      "prefer-destructuring": "warn",
       "no-mixed-operators": 0,
       "no-undef": 0,
       "no-underscore-dangle": 0,
@@ -69,9 +94,24 @@
       "no-param-reassign": 0,
       "consistent-return": 0,
       "no-restricted-syntax": 0,
+      "no-restricted-globals": 0,
       "no-bitwise": 0,
-      "no-plusplus": 0
+      "no-plusplus": 0,
+      "quotes": [
+        "error",
+        "double",
+        {
+          "avoidEscape": true
+        }
+      ],
+      "eqeqeq": [
+        "error",
+        "always",
+        {
+          "null": "ignore"
+        }
+      ],
+      "guard-for-in": "warn"
     }
-  },
-  "dependencies": {}
+  }
 }

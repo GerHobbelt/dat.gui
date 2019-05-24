@@ -159,6 +159,9 @@ $input-color: darken($background-color, 8.5%);
       input[type=number] {
         color: $number-color;
       }
+      input[type=number] {
+        color: $number-color;
+      }
     }
 
     &.string {
@@ -188,6 +191,21 @@ $input-color: darken($background-color, 8.5%);
       &:focus {
         background: darken($input-color, $active-darken);
         color: #555; // #fff;
+      }
+
+    }
+
+    input[type=number] {
+
+      background: $input-color;
+      outline: none;
+      border: none;
+      &:hover {
+        background: lighten($input-color, $hover-lighten);
+      }
+      &:focus {
+        background: lighten($input-color, $active-lighten);
+        color: #fff;
       }
 
     }

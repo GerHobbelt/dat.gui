@@ -11,8 +11,8 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import Controller from './Controller';
-import Plotter from '../utils/plotter';
+import Controller from "./Controller";
+import Plotter from "../utils/plotter";
 
 /**
  * @class Provides a canvas that graphically displays the value of the object property at the specified interval
@@ -48,7 +48,7 @@ class PlotterController extends Controller {
     if (this.period < 1 && value !== this.prevValue) {
       /* Update only on value change when auto-refresh is off */
       this.__panel.update(value, this.max);
-    } else if ((Date.now() - this.lastUpdate) > this.period) {
+    } else if (Date.now() - this.lastUpdate > this.period) {
       /* Update if elapsed time since last update is greater than the period */
       this.__panel.update(value, this.max);
       this.lastUpdate = Date.now() * 2 - this.lastUpdate - this.period;
@@ -58,7 +58,6 @@ class PlotterController extends Controller {
 
     return super.updateDisplay();
   }
-
 }
 
 export default PlotterController;

@@ -24,27 +24,39 @@ const Common = {
   BREAK: {},
 
   extend: function(target) {
-    this.each(ARR_SLICE.call(arguments, 1), function(obj) {
-      const keys = this.isObject(obj) ? Object.keys(obj) : [];
-      keys.forEach(function(key) {
-        if (!this.isUndefined(obj[key])) {
-          target[key] = obj[key];
-        }
-      }.bind(this));
-    }, this);
+    this.each(
+      ARR_SLICE.call(arguments, 1),
+      function(obj) {
+        const keys = this.isObject(obj) ? Object.keys(obj) : [];
+        keys.forEach(
+          function(key) {
+            if (!this.isUndefined(obj[key])) {
+              target[key] = obj[key];
+            }
+          }.bind(this)
+        );
+      },
+      this
+    );
 
     return target;
   },
 
   defaults: function(target) {
-    this.each(ARR_SLICE.call(arguments, 1), function(obj) {
-      const keys = this.isObject(obj) ? Object.keys(obj) : [];
-      keys.forEach(function(key) {
-        if (this.isUndefined(target[key])) {
-          target[key] = obj[key];
-        }
-      }.bind(this));
-    }, this);
+    this.each(
+      ARR_SLICE.call(arguments, 1),
+      function(obj) {
+        const keys = this.isObject(obj) ? Object.keys(obj) : [];
+        keys.forEach(
+          function(key) {
+            if (this.isUndefined(target[key])) {
+              target[key] = obj[key];
+            }
+          }.bind(this)
+        );
+      },
+      this
+    );
 
     return target;
   },
@@ -65,10 +77,11 @@ const Common = {
       return;
     }
 
-    //if (ARR_EACH && obj.forEach && obj.forEach === ARR_EACH) {
+    // if (ARR_EACH && obj.forEach && obj.forEach === ARR_EACH) {
     if (obj.forEach) {
       obj.forEach(itr, scope);
-    } else if (obj.length === obj.length + 0) { // Is number but not NaN
+    } else if (obj.length === obj.length + 0) {
+      // Is number but not NaN
       let key;
       let l;
       for (key = 0, l = obj.length; key < l; key++) {
@@ -132,10 +145,10 @@ const Common = {
     return isNaN(obj);
   },
 
-  //isArray: Array.isArray || function(obj) {
+  // isArray: Array.isArray || function(obj) {
   isArray: function(obj) {
-    //return obj.constructor === Array;
-    return obj != void 0 && obj.length >= 0 && typeof obj === 'object';
+    // return obj.constructor === Array;
+    return obj != void 0 && obj.length >= 0 && typeof obj === "object";
   },
 
   isObject: function(obj) {
@@ -147,7 +160,7 @@ const Common = {
   },
 
   isString: function(obj) {
-    return obj === obj + '';
+    return obj === obj + "";
   },
 
   isBoolean: function(obj) {
@@ -155,25 +168,24 @@ const Common = {
   },
 
   isFunction: function(obj) {
-    return Object.prototype.toString.call(obj) === '[object Function]';
+    return Object.prototype.toString.call(obj) === "[object Function]";
   },
 
   supportsPassive: function() {
     let supportsPassive = false;
     try {
-      const opts = Object.defineProperty({}, 'passive', {
+      const opts = Object.defineProperty({}, "passive", {
         get: function() {
           supportsPassive = true;
         }
       });
-      window.addEventListener('testPassive', null, opts);
-      window.removeEventListener('testPassive', null, opts);
+      window.addEventListener("testPassive", null, opts);
+      window.removeEventListener("testPassive", null, opts);
     } catch (e) {
       // Do nothing
     }
     return supportsPassive;
   }
-
 };
 
 export default Common;

@@ -11,8 +11,8 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import NumberController from './NumberController';
-import dom from '../dom/dom';
+import NumberController from "./NumberController";
+import dom from "../dom/dom";
 
 function map(v, i1, i2, o1, o2) {
   return o1 + (o2 - o1) * ((v - i1) / (i2 - i1));
@@ -40,21 +40,21 @@ class NumberControllerSlider extends NumberController {
 
     const _this = this;
 
-    this.__background = document.createElement('div');
-    this.__foreground = document.createElement('div');
+    this.__background = document.createElement("div");
+    this.__foreground = document.createElement("div");
 
-    dom.bind(this.__background, 'mousedown', onMouseDown);
-    dom.bind(this.__background, 'touchstart', onTouchStart, false, true);
-    dom.bind(this.__background, 'wheel', onWheel);
+    dom.bind(this.__background, "mousedown", onMouseDown);
+    dom.bind(this.__background, "touchstart", onTouchStart, false, true);
+    dom.bind(this.__background, "wheel", onWheel);
 
-    dom.addClass(this.__background, 'slider');
-    dom.addClass(this.__foreground, 'slider-fg');
+    dom.addClass(this.__background, "slider");
+    dom.addClass(this.__foreground, "slider-fg");
 
     function onMouseDown(e) {
       document.activeElement.blur();
 
-      dom.bind(window, 'mousemove', onMouseDrag);
-      dom.bind(window, 'mouseup', onMouseUp, false, true);
+      dom.bind(window, "mousemove", onMouseDrag);
+      dom.bind(window, "mouseup", onMouseUp, false, true);
 
       onMouseDrag(e);
     }
@@ -64,42 +64,42 @@ class NumberControllerSlider extends NumberController {
 
       const bgRect = _this.__background.getBoundingClientRect();
 
-      if (!_this._readonly)
-        _this.setValue(
-          map(e.clientX, bgRect.left, bgRect.right, _this.__min, _this.__max)
-        );
+      if (!_this._readonly) {
+        _this.setValue(map(e.clientX, bgRect.left, bgRect.right, _this.__min, _this.__max));
+      }
 
       return false;
     }
 
     function onMouseUp() {
-      dom.unbind(window, 'mousemove', onMouseDrag);
-      dom.unbind(window, 'mouseup', onMouseUp);
+      dom.unbind(window, "mousemove", onMouseDrag);
+      dom.unbind(window, "mouseup", onMouseUp);
       if (_this.__onFinishChange) {
         _this.__onFinishChange.call(_this, _this.getValue());
       }
     }
 
     function onTouchStart(e) {
-      if (e.touches.length !== 1) { return; }
-      dom.bind(window, 'touchmove', onTouchMove, false, true);
-      dom.bind(window, 'touchend', onTouchEnd, false, true);
+      if (e.touches.length !== 1) {
+        return;
+      }
+      dom.bind(window, "touchmove", onTouchMove, false, true);
+      dom.bind(window, "touchend", onTouchEnd, false, true);
       onTouchMove(e);
     }
 
     function onTouchMove(e) {
-      const clientX = e.touches[0].clientX;
+      const { clientX } = e.touches[0];
       const bgRect = _this.__background.getBoundingClientRect();
 
-      if (!_this._readonly)
-        _this.setValue(
-          map(clientX, bgRect.left, bgRect.right, _this.__min, _this.__max)
-        );
+      if (!_this._readonly) {
+        _this.setValue(map(clientX, bgRect.left, bgRect.right, _this.__min, _this.__max));
+      }
     }
 
     function onTouchEnd() {
-      dom.unbind(window, 'touchmove', onTouchMove);
-      dom.unbind(window, 'touchend', onTouchEnd);
+      dom.unbind(window, "touchmove", onTouchMove);
+      dom.unbind(window, "touchend", onTouchEnd);
       if (_this.__onFinishChange) {
         _this.__onFinishChange.call(_this, _this.getValue());
       }
@@ -107,7 +107,7 @@ class NumberControllerSlider extends NumberController {
 
     function onWheel(e) {
       e.preventDefault();
-      const direction = (-e.deltaY >> 10) || 1;
+      const direction = -e.deltaY >> 10 || 1;
       _this.setValue(_this.getValue() + direction * _this.__impliedStep);
     }
 
@@ -118,11 +118,11 @@ class NumberControllerSlider extends NumberController {
   }
 
   updateDisplay() {
-    if(this.__input === document.activeElement) {
+    if (this.__input === document.activeElement) {
       return;
     }
     const pct = (this.getValue() - this.__min) / (this.__max - this.__min);
-    this.__foreground.style.width = pct * 100 + '%';
+    this.__foreground.style.width = pct * 100 + "%";
     return super.updateDisplay();
   }
 }

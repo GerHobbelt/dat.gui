@@ -42,7 +42,7 @@ THE SOFTWARE.
 const plotter = function(fg, bg, type) {
   let min = Infinity;
   let max = 0;
-  const round = Math.round;
+  const { round } = Math;
   const PR = round(window.devicePixelRatio || 1);
 
   const WIDTH = 160 * PR;
@@ -52,13 +52,13 @@ const plotter = function(fg, bg, type) {
   const GRAPH_WIDTH = 154 * PR;
   const GRAPH_HEIGHT = 54 * PR;
 
-  const canvas = document.createElement('canvas');
+  const canvas = document.createElement("canvas");
   canvas.width = WIDTH;
   canvas.height = HEIGHT;
 
-  const context = canvas.getContext('2d');
-  context.font = 'bold ' + (9 * PR) + 'px Helvetica,Arial,sans-serif';
-  context.textBaseline = 'top';
+  const context = canvas.getContext("2d");
+  context.font = "bold " + 9 * PR + "px Helvetica,Arial,sans-serif";
+  context.textBaseline = "top";
 
   context.fillStyle = bg;
   context.fillRect(0, 0, WIDTH, HEIGHT);
@@ -72,7 +72,7 @@ const plotter = function(fg, bg, type) {
 
   return {
     dom: canvas,
-    update: function (value, maxValue) {
+    update: function(value, maxValue) {
       min = Math.min(min, value);
       max = Math.max(max, value);
 
@@ -80,7 +80,17 @@ const plotter = function(fg, bg, type) {
       context.fillStyle = fg;
 
       // Move graph over 1px
-      context.drawImage(canvas, GRAPH_X + PR, GRAPH_Y, GRAPH_WIDTH - PR, GRAPH_HEIGHT, GRAPH_X, GRAPH_Y, GRAPH_WIDTH - PR, GRAPH_HEIGHT);
+      context.drawImage(
+        canvas,
+        GRAPH_X + PR,
+        GRAPH_Y,
+        GRAPH_WIDTH - PR,
+        GRAPH_HEIGHT,
+        GRAPH_X,
+        GRAPH_Y,
+        GRAPH_WIDTH - PR,
+        GRAPH_HEIGHT
+      );
 
       // Draw fg color
       context.fillRect(GRAPH_X + GRAPH_WIDTH - PR, GRAPH_Y, PR, GRAPH_HEIGHT);
@@ -89,18 +99,13 @@ const plotter = function(fg, bg, type) {
       context.globalAlpha = 0.9;
 
       // Blank out above the value
-      context.fillRect(
-        GRAPH_X + GRAPH_WIDTH - PR,
-        GRAPH_Y,
-        PR,
-        round((1 - (value / maxValue)) * GRAPH_HEIGHT)
-      );
+      context.fillRect(GRAPH_X + GRAPH_WIDTH - PR, GRAPH_Y, PR, round((1 - value / maxValue) * GRAPH_HEIGHT));
 
       // Blank out below the value if line
-      if (type === 'line') {
+      if (type === "line") {
         context.fillRect(
           GRAPH_X + GRAPH_WIDTH - PR,
-          round((1 - (value / maxValue)) * GRAPH_HEIGHT) + PR + 3,
+          round((1 - value / maxValue) * GRAPH_HEIGHT) + PR + 3,
           PR,
           round((value / maxValue) * GRAPH_HEIGHT)
         );

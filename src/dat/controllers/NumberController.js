@@ -11,13 +11,13 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import Controller from './Controller';
-import common from '../utils/common';
+import Controller from "./Controller";
+import common from "../utils/common";
 
 function numDecimals(x) {
   const _x = x.toString();
-  if (_x.indexOf('.') > -1) {
-    return _x.length - _x.indexOf('.') - 1;
+  if (_x.indexOf(".") > -1) {
+    return _x.length - _x.indexOf(".") - 1;
   }
 
   return 0;
@@ -113,7 +113,7 @@ class NumberController extends Controller {
     this.__step = stepValue;
     this.__impliedStep = stepValue;
     this.__precision = numDecimals(stepValue);
-    if(this.__input)  this.__input.setAttribute('step', stepValue);
+    if (this.__input) this.__input.setAttribute("step", stepValue);
     return this;
   }
 }

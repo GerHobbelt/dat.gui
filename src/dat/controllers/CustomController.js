@@ -10,18 +10,18 @@
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  */
-import Controller from './Controller';
+import Controller from "./Controller";
 
 /**
  * @class Represents a custom controller.
  * @param {Object} object
  * @param {string} property
  */
-class CustomController extends Controller{
+class CustomController extends Controller {
   constructor(object, property) {
-  	super(object, property);
+    super(object, property);
 
-  	object.constructor( this );
+    object.constructor(this);
   }
 }
 

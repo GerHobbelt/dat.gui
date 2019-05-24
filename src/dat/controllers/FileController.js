@@ -11,8 +11,8 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import Controller from './Controller';
-import dom from '../dom/dom';
+import Controller from "./Controller";
+import dom from "../dom/dom";
 
 /**
  * @class Provides a file input.
@@ -29,19 +29,19 @@ class FileController extends Controller {
     const _this = this;
 
     function onChange(e) {
-      const fileReader = new FileReader()
-      fileReader.addEventListener('load', function(file) {
+      const fileReader = new FileReader();
+      fileReader.addEventListener("load", function(file) {
         _this.fire(fileReader.result);
-      })
+      });
 
-      const file = e.target.files[0]
-      fileReader.readAsDataURL(file)
+      const file = e.target.files[0];
+      fileReader.readAsDataURL(file);
     }
 
-    this.__input = document.createElement('input');
-    this.__input.setAttribute('type', 'file');
+    this.__input = document.createElement("input");
+    this.__input.setAttribute("type", "file");
 
-    dom.bind(this.__input, 'change', onChange);
+    dom.bind(this.__input, "change", onChange);
 
     this.domElement.appendChild(this.__input);
   }

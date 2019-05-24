@@ -11,8 +11,8 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import toString from './toString';
-import common from '../utils/common';
+import toString from "./toString";
+import common from "../utils/common";
 
 const INTERPRETATIONS = [
   // Strings
@@ -27,12 +27,17 @@ const INTERPRETATIONS = [
           }
 
           return {
-            space: 'HEX',
+            space: "HEX",
             hex: parseInt(
-              '0x' +
-              test[1].toString() + test[1].toString() +
-              test[2].toString() + test[2].toString() +
-              test[3].toString() + test[3].toString(), 0)
+              "0x" +
+                test[1].toString() +
+                test[1].toString() +
+                test[2].toString() +
+                test[2].toString() +
+                test[3].toString() +
+                test[3].toString(),
+              0
+            )
           };
         },
 
@@ -47,8 +52,8 @@ const INTERPRETATIONS = [
           }
 
           return {
-            space: 'HEX',
-            hex: parseInt('0x' + test[1].toString(), 0)
+            space: "HEX",
+            hex: parseInt("0x" + test[1].toString(), 0)
           };
         },
 
@@ -63,7 +68,7 @@ const INTERPRETATIONS = [
           }
 
           return {
-            space: 'RGB',
+            space: "RGB",
             r: parseFloat(test[1]),
             g: parseFloat(test[2]),
             b: parseFloat(test[3])
@@ -81,7 +86,7 @@ const INTERPRETATIONS = [
           }
 
           return {
-            space: 'RGB',
+            space: "RGB",
             r: parseFloat(test[1]),
             g: parseFloat(test[2]),
             b: parseFloat(test[3]),
@@ -99,13 +104,12 @@ const INTERPRETATIONS = [
     litmus: common.isNumber,
 
     conversions: {
-
       HEX: {
         read: function(original) {
           return {
-            space: 'HEX',
+            space: "HEX",
             hex: original,
-            conversionName: 'HEX'
+            conversionName: "HEX"
           };
         },
 
@@ -113,9 +117,7 @@ const INTERPRETATIONS = [
           return color.hex;
         }
       }
-
     }
-
   },
 
   // Arrays
@@ -129,7 +131,7 @@ const INTERPRETATIONS = [
           }
 
           return {
-            space: 'RGB',
+            space: "RGB",
             r: original[0],
             g: original[1],
             b: original[2]
@@ -145,7 +147,7 @@ const INTERPRETATIONS = [
         read: function(original) {
           if (original.length !== 4) return false;
           return {
-            space: 'RGB',
+            space: "RGB",
             r: original[0],
             g: original[1],
             b: original[2],
@@ -164,15 +166,16 @@ const INTERPRETATIONS = [
   {
     litmus: common.isObject,
     conversions: {
-
       RGBA_OBJ: {
         read: function(original) {
-          if (common.isNumber(original.r) &&
+          if (
+            common.isNumber(original.r) &&
             common.isNumber(original.g) &&
             common.isNumber(original.b) &&
-            common.isNumber(original.a)) {
+            common.isNumber(original.a)
+          ) {
             return {
-              space: 'RGB',
+              space: "RGB",
               r: original.r,
               g: original.g,
               b: original.b,
@@ -194,11 +197,9 @@ const INTERPRETATIONS = [
 
       RGB_OBJ: {
         read: function(original) {
-          if (common.isNumber(original.r) &&
-            common.isNumber(original.g) &&
-            common.isNumber(original.b)) {
+          if (common.isNumber(original.r) && common.isNumber(original.g) && common.isNumber(original.b)) {
             return {
-              space: 'RGB',
+              space: "RGB",
               r: original.r,
               g: original.g,
               b: original.b
@@ -218,12 +219,14 @@ const INTERPRETATIONS = [
 
       HSVA_OBJ: {
         read: function(original) {
-          if (common.isNumber(original.h) &&
+          if (
+            common.isNumber(original.h) &&
             common.isNumber(original.s) &&
             common.isNumber(original.v) &&
-            common.isNumber(original.a)) {
+            common.isNumber(original.a)
+          ) {
             return {
-              space: 'HSV',
+              space: "HSV",
               h: original.h,
               s: original.s,
               v: original.v,
@@ -245,11 +248,9 @@ const INTERPRETATIONS = [
 
       HSV_OBJ: {
         read: function(original) {
-          if (common.isNumber(original.h) &&
-            common.isNumber(original.s) &&
-            common.isNumber(original.v)) {
+          if (common.isNumber(original.h) && common.isNumber(original.s) && common.isNumber(original.v)) {
             return {
-              space: 'HSV',
+              space: "HSV",
               h: original.h,
               s: original.s,
               v: original.v

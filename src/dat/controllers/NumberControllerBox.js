@@ -11,9 +11,9 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import NumberController from './NumberController';
-import dom from '../dom/dom';
-import common from '../utils/common';
+import NumberController from "./NumberController";
+import dom from "../dom/dom";
+import common from "../utils/common";
 
 function roundToDecimal(value, decimals) {
   const tenTo = Math.pow(10, decimals);
@@ -48,25 +48,35 @@ class NumberControllerBox extends NumberController {
      */
     let prevY;
 
-    this.__input = document.createElement('input');
-    this.__input.setAttribute('type', 'text');
-    this.__up = document.createElement('button');
-    this.__up.setAttribute('style', "position:absolute;right:0;height:10px;top:4px;background-color: #555;border: none;");
-    this.__down = document.createElement('button');
-    this.__down.setAttribute('style', "position:absolute;right:0;height:10px;top:15px;background-color: #555;border: none;");
-    dom.bind(this.__up, 'mousedown', function(){_this.setValue(_this.getValue() + _this.__impliedStep)});
-    dom.bind(this.__down, 'mousedown', function(){_this.setValue(_this.getValue() - _this.__impliedStep)});
+    this.__input = document.createElement("input");
+    this.__input.setAttribute("type", "text");
+    this.__up = document.createElement("button");
+    this.__up.setAttribute(
+      "style",
+      "position:absolute;right:0;height:10px;top:4px;background-color: #555;border: none;"
+    );
+    this.__down = document.createElement("button");
+    this.__down.setAttribute(
+      "style",
+      "position:absolute;right:0;height:10px;top:15px;background-color: #555;border: none;"
+    );
+    dom.bind(this.__up, "mousedown", function() {
+      _this.setValue(_this.getValue() + _this.__impliedStep);
+    });
+    dom.bind(this.__down, "mousedown", function() {
+      _this.setValue(_this.getValue() - _this.__impliedStep);
+    });
 
     // this.__input.setAttribute('type', 'number');
     // this.__input.setAttribute('step', params.step || 1);
     // this.__input.setAttribute('style', "width : 100px;");
     // Makes it so manually specified values are not truncated.
 
-    dom.bind(this.__input, 'change', onChange, false, true);
-    dom.bind(this.__input, 'blur', onBlur, false, true);
-    dom.bind(this.__input, 'mousedown', onMouseDown, false, true);
-    dom.bind(this.__input, 'wheel', onWheel);
-    dom.bind(this.__input, 'keydown', onKeyDown, false, true);
+    dom.bind(this.__input, "change", onChange, false, true);
+    dom.bind(this.__input, "blur", onBlur, false, true);
+    dom.bind(this.__input, "mousedown", onMouseDown, false, true);
+    dom.bind(this.__input, "wheel", onWheel);
+    dom.bind(this.__input, "keydown", onKeyDown, false, true);
 
     function onChange() {
       const attempted = parseFloat(_this.__input.value);
@@ -93,43 +103,42 @@ class NumberControllerBox extends NumberController {
     }
 
     function onMouseUp() {
-      dom.unbind(window, 'mousemove', onMouseDrag);
-      dom.unbind(window, 'mouseup', onMouseUp);
+      dom.unbind(window, "mousemove", onMouseDrag);
+      dom.unbind(window, "mouseup", onMouseUp);
       onFinish();
     }
 
     function onMouseDown(e) {
-      dom.bind(window, 'mousemove', onMouseDrag, false, true);
-      dom.bind(window, 'mouseup', onMouseUp, false, true);
+      dom.bind(window, "mousemove", onMouseDrag, false, true);
+      dom.bind(window, "mouseup", onMouseUp, false, true);
       prevY = e.clientY;
     }
 
     function onKeyDown(e) {
       switch (e.keyCode) {
-      // When pressing enter, you can be as precise as you want.
-      case 13: 
-        _this.__truncationSuspended = true;
-        this.blur();
-        _this.__truncationSuspended = false;
-        onFinish();
-      break;
+        // When pressing enter, you can be as precise as you want.
+        case 13:
+          _this.__truncationSuspended = true;
+          this.blur();
+          _this.__truncationSuspended = false;
+          onFinish();
+          break;
 
-      // arrow up
-      case 38:
-        _this.setValue(_this.getValue() + _this.__impliedStep)
-      break;
+        // arrow up
+        case 38:
+          _this.setValue(_this.getValue() + _this.__impliedStep);
+          break;
 
-      // arrow down
-      case 40:
-        _this.setValue(_this.getValue() - _this.__impliedStep)
-      break;
+        // arrow down
+        case 40:
+          _this.setValue(_this.getValue() - _this.__impliedStep);
+          break;
       }
-
     }
 
     function onWheel(e) {
       e.preventDefault();
-      const direction = (-e.deltaY >> 10) || 1;
+      const direction = -e.deltaY >> 10 || 1;
       _this.setValue(_this.getValue() + direction * _this.__impliedStep);
     }
 
@@ -141,10 +150,12 @@ class NumberControllerBox extends NumberController {
   }
 
   updateDisplay() {
-    if(this.__input === document.activeElement) {
+    if (this.__input === document.activeElement) {
       return;
     }
-    this.__input.value = this.__truncationSuspended ? this.getValue() : roundToDecimal(this.getValue(), this.__precision);
+    this.__input.value = this.__truncationSuspended
+      ? this.getValue()
+      : roundToDecimal(this.getValue(), this.__precision);
     return super.updateDisplay();
   }
 }

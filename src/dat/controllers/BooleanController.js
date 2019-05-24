@@ -11,8 +11,8 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import Controller from './Controller';
-import dom from '../dom/dom';
+import Controller from "./Controller";
+import dom from "../dom/dom";
 
 /**
  * @class Provides a checkbox input to alter the boolean property of an object.
@@ -29,15 +29,16 @@ class BooleanController extends Controller {
     const _this = this;
     this.__prev = this.getValue();
 
-    this.__checkbox = document.createElement('input');
-    this.__checkbox.setAttribute('type', 'checkbox');
+    this.__checkbox = document.createElement("input");
+    this.__checkbox.setAttribute("type", "checkbox");
 
     function onChange() {
-      if (!_this._readonly)
+      if (!_this._readonly) {
         _this.setValue(!_this.__prev);
+      }
     }
 
-    dom.bind(this.__checkbox, 'change', onChange, false, true);
+    dom.bind(this.__checkbox, "change", onChange, false, true);
 
     this.domElement.appendChild(this.__checkbox);
 
@@ -56,7 +57,7 @@ class BooleanController extends Controller {
 
   updateDisplay() {
     if (this.getValue() === true) {
-      this.__checkbox.setAttribute('checked', 'checked');
+      this.__checkbox.setAttribute("checked", "checked");
       this.__checkbox.checked = true;
       this.__prev = true;
     } else {

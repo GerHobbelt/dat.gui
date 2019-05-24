@@ -344,7 +344,11 @@ const GUI = function(pars) {
 
   // Are we a root level GUI?
   if (common.isUndefined(params.parent)) {
-    params.closed = false;
+    if (params.closed) {
+      this.closed = params.closed;
+    } else {
+      params.closed = false;
+    }
 
     dom.addClass(this.domElement, GUI.CLASS_MAIN);
     dom.makeSelectable(this.domElement, false);

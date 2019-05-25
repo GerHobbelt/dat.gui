@@ -40,6 +40,12 @@ class Controller {
     this.property = property;
 
     /**
+     * Readonly field
+     * @type {Object}
+     */
+    this._readonly = false;
+
+    /**
      * The function to be called on change.
      * @type {Function}
      * @private
@@ -52,6 +58,32 @@ class Controller {
      * @private
      */
     this.__onFinishChange = undefined;
+
+    this.__transformInput = x => x;
+
+    this.__transformOutput = x => x;
+
+    /**
+     * Whether to force update a display, even when input is active.
+     * @type boolean
+     */
+    this.forceUpdateDisplay = false;
+  }
+
+  /**
+   * Hides the controller on it's parent GUI.
+   */
+  hide() {
+    this.domElement.parentNode.parentNode.style.display = "none";
+    return this;
+  }
+
+  /**
+   * Shows the controller on it's parent GUI.
+   */
+  show() {
+    this.domElement.parentNode.parentNode.style.display = "";
+    return this;
   }
 
   /**
@@ -87,9 +119,11 @@ class Controller {
    * @param {Object} newValue The new value of <code>object[property]</code>
    */
   setValue(newValue) {
-    this.object[this.property] = newValue;
+    const __newValue = this.__transformOutput(newValue);
+
+    this.object[this.property] = __newValue;
     if (this.__onChange) {
-      this.__onChange.call(this, newValue);
+      this.__onChange.call(this, __newValue);
     }
 
     this.updateDisplay();
@@ -102,7 +136,7 @@ class Controller {
    * @returns {Object} The current value of <code>object[property]</code>
    */
   getValue() {
-    return this.object[this.property];
+    return this.__transformInput(this.object[this.property]);
   }
 
   /**
@@ -119,6 +153,27 @@ class Controller {
    */
   isModified() {
     return this.initialValue !== this.getValue();
+  }
+
+  transform(transformInput = x => x, transformOutput = x => x) {
+    this.__transformInput = transformInput;
+    this.__transformOutput = transformOutput;
+
+    this.updateDisplay();
+
+    return this;
+  }
+
+  /**
+   * Set readonly mode
+   *
+   * @param {Number} ro
+   * @default false
+   * @returns {dat.controllers.StringController} this
+   */
+  readonly(ro) {
+    this._readonly = ro;
+    return this;
   }
 }
 

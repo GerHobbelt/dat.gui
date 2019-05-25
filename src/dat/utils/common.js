@@ -77,7 +77,8 @@ const Common = {
       return;
     }
 
-    if (ARR_EACH && obj.forEach && obj.forEach === ARR_EACH) {
+    // if (ARR_EACH && obj.forEach && obj.forEach === ARR_EACH) {
+    if (obj.forEach) {
       obj.forEach(itr, scope);
     } else if (obj.length === obj.length + 0) {
       // Is number but not NaN
@@ -144,11 +145,11 @@ const Common = {
     return isNaN(obj);
   },
 
-  isArray:
-    Array.isArray ||
-    function(obj) {
-      return obj.constructor === Array;
-    },
+  // isArray: Array.isArray || function(obj) {
+  isArray: function(obj) {
+    // return obj.constructor === Array;
+    return obj != null && obj.length >= 0 && typeof obj === "object";
+  },
 
   isObject: function(obj) {
     return obj === Object(obj);
@@ -168,6 +169,23 @@ const Common = {
 
   isFunction: function(obj) {
     return Object.prototype.toString.call(obj) === "[object Function]";
+  },
+
+  supportsPassive: function() {
+    let supportsPassive = false;
+    try {
+      const opts = Object.defineProperty({}, "passive", {
+        get: function() {
+          supportsPassive = true;
+          return false; // make lint happy: return a value
+        }
+      });
+      window.addEventListener("testPassive", null, opts);
+      window.removeEventListener("testPassive", null, opts);
+    } catch (e) {
+      // Do nothing
+    }
+    return supportsPassive;
   }
 };
 

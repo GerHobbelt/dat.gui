@@ -55,26 +55,50 @@ class ColorController extends Controller {
     this.__input.type = "text";
     this.__input_textShadow = "0 1px 1px ";
 
-    dom.bind(this.__input, "keydown", function(e) {
-      if (e.keyCode === 13) {
-        // on enter
-        onBlur.call(this);
-      }
-    });
+    dom.bind(
+      this.__input,
+      "keydown",
+      function(e) {
+        if (e.keyCode === 13) {
+          // on enter
+          onBlur.call(this);
+        }
+      },
+      false,
+      true
+    );
 
-    dom.bind(this.__input, "blur", onBlur);
+    dom.bind(this.__input, "blur", onBlur, false, true);
 
-    dom.bind(this.__selector, "mousedown", function(/* e */) {
-      dom.addClass(this, "drag").bind(window, "mouseup", function(/* e */) {
-        dom.removeClass(_this.__selector, "drag");
-      });
-    });
+    dom.bind(
+      this.__selector,
+      "mousedown",
+      function(/* e */) {
+        dom.addClass(this, "drag").bind(window, "mouseup", function(/* e */) {
+          dom.removeClass(_this.__selector, "drag");
+        });
+      },
+      false,
+      true
+    );
 
-    dom.bind(this.__selector, "touchstart", function(/* e */) {
-      dom.addClass(this, "drag").bind(window, "touchend", function(/* e */) {
-        dom.removeClass(_this.__selector, "drag");
-      });
-    });
+    dom.bind(
+      this.__selector,
+      "touchstart",
+      function(/* e */) {
+        dom.addClass(this, "drag").bind(
+          window,
+          "touchend",
+          function(/* e */) {
+            dom.removeClass(_this.__selector, "drag");
+          },
+          false,
+          true
+        );
+      },
+      false,
+      true
+    );
 
     const valueField = document.createElement("div");
 
@@ -158,16 +182,16 @@ class ColorController extends Controller {
       setSV(e);
       dom.bind(window, "mousemove", setSV);
       dom.bind(window, "touchmove", setSV);
-      dom.bind(window, "mouseup", fieldUpSV);
-      dom.bind(window, "touchend", fieldUpSV);
+      dom.bind(window, "mouseup", fieldUpSV, false, true);
+      dom.bind(window, "touchend", fieldUpSV, false, true);
     }
 
     function fieldDownH(e) {
       setH(e);
       dom.bind(window, "mousemove", setH);
       dom.bind(window, "touchmove", setH);
-      dom.bind(window, "mouseup", fieldUpH);
-      dom.bind(window, "touchend", fieldUpH);
+      dom.bind(window, "mouseup", fieldUpH, false, true);
+      dom.bind(window, "touchend", fieldUpH, false, true);
     }
 
     function fieldUpSV() {
@@ -278,9 +302,9 @@ class ColorController extends Controller {
         Color.COMPONENTS,
         function(component) {
           if (
-            !common.isUndefined(i[component]) &&
-            !common.isUndefined(this.__color.__state[component]) &&
-            i[component] !== this.__color.__state[component]
+            !common.isUndefined(i[component])
+            && !common.isUndefined(this.__color.__state[component])
+            && i[component] !== this.__color.__state[component]
           ) {
             mismatch = true;
             return {}; // break
@@ -338,16 +362,16 @@ function linearGradient(elem, x, a, b) {
 
 function hueGradient(elem) {
   elem.style.background = "";
-  elem.style.cssText +=
-    "background: -moz-linear-gradient(top,  #ff0000 0%, #ff00ff 17%, #0000ff 34%, #00ffff 50%, #00ff00 67%, #ffff00 84%, #ff0000 100%);";
-  elem.style.cssText +=
-    "background: -webkit-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
-  elem.style.cssText +=
-    "background: -o-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
-  elem.style.cssText +=
-    "background: -ms-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
-  elem.style.cssText +=
-    "background: linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
+  elem.style.cssText
+    += "background: -moz-linear-gradient(top,  #ff0000 0%, #ff00ff 17%, #0000ff 34%, #00ffff 50%, #00ff00 67%, #ffff00 84%, #ff0000 100%);";
+  elem.style.cssText
+    += "background: -webkit-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
+  elem.style.cssText
+    += "background: -o-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
+  elem.style.cssText
+    += "background: -ms-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
+  elem.style.cssText
+    += "background: linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
 }
 
 export default ColorController;

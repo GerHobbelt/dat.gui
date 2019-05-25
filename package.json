@@ -1,7 +1,7 @@
 {
   "name": "@gerhobbelt/dat.GUI",
   "version": "0.7.6-3",
-  "description": "A lightweight graphical user interface for changing variables in JavaScript.",
+  "description": "A lightweight graphical user interface for changing variables in JavaScript (fork with extra features).",
   "main": "build/dat.gui.js",
   "module": "build/dat.gui.module.js",
   "directories": {

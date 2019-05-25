@@ -15,7 +15,7 @@ import common from "../utils/common";
 
 const EVENT_MAP = {
   HTMLEvents: ["change"],
-  MouseEvents: ["click", "mousemove", "mousedown", "mouseup", "mouseover"],
+  MouseEvents: ["click", "mousemove", "mousedown", "mouseup", "mouseover", "wheel"],
   KeyboardEvents: ["keydown"]
 };
 
@@ -61,8 +61,8 @@ const dom = {
 
     elem.onselectstart = selectable
       ? function() {
-          return false;
-        }
+        return false;
+      }
       : function() {};
 
     elem.style.MozUserSelect = selectable ? "auto" : "none";
@@ -177,10 +177,12 @@ const dom = {
    * @param func
    * @param bool
    */
-  bind: function(elem, event, func, newBool) {
+  bind: function(elem, event, func, newBool, newPassive) {
     const bool = newBool || false;
+    const passive = newPassive || false;
     if (elem.addEventListener) {
-      elem.addEventListener(event, func, bool);
+      const listenerArg = common.supportsPassive() ? { capture: bool, passive: passive } : bool;
+      elem.addEventListener(event, func, listenerArg);
     } else if (elem.attachEvent) {
       elem.attachEvent("on" + event, func);
     }
@@ -260,11 +262,11 @@ const dom = {
     const style = getComputedStyle(elem);
 
     return (
-      cssValueToPixels(style["border-left-width"]) +
-      cssValueToPixels(style["border-right-width"]) +
-      cssValueToPixels(style["padding-left"]) +
-      cssValueToPixels(style["padding-right"]) +
-      cssValueToPixels(style.width)
+      cssValueToPixels(style["border-left-width"])
+      + cssValueToPixels(style["border-right-width"])
+      + cssValueToPixels(style["padding-left"])
+      + cssValueToPixels(style["padding-right"])
+      + cssValueToPixels(style.width)
     );
   },
 
@@ -276,11 +278,11 @@ const dom = {
     const style = getComputedStyle(elem);
 
     return (
-      cssValueToPixels(style["border-top-width"]) +
-      cssValueToPixels(style["border-bottom-width"]) +
-      cssValueToPixels(style["padding-top"]) +
-      cssValueToPixels(style["padding-bottom"]) +
-      cssValueToPixels(style.height)
+      cssValueToPixels(style["border-top-width"])
+      + cssValueToPixels(style["border-bottom-width"])
+      + cssValueToPixels(style["padding-top"])
+      + cssValueToPixels(style["padding-bottom"])
+      + cssValueToPixels(style.height)
     );
   },
 

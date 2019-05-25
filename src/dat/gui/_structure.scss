@@ -11,6 +11,7 @@ $button-height: 20px;
     margin: 0;
     padding: 0;
     width: 100%;
+    overflow: auto;
     clear: both;
   }
 
@@ -39,21 +40,21 @@ $button-height: 20px;
 
     @include transition(opacity, 0.1s, linear);
 
-    &.taller-than-window {
+    // &.taller-than-window {
+    //   overflow-x: hidden;
+    //   overflow-y: auto;
 
-      overflow-y: auto;
+    //   .close-button {
 
-      .close-button {
+    //     opacity: 1;
 
-        opacity: 1;
+    //     /* TODO, these are style notes */
+    //     margin-top: -1px;
+    //     border-top: 1px solid $border-color;
 
-        /* TODO, these are style notes */
-        margin-top: -1px;
-        border-top: 1px solid $border-color;
+    //   }
 
-      }
-
-    }
+    // }
 
     ul.closed .close-button {
       opacity: 1 !important;
@@ -75,7 +76,7 @@ $button-height: 20px;
       /* TODO, these are style notes */
       cursor: pointer;
       text-align: center;
-      background-color: #000;
+      background-color: #ccc; // #000
       &.close-top {
         position: relative;
       }
@@ -83,7 +84,7 @@ $button-height: 20px;
         position: absolute;
       }
       &:hover {
-        background-color: #111;
+        background-color: #ddd; // #111
       }
 
     }
@@ -185,7 +186,7 @@ $button-height: 20px;
   }
 
   /** Controller placement */
-  .c input[type=text] {
+  .c input[type=text], .c input[type=number], .c canvas {
     border: 0;
     margin-top: 4px;
     padding: 3px;
@@ -194,10 +195,18 @@ $button-height: 20px;
   }
 
   /** Shorter number boxes when slider is present. */
-  .has-slider input[type=text] {
-    width: 30%;
-    /*display: none;*/
-    margin-left: 0;
+  .has-slider {
+    input[type=number] {
+      width: 30%;
+      /*display: none;*/
+      margin-left: 0;
+    }
+  }
+
+  /** Reduce margin and set height for plotter */
+  .c canvas {
+    padding: 0;
+    height: 53px;
   }
 
   .slider {
@@ -281,9 +290,22 @@ $button-height: 20px;
   word-wrap: break-word;
   margin: 12px 0;
   display: block;
+  //background-color: #0d3349;
   width: 440px;
   overflow-y: scroll;
   height: 100px;
+  position: relative;
+}
+
+#dg-new-editor {
+  padding: 10px;
+  resize: none;
+  box-shadow: inset 1px 1px 1px #888;
+  margin: 12px 0;
+  display: block;
+  //background-color: #0d3349;
+  width: 440px;
+  height: 350px;
   position: relative;
 }
 

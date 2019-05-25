@@ -344,7 +344,11 @@
         });
 
         test("Setting HSV, Modifying RGB", function() {
-          const c = new Color({ h: 340, s: 0.3, v: 0.9 });
+          const c = new Color({
+            h: 340,
+            s: 0.3,
+            v: 0.9
+          });
 
           c.g = 0;
 
@@ -371,8 +375,6 @@
           const c = new Color(120, 100, 20, 0.3);
 
           const prevHue = c.h;
-          console.log("heh?");
-
           c.r = 0;
           c.b = 0;
           c.g = 0;
@@ -431,13 +433,13 @@
 
           equal(c1.__checkbox.checked, object.booleanProperty);
 
-          console.log(c2.__checkbox.getAttribute("checked"));
-
           equal(c2.__checkbox.getAttribute("checked") === "checked", object.anotherBooleanProperty);
         });
 
         test("Modifies values (starting true)", function() {
-          const object = { booleanProperty: true };
+          const object = {
+            booleanProperty: true
+          };
 
           const c1 = new BooleanController(object, "booleanProperty");
 
@@ -460,7 +462,9 @@
         });
 
         test("Modifies values (starting false)", function() {
-          const object = { booleanProperty: false };
+          const object = {
+            booleanProperty: false
+          };
 
           const c1 = new BooleanController(object, "booleanProperty");
 
@@ -583,7 +587,11 @@
 
         test("Constraints", function() {
           const object = initObject();
-          const params = { min: 0, max: 10, step: 2 };
+          const params = {
+            min: 0,
+            max: 10,
+            step: 2
+          };
 
           const c1 = new NumberController(object, "numberProperty", params);
 
@@ -638,8 +646,12 @@
         });
 
         test("Handles drag", function() {
-          const object = { numberProperty: 0 };
-          const params = { step: Math.random() * 21 };
+          const object = {
+            numberProperty: 0
+          };
+          const params = {
+            step: Math.random() * 21
+          };
 
           const c1 = new NumberControllerBox(object, "numberProperty", params);
 
@@ -766,25 +778,6 @@
           // click hue slider
 
           equal(1, 0, "TODO: add set color tests.");
-
-          document.body.removeChild(c1.domElement);
-        });
-
-        module("CustomController");
-
-        test("Get Custom", function() {
-          const value = "value";
-          const c1 = new CustomController({
-            constructor: function(controller) {
-              const input = document.createElement("input");
-              input.value = value;
-              controller.domElement.appendChild(input);
-            }
-          });
-          document.body.appendChild(c1.domElement);
-
-          const input = c1.domElement.getElementsByTagName("input")[0];
-          equal(input.value, value, "Input value is the same as the " + value);
 
           document.body.removeChild(c1.domElement);
         });
@@ -929,10 +922,20 @@
 
         test("Auto placement", function() {
           const gui = new GUI();
-          gui.add({ x: 0 }, "x");
+          gui.add(
+            {
+              x: 0
+            },
+            "x"
+          );
 
           const gui2 = new GUI();
-          gui2.add({ x: 0 }, "x");
+          gui2.add(
+            {
+              x: 0
+            },
+            "x"
+          );
 
           equal($(".dg.ac").length, 1, "A single auto-place container created");
           equal($(".dg.ac").children().length, 2, "Containing two GUI's");
@@ -956,7 +959,12 @@
 
           // Add a lot of controllers. This will fail if you have some freakishly tall monitor.
           for (let i = 0; i < 100; i++) {
-            gui.add({ x: 0 }, "x");
+            gui.add(
+              {
+                x: 0
+              },
+              "x"
+            );
           }
 
           setTimeout(function() {
@@ -968,8 +976,12 @@
         });
 
         test("close/open button position", function() {
-          const gui = new GUI({ closeOnTop: true });
-          const gui2 = new GUI({ closeOnTop: false });
+          const gui = new GUI({
+            closeOnTop: true
+          });
+          const gui2 = new GUI({
+            closeOnTop: false
+          });
           const gui3 = new GUI();
 
           ok(
@@ -1013,12 +1025,22 @@
 
         test("Folders", function() {
           const gui = new GUI();
-          gui.add({ x: 0 }, "x");
+          gui.add(
+            {
+              x: 0
+            },
+            "x"
+          );
 
           const name1 = "name";
           const f1 = gui.addFolder(name1);
 
-          f1.add({ x: 0 }, "x");
+          f1.add(
+            {
+              x: 0
+            },
+            "x"
+          );
 
           equal(f1.name, name1, "Accepts name");
           equal(
@@ -1067,7 +1089,14 @@
         test("options", function() {
           const gui = new GUI();
 
-          let controller = gui.add({ x: 0 }, "x").options(0, 1, 2, 3, 4);
+          let controller = gui
+            .add(
+              {
+                x: 0
+              },
+              "x"
+            )
+            .options(0, 1, 2, 3, 4);
 
           $(controller.__select)
             .children()
@@ -1076,13 +1105,20 @@
               equals(value.value, key, "By array value okay");
             });
 
-          controller = gui.add({ x: 0 }, "x").options({
-            0: "0",
-            1: "1",
-            2: "2",
-            3: "3",
-            4: "4"
-          });
+          controller = gui
+            .add(
+              {
+                x: 0
+              },
+              "x"
+            )
+            .options({
+              0: "0",
+              1: "1",
+              2: "2",
+              3: "3",
+              4: "4"
+            });
 
           $(controller.__select)
             .children()
@@ -1100,7 +1136,14 @@
           const name = "hey man";
           const name2 = "yoyoo";
 
-          const controller = gui.add({ x: 0 }, "x").name(name);
+          const controller = gui
+            .add(
+              {
+                x: 0
+              },
+              "x"
+            )
+            .name(name);
 
           equals(
             $(controller.__li)
@@ -1123,7 +1166,9 @@
         test("listen", function() {
           const gui = new GUI();
 
-          const obj = { x: 0 };
+          const obj = {
+            x: 0
+          };
 
           const returned1 = gui.add(obj, "x");
           const returned2 = returned1.listen();
@@ -1141,7 +1186,12 @@
         test("remove", function() {
           const gui = new GUI();
 
-          const c = gui.add({ x: 0 }, "x");
+          const c = gui.add(
+            {
+              x: 0
+            },
+            "x"
+          );
 
           ok($.contains(gui.domElement, c.domElement), "Now you see it");
           c.remove();
@@ -1171,7 +1221,12 @@
           const max = 200;
           const step = 5;
 
-          const c = gui.add({ x: 0 }, "x");
+          const c = gui.add(
+            {
+              x: 0
+            },
+            "x"
+          );
 
           c.min(min);
           equals(c.__min, min, "min");
@@ -1196,7 +1251,14 @@
         test("Adds NumberControllerBox to sliders", function() {
           const gui = new GUI();
 
-          const c = gui.add({ x: 0 }, "x", 0, 10);
+          const c = gui.add(
+            {
+              x: 0
+            },
+            "x",
+            0,
+            10
+          );
 
           ok($(c.__li).find("input").length > 0, "NumberControllerBox added");
 
@@ -1206,7 +1268,12 @@
         test("Clickable rows for BooleanControllers", function() {
           const gui = new GUI();
 
-          const c = gui.add({ x: false }, "x");
+          const c = gui.add(
+            {
+              x: false
+            },
+            "x"
+          );
 
           equal(c.__checkbox.checked, false, "Acknowledges original");
 

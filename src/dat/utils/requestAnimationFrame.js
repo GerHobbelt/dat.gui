@@ -21,9 +21,9 @@ function requestAnimationFrame(callback, element) {
  * http://paulirish.com/2011/requestanimationframe-for-smart-animating/
  */
 
-export default window.requestAnimationFrame ||
-  window.webkitRequestAnimationFrame ||
-  window.mozRequestAnimationFrame ||
-  window.oRequestAnimationFrame ||
-  window.msRequestAnimationFrame ||
-  requestAnimationFrame;
+export default window.requestAnimationFrame
+  || window.webkitRequestAnimationFrame
+  || window.mozRequestAnimationFrame
+  || window.oRequestAnimationFrame
+  || window.msRequestAnimationFrame
+  || requestAnimationFrame;

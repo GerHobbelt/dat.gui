@@ -12,6 +12,7 @@
  */
 
 import css from "../utils/css";
+
 import saveDialogueContents from "./saveDialogue.html";
 import ControllerFactory from "../controllers/ControllerFactory";
 import Controller from "../controllers/Controller";
@@ -20,14 +21,18 @@ import FunctionController from "../controllers/FunctionController";
 import NumberControllerBox from "../controllers/NumberControllerBox";
 import NumberControllerSlider from "../controllers/NumberControllerSlider";
 import ColorController from "../controllers/ColorController";
+import FileController from "../controllers/FileController";
+import PlotterController from "../controllers/PlotterController";
+import CustomController from "../controllers/CustomController";
 import requestAnimationFrame from "../utils/requestAnimationFrame";
 import CenteredDiv from "../dom/CenteredDiv";
 import dom from "../dom/dom";
 import common from "../utils/common";
+import autocomplete from "../dom/autocomplete";
 
 import styleSheet from "./style.scss"; // CSS to embed in build
 
-css.inject(styleSheet);
+// css.inject(styleSheet);
 
 /** Outer-most className for GUI's */
 const CSS_NAMESPACE = "dg";
@@ -45,12 +50,16 @@ const SUPPORTS_LOCAL_STORAGE = (function() {
   } catch (e) {
     return false;
   }
-})();
+}());
 
 let SAVE_DIALOGUE;
 
 /** Have we yet to create an autoPlace GUI? */
 let autoPlaceVirgin = true;
+
+let Editor;
+
+let modalTitle;
 
 /** Fixed position div that auto place GUI's go inside */
 let autoPlaceContainer;
@@ -78,8 +87,8 @@ const hideableGuis = [];
  *
  * @param {Object} [params]
  * @param {String} [params.name] The name of this GUI.
- * @param {Object} [params.load] JSON object representing the saved state of
- * this GUI.
+ * @param {Object} [params.load] JSON object representing the saved state of this GUI.
+ * @param {Object} [params.object] Providing your object will create a controller for each property automatically
  * @param {dat.gui.GUI} [params.parent] The GUI I'm nested in.
  * @param {Boolean} [params.autoPlace=true]
  * @param {Boolean} [params.hideable=true] If true, GUI is shown/hidden by <kbd>h</kbd> keypress.
@@ -450,7 +459,15 @@ const GUI = function(pars) {
   if (!params.parent) {
     resetWidth();
   }
+
+  if (common.isObject(params.object)) {
+    common.each(params.object, function(property, propertyName) {
+      _this.add(params.object, propertyName);
+    });
+  }
 };
+
+GUI.CustomController = CustomController;
 
 GUI.toggleHide = function() {
   hide = !hide;
@@ -488,8 +505,9 @@ common.extend(
   {
     /**
      * Adds a new {@link Controller} to the GUI. The type of controller created
-     * is inferred from the initial value of <code>object[property]</code>. For
-     * color properties, see {@link addColor}.
+     * is inferred from the initial value of <code>object[property]</code>.
+     * For color properties, see {@link addColor}.
+     * For file properties, see {@link addFile}.
      *
      * @param {Object} object The object to be manipulated
      * @param {String} property The name of the property to be manipulated
@@ -511,8 +529,37 @@ common.extend(
      */
     add: function(object, property) {
       return add(this, object, property, {
+        custom: object instanceof CustomController,
         factoryArgs: Array.prototype.slice.call(arguments, 2)
       });
+    },
+
+    openExportWindow: function(title, content) {
+      if (common.isUndefined(SAVE_DIALOGUE)) {
+        SAVE_DIALOGUE = new CenteredDiv();
+        SAVE_DIALOGUE.domElement.innerHTML = saveDialogueContents;
+
+        modalTitle = document.getElementById("dg-title");
+
+        const JsonMode = ace.require("ace/mode/json").Mode;
+        Editor = ace.edit("dg-new-editor");
+        Editor.setTheme("ace/theme/solarized_dark");
+        Editor.session.setMode(new JsonMode());
+        Editor.setReadOnly(true);
+      }
+
+      if (this.autoPlace) {
+        setWidth(this, this.width);
+      }
+
+      modalTitle.innerHTML = title;
+      Editor.setValue(JSON.stringify(content, undefined, 2));
+      SAVE_DIALOGUE.show();
+      Editor.focus();
+    },
+
+    plugins: {
+      autocomplete: autocomplete
     },
 
     /**
@@ -542,6 +589,75 @@ common.extend(
     },
 
     /**
+     * Adds a new plotter controller to the GUI.
+     *
+     * @param object
+     * @param property
+     * @param max The maximum value that the plotter will display (default 10)
+     * @param period The update interval in ms or use 0 to only update on value change (default 500)
+     * @param type Type of graph to render - line or bar (default line)
+     * @param fgColor Foreground color of the graph in hex (default #fff)
+     * @param bgColor Background color of the graph in hex (default #000)
+     * @returns {Controller} The controller that was added to the GUI.
+     * @instance
+     *
+     * @example
+     * var obj = {
+     *   value: 5
+     * };
+     * gui.addPlotter(obj, 'value', 10, 100);
+     * gui.addPlotter(obj, 'value', 10, 0);
+     */
+    addPlotter: function(object, property, max, period, type, fgColor, bgColor) {
+      return add(this, object, property, {
+        plotter: true,
+        max: max || 10,
+        period: typeof period === "number" ? period : 500,
+        type: type || "line",
+        fgColor: fgColor || "#fff",
+        bgColor: bgColor || "#000"
+      });
+    },
+
+    /**
+     * Adds a new file controller to the GUI.
+     *
+     * @param object
+     * @param property
+     * @returns {Controller} The controller that was added to the GUI.
+     * @instance
+     *
+     * @example
+     * var instance = {
+     *  onLoad: function(dataURL) {
+     *    document.getElementById('img').src = dataURL
+     *  }
+     * };
+     * gui.addFile(instance, 'onLoad');
+     */
+    addFile: function(object, property) {
+      return add(this, object, property, {
+        file: true
+      });
+    },
+
+    /**
+     * Adds a new custom controller to the GUI.
+     *
+     * @param object
+     * @param property
+     * @returns {Controller} The controller that was added to the GUI.
+     * @instance
+     *
+     */
+    addCustomController: function(object, property) {
+      return add(this, object, property, {
+        custom: true,
+        factoryArgs: Array.prototype.slice.call(arguments, 2)
+      });
+    },
+
+    /**
      * Removes the given controller from the GUI.
      * @param {Controller} controller
      * @instance
@@ -564,8 +680,8 @@ common.extend(
     destroy: function() {
       if (this.parent) {
         throw new Error(
-          "Only the root GUI should be removed with .destroy(). " +
-            "For subfolders, use gui.removeFolder(folder) instead."
+          "Only the root GUI should be removed with .destroy(). "
+            + "For subfolders, use gui.removeFolder(folder) instead."
         );
       }
 
@@ -608,10 +724,10 @@ common.extend(
       // Do we have saved appearance data for this folder?
       if (
         // Anything loaded?
-        this.load &&
+        this.load
         // Was my parent a dead-end?
-        this.load.folders &&
-        this.load.folders[name]
+        && this.load.folders
+        && this.load.folders[name]
       ) {
         // Did daddy remember me?
         // Start me closed if I was closed
@@ -641,9 +757,11 @@ common.extend(
 
       // Do we have saved appearance data for this folder?
       if (
-        this.load && // Anything loaded?
-        this.load.folders && // Was my parent a dead-end?
-        this.load.folders[folder.name]
+        // Anything loaded?
+        this.load
+        // Was my parent a dead-end?
+        && this.load.folders
+        && this.load.folders[folder.name]
       ) {
         delete this.load.folders[folder.name];
       }
@@ -756,7 +874,8 @@ common.extend(
       });
 
       if (this.autoPlace) {
-        // Set save row width
+        // Set save row width and increase to accomodate buttons
+        this.width += 40;
         setWidth(this, this.width);
       }
     },
@@ -850,6 +969,17 @@ common.extend(
       if (!gui) {
         markPresetModified(this.getRoot(), false);
       }
+    },
+
+    deleteSave: function() {
+      // Not allowed to remove Default preset
+      if (this.preset === DEFAULT_DEFAULT_PRESET_NAME || !confirm(`Delete preset "${this.preset}". Are you sure?`)) {
+        return;
+      }
+
+      delete this.load.remembered[this.preset];
+      this.preset = removeCurrentPresetOption(this);
+      this.saveToLocalStorageIfPossible();
     },
 
     listen: function(controller) {
@@ -956,9 +1086,11 @@ function augmentController(gui, li, controller) {
 
       /**
        * Sets controller to listen for changes on its underlying object.
+       * @param {boolean} forceUpdateDisplay Whether to force update a display, even when input is active (default: false).
        * @return {Controller}
        */
-      listen: function() {
+      listen: function(forceUpdateDisplay) {
+        controller.forceUpdateDisplay = !!forceUpdateDisplay;
         controller.__gui.listen(controller);
         return controller;
       },
@@ -1051,13 +1183,15 @@ function augmentController(gui, li, controller) {
     dom.addClass(li, "color");
     controller.updateDisplay = common.compose(
       function(val) {
-        li.style.borderLeftColor = controller.__color.toString();
+        li.style.borderLeftColor = controller.__color.toHexString();
         return val;
       },
       controller.updateDisplay
     );
 
     controller.updateDisplay();
+  } else if (controller instanceof FileController) {
+    dom.addClass(li, "file");
   }
 
   controller.setValue = common.compose(
@@ -1126,16 +1260,28 @@ function recallSavedValue(gui, controller) {
 }
 
 function add(gui, object, property, params) {
-  if (object[property] === undefined) {
+  if (!(object instanceof CustomController) && !params.custom && object[property] === undefined) {
     throw new Error(`Object "${object}" has no property "${property}"`);
   }
 
   let controller;
+  const value = object[property];
 
   if (params.color) {
     controller = new ColorController(object, property);
+  } else if (params.plotter) {
+    controller = new PlotterController(object, property, params);
+    gui.listen(controller);
+  } else if (params.file) {
+    controller = new FileController(object, property);
+  } else if (object instanceof CustomController && property === undefined) {
+    controller = object;
+  } else if (!(object instanceof CustomController) && params.custom && object[property] === undefined) {
+    controller = new CustomController(object, property);
   } else {
-    const factoryArgs = [object, property].concat(params.factoryArgs);
+    const factoryArgs = object instanceof CustomController
+      ? [property].concat(params.factoryArgs)
+      : [object, property].concat(params.factoryArgs);
     controller = ControllerFactory.apply(gui, factoryArgs);
   }
 
@@ -1147,12 +1293,19 @@ function add(gui, object, property, params) {
 
   dom.addClass(controller.domElement, "c");
 
-  const name = document.createElement("span");
+  const name = params.custom && controller instanceof CustomController === false
+    ? object instanceof CustomController
+      ? object.domElement
+      : new CustomController(object).domElement
+    : document.createElement("span");
+  if (!params.custom) {
+    name.innerHTML = controller.property;
+  }
   dom.addClass(name, "property-name");
-  name.innerHTML = controller.property;
 
   const container = document.createElement("div");
   container.appendChild(name);
+
   container.appendChild(controller.domElement);
 
   const li = addRow(gui, container, params.before);
@@ -1160,6 +1313,10 @@ function add(gui, object, property, params) {
   dom.addClass(li, GUI.CLASS_CONTROLLER_ROW);
   if (controller instanceof ColorController) {
     dom.addClass(li, "color");
+  } else if (controller instanceof PlotterController) {
+    dom.addClass(li, "plotter");
+  } else if (controller instanceof FileController) {
+    dom.addClass(li, "file");
   } else {
     dom.addClass(li, typeof controller.getValue());
   }
@@ -1184,6 +1341,11 @@ function addPresetOption(gui, name, setSelected) {
   if (setSelected) {
     gui.__preset_select.selectedIndex = gui.__preset_select.length - 1;
   }
+}
+
+function removeCurrentPresetOption(gui) {
+  gui.__preset_select.removeChild(gui.__preset_select.options[gui.__preset_select.selectedIndex]);
+  return gui.__preset_select.options[gui.__preset_select.selectedIndex].value;
 }
 
 function showHideExplain(gui, explain) {
@@ -1219,6 +1381,11 @@ function addSaveMenu(gui) {
   dom.addClass(button3, "button");
   dom.addClass(button3, "revert");
 
+  const button4 = document.createElement("span");
+  button4.innerHTML = "Delete";
+  dom.addClass(button4, "button");
+  dom.addClass(button4, "delete");
+
   const select = (gui.__preset_select = document.createElement("select"));
 
   if (gui.load && gui.load.remembered) {
@@ -1242,6 +1409,7 @@ function addSaveMenu(gui) {
   div.appendChild(button);
   div.appendChild(button2);
   div.appendChild(button3);
+  div.appendChild(button4);
 
   if (SUPPORTS_LOCAL_STORAGE) {
     const explain = document.getElementById("dg-local-explain");
@@ -1291,6 +1459,10 @@ function addSaveMenu(gui) {
 
   dom.bind(button3, "click", function() {
     gui.revert();
+  });
+
+  dom.bind(button4, "click", function() {
+    gui.deleteSave();
   });
 
   // div.appendChild(button2);

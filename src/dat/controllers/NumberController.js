@@ -113,6 +113,7 @@ class NumberController extends Controller {
     this.__step = stepValue;
     this.__impliedStep = stepValue;
     this.__precision = numDecimals(stepValue);
+    if (this.__input) this.__input.setAttribute("step", stepValue);
     return this;
   }
 }

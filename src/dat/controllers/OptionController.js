@@ -58,15 +58,22 @@ class OptionController extends Controller {
     // Acknowledge original value
     this.updateDisplay();
 
-    dom.bind(this.__select, "change", function() {
-      const desiredValue = this.options[this.selectedIndex].value;
-      _this.setValue(desiredValue);
-    });
+    dom.bind(
+      this.__select,
+      "change",
+      function() {
+        const desiredValue = this.options[this.selectedIndex].value;
+        _this.setValue(desiredValue);
+      },
+      false,
+      true
+    );
 
     this.domElement.appendChild(this.__select);
   }
 
   setValue(v) {
+    if (this._readonly) return this.getValue();
     const toReturn = super.setValue(v);
 
     if (this.__onFinishChange) {
@@ -76,7 +83,7 @@ class OptionController extends Controller {
   }
 
   updateDisplay() {
-    if (dom.isActive(this.__select)) return this; // prevent number from updating if user is trying to manually update
+    if (dom.isActive(this.__select) && !this.forceUpdateDisplay) return this; // prevent number from updating if user is trying to manually update
     this.__select.value = this.getValue();
     return super.updateDisplay();
   }

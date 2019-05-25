@@ -46,7 +46,8 @@ class NumberControllerSlider extends NumberController {
     this.__foreground = document.createElement("div");
 
     dom.bind(this.__background, "mousedown", onMouseDown);
-    dom.bind(this.__background, "touchstart", onTouchStart);
+    dom.bind(this.__background, "touchstart", onTouchStart, false, true);
+    dom.bind(this.__background, "wheel", onWheel);
 
     dom.addClass(this.__background, "slider");
     dom.addClass(this.__foreground, "slider-fg");
@@ -55,7 +56,7 @@ class NumberControllerSlider extends NumberController {
       document.activeElement.blur();
 
       dom.bind(window, "mousemove", onMouseDrag);
-      dom.bind(window, "mouseup", onMouseUp);
+      dom.bind(window, "mouseup", onMouseUp, false, true);
 
       onMouseDrag(e);
     }
@@ -65,7 +66,9 @@ class NumberControllerSlider extends NumberController {
 
       const bgRect = _this.__background.getBoundingClientRect();
 
-      _this.setValue(map(e.clientX, bgRect.left, bgRect.right, _this.__min, _this.__max));
+      if (!_this._readonly) {
+        _this.setValue(map(e.clientX, bgRect.left, bgRect.right, _this.__min, _this.__max));
+      }
 
       return false;
     }
@@ -82,8 +85,8 @@ class NumberControllerSlider extends NumberController {
       if (e.touches.length !== 1) {
         return;
       }
-      dom.bind(window, "touchmove", onTouchMove);
-      dom.bind(window, "touchend", onTouchEnd);
+      dom.bind(window, "touchmove", onTouchMove, false, true);
+      dom.bind(window, "touchend", onTouchEnd, false, true);
       onTouchMove(e);
     }
 
@@ -91,7 +94,9 @@ class NumberControllerSlider extends NumberController {
       const { clientX } = e.touches[0];
       const bgRect = _this.__background.getBoundingClientRect();
 
-      _this.setValue(map(clientX, bgRect.left, bgRect.right, _this.__min, _this.__max));
+      if (!_this._readonly) {
+        _this.setValue(map(clientX, bgRect.left, bgRect.right, _this.__min, _this.__max));
+      }
     }
 
     function onTouchEnd() {
@@ -102,6 +107,12 @@ class NumberControllerSlider extends NumberController {
       }
     }
 
+    function onWheel(e) {
+      e.preventDefault();
+      const direction = -e.deltaY >> 10 || 1;
+      _this.setValue(_this.getValue() + direction * _this.__impliedStep);
+    }
+
     this.updateDisplay();
 
     this.__background.appendChild(this.__foreground);
@@ -109,6 +120,9 @@ class NumberControllerSlider extends NumberController {
   }
 
   updateDisplay() {
+    if (this.__input === document.activeElement) {
+      return;
+    }
     const pct = (this.getValue() - this.__min) / (this.__max - this.__min);
     this.__foreground.style.width = pct * 100 + "%";
     return super.updateDisplay();

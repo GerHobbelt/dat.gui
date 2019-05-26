@@ -12,8 +12,9 @@
   "scripts": {
     "build": "rollup -c && prettier --print-width 120 --write build/**/*.js && rollup -c rollup.config.min.js && npm run update-banner",
     "build-docs": "jsdoc2md -f src/dat/gui/GUI.js src/dat/controllers/Controller.js src/dat/controllers/NumberController.js | replace-between --target API.md --token API",
-    "lint": "eslint src tests/*.html example.html",
-    "fix": "eslint --fix src tests/*.html example.html && npm run prettier",
+    "build-all": "npm run prettier && npm run fix && npm run update-banner && npm run build && npm run build-docs",
+    "lint": "eslint --report-unused-disable-directives src tests/*.html example.html",
+    "fix": "eslint --fix -c eslint-config-ignore-all-errors.json5 src tests/*.html example.html && npm run prettier",
     "update-banner": "node util/__patch_licenseBanner_in_js.js",
     "postversion": "git push && git push --tags && npm publish",
     "prettier": "prettier --print-width 120 --write *.js **/*.js **/*.ts tests/*.html example.html",

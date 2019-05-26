@@ -45,7 +45,7 @@ export const controllers = {
   NumberControllerSlider: NumberControllerSlider,
   FunctionController: FunctionController,
   ColorController: ColorController,
-  ArrayController: ArrayController,
+  ArrayController: ArrayController
 };
 
 export const dom = { dom: domImport };

@@ -631,10 +631,14 @@
       this.__onFinishChange = fnc;
       return this;
     };
-    _proto.setValue = function setValue(newValue) {
+    _proto.setValue = function setValue(newValue, disableOnChange) {
+      if (disableOnChange === void 0) {
+        disableOnChange = false;
+      }
+      var oldValue = this.object[this.property];
       this.object[this.property] = newValue;
-      if (this.__onChange) {
-        this.__onChange.call(this, newValue);
+      if (this.__onChange && !disableOnChange) {
+        this.__onChange.call(this, newValue, oldValue);
       }
       this.updateDisplay();
       return this;
@@ -902,9 +906,12 @@
       return _this2;
     }
     var _proto = BooleanController.prototype;
-    _proto.setValue = function setValue(v) {
-      var toReturn = _Controller.prototype.setValue.call(this, v);
-      if (this.__onFinishChange) {
+    _proto.setValue = function setValue(v, disableOnChange) {
+      if (disableOnChange === void 0) {
+        disableOnChange = false;
+      }
+      var toReturn = _Controller.prototype.setValue.call(this, v, disableOnChange);
+      if (this.__onFinishChange && !disableOnChange) {
         this.__onFinishChange.call(this, this.getValue());
       }
       this.__prev = this.getValue();
@@ -954,9 +961,12 @@
       return _this2;
     }
     var _proto = OptionController.prototype;
-    _proto.setValue = function setValue(v) {
-      var toReturn = _Controller.prototype.setValue.call(this, v);
-      if (this.__onFinishChange) {
+    _proto.setValue = function setValue(v, disableOnChange) {
+      if (disableOnChange === void 0) {
+        disableOnChange = false;
+      }
+      var toReturn = _Controller.prototype.setValue.call(this, v, disableOnChange);
+      if (this.__onFinishChange && !disableOnChange) {
         this.__onFinishChange.call(this, this.getValue());
       }
       return toReturn;
@@ -1037,7 +1047,10 @@
       return _this;
     }
     var _proto = NumberController.prototype;
-    _proto.setValue = function setValue(v) {
+    _proto.setValue = function setValue(v, disableOnChange) {
+      if (disableOnChange === void 0) {
+        disableOnChange = false;
+      }
       var _v = v;
       if (this.__min !== undefined && _v < this.__min) {
         _v = this.__min;
@@ -1047,7 +1060,7 @@
       if (this.__step !== undefined && _v % this.__step !== 0) {
         _v = Math.round(_v / this.__step) * this.__step;
       }
-      return _Controller.prototype.setValue.call(this, _v);
+      return _Controller.prototype.setValue.call(this, _v, disableOnChange);
     };
     _proto.min = function min(minValue) {
       this.__min = minValue;
@@ -1487,6 +1500,97 @@
       "background: linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
   }
 
+  var ArrayController = (function(_Controller) {
+    _inheritsLoose(ArrayController, _Controller);
+    function ArrayController(object, property) {
+      var _this2;
+      _this2 = _Controller.call(this, object, property) || this;
+      var _this = _assertThisInitialized(_this2);
+      _this2.__div = document.createElement("div");
+      _this2.__inputs = [];
+      _this2.__new = document.createElement("input");
+      _this2.__new.setAttribute("type", "text");
+      dom.bind(_this2.__new, "keydown", function(e) {
+        if (e.keyCode === 13) {
+          var values = _this.getValue();
+          values.push(_this.__new.value);
+          _this.__new.value = "";
+          _this.updateDisplay();
+        }
+      });
+      _this2.__div.appendChild(_this2.__new);
+      _this2.updateDisplay();
+      _this2.domElement.appendChild(_this2.__div);
+      return _this2;
+    }
+    var _proto = ArrayController.prototype;
+    _proto.updateDisplay = function updateDisplay() {
+      for (var i = 0; i < this.__inputs.length; i++) {
+        if (dom.isActive(this.__inputs[i])) {
+          return;
+        }
+      }
+      var _this = this;
+      this.__inputs.forEach(function(i) {
+        _this.__div.removeChild(i.parentElement);
+      });
+      this.__inputs = [];
+      this.getValue().forEach(function(v) {
+        var group = document.createElement("div");
+        dom.addClass(group, "array-input");
+        var input = document.createElement("input");
+        group.appendChild(input);
+        input.setAttribute("type", "text");
+        input.value = v;
+        var remove = document.createElement("span");
+        remove.innerHTML = "&nbsp;";
+        dom.addClass(remove, "remove-icon");
+        group.appendChild(remove);
+        dom.bind(remove, "click", onRemove);
+        dom.bind(input, "keyup", onChange);
+        dom.bind(input, "change", onChange);
+        dom.bind(input, "blur", onBlur);
+        dom.bind(input, "keydown", function(e) {
+          if (e.keyCode === 13) {
+            this.blur();
+          }
+        });
+        _this.__div.insertBefore(group, _this.__new);
+        _this.__inputs.push(input);
+      });
+      function onRemove(e) {
+        var _loop = function _loop(_i) {
+          if (_this.__inputs[_i].parentElement === e.target.parentElement) {
+            var values = _this.getValue().filter(function(v) {
+              return v !== _this.__inputs[_i].value;
+            });
+            _this.setValue(values);
+          }
+        };
+        for (var _i = 0; _i < _this.__inputs.length; _i++) {
+          _loop(_i);
+        }
+      }
+      function onChange() {
+        if (_this.__changing) {
+          return;
+        }
+        _this.__changing = true;
+        var values = _this.__inputs.map(function(i) {
+          return i.value;
+        });
+        _this.setValue(values);
+        _this.__changing = false;
+      }
+      function onBlur() {
+        if (_this.__onFinishChange) {
+          _this.__onFinishChange.call(_this, _this.getValue());
+        }
+      }
+    };
+    return ArrayController;
+  })(Controller);
+
   var css = {
     load: function load(url, indoc) {
       var doc = indoc || document;
@@ -1543,6 +1647,9 @@
     }
     if (Common.isBoolean(initialValue)) {
       return new BooleanController(object, property);
+    }
+    if (Common.isArray(initialValue)) {
+      return new ArrayController(object, property);
     }
     return null;
   };
@@ -2106,6 +2213,10 @@
     close: function close() {
       this.closed = true;
     },
+    onFinishRevert: function onFinishRevert(fn) {
+      this.__onFinishRevert = fn;
+      return this;
+    },
     onResize: function onResize() {
       var root = this.getRoot();
       if (root.scrollable) {
@@ -2200,15 +2311,16 @@
       this.saveToLocalStorageIfPossible();
     },
     revert: function revert(gui) {
+      var _this = this.getRoot();
       Common.each(
         this.__controllers,
         function(controller) {
           if (!this.getRoot().load.remembered) {
-            controller.setValue(controller.initialValue);
+            controller.setValue(controller.initialValue, true);
           } else {
             recallSavedValue(gui || this.getRoot(), controller);
           }
-          if (controller.__onFinishChange) {
+          if (!_this.__onFinishRevert && controller.__onFinishChange) {
             controller.__onFinishChange.call(controller, controller.getValue());
           }
         },
@@ -2219,6 +2331,9 @@
       });
       if (!gui) {
         markPresetModified(this.getRoot(), false);
+      }
+      if (_this === this && _this.__onFinishRevert) {
+        _this.__onFinishRevert.call(_this);
       }
     },
     delete: function _delete() {
@@ -2380,6 +2495,15 @@
         controller.updateDisplay
       );
       controller.updateDisplay();
+    } else if (controller instanceof ArrayController) {
+      dom.addClass(li, "array");
+      controller.updateDisplay = Common.compose(
+        function(val) {
+          li.style.height = (controller.__inputs.length + 1) * 26 + "px";
+        },
+        controller.updateDisplay
+      );
+      controller.updateDisplay();
     } else if (controller instanceof GradientController) {
       li.style.borderLeft = "3px solid #2FA1D6";
     }
@@ -2416,7 +2540,7 @@
         if (preset[matchedIndex] && preset[matchedIndex][controller.property] !== undefined) {
           var value = preset[matchedIndex][controller.property];
           controller.initialValue = value;
-          controller.setValue(value);
+          controller.setValue(value, true);
         }
       }
     }
@@ -2651,7 +2775,8 @@
     NumberControllerBox: NumberControllerBox,
     NumberControllerSlider: NumberControllerSlider,
     FunctionController: FunctionController,
-    ColorController: ColorController
+    ColorController: ColorController,
+    ArrayController: ArrayController
   };
   var dom$1 = {
     dom: dom

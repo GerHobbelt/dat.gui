@@ -34,7 +34,8 @@
           0.55: "rgb(0,255,0)",
           0.85: "yellow",
           1.0: "rgb(255,0,0)"
-        }
+        },
+        array: ["one", "two"]
       };
 
       const gui = new dat.gui.GUI({
@@ -45,8 +46,19 @@
 
       gui.remember(obj);
 
+      gui.onFinishRevert(function() {
+        console.log("finished reverting");
+      });
+
       gui.add(obj, "message");
-      gui.add(obj, "displayOutline");
+      const control = gui.add(obj, "displayOutline");
+      control.onChange(function(newValue, oldValue) {
+        console.log(newValue, oldValue);
+      });
+      control.onFinishChange(function(newValue, oldValue) {
+        console.log("finish change");
+      });
+
       const controller = gui
         .add(obj, "explode")
         .borderColor("red")
@@ -66,6 +78,8 @@
       // Choose from named values
       gui.add(obj, "speed", { Stopped: 0, Slow: 0.1, Fast: 5 });
 
+      gui.add(obj, "array");
+
       const f1 = gui.addFolder("Colors");
       f1.addColor(obj, "color0");
       f1.addColor(obj, "color1");
@@ -73,7 +87,15 @@
       f1.addColor(obj, "color3");
 
       const f2 = gui.addFolder("Another Folder");
-      f2.add(obj, "noiseStrength");
+      const test = f2.add(obj, "noiseStrength");
+
+      test.onChange(function() {
+        console.log("nested change");
+      });
+
+      test.onFinishChange(function() {
+        console.log("nested change finish");
+      });
 
       const f3 = f2.addFolder("Nested Folder");
       f3.add(obj, "growthSpeed");

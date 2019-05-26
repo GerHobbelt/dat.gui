@@ -21,6 +21,7 @@ import NumberControllerBox from "../controllers/NumberControllerBox";
 import NumberControllerSlider from "../controllers/NumberControllerSlider";
 import ColorController from "../controllers/ColorController";
 import GradientController from "../controllers/GradientController";
+import ArrayController from "../controllers/ArrayController";
 import requestAnimationFrame from "../utils/requestAnimationFrame";
 import CenteredDiv from "../dom/CenteredDiv";
 import dom from "../dom/dom";
@@ -716,6 +717,11 @@ common.extend(
       this.closed = true;
     },
 
+    onFinishRevert: function(fn) {
+      this.__onFinishRevert = fn;
+      return this;
+    },
+
     onResize: function() {
       // we debounce this function to prevent performance issues when rotating on tablet/mobile
       const root = this.getRoot();
@@ -853,18 +859,20 @@ common.extend(
     },
 
     revert: function(gui) {
+      const _this = this.getRoot();
+
       common.each(
         this.__controllers,
         function(controller) {
           // Make revert work on Default.
           if (!this.getRoot().load.remembered) {
-            controller.setValue(controller.initialValue);
+            controller.setValue(controller.initialValue, true);
           } else {
             recallSavedValue(gui || this.getRoot(), controller);
           }
 
           // fire onFinishChange callback
-          if (controller.__onFinishChange) {
+          if (!_this.__onFinishRevert && controller.__onFinishChange) {
             controller.__onFinishChange.call(controller, controller.getValue());
           }
         },
@@ -877,6 +885,10 @@ common.extend(
 
       if (!gui) {
         markPresetModified(this.getRoot(), false);
+      }
+
+      if (_this === this && _this.__onFinishRevert) {
+        _this.__onFinishRevert.call(_this);
       }
     },
 
@@ -1080,6 +1092,17 @@ function augmentController(gui, li, controller) {
     );
 
     controller.updateDisplay();
+  } else if (controller instanceof ArrayController) {
+    dom.addClass(li, "array");
+
+    controller.updateDisplay = common.compose(
+      function(val) {
+        li.style.height = `${(controller.__inputs.length + 1) * 26}px`;
+      },
+      controller.updateDisplay
+    );
+
+    controller.updateDisplay();
   } else if (controller instanceof GradientController) {
     li.style.borderLeft = "3px solid #2FA1D6";
   }
@@ -1143,7 +1166,7 @@ function recallSavedValue(gui, controller) {
 
         // And that's what it is.
         controller.initialValue = value;
-        controller.setValue(value);
+        controller.setValue(value, true);
       }
     }
   }
@@ -1198,6 +1221,7 @@ function add(gui, object, property, params) {
 }
 
 function getLocalStorageHash(gui, key) {
+  // This deals with multiple GUI's IFF every GUI has its own namespace:
   const namespace = localStorage.getItem("dat.gui.namespace") || document.location.href;
   return "dat.gui." + namespace + "." + key;
 }

@@ -86,10 +86,11 @@ class Controller {
    *
    * @param {Object} newValue The new value of <code>object[property]</code>
    */
-  setValue(newValue) {
+  setValue(newValue, disableOnChange = false) {
+    const oldValue = this.object[this.property];
     this.object[this.property] = newValue;
-    if (this.__onChange) {
-      this.__onChange.call(this, newValue);
+    if (this.__onChange && !disableOnChange) {
+      this.__onChange.call(this, newValue, oldValue);
     }
 
     this.updateDisplay();

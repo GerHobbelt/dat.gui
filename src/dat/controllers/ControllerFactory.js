@@ -17,6 +17,7 @@ import NumberControllerSlider from "./NumberControllerSlider";
 import StringController from "./StringController";
 import FunctionController from "./FunctionController";
 import BooleanController from "./BooleanController";
+import ArrayController from "./ArrayController";
 import common from "../utils/common";
 
 const ControllerFactory = function(object, property) {
@@ -57,6 +58,10 @@ const ControllerFactory = function(object, property) {
 
   if (common.isBoolean(initialValue)) {
     return new BooleanController(object, property);
+  }
+
+  if (common.isArray(initialValue)) {
+    return new ArrayController(object, property);
   }
 
   return null;

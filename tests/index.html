@@ -20,6 +20,7 @@
         const { BooleanController } = dat.controllers;
         const { OptionController } = dat.controllers;
         const { StringController } = dat.controllers;
+        const { ArrayController } = dat.controllers;
         const { NumberController } = dat.controllers;
         const { NumberControllerBox } = dat.controllers;
         const { NumberControllerSlider } = dat.controllers;
@@ -383,6 +384,7 @@
           return {
             numberProperty: 10,
             stringProperty: "foo",
+            arrayProperty: [0, 0, 0],
             booleanProperty: false,
             functionProperty: function() {
               // do something
@@ -576,6 +578,45 @@
           dom.fakeEvent(elem, "change");
 
           equal(newVal, object.stringProperty);
+        });
+
+        module("ArrayController");
+
+        test("Acknowledges original value", function() {
+          const object = initObject();
+          const c1 = new ArrayController(object, "arrayProperty");
+
+          const a = [];
+          $(c1.__inputs).each(function(idx) {
+            const el = $(c1.__inputs)[idx];
+            let v = $(el).val();
+            if (!Number.isNaN(parseFloat(v))) {
+              v = parseFloat(v);
+            }
+            a.push(v);
+          });
+          console.log({ a, b: object.arrayProperty });
+          deepEqual(a, object.arrayProperty);
+        });
+
+        test("Modifies values", function() {
+          const object = initObject();
+          const c1 = new ArrayController(object, "arrayProperty");
+
+          const newVal = [1, "a", true];
+
+          $(c1.__inputs).each(function(idx) {
+            const el = $(c1.__inputs)[idx];
+            const elem = $(el).val(newVal[idx])[0];
+            // dom.fakeEvent(elem, "change");
+          });
+          const elem = $(c1.__inputs)[0];
+          dom.fakeEvent(elem, "change");
+
+          // WARNING: ArrayController does not detect 'value type': everything is produced as string value:
+          equal("1", object.arrayProperty[0]);
+          equal("a", object.arrayProperty[1]);
+          equal("true", object.arrayProperty[2]);
         });
 
         module("NumberController");

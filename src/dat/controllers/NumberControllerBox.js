@@ -137,6 +137,10 @@ class NumberControllerBox extends NumberController {
         case 40:
           _this.setValue(_this.getValue() - _this.__impliedStep);
           break;
+
+        // make ESLINT happy:
+        default:
+          break;
       }
     }
 

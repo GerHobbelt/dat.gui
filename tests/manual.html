@@ -2,9 +2,12 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <link rel="stylesheet" href="../build/dat.gui.css" />
     <script type="text/javascript" src="jquery.js"></script>
     <script type="text/javascript" src="../build/dat.gui.js"></script>
     <script type="text/javascript">
+      /* eslint-disable no-console, camelcase, no-new */
+
       $.noConflict();
       jQuery(document).ready(function($) {
         const gui = new dat.GUI();
@@ -102,7 +105,6 @@
       });
     </script>
   </head>
-
   <body>
     <div>The menus should be right there -></div>
   </body>

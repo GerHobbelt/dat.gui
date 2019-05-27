@@ -1,4 +1,4 @@
-$background-color: #fafafa; // #1a1a1a;
+$background-color: #FAFAFA; // #1a1a1a;
 
 $hover-darken: 5%;
 $border-darken: 7%;
@@ -6,10 +6,10 @@ $active-darken: 10%;
 
 $number-color: #2FA1D6;
 $boolean-color: #806787;
-$string-color: #1ed36f;
-$function-color: #e61d5f;
-$file-color: #e6d21d;
-$save-row-color: #dad5cb;
+$string-color: #1ED36F;
+$function-color: #E61D5F;
+$file-color: #E6D21D;
+$save-row-color: #DAD5CB;
 $button-color: darken($save-row-color, 10%);
 $border-color: darken($background-color, $border-darken);
 $input-color: darken($background-color, 8.5%);
@@ -35,14 +35,17 @@ $input-color: darken($background-color, 8.5%);
   line-height: 7px;
   padding: 4px 4px 5px 4px;
   background: $button-color;
-  color: #fff;
+  color: #FFFFFF;
   text-shadow: 0 1px 0 darken($button-color, 10%);
   box-shadow: 0 -1px 0 darken($button-color, 10%);
   cursor: pointer;
 }
 
 @mixin gears() {
-  background: $button-color url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAANCAYAAAB/9ZQ7AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAQJJREFUeNpiYKAU/P//PwGIC/ApCABiBSAW+I8AClAcgKxQ4T9hoMAEUrxx2QSGN6+egDX+/vWT4e7N82AMYoPAx/evwWoYoSYbACX2s7KxCxzcsezDh3evFoDEBYTEEqycggWAzA9AuUSQQgeYPa9fPv6/YWm/Acx5IPb7ty/fw+QZblw67vDs8R0YHyQhgObx+yAJkBqmG5dPPDh1aPOGR/eugW0G4vlIoTIfyFcA+QekhhHJhPdQxbiAIguMBTQZrPD7108M6roWYDFQiIAAv6Aow/1bFwXgis+f2LUAynwoIaNcz8XNx3Dl7MEJUDGQpx9gtQ8YCueB+D26OECAAQDadt7e46D42QAAAABJRU5ErkJggg==) 2px 1px no-repeat;
+  background:
+    $button-color
+    url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAANCAYAAAB/9ZQ7AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAQJJREFUeNpiYKAU/P//PwGIC/ApCABiBSAW+I8AClAcgKxQ4T9hoMAEUrxx2QSGN6+egDX+/vWT4e7N82AMYoPAx/evwWoYoSYbACX2s7KxCxzcsezDh3evFoDEBYTEEqycggWAzA9AuUSQQgeYPa9fPv6/YWm/Acx5IPb7ty/fw+QZblw67vDs8R0YHyQhgObx+yAJkBqmG5dPPDh1aPOGR/eugW0G4vlIoTIfyFcA+QekhhHJhPdQxbiAIguMBTQZrPD7108M6roWYDFQiIAAv6Aow/1bFwXgis+f2LUAynwoIaNcz8XNx3Dl7MEJUDGQpx9gtQ8YCueB+D26OECAAQDadt7e46D42QAAAABJRU5ErkJggg==)
+    2px 1px no-repeat;
   height: 7px;
   width: 8px;
 }
@@ -51,41 +54,38 @@ $input-color: darken($background-color, 8.5%);
 
 /** Main type */
 .dg {
-
-  color: #555; // #eee;
-  font: 11px 'Lucida Grande', sans-serif;
+  color: #555555; // #eee;
+  font: 11px "Lucida Grande", sans-serif;
   text-shadow: none; // 0 -1px 0 #111;
 
   /** Auto place */
   &.main {
-
     ul {
       /** Scrollbar */
       &::-webkit-scrollbar {
         width: 5px;
         background: $background-color;
       }
+
       &::-webkit-scrollbar-corner {
         height: 0;
         display: none;
       }
+
       &::-webkit-scrollbar-thumb {
         border-radius: 5px;
         background: darken($background-color, 30%);
       }
-
     }
   }
 
   li {
-
     &:not(.folder) {
       background: $background-color;
       border-bottom: 1px solid $border-color;
     }
 
     &.save-row {
-
       line-height: 25px;
       background: $save-row-color;
       border: 0;
@@ -93,7 +93,6 @@ $input-color: darken($background-color, 8.5%);
       select {
         margin-left: 5px;
         width: 108px;
-
       }
 
       .button {
@@ -109,9 +108,7 @@ $input-color: darken($background-color, 8.5%);
           background-color: darken($button-color, 5%);
           box-shadow: 0 -1px 0 darken($button-color, 10%);
         }
-
       }
-
     }
 
     &.folder {
@@ -120,11 +117,10 @@ $input-color: darken($background-color, 8.5%);
 
     &.title {
       padding-left: 16px;
-      background: #e8e8e8; // #000 url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlI+hKgFxoCgAOw==) 6px 10px no-repeat;
+      background: #E8E8E8; // #000 url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlI+hKgFxoCgAOw==) 6px 10px no-repeat;
       cursor: pointer;
       border-bottom: 1px solid rgba(255, 255, 255, 0.2);
     }
-
   }
 
   // .closed li.title {
@@ -133,7 +129,6 @@ $input-color: darken($background-color, 8.5%);
 
   /* Controller row, <li> */
   .cr {
-
     &.boolean {
       border-left: 3px solid $boolean-color;
     }
@@ -156,58 +151,60 @@ $input-color: darken($background-color, 8.5%);
 
     &.number {
       border-left: 3px solid $number-color;
-      input[type=number] {
+
+      input[type="number"] {
         color: $number-color;
       }
-      input[type=number] {
+
+      input[type="number"] {
         color: $number-color;
       }
     }
 
     &.string {
       border-left: 3px solid $string-color;
-      input[type=text] {
+
+      input[type="text"] {
         color: $string-color;
       }
     }
 
     &.function:hover,
     &.boolean:hover {
-      background: #eee; // #111;
+      background: #EEEEEE; // #111;
     }
-
   }
 
   /** Controllers */
   .c {
-
-    input[type=text], input[type=number] {
-
+    input[type="text"],
+    input[type="number"] {
       background: $input-color;
       outline: none;
+
       &:hover {
         background: darken($input-color, $hover-darken);
       }
+
       &:focus {
         background: darken($input-color, $active-darken);
-        color: #555; // #fff;
+        color: #555555; // #fff;
       }
-
     }
 
-    input[type=number] {
-
+    input[type="number"] {
       background: $input-color;
       outline: none;
       border: none;
+
       &:hover {
         background: darken($input-color, $hover-darken);
       }
+
       &:focus {
         background: darken($input-color, $active-darken);
-        color: #fff;
+        color: #FFFFFF;
       }
-
     }
 
     .slider {
@@ -222,13 +219,12 @@ $input-color: darken($background-color, 8.5%);
 
     .slider:hover {
       background: darken($input-color, $hover-darken);
+
       .slider-fg {
         background: darken($number-color, $hover-darken);
       }
     }
-
   }
-
 }
 
 // Some extra styles.
@@ -251,11 +247,11 @@ $input-color: darken($background-color, 8.5%);
 }
 
 .autocomplete .group {
-  background: #eee;
+  background: #EEEEEE;
 }
 
 .autocomplete > div:hover:not(.group),
 .autocomplete > div.selected {
-  background: #81ca91;
+  background: #81CA91;
   cursor: pointer;
 }

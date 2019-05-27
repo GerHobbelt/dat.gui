@@ -988,33 +988,33 @@
             $(gui.domElement)
               .find("ul")
               .prev()
-              .hasClass(GUI.CLASS_CLOSE_BUTTON)
-        && $(gui.domElement)
-          .find("ul")
-          .prev()
-          .hasClass(GUI.CLASS_CLOSE_TOP),
+              .hasClass(GUI.CLASS_CLOSE_BUTTON) &&
+              $(gui.domElement)
+                .find("ul")
+                .prev()
+                .hasClass(GUI.CLASS_CLOSE_TOP),
             "GUI has close/open button on top"
           );
           ok(
             $(gui2.domElement)
               .find("ul")
               .next()
-              .hasClass(GUI.CLASS_CLOSE_BUTTON)
-        && $(gui2.domElement)
-          .find("ul")
-          .next()
-          .hasClass(GUI.CLASS_CLOSE_BOTTOM),
+              .hasClass(GUI.CLASS_CLOSE_BUTTON) &&
+              $(gui2.domElement)
+                .find("ul")
+                .next()
+                .hasClass(GUI.CLASS_CLOSE_BOTTOM),
             "GUI has close/open button on bottom"
           );
           ok(
             $(gui3.domElement)
               .find("ul")
               .next()
-              .hasClass(GUI.CLASS_CLOSE_BUTTON)
-        && $(gui3.domElement)
-          .find("ul")
-          .next()
-          .hasClass(GUI.CLASS_CLOSE_BOTTOM),
+              .hasClass(GUI.CLASS_CLOSE_BUTTON) &&
+              $(gui3.domElement)
+                .find("ul")
+                .next()
+                .hasClass(GUI.CLASS_CLOSE_BOTTOM),
             "GUI has close/open button on bottom by default"
           );
 

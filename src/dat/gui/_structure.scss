@@ -4,7 +4,6 @@ $row-height: 27px;
 $button-height: 20px;
 
 .dg {
-
   /** Clear list styles */
   ul {
     list-style: none;
@@ -24,8 +23,8 @@ $button-height: 20px;
     height: 0;
     // we make sure the dat.gui sits in its own layer for repaint purposes:
     // see http://benfrain.com/improving-css-performance-fixed-position-elements/
-    // Note that the backface style here comes from that article but is not 
-    // really necessary any more now that we have our layer. 
+    // Note that the backface style here comes from that article but is not
+    // really necessary any more now that we have our layer.
     // Compare: https://developers.google.com/web/updates/2012/09/Stacking-Changes-Coming-to-position-fixed-elements?hl=en
     z-index: 0;
     // backface-visibility: hidden;
@@ -37,7 +36,6 @@ $button-height: 20px;
   }
 
   &.main {
-
     @include transition(opacity, 0.1s, linear);
 
     // &.taller-than-window {
@@ -66,43 +64,42 @@ $button-height: 20px;
     }
 
     .close-button {
-      /*opacity: 0;*/
+      /* opacity: 0; */
       @include transition(opacity, 0.1s, linear);
-      border: 0;
 
+      border: 0;
       line-height: $button-height - 1;
       height: $button-height;
 
       /* TODO, these are style notes */
       cursor: pointer;
       text-align: center;
-      background-color: #ccc; // #000
+      background-color: #CCCCCC; // #000
       &.close-top {
         position: relative;
       }
+
       &.close-bottom {
         position: absolute;
       }
+
       &:hover {
-        background-color: #ddd; // #111
+        background-color: #DDDDDD; // #111
       }
-
     }
-
   }
 
   /* Auto-placed GUI's */
   &.a {
-
     float: right;
     margin-right: 15px;
     overflow-y: visible;
 
     &.has-save > ul {
-
       &.close-top {
         margin-top: 0;
       }
+
       &.close-bottom {
         margin-top: $row-height;
       }
@@ -119,12 +116,11 @@ $button-height: 20px;
       &.close-top {
         position: relative;
       }
+
       &.close-bottom {
         position: fixed;
       }
-
     }
-
   }
 
   li {
@@ -186,7 +182,9 @@ $button-height: 20px;
   }
 
   /** Controller placement */
-  .c input[type=text], .c input[type=number], .c canvas {
+  .c input[type="text"],
+  .c input[type="number"],
+  .c canvas {
     border: 0;
     margin-top: 4px;
     padding: 3px;
@@ -196,9 +194,10 @@ $button-height: 20px;
 
   /** Shorter number boxes when slider is present. */
   .has-slider {
-    input[type=number] {
+    input[type="number"] {
       width: 30%;
-      /*display: none;*/
+
+      /* display: none; */
       margin-left: 0;
     }
   }
@@ -222,7 +221,7 @@ $button-height: 20px;
     height: 100%;
   }
 
-  .c input[type=checkbox] {
+  .c input[type="checkbox"] {
     margin-top: 7px;
   }
 
@@ -258,35 +257,32 @@ $button-height: 20px;
   }
 
   li.save-row {
-
     padding: 0;
 
     .button {
       display: inline-block;
-      padding: 0px 6px;
+      padding: 0 6px;
     }
-
   }
 
   &.dialogue {
-    background-color: #222;
+    background-color: #222222;
     width: 460px;
     padding: 15px;
     font-size: 13px;
     line-height: 15px;
   }
-
 }
 
 /* TODO Separate style and structure */
 #dg-new-constructor {
   padding: 10px;
-  color: #222;
+  color: #222222;
   font-family: Monaco, monospace;
   font-size: 10px;
   border: 0;
   resize: none;
-  box-shadow: inset 1px 1px 1px #888;
+  box-shadow: inset 1px 1px 1px #888888;
   word-wrap: break-word;
   margin: 12px 0;
   display: block;
@@ -300,7 +296,7 @@ $button-height: 20px;
 #dg-new-editor {
   padding: 10px;
   resize: none;
-  box-shadow: inset 1px 1px 1px #888;
+  box-shadow: inset 1px 1px 1px #888888;
   margin: 12px 0;
   display: block;
   //background-color: #0d3349;
@@ -314,9 +310,10 @@ $button-height: 20px;
   font-size: 11px;
   line-height: 17px;
   border-radius: 3px;
-  background-color: #333;
+  background-color: #333333;
   padding: 8px;
   margin-top: 10px;
+
   code {
     font-size: 10px;
   }

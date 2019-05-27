@@ -50,7 +50,7 @@ const SUPPORTS_LOCAL_STORAGE = (function() {
   } catch (e) {
     return false;
   }
-}());
+})();
 
 let SAVE_DIALOGUE;
 
@@ -680,8 +680,8 @@ common.extend(
     destroy: function() {
       if (this.parent) {
         throw new Error(
-          "Only the root GUI should be removed with .destroy(). "
-            + "For subfolders, use gui.removeFolder(folder) instead."
+          "Only the root GUI should be removed with .destroy(). " +
+            "For subfolders, use gui.removeFolder(folder) instead."
         );
       }
 
@@ -724,10 +724,10 @@ common.extend(
       // Do we have saved appearance data for this folder?
       if (
         // Anything loaded?
-        this.load
+        this.load &&
         // Was my parent a dead-end?
-        && this.load.folders
-        && this.load.folders[name]
+        this.load.folders &&
+        this.load.folders[name]
       ) {
         // Did daddy remember me?
         // Start me closed if I was closed
@@ -758,10 +758,10 @@ common.extend(
       // Do we have saved appearance data for this folder?
       if (
         // Anything loaded?
-        this.load
+        this.load &&
         // Was my parent a dead-end?
-        && this.load.folders
-        && this.load.folders[folder.name]
+        this.load.folders &&
+        this.load.folders[folder.name]
       ) {
         delete this.load.folders[folder.name];
       }
@@ -1279,9 +1279,10 @@ function add(gui, object, property, params) {
   } else if (!(object instanceof CustomController) && params.custom && object[property] === undefined) {
     controller = new CustomController(object, property);
   } else {
-    const factoryArgs = object instanceof CustomController
-      ? [property].concat(params.factoryArgs)
-      : [object, property].concat(params.factoryArgs);
+    const factoryArgs =
+      object instanceof CustomController
+        ? [property].concat(params.factoryArgs)
+        : [object, property].concat(params.factoryArgs);
     controller = ControllerFactory.apply(gui, factoryArgs);
   }
 
@@ -1293,11 +1294,12 @@ function add(gui, object, property, params) {
 
   dom.addClass(controller.domElement, "c");
 
-  const name = params.custom && controller instanceof CustomController === false
-    ? object instanceof CustomController
-      ? object.domElement
-      : new CustomController(object).domElement
-    : document.createElement("span");
+  const name =
+    params.custom && controller instanceof CustomController === false
+      ? object instanceof CustomController
+        ? object.domElement
+        : new CustomController(object).domElement
+      : document.createElement("span");
   if (!params.custom) {
     name.innerHTML = controller.property;
   }

@@ -1,14 +1,20 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <link rel="stylesheet" href="build/dat.gui.css" />
   </head>
   <body>
+    <center>
+      <h1>Example Page</h1>
+      <div id="example"></div>
+    </center>
     <script type="text/javascript" src="build/dat.gui.js"></script>
     <script type="text/javascript">
       /* eslint-disable no-console, camelcase */
 
       const obj = {
+        vector: [0, 0],
         message: "Hello World",
         displayOutline: false,
 
@@ -38,18 +44,29 @@
         array: ["one", "two"]
       };
 
+      const asUsual = true;
       const gui = new dat.gui.GUI({
-        nameMaper: {
+        autoPlace: asUsual,
+        showCloseButton: false,
+        lightTheme: true,
+        width: "100%",
+		
+		        nameMaper: {
           maxSize: "最大值"
         }
       });
-
-      gui.remember(obj);
+	  
+      if (!asUsual) {
+        document.getElementById("example").appendChild(gui.domElement);
+      }
 
       gui.onFinishRevert(function() {
         console.log("finished reverting");
       });
 
+      gui.remember(obj);
+
+      gui.add(obj, "vector");
       gui.add(obj, "message");
       const control = gui.add(obj, "displayOutline");
       control.onChange(function(newValue, oldValue) {

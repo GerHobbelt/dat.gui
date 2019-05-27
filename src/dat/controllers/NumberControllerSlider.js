@@ -46,8 +46,22 @@ class NumberControllerSlider extends NumberController {
     dom.bind(this.__background, "mousedown", onMouseDown);
     dom.bind(this.__background, "touchstart", onTouchStart);
 
+    const mousewheelevt = /Firefox/i.test(navigator.userAgent) ? "DOMMouseScroll" : "mousewheel";
+    dom.bind(this.__background, mousewheelevt, onMouseWheel);
+
     dom.addClass(this.__background, "slider");
     dom.addClass(this.__foreground, "slider-fg");
+
+    function onMouseWheel(e) {
+      let value = _this.getValue();
+      const delta = (e.deltaY || -e.wheelDelta || e.detail) >> 10 || 1;
+      e.preventDefault();
+      document.activeElement.blur();
+
+      if (delta < 0) value += _this.__impliedStep;
+      else value -= _this.__impliedStep;
+      _this.setValue(value);
+    }
 
     function onMouseDown(e) {
       document.activeElement.blur();
@@ -59,6 +73,10 @@ class NumberControllerSlider extends NumberController {
     }
 
     function onTouchStart(e) {
+      if (e.touches.length !== 1) {
+        return;
+      }
+
       document.activeElement.blur();
 
       dom.bind(window, "touchmove", onTouchMove);
@@ -75,6 +93,12 @@ class NumberControllerSlider extends NumberController {
       onDrag(e.clientX);
     }
 
+    //function onTouchMove(e) {
+    //  const { clientX } = e.touches[0];
+    //  const bgRect = _this.__background.getBoundingClientRect();
+    //
+    //  _this.setValue(map(clientX, bgRect.left, bgRect.right, _this.__min, _this.__max));
+    //}
     function onTouchMove(e) {
       // e.preventDefault();
 
@@ -96,26 +120,34 @@ class NumberControllerSlider extends NumberController {
     }
 
     function onTouchEnd() {
+      dom.unbind(window, "touchmove", onTouchMove);
+      dom.unbind(window, "touchend", onTouchEnd);
+
+      if (_this.__onFinishChange) {
+        _this.__onFinishChange.call(_this, _this.getValue());
+      }
+    }
+    function onTouchEnd() {
       dom.unbind(window, "touchmove", onMouseDrag);
       dom.unbind(window, "touchend", onMouseUp);
 
       _this.__activeTouch = null;
 
-      moveFinish();
+      if (_this.__onFinishChange) {
+        _this.__onFinishChange.call(_this, _this.getValue());
+      }
     }
 
     function onMouseUp() {
       dom.unbind(window, "mousemove", onMouseDrag);
       dom.unbind(window, "mouseup", onMouseUp);
 
-      moveFinish();
-    }
-
-    function moveFinish() {
       if (_this.__onFinishChange) {
         _this.__onFinishChange.call(_this, _this.getValue());
       }
     }
+
+
 
     this.updateDisplay();
 
@@ -124,6 +156,9 @@ class NumberControllerSlider extends NumberController {
   }
 
   updateDisplay() {
+    if (this.__input === document.activeElement) {
+      return;
+    }
     const pct = (this.getValue() - this.__min) / (this.__max - this.__min);
     this.__foreground.style.width = pct * 100 + "%";
     return super.updateDisplay();

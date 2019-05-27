@@ -54,6 +54,18 @@ class NumberControllerBox extends NumberController {
      */
     let prevY;
 
+    const mousewheelevt = /Firefox/i.test(navigator.userAgent) ? "DOMMouseScroll" : "mousewheel";
+
+    function onMouseWheel(e) {
+      let value = _this.getValue();
+      const delta = (e.deltaY || -e.wheelDelta || e.detail) >> 10 || 1;
+      e.preventDefault();
+
+      if (delta < 0) value += _this.__impliedStep;
+      else value -= _this.__impliedStep;
+      _this.setValue(value);
+    }
+
     function onChange() {
       let { value } = _this.__input;
       if (params && _this.__suffix) {
@@ -102,6 +114,7 @@ class NumberControllerBox extends NumberController {
     dom.bind(this.__input, "change", onChange);
     dom.bind(this.__input, "blur", onBlur);
     dom.bind(this.__input, "mousedown", onMouseDown);
+    dom.bind(this.__input, mousewheelevt, onMouseWheel);
     dom.bind(this.__input, "keydown", onKeyDown);
 
     function onKeyDown(e) {
@@ -121,6 +134,9 @@ class NumberControllerBox extends NumberController {
 
   updateDisplay() {
     // if (dom.isActive(this.__input)) return this; // prevent number from updating if user is trying to manually update
+    if (this.__input === document.activeElement) {
+      return;
+    }
 
     this.__input.value = this.__truncationSuspended
       ? this.getValue()

@@ -16,12 +16,16 @@ import saveDialogueContents from "./saveDialogue.html";
 import ControllerFactory from "../controllers/ControllerFactory";
 import Controller from "../controllers/Controller";
 import BooleanController from "../controllers/BooleanController";
+import VectorController from "../controllers/VectorController";
 import FunctionController from "../controllers/FunctionController";
+import TabbedController from "../controllers/TabbedController";
 import NumberControllerBox from "../controllers/NumberControllerBox";
 import NumberControllerSlider from "../controllers/NumberControllerSlider";
+import NumberControllerAnimator from "../controllers/NumberControllerAnimator";
 import ColorController from "../controllers/ColorController";
 import GradientController from "../controllers/GradientController";
 import ArrayController from "../controllers/ArrayController";
+import ImageController from "../controllers/ImageController";
 import requestAnimationFrame from "../utils/requestAnimationFrame";
 import CenteredDiv from "../dom/CenteredDiv";
 import dom from "../dom/dom";
@@ -44,7 +48,7 @@ const DEFAULT_DEFAULT_PRESET_NAME = "Default";
 
 const SUPPORTS_LOCAL_STORAGE = (function() {
   try {
-    return "localStorage" in window && window.localStorage != null;
+    return !!window.localStorage;
   } catch (e) {
     return false;
   }
@@ -83,10 +87,11 @@ const hideableGuis = [];
  * @param {String} [params.name] The name of this GUI.
  * @param {Object} [params.load] JSON object representing the saved state of
  * this GUI.
- * @param {Boolean} [params.auto=true]
  * @param {dat.gui.GUI} [params.parent] The GUI I'm nested in.
- * @param {Boolean} [params.closed] If true, starts closed
- * @param {Boolean} [params.closeOnTop] If true, close/open button shows on top of the GUI
+ * @param {Boolean} [params.autoPlace=true]
+ * @param {Boolean} [params.hideable=true] If true, GUI is shown/hidden by <kbd>h</kbd> keypress.
+ * @param {Boolean} [params.closed=false] If true, starts closed
+ * @param {Boolean} [params.closeOnTop=false] If true, close/open button shows on top of the GUI
  */
 const GUI = function(pars) {
   const _this = this;
@@ -142,7 +147,8 @@ const GUI = function(pars) {
   params = common.defaults(params, {
     closeOnTop: false,
     autoPlace: true,
-    width: GUI.DEFAULT_WIDTH
+    width: GUI.DEFAULT_WIDTH,
+    showCloseButton: true
   });
 
   params = common.defaults(params, {
@@ -176,11 +182,44 @@ const GUI = function(pars) {
   let useLocalStorage = SUPPORTS_LOCAL_STORAGE && localStorage.getItem(getLocalStorageHash(this, "isLocal")) === "true";
 
   let saveToLocalStorage;
+  let titleRow;
 
   Object.defineProperties(
     this,
     /** @lends dat.gui.GUI.prototype */
     {
+      /**
+       * Toggles light theme
+       * @type Boolean
+       */
+      lightTheme: {
+        set: function(v) {
+          params.lightTheme = v;
+          if (v) dom.addClass(_this.domElement, GUI.CLASS_LIGHT_THEME);
+          else dom.removeClass(_this.domElement, GUI.CLASS_LIGHT_THEME);
+        },
+
+        get: function() {
+          return params.lightTheme;
+        }
+      },
+
+      /**
+       * Toggles open/close button
+       * @type Boolean
+       */
+      showCloseButton: {
+        set: function(v) {
+          params.showCloseButton = v;
+          if (v) dom.removeClass(_this.__closeButton, GUI.CLASS_DISPLAY_NONE);
+          else dom.addClass(_this.__closeButton, GUI.CLASS_DISPLAY_NONE);
+        },
+
+        get: function() {
+          return params.showCloseButton;
+        }
+      },
+
       /**
        * The parent <code>GUI</code>
        * @type dat.gui.GUI
@@ -356,10 +395,14 @@ const GUI = function(pars) {
 
   // Are we a root level GUI?
   if (common.isUndefined(params.parent)) {
-    params.closed = false;
+    this.closed = params.closed || false;
 
     dom.addClass(this.domElement, GUI.CLASS_MAIN);
     dom.makeSelectable(this.domElement, false);
+
+    if (params.lightTheme) {
+      dom.addClass(this.domElement, GUI.CLASS_LIGHT_THEME);
+    }
 
     // Are we supposed to be loading locally?
     if (SUPPORTS_LOCAL_STORAGE) {
@@ -383,6 +426,9 @@ const GUI = function(pars) {
     } else {
       dom.addClass(this.__closeButton, GUI.CLASS_CLOSE_BOTTOM);
       this.domElement.appendChild(this.__closeButton);
+    }
+    if (!params.showCloseButton) {
+      dom.addClass(this.__closeButton, GUI.CLASS_DISPLAY_NONE);
     }
 
     dom.bind(this.__closeButton, "click", function() {
@@ -495,10 +541,12 @@ GUI.CLASS_CLOSE_BUTTON = "close-button";
 GUI.CLASS_CLOSE_TOP = "close-top";
 GUI.CLASS_CLOSE_BOTTOM = "close-bottom";
 GUI.CLASS_DRAG = "drag";
+GUI.CLASS_DISPLAY_NONE = "display-none";
+GUI.CLASS_LIGHT_THEME = "light-theme";
 
 GUI.DEFAULT_WIDTH = 245;
-GUI.TEXT_CLOSED = "Close Controls";
-GUI.TEXT_OPEN = "Open Controls";
+GUI.TEXT_CLOSED = "Close View Controls";
+GUI.TEXT_OPEN = "Open View Controls";
 
 GUI._keydownHandler = function(e) {
   if (
@@ -523,6 +571,7 @@ common.extend(
      *
      * @param {Object} object The object to be manipulated
      * @param {String} property The name of the property to be manipulated
+     * @param {String} label The label to display for the object controller
      * @param {Number} [min] Minimum allowed value
      * @param {Number} [max] Maximum allowed value
      * @param {Number} [step] Increment by which to change value
@@ -539,9 +588,9 @@ common.extend(
      * var person = {age: 45};
      * gui.add(person, 'age', 0, 100);
      */
-    add: function(object, property) {
-      return add(this, object, property, {
-        factoryArgs: Array.prototype.slice.call(arguments, 2)
+    add: function(object, property, label) {
+      return add(this, object, property, label, {
+        factoryArgs: Array.prototype.slice.call(arguments, 3)
       });
     },
 
@@ -565,8 +614,8 @@ common.extend(
      * gui.addColor(palette, 'color3');
      * gui.addColor(palette, 'color4');
      */
-    addColor: function(object, property) {
-      return add(this, object, property, {
+    addColor: function(object, property, label) {
+      return add(this, object, property, label, {
         color: true
       });
     },
@@ -577,10 +626,24 @@ common.extend(
      * @returns {dat.controllers.ColorController} The new controller that was added.
      * @instance
      */
-    addGradient: function(object, property) {
-      return add(this, object, property, {
+    addGradient: function(object, property, label) {
+      return add(this, object, property, label, {
         gradient: true,
-        factoryArgs: Array.prototype.slice.call(arguments, 2)
+        factoryArgs: Array.prototype.slice.call(arguments, 3)
+      });
+    },
+
+
+    /**
+     * @param object
+     * @param property
+     * @returns {dat.controllers.ImageController } THe new controller that was added.
+     * @instance
+     */
+    addImage: function(object, property, label) {
+      return add(this, object, property, label, {
+        factoryArgs: Array.prototype.slice.call(arguments, 3),
+        image: true
       });
     },
 
@@ -594,6 +657,10 @@ common.extend(
       if (lIndex !== -1) {
         this.__listening.splice(lIndex, 1);
       }
+      // Hacky remove check, should be in events
+      if (controller.destruct) {
+        controller.destruct();
+      }
       this.__ul.removeChild(controller.__li);
       this.__controllers.splice(this.__controllers.indexOf(controller), 1);
       const _this = this;
@@ -603,26 +670,31 @@ common.extend(
     },
 
     /**
-     * Removes the GUI from the document and unbinds all event listeners.
+     * Removes the root GUI from the document and unbinds all event listeners.
+     * For subfolders, use `gui.removeFolder(folder)` instead.
      * @instance
      */
     destroy: function() {
-      const _this = this;
+      if (this.parent) {
+        throw new Error(
+          "Only the root GUI should be removed with .destroy(). " +
+            "For subfolders, use gui.removeFolder(folder) instead."
+        );
+      }
 
-      common.each(this.__folders, function(folder, name) {
-        _this.removeFolder(name);
-      });
 
       if (this.autoPlace) {
         autoPlaceContainer.removeChild(this.domElement);
       }
 
-      dom.unbind(window, "keydown", GUI._keydownHandler, false);
-      dom.unbind(window, "resize", this.__resizeHandler);
+      const _this = this;
+      common.each(this.__folders, function(folder, name) {
+        _this.removeFolder(name);
+      });
 
-      if (this.saveToLocalStorageIfPossible) {
-        dom.unbind(window, "unload", this.saveToLocalStorageIfPossible);
-      }
+      dom.unbind(window, "keydown", GUI._keydownHandler, false);
+
+      removeListeners(this);
 
       for (let i = this.__listening.length - 1; i >= 0; i--) {
         this.__listening.splice(i, 1);
@@ -677,7 +749,9 @@ common.extend(
     },
 
     /**
-     * @param name
+     * Removes a subfolder GUI instance.
+     * @param {dat.gui.GUI} folder The folder to remove.
+     * @instance
      */
     removeFolder: function(name) {
       const folder = this.__folders[name];
@@ -693,14 +767,23 @@ common.extend(
 
       // Do we have saved appearance data for this folder?
       if (
-        this.load && // Anything loaded?
-        this.load.folders && // Was my parent a dead-end?
+        // Anything loaded?
+        this.load && 
+        // Was my parent a dead-end?
+        this.load.folders && 
         this.load.folders[folder.name]
       ) {
         delete this.load.folders[folder.name];
       }
 
+      removeListeners(folder);
+
       const _this = this;
+
+      common.each(folder.__folders, function(subfolder) {
+        folder.removeFolder(subfolder);
+      });
+
       common.defer(function() {
         _this.onResize();
       });
@@ -715,6 +798,20 @@ common.extend(
      */
     close: function() {
       this.closed = true;
+    },
+
+    /**
+     * Hides the GUI.
+     */
+    hide: function() {
+      this.domElement.style.display = "none";
+    },
+
+    /**
+     * Shows the GUI.
+     */
+    show: function() {
+      this.domElement.style.display = "";
     },
 
     onFinishRevert: function(fn) {
@@ -735,9 +832,9 @@ common.extend(
           }
         });
 
-        if (window.innerHeight - top - CLOSE_BUTTON_HEIGHT < h) {
+        if (root.domElement.clientHeight - CLOSE_BUTTON_HEIGHT < h) {
           dom.addClass(root.domElement, GUI.CLASS_TOO_TALL);
-          root.__ul.style.height = window.innerHeight - top - CLOSE_BUTTON_HEIGHT + "px";
+          root.__ul.style.height = root.domElement.clientHeight - CLOSE_BUTTON_HEIGHT + "px";
         } else {
           dom.removeClass(root.domElement, GUI.CLASS_TOO_TALL);
           root.__ul.style.height = "auto";
@@ -945,10 +1042,17 @@ function addRow(gui, newDom, liBefore) {
   return li;
 }
 
+function removeListeners(gui) {
+  dom.unbind(window, "resize", gui.__resizeHandler);
+
+  if (gui.saveToLocalStorageIfPossible) {
+    dom.unbind(window, "unload", gui.saveToLocalStorageIfPossible);
+  }
+}
+
 function markPresetModified(gui, modified) {
   const opt = gui.__preset_select[gui.__preset_select.selectedIndex];
 
-  // console.log('mark', modified, opt);
   if (modified) {
     opt.innerHTML = opt.value + "*";
   } else {
@@ -960,31 +1064,42 @@ function augmentController(gui, li, controller) {
   controller.__li = li;
   controller.__gui = gui;
 
-  common.extend(controller, {
-    options: function(options) {
-      if (arguments.length > 1) {
-        const nextSibling = controller.__li.nextElementSibling;
-        controller.remove();
+  common.extend(
+    controller,
+    /** @lends Controller.prototype */ {
+      /**
+       * @param  {Array|Object} options
+       * @return {Controller}
+       */
+      options: function(options) {
+        if (arguments.length > 1) {
+          const nextSibling = controller.__li.nextElementSibling;
+          controller.remove();
 
-        return add(gui, controller.object, controller.property, {
+          return add(gui, controller.object, controller.property, controller.label, {
           before: nextSibling,
           factoryArgs: [common.toArray(arguments)]
-        });
-      }
+          });
+        }
 
-      if (common.isArray(options) || common.isObject(options)) {
-        const nextSibling = controller.__li.nextElementSibling;
-        controller.remove();
+        if (common.isArray(options) || common.isObject(options)) {
+          const nextSibling = controller.__li.nextElementSibling;
+          controller.remove();
 
-        return add(gui, controller.object, controller.property, {
+          return add(gui, controller.object, controller.property, controller.label, {
           before: nextSibling,
           factoryArgs: [options]
         });
-      }
-    },
+        }
+      },
 
-    name: function(v) {
-      controller.__li.firstElementChild.firstElementChild.innerHTML = v;
+      /**
+       * Sets the name of the controller.
+       * @param  {string} name
+       * @return {Controller}
+       */
+      name: function(name) {
+        controller.__li.firstElementChild.firstElementChild.innerHTML = name;
       return controller;
     },
 
@@ -994,19 +1109,28 @@ function augmentController(gui, li, controller) {
       } else {
         controller.__li.removeAttribute("title");
       }
-      return controller;
-    },
+        return controller;
+      },
 
-    listen: function() {
-      controller.__gui.listen(controller);
-      return controller;
-    },
+      /**
+       * Sets controller to listen for changes on its underlying object.
+       * @return {Controller}
+       */
+      listen: function() {
+        controller.__gui.listen(controller);
+        return controller;
+      },
 
-    remove: function() {
-      controller.__gui.remove(controller);
-      return controller;
+      /**
+       * Removes the controller from its parent GUI.
+       * @return {Controller}
+       */
+      remove: function() {
+        controller.__gui.remove(controller);
+        return controller;
+      }
     }
-  });
+  );
 
   // All sliders should be accompanied by a box.
   if (controller instanceof NumberControllerSlider) {
@@ -1016,7 +1140,7 @@ function augmentController(gui, li, controller) {
       step: controller.__step
     });
 
-    common.each(["updateDisplay", "onChange", "onFinishChange", "step"], function(method) {
+    common.each(["updateDisplay", "onChange", "onFinishChange", "step", "min", "max"], function(method) {
       const pc = controller[method];
       const pb = box[method];
       controller[method] = box[method] = function() {
@@ -1028,6 +1152,25 @@ function augmentController(gui, li, controller) {
 
     dom.addClass(li, "has-slider");
     controller.domElement.insertBefore(box.domElement, controller.domElement.firstElementChild);
+
+    // Add animation buttons to slider.
+    const animateButtons = new NumberControllerAnimator(controller.object, controller.property, {
+      min: controller.__min,
+      max: controller.__max,
+      step: controller.__step
+    });
+
+    common.each(["updateDisplay", "onChange", "onFinishChange", "step"], function(method) {
+      const pc = controller[method];
+      const pb = animateButtons[method];
+      controller[method] = animateButtons[method] = function() {
+        const args = Array.prototype.slice.call(arguments);
+        pb.apply(animateButtons, args);
+        return pc.apply(controller, args);
+      };
+    });
+    dom.addClass(li, "has-animate-buttons");
+    controller.domElement.insertBefore(animateButtons.domElement, controller.domElement.firstElementChild);
   } else if (controller instanceof NumberControllerBox) {
     const r = function(returned) {
       // Have we defined both boundaries?
@@ -1039,7 +1182,7 @@ function augmentController(gui, li, controller) {
         const wasListening = controller.__gui.__listening.indexOf(controller) > -1;
 
         controller.remove();
-        const newController = add(gui, controller.object, controller.property, {
+        const newController = add(gui, controller.object, controller.property, controller.label, {
           before: controller.__li.nextElementSibling,
           factoryArgs: [controller.__min, controller.__max, controller.__step]
         });
@@ -1069,7 +1212,7 @@ function augmentController(gui, li, controller) {
     dom.bind(controller.__checkbox, "click", function(e) {
       e.stopPropagation(); // Prevents double-toggle
     });
-  } else if (controller instanceof FunctionController) {
+  } else if (controller instanceof FunctionController || controller instanceof TabbedController) {
     dom.bind(li, "click", function() {
       dom.fakeEvent(controller.__button, "click");
     });
@@ -1105,6 +1248,8 @@ function augmentController(gui, li, controller) {
     controller.updateDisplay();
   } else if (controller instanceof GradientController) {
     li.style.borderLeft = "3px solid #2FA1D6";
+  } else if (controller instanceof VectorController) {
+    dom.addClass(li, "vector");
   }
 
   controller.setValue = common.compose(
@@ -1172,7 +1317,7 @@ function recallSavedValue(gui, controller) {
   }
 }
 
-function add(gui, object, property, params) {
+function add(gui, object, property, label, params) {
   if (object[property] === undefined) {
     throw new Error(`Object "${object}" has no property "${property}"`);
   }
@@ -1183,6 +1328,8 @@ function add(gui, object, property, params) {
     controller = new ColorController(object, property);
   } else if (params.gradient) {
     controller = new GradientController(object, property, params.factoryArgs[0]);
+  } else if (params.image) {
+    controller = new ImageController(object, property, params.factoryArgs[0]);
   } else {
     const factoryArgs = [object, property].concat(params.factoryArgs);
     controller = ControllerFactory.apply(gui, factoryArgs);
@@ -1198,7 +1345,12 @@ function add(gui, object, property, params) {
 
   const name = document.createElement("span");
   dom.addClass(name, "property-name");
-  name.innerHTML = controller.property;
+
+  if (label !== null) {
+    name.innerHTML = label;
+  } else {
+    name.innerHTML = controller.property;
+  }
 
   const container = document.createElement("div");
   container.appendChild(name);
@@ -1209,6 +1361,8 @@ function add(gui, object, property, params) {
   dom.addClass(li, GUI.CLASS_CONTROLLER_ROW);
   if (controller instanceof ColorController) {
     dom.addClass(li, "color");
+  } else if (controller instanceof ImageController) {
+    dom.addClass(li, "image");
   } else {
     dom.addClass(li, typeof controller.getValue());
   }

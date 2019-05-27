@@ -22,8 +22,8 @@ import dom from "../dom/dom";
  * @param {Object} object The object to be manipulated
  * @param {string} property The name of the property to be manipulated
  */
-class FunctionController extends Controller {
-  constructor(object, property, text) {
+class TabbedController extends Controller {
+  constructor(object, property, text, tabs, displayName) {
     super(object, property);
 
     const _this = this;
@@ -34,15 +34,14 @@ class FunctionController extends Controller {
     dom.bind(this.__button, "click", function(e) {
       e.preventDefault();
       _this.fire();
-      dom.addClass(_this.__button.parentElement.parentElement.parentElement, "function--active");
-      setTimeout(() => {
-        dom.removeClass(_this.__button.parentElement.parentElement.parentElement, "function--active");
-      }, 100);
       return false;
     });
 
     dom.addClass(this.__button, "button");
 
+    const tabSize = tabs * 2; // 2em = 1 tab
+    this.__button.style.paddingLeft = tabSize.toString() + "em";
+    this.property = displayName;
     this.domElement.appendChild(this.__button);
   }
 
@@ -57,4 +56,4 @@ class FunctionController extends Controller {
   }
 }
 
-export default FunctionController;
+export default TabbedController;

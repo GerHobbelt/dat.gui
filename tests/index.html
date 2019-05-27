@@ -25,6 +25,7 @@
         const { NumberControllerBox } = dat.controllers;
         const { NumberControllerSlider } = dat.controllers;
         const { FunctionController } = dat.controllers;
+        const { TabbedController } = dat.controllers;
         const { ColorController } = dat.controllers;
         const { GUI } = dat.gui;
 
@@ -821,6 +822,7 @@
           const c3 = new BooleanController(object, "booleanProperty");
           const c4 = new FunctionController(object, "functionProperty");
           const c5 = new OptionController(object, "stringProperty", [0, 1, 2]);
+          const c6 = new TabbedController(object, "functionProperty");
 
           let c0_changed = false;
           let c1_changed = false;
@@ -828,6 +830,7 @@
           let c3_changed = false;
           let c4_changed = false;
           let c5_changed = false;
+          let c6_changed = false;
 
           c0.onChange(function() {
             c0_changed = true;
@@ -853,6 +856,10 @@
             c5_changed = true;
           });
 
+          c6.onChange(function() {
+            c6_changed = true;
+          });
+
           hidden.appendChild(c3.domElement);
 
           c0.setValue(0.5);
@@ -861,6 +868,7 @@
           c3.setValue(false);
           c4.fire();
           c5.setValue("yo");
+          c6.fire();
 
           ok(c1_changed, "NumberControllerSlider");
           ok(c1_changed, "NumberControllerBox");
@@ -868,6 +876,7 @@
           ok(c3_changed, "BooleanController");
           ok(c4_changed, "FunctionController");
           ok(c5_changed, "OptionController");
+          ok(c6_changed, "TabbedController");
         });
 
         test("onFinishChange", function() {
@@ -1168,6 +1177,19 @@
           c.remove();
 
           ok(!$.contains(gui.domElement, c.domElement), "Now you don't.");
+
+          gui.destroy();
+        });
+
+        test("removeFolder", function() {
+          const gui = new GUI();
+
+          const f = gui.addFolder("Temporary folder");
+
+          ok($.contains(gui.domElement, f.domElement), "Now you see it");
+          gui.removeFolder(f);
+
+          ok(!$.contains(gui.domElement, f.domElement), "Now you don't.");
 
           gui.destroy();
         });

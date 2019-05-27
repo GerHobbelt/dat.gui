@@ -11,11 +11,13 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
+import VectorController from "./VectorController";
 import OptionController from "./OptionController";
 import NumberControllerBox from "./NumberControllerBox";
 import NumberControllerSlider from "./NumberControllerSlider";
 import StringController from "./StringController";
 import FunctionController from "./FunctionController";
+import TabbedController from "./TabbedController";
 import BooleanController from "./BooleanController";
 import ArrayController from "./ArrayController";
 import common from "../utils/common";
@@ -24,7 +26,11 @@ const ControllerFactory = function(object, property) {
   const initialValue = object[property];
 
   // Providing options?
-  if (common.isArray(arguments[2]) || common.isObject(arguments[2])) {
+  if (
+    arguments.length <= 3 &&
+    arguments[2] != null &&
+    (common.isArray(arguments[2]) || common.isObject(arguments[2]))
+  ) {
     return new OptionController(object, property, arguments[2]);
   }
 
@@ -47,9 +53,21 @@ const ControllerFactory = function(object, property) {
     }
     return new NumberControllerBox(object, property, { min: arguments[2], max: arguments[3] });
   }
+  if (common.isArray(initialValue) && initialValue.length === 2) {
+    if (arguments.length > 3) {
+      return new VectorController(object, property, arguments[2], arguments[3]);
+    }
+
+    return new VectorController(object, property);
+  }
 
   if (common.isString(initialValue)) {
     return new StringController(object, property);
+  }
+
+  // arguments[2] is tabs. arguments[3] is the name of the object
+  if (common.isFunction(initialValue) && arguments[2] !== undefined) {
+    return new TabbedController(object, property, "", arguments[2] || 0, arguments[3] || "Object");
   }
 
   if (common.isFunction(initialValue)) {

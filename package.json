@@ -10,12 +10,16 @@
     "test": "tests"
   },
   "scripts": {
+    "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"serve --port 8080\"",
     "build": "rollup -c && prettier --print-width 120 --write build/**/*.js && rollup -c rollup.config.min.js && npm run update-banner",
+    "watch": "rollup --watch -c && rollup --watch -c rollup.config.js",
     "build-docs": "jsdoc2md -f src/dat/gui/GUI.js src/dat/controllers/Controller.js src/dat/controllers/NumberController.js | replace-between --target API.md --token API",
     "build-all": "npm run prettier && npm run fix && npm run update-banner && npm run build && npm run build-docs",
     "lint": "eslint --report-unused-disable-directives src tests/*.html example.html",
     "fix": "eslint --fix -c eslint-config-ignore-all-errors.json5 src tests/*.html example.html && npm run prettier",
     "update-banner": "node util/__patch_licenseBanner_in_js.js",
+    "preversion": "npm run lint",
+    "version": "npm run build && git add -A build",
     "postversion": "git push && git push --tags && npm publish",
     "prettier": "prettier --print-width 120 --write *.js **/*.js **/*.ts tests/*.html example.html",
     "pub": "npm publish --access public"
@@ -110,5 +114,9 @@
       ],
       "guard-for-in": "warn"
     }
+  },
+  "dependencies": {
+    "nan": "^2.14.0",
+    "wsgif": "^1.0.0"
   }
 }

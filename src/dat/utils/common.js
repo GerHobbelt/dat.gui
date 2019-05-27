@@ -67,7 +67,8 @@ define([], function() {
       } else if (obj.length === obj.length + 0) {
         // Is number but not NaN
 
-        for (var key = 0, l = obj.length; key < l; key++) if (key in obj && itr.call(scope, obj[key], key) === this.BREAK) return;
+        for (var key = 0, l = obj.length; key < l; key++)
+          if (key in obj && itr.call(scope, obj[key], key) === this.BREAK) return;
       } else {
         for (var key in obj) if (itr.call(scope, obj[key], key) === this.BREAK) return;
       }
@@ -95,8 +96,8 @@ define([], function() {
     },
 
     isArray:
-      Array.isArray
-      || function(obj) {
+      Array.isArray ||
+      function(obj) {
         return obj.constructor === Array;
       },
 

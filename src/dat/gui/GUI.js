@@ -69,7 +69,7 @@ define([
     } catch (e) {
       return false;
     }
-  }());
+  })();
 
   let SAVE_DIALOGUE;
 
@@ -185,7 +185,8 @@ define([
 
     // Not part of params because I don't want people passing this in via
     // constructor. Should be a 'remembered' value.
-    let use_local_storage = SUPPORTS_LOCAL_STORAGE && localStorage.getItem(getLocalStorageHash(this, "isLocal")) === "true";
+    let use_local_storage =
+      SUPPORTS_LOCAL_STORAGE && localStorage.getItem(getLocalStorageHash(this, "isLocal")) === "true";
 
     let saveToLocalStorage;
 
@@ -563,9 +564,9 @@ define([
         // Do we have saved appearance data for this folder?
 
         if (
-          this.load // Anything loaded?
-          && this.load.folders // Was my parent a dead-end?
-          && this.load.folders[name]
+          this.load && // Anything loaded?
+          this.load.folders && // Was my parent a dead-end?
+          this.load.folders[name]
         ) {
           // Did daddy remember me?
 
@@ -1002,9 +1003,9 @@ define([
 
         // Did the loaded object remember thcommon.isObject?
         if (
-          preset[matched_index]
+          preset[matched_index] &&
           // Did we remember this particular property?
-          && preset[matched_index][controller.property] !== undefined
+          preset[matched_index][controller.property] !== undefined
         ) {
           // We did remember something for this guy ...
           const value = preset[matched_index][controller.property];

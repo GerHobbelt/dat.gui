@@ -188,7 +188,8 @@ const GUI = function(pars) {
 
   // Not part of params because I don't want people passing this in via
   // constructor. Should be a 'remembered' value.
-  let useLocalStorage = SUPPORTS_LOCAL_STORAGE && window.localStorage.getItem(getLocalStorageHash(this, "isLocal")) === "true";
+  let useLocalStorage =
+    SUPPORTS_LOCAL_STORAGE && window.localStorage.getItem(getLocalStorageHash(this, "isLocal")) === "true";
 
   this.saveToLocalStorageIfPossible = function() {
     if (SUPPORTS_LOCAL_STORAGE && window.localStorage.getItem(getLocalStorageHash(_this, "isLocal")) === "true") {
@@ -200,7 +201,7 @@ const GUI = function(pars) {
 
   Object.defineProperties(
     this,
-    /** @lends dat.gui.GUI.prototype */
+    /** @lends GUI.prototype */
     {
       /**
        * Toggles light theme
@@ -563,9 +564,9 @@ GUI.TEXT_OPEN = "Open View Controls";
 
 GUI._keydownHandler = function(e) {
   if (
-    document.activeElement
-    && document.activeElement.type !== "text"
-    && (e.which === HIDE_KEY_CODE || e.keyCode === HIDE_KEY_CODE)
+    document.activeElement &&
+    document.activeElement.type !== "text" &&
+    (e.which === HIDE_KEY_CODE || e.keyCode === HIDE_KEY_CODE)
   ) {
     GUI.toggleHide();
   }
@@ -788,8 +789,8 @@ common.extend(
     destroy: function() {
       if (this.parent) {
         throw new Error(
-          "Only the root GUI should be removed with .destroy(). "
-            + "For subfolders, use gui.removeFolder(folder) instead."
+          "Only the root GUI should be removed with .destroy(). " +
+            "For subfolders, use gui.removeFolder(folder) instead."
         );
       }
 
@@ -1109,11 +1110,10 @@ common.extend(
         return;
       }
 
-
       const opt = this.__preset_select[this.__preset_select.selectedIndex];
-  // delete preset option
-  this.__preset_select.removeChild(opt);
-  this.__preset_select.selectedIndex = 0;
+      // delete preset option
+      this.__preset_select.removeChild(opt);
+      this.__preset_select.selectedIndex = 0;
       delete this.load.remembered[this.preset];
       this.preset = DEFAULT_DEFAULT_PRESET_NAME;
       this.saveToLocalStorageIfPossible();
@@ -1649,15 +1649,15 @@ function addSaveMenu(gui) {
   });
 
   dom.bind(button4, "click", function() {
-      if (gui.preset === DEFAULT_DEFAULT_PRESET_NAME) {
-        alert("Default preset can't be deleted.");
-        return;
-      }
-      if (!confirm(`Are you sure you want to delete preset "${gui.preset}"?`)) {
-        return;
-      }
+    if (gui.preset === DEFAULT_DEFAULT_PRESET_NAME) {
+      alert("Default preset can't be deleted.");
+      return;
+    }
+    if (!confirm(`Are you sure you want to delete preset "${gui.preset}"?`)) {
+      return;
+    }
 
-      gui.deleteSave();
+    gui.deleteSave();
   });
 
   // div.appendChild(button2);

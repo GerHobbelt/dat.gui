@@ -125,8 +125,8 @@
   "stylelint": {
     "extends": [
       "stylelint-config-standard",
-       "stylelint-config-recommended-scss"
-      ],
+      "stylelint-config-recommended-scss"
+    ],
     "defaultSeverity": "warning",
     "rules": {
       "block-no-empty": null,

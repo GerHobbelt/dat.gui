@@ -61,8 +61,8 @@ const dom = {
 
     elem.onselectstart = selectable
       ? function() {
-        return false;
-      }
+          return false;
+        }
       : function() {};
 
     elem.style.MozUserSelect = selectable ? "auto" : "none";

@@ -76,7 +76,7 @@ $button-height: 20px;
       /* TODO, these are style notes */
       cursor: pointer;
       text-align: center;
-      background-color: #cccccc; // #000
+      background-color: #CCCCCC; // #000
 
       &.close-top {
         position: relative;
@@ -87,7 +87,7 @@ $button-height: 20px;
       }
 
       &:hover {
-        background-color: #dddddd; // #111
+        background-color: #DDDDDD; // #111
       }
 
       &.display-none {

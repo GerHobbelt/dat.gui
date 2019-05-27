@@ -72,6 +72,7 @@ manipulate variables and fire functions on the fly.
     * [.preset](#GUI+preset) : <code>String</code>
     * [.width](#GUI+width) : <code>Number</code>
     * [.name](#GUI+name) : <code>String</code>
+    * [.title](#GUI+title) : <code>String</code>
     * [.closed](#GUI+closed) : <code>Boolean</code>
     * [.load](#GUI+load) : <code>Object</code>
     * [.useLocalStorage](#GUI+useLocalStorage) : <code>Boolean</code>
@@ -80,11 +81,13 @@ manipulate variables and fire functions on the fly.
     * [.addPlotter(object, property, max, period, type, fgColor, bgColor)](#GUI+addPlotter) ⇒ [<code>Controller</code>](#Controller)
     * [.addFile(object, property)](#GUI+addFile) ⇒ [<code>Controller</code>](#Controller)
     * [.addCustomController(object, property)](#GUI+addCustomController) ⇒ [<code>Controller</code>](#Controller)
+    * [.addGradient(object, property)](#GUI+addGradient) ⇒ <code>dat.controllers.ColorController</code>
+    * [.addImage(object, property)](#GUI+addImage) ⇒ <code>dat.controllers.ImageController</code>
     * [.remove(controller)](#GUI+remove)
     * [.destroy()](#GUI+destroy)
     * [.addFolder(name, [title])](#GUI+addFolder) ⇒ <code>dat.gui.GUI</code>
     * [.removeFolder(folder)](#GUI+removeFolder)
-    * [.removeFolder(name)](#GUI+removeFolder)
+    * [.open()](#GUI+open)
     * [.close()](#GUI+close)
     * [.hide()](#GUI+hide)
     * [.show()](#GUI+show)
@@ -172,6 +175,13 @@ The width of <code>GUI</code> element
 ### gui.name : <code>String</code>
 The name of <code>GUI</code>. Used for folders. i.e
 a folder's name
+
+**Kind**: instance property of [<code>GUI</code>](#GUI)  
+<a name="GUI+title"></a>
+
+### gui.title : <code>String</code>
+The name of <code>GUI</code>. Used for folders. i.e
+a folder's title
 
 **Kind**: instance property of [<code>GUI</code>](#GUI)  
 <a name="GUI+closed"></a>
@@ -277,10 +287,13 @@ var obj = {
 gui.addPlotter(obj, 'value', 10, 100);
 gui.addPlotter(obj, 'value', 10, 0);
 ```
+<a name="GUI+addFile"></a>
 
+### gui.addFile(object, property) ⇒ [<code>Controller</code>](#Controller)
 Adds a new file controller to the GUI.
 
 **Kind**: instance method of [<code>GUI</code>](#GUI)  
+**Returns**: [<code>Controller</code>](#Controller) - The controller that was added to the GUI.  
 
 | Param |
 | --- |
@@ -302,6 +315,29 @@ gui.addFile(instance, 'onLoad');
 Adds a new custom controller to the GUI.
 
 **Kind**: instance method of [<code>GUI</code>](#GUI)  
+**Returns**: [<code>Controller</code>](#Controller) - The controller that was added to the GUI.  
+
+| Param |
+| --- |
+| object | 
+| property | 
+
+<a name="GUI+addGradient"></a>
+
+### gui.addGradient(object, property) ⇒ <code>dat.controllers.ColorController</code>
+**Kind**: instance method of [<code>GUI</code>](#GUI)  
+**Returns**: <code>dat.controllers.ColorController</code> - The new controller that was added.  
+
+| Param |
+| --- |
+| object | 
+| property | 
+
+<a name="GUI+addImage"></a>
+
+### gui.addImage(object, property) ⇒ <code>dat.controllers.ImageController</code>
+**Kind**: instance method of [<code>GUI</code>](#GUI)  
+**Returns**: <code>dat.controllers.ImageController</code> - THe new controller that was added.  
 
 | Param |
 | --- |
@@ -355,16 +391,12 @@ Removes a subfolder GUI instance.
 | --- | --- | --- |
 | folder | <code>dat.gui.GUI</code> | The folder to remove. |
 
+<a name="GUI+open"></a>
 
-<a name="GUI+removeFolder"></a>
+### gui.open()
+Opens the GUI.
 
-### gui.removeFolder(name)
 **Kind**: instance method of [<code>GUI</code>](#GUI)  
-
-| Param |
-| --- |
-| name | 
-
 <a name="GUI+close"></a>
 
 ### gui.close()

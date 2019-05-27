@@ -1,20 +1,20 @@
-$background-color: #fafafa; // #1a1a1a;
+$background-color: #FAFAFA; // #1a1a1a;
 
 $hover-darken: 5%;
 $border-darken: 7%;
 $active-darken: 10%;
 
-$number-color: #2fa1d6;
+$number-color: #2FA1D6;
 $boolean-color: #806787;
-$string-color: #1ed36f;
-$function-color: #e61d5f;
-$file-color: #e6d21d;
-$save-row-color: #dad5cb;
+$string-color: #1ED36F;
+$function-color: #E61D5F;
+$file-color: #E6D21D;
+$save-row-color: #DAD5CB;
 $save-row-border-color: #806787;
 $button-color: darken($save-row-color, 10%);
 $border-color: darken($background-color, $border-darken);
 $input-color: darken($background-color, 8.5%);
-$array-color: #1ed36f;
+$array-color: #1ED36F;
 
 @mixin transition($prop, $time, $curve) {
   -webkit-transition: $prop $time $curve;
@@ -37,7 +37,7 @@ $array-color: #1ed36f;
   line-height: 7px;
   padding: 4px 4px 5px 4px;
   background: $button-color;
-  color: #ffffff;
+  color: #FFFFFF;
   text-shadow: 0 1px 0 darken($button-color, 10%);
   box-shadow: 0 -1px 0 darken($button-color, 10%);
   cursor: pointer;
@@ -55,7 +55,7 @@ $array-color: #1ed36f;
 .dg {
   color: #555555; // #eee;
   font: 11px "Lucida Grande", sans-serif;
-  text-shadow: 0 -1px 0 #eee; // #111
+  text-shadow: 0 -1px 0 #EEEEEE; // #111
 
   /** Auto place */
   &.main {
@@ -117,7 +117,7 @@ $array-color: #1ed36f;
 
     &.title {
       padding-left: 16px;
-      background: #e8e8e8;
+      background: #E8E8E8;
       //background:
       //  #000000
       //  // assets/title-background.png
@@ -186,7 +186,7 @@ $array-color: #1ed36f;
 
     &.function:hover,
     &.boolean:hover {
-      background: #eeeeee; // #111;
+      background: #EEEEEE; // #111;
     }
   }
 
@@ -218,7 +218,7 @@ $array-color: #1ed36f;
 
       &:focus {
         background: darken($input-color, $active-darken);
-        color: #ffffff;
+        color: #FFFFFF;
       }
     }
 
@@ -262,12 +262,12 @@ $array-color: #1ed36f;
 }
 
 .autocomplete .group {
-  background: #eeeeee;
+  background: #EEEEEE;
 }
 
 .autocomplete > div:hover:not(.group),
 .autocomplete > div.selected {
-  background: #81ca91;
+  background: #81CA91;
   cursor: pointer;
 }
 
@@ -276,23 +276,23 @@ $array-color: #1ed36f;
 .dg {
   &.light-theme.main {
     &.taller-than-window .close-button {
-      border-top: 1px solid #dddddd;
+      border-top: 1px solid #DDDDDD;
     }
 
     .close-button {
-      background-color: #e8e8e8;
+      background-color: #E8E8E8;
     }
 
     .close-button:hover {
-      background-color: #dddddd;
+      background-color: #DDDDDD;
     }
 
     &::-webkit-scrollbar {
-      background: #fafafa;
+      background: #FAFAFA;
     }
 
     &::-webkit-scrollbar-thumb {
-      background: #bbbbbb;
+      background: #BBBBBB;
     }
   }
 
@@ -302,8 +302,8 @@ $array-color: #1ed36f;
     text-shadow: none !important;
 
     li:not(.folder) {
-      background: #fafafa;
-      border-bottom: 1px solid #dddddd;
+      background: #FAFAFA;
+      border-bottom: 1px solid #DDDDDD;
     }
 
     li.save-row .button {
@@ -311,7 +311,7 @@ $array-color: #1ed36f;
     }
 
     li.title {
-      background: #e8e8e8 url(assets/light-title.png) 6px 10px no-repeat;
+      background: #E8E8E8 url(assets/light-title.png) 6px 10px no-repeat;
     }
 
     .closed li.title {
@@ -320,33 +320,33 @@ $array-color: #1ed36f;
 
     .cr.function:hover,
     .cr.boolean:hover {
-      background: #ffffff;
+      background: #FFFFFF;
     }
 
     .c input[type="text"] {
-      background: #e9e9e9;
+      background: #E9E9E9;
     }
 
     .c input[type="text"]:hover {
-      background: #eeeeee;
+      background: #EEEEEE;
     }
 
     .c input[type="text"]:focus {
-      background: #eeeeee;
+      background: #EEEEEE;
       color: #555555;
     }
 
     .c .slider {
-      background: #e9e9e9;
+      background: #E9E9E9;
     }
 
     .c .slider:hover {
-      background: #eeeeee;
+      background: #EEEEEE;
     }
 
     li.save-row .button,
     li.save-row .button.gears {
-      background-color: #bbbbbb;
+      background-color: #BBBBBB;
 
       /* box-shadow: none; */
     }

@@ -649,11 +649,15 @@ var Controller = (function() {
     this.__onFinishChange = fnc;
     return this;
   };
-  _proto.setValue = function setValue(newValue) {
+  _proto.setValue = function setValue(newValue, disableOnChange) {
+    if (disableOnChange === void 0) {
+      disableOnChange = false;
+    }
     var __newValue = this.__transformOutput(newValue);
+    var oldValue = this.object[this.property];
     this.object[this.property] = __newValue;
-    if (this.__onChange) {
-      this.__onChange.call(this, __newValue);
+    if (this.__onChange && !disableOnChange) {
+      this.__onChange.call(this, __newValue, oldValue);
     }
     this.updateDisplay();
     return this;
@@ -685,6 +689,14 @@ var Controller = (function() {
   };
   _proto.readonly = function readonly(ro) {
     this._readonly = ro;
+    return this;
+  };
+  _proto.borderColor = function borderColor(color) {
+    this.__li.style.borderLeftColor = color;
+    return this;
+  };
+  _proto.borderWidth = function borderWidth(px) {
+    this.__li.style.borderLeftWidth = px + "px";
     return this;
   };
   return Controller;
@@ -942,9 +954,12 @@ var BooleanController = (function(_Controller) {
     return _this2;
   }
   var _proto = BooleanController.prototype;
-  _proto.setValue = function setValue(v) {
-    var toReturn = _Controller.prototype.setValue.call(this, v);
-    if (this.__onFinishChange) {
+  _proto.setValue = function setValue(v, disableOnChange) {
+    if (disableOnChange === void 0) {
+      disableOnChange = false;
+    }
+    var toReturn = _Controller.prototype.setValue.call(this, v, disableOnChange);
+    if (this.__onFinishChange && !disableOnChange) {
       this.__onFinishChange.call(this, this.getValue());
     }
     this.__prev = this.getValue();
@@ -1000,10 +1015,13 @@ var OptionController = (function(_Controller) {
     return _this2;
   }
   var _proto = OptionController.prototype;
-  _proto.setValue = function setValue(v) {
+  _proto.setValue = function setValue(v, disableOnChange) {
+    if (disableOnChange === void 0) {
+      disableOnChange = false;
+    }
     if (this._readonly) return this.getValue();
-    var toReturn = _Controller.prototype.setValue.call(this, v);
-    if (this.__onFinishChange) {
+    var toReturn = _Controller.prototype.setValue.call(this, v, disableOnChange);
+    if (this.__onFinishChange && !disableOnChange) {
       this.__onFinishChange.call(this, this.getValue());
     }
     return toReturn;
@@ -1062,7 +1080,7 @@ function numDecimals(x) {
   if (_x.indexOf(".") > -1) {
     return _x.length - _x.indexOf(".") - 1;
   }
-  return 0;
+  return 2;
 }
 var NumberController = (function(_Controller) {
   _inheritsLoose(NumberController, _Controller);
@@ -1086,7 +1104,10 @@ var NumberController = (function(_Controller) {
     return _this;
   }
   var _proto = NumberController.prototype;
-  _proto.setValue = function setValue(v) {
+  _proto.setValue = function setValue(v, disableOnChange) {
+    if (disableOnChange === void 0) {
+      disableOnChange = false;
+    }
     var _v = v;
     if (this.__min !== undefined && _v < this.__min) {
       _v = this.__min;
@@ -1096,7 +1117,7 @@ var NumberController = (function(_Controller) {
     if (this.__step !== undefined && _v % this.__step !== 0) {
       _v = Math.round(_v / this.__step) * this.__step;
     }
-    return _Controller.prototype.setValue.call(this, _v);
+    return _Controller.prototype.setValue.call(this, _v, disableOnChange);
   };
   _proto.min = function min(minValue) {
     this.__min = minValue;
@@ -1125,6 +1146,8 @@ var NumberControllerBox = (function(_NumberController) {
   function NumberControllerBox(object, property, params) {
     var _this2;
     _this2 = _NumberController.call(this, object, property, params) || this;
+    var _params = params || {};
+    _this2.__suffix = _params.suffix ? _params.suffix : "";
     _this2.__truncationSuspended = false;
     var _this = _assertThisInitialized(_this2);
     var prevY;
@@ -1152,7 +1175,11 @@ var NumberControllerBox = (function(_NumberController) {
     dom.bind(_this2.__input, "wheel", onWheel);
     dom.bind(_this2.__input, "keydown", onKeyDown, false, true);
     function onChange() {
-      var attempted = parseFloat(_this.__input.value);
+      var value = _this.__input.value;
+      if (params && _this.__suffix) {
+        value = value.replace(_this.__suffix, "");
+      }
+      var attempted = parseFloat(value);
       if (!Common.isNaN(attempted) && !_this._readonly) {
         _this.setValue(attempted);
       }
@@ -1216,7 +1243,7 @@ var NumberControllerBox = (function(_NumberController) {
     }
     this.__input.value = this.__truncationSuspended
       ? this.getValue()
-      : roundToDecimal(this.getValue(), this.__precision);
+      : roundToDecimal(this.getValue(), this.__precision) + this.__suffix;
     return _NumberController.prototype.updateDisplay.call(this);
   };
   return NumberControllerBox;
@@ -1250,7 +1277,9 @@ var NumberControllerSlider = (function(_NumberController) {
       onMouseDrag(e);
     }
     function onMouseDrag(e) {
-      e.preventDefault();
+      onDrag(e.clientX);
+    }
+    function onDrag(clientX) {
       var bgRect = _this.__background.getBoundingClientRect();
       if (!_this._readonly) {
         _this.setValue(map(e.clientX, bgRect.left, bgRect.right, _this.__min, _this.__max));
@@ -1268,20 +1297,24 @@ var NumberControllerSlider = (function(_NumberController) {
       if (e.touches.length !== 1) {
         return;
       }
+      document.activeElement.blur();
       dom.bind(window, "touchmove", onTouchMove, false, true);
       dom.bind(window, "touchend", onTouchEnd, false, true);
+      _this.__activeTouch = e.targetTouches[0];
       onTouchMove(e);
     }
     function onTouchMove(e) {
-      var clientX = e.touches[0].clientX;
-      var bgRect = _this.__background.getBoundingClientRect();
-      if (!_this._readonly) {
-        _this.setValue(map(clientX, bgRect.left, bgRect.right, _this.__min, _this.__max));
+      var changed = e.changedTouches;
+      for (var i = 0; i < changed.length; i++) {
+        if (changed[i].identifier === _this.__activeTouch.identifier) {
+          onDrag(changed[i].clientX);
+        }
       }
     }
     function onTouchEnd() {
       dom.unbind(window, "touchmove", onTouchMove);
       dom.unbind(window, "touchend", onTouchEnd);
+      _this.__activeTouch = null;
       if (_this.__onFinishChange) {
         _this.__onFinishChange.call(_this, _this.getValue());
       }
@@ -1319,6 +1352,10 @@ var FunctionController = (function(_Controller) {
     dom.bind(_this2.__button, "click", function(e) {
       e.preventDefault();
       _this.fire();
+      dom.addClass(_this.__button.parentElement.parentElement.parentElement, "function--active");
+      setTimeout(function() {
+        dom.removeClass(_this.__button.parentElement.parentElement.parentElement, "function--active");
+      }, 100);
       return false;
     });
     dom.addClass(_this2.__button, "button");
@@ -1336,6 +1373,39 @@ var FunctionController = (function(_Controller) {
     }
   };
   return FunctionController;
+})(Controller);
+
+var TabbedController = (function(_Controller) {
+  _inheritsLoose(TabbedController, _Controller);
+  function TabbedController(object, property, text, tabs, displayName) {
+    var _this2;
+    _this2 = _Controller.call(this, object, property) || this;
+    var _this = _assertThisInitialized(_this2);
+    _this2.__button = document.createElement("div");
+    _this2.__button.innerHTML = text === undefined ? "Fire" : text;
+    dom.bind(_this2.__button, "click", function(e) {
+      e.preventDefault();
+      _this.fire();
+      return false;
+    });
+    dom.addClass(_this2.__button, "button");
+    var tabSize = tabs * 2;
+    _this2.__button.style.paddingLeft = tabSize.toString() + "em";
+    _this2.property = displayName;
+    _this2.domElement.appendChild(_this2.__button);
+    return _this2;
+  }
+  var _proto = TabbedController.prototype;
+  _proto.fire = function fire() {
+    if (this.__onChange) {
+      this.__onChange.call(this);
+    }
+    this.getValue().call(this.object);
+    if (this.__onFinishChange) {
+      this.__onFinishChange.call(this, this.getValue());
+    }
+  };
+  return TabbedController;
 })(Controller);
 
 var ColorController = (function(_Controller) {
@@ -1751,12 +1821,1356 @@ var CustomController = (function(_Controller) {
   return CustomController;
 })(Controller);
 
+var commonjsGlobal =
+  typeof globalThis !== "undefined"
+    ? globalThis
+    : typeof window !== "undefined"
+    ? window
+    : typeof global !== "undefined"
+    ? global
+    : typeof self !== "undefined"
+    ? self
+    : {};
+
+function createCommonjsModule(fn, module) {
+  return (module = { exports: {} }), fn(module, module.exports), module.exports;
+}
+
+var Stream = function(data) {
+  this.data = data;
+  this.len = this.data.length;
+  this.pos = 0;
+  this.readByte = function() {
+    if (this.pos >= this.data.length) {
+      throw new Error("Attempted to read past end of stream.");
+    }
+    if (data instanceof Uint8Array) return data[this.pos++];
+    else return data.charCodeAt(this.pos++) & 0xff;
+  };
+  this.readBytes = function(n) {
+    var bytes = [];
+    for (var i = 0; i < n; i++) {
+      bytes.push(this.readByte());
+    }
+    return bytes;
+  };
+  this.read = function(n) {
+    var s = "";
+    for (var i = 0; i < n; i++) {
+      s += String.fromCharCode(this.readByte());
+    }
+    return s;
+  };
+  this.readUnsigned = function() {
+    var a = this.readBytes(2);
+    return (a[1] << 8) + a[0];
+  };
+};
+var Stream_1 = Stream;
+
+var lzwDecode = function(minCodeSize, data) {
+  var pos = 0;
+  var readCode = function(size) {
+    var code = 0;
+    for (var i = 0; i < size; i++) {
+      if (data[pos >> 3] & (1 << (pos & 7))) {
+        code |= 1 << i;
+      }
+      pos++;
+    }
+    return code;
+  };
+  var clearCode = 1 << minCodeSize;
+  var eoiCode = clearCode + 1;
+  var codeSize = minCodeSize + 1;
+  var outputBlockSize = 4096,
+    bufferBlockSize = 4096;
+  var output = new Uint8Array(outputBlockSize),
+    buffer = new Uint8Array(bufferBlockSize),
+    dict = [];
+  var bufferOffset = 0,
+    outputOffset = 0;
+  var fill = function() {
+    for (var i = 0; i < clearCode; i++) {
+      dict[i] = new Uint8Array(1);
+      dict[i][0] = i;
+    }
+    dict[clearCode] = new Uint8Array(0);
+    dict[eoiCode] = null;
+  };
+  var clear = function() {
+    var keep = clearCode + 2;
+    dict.splice(keep, dict.length - keep);
+    codeSize = minCodeSize + 1;
+    bufferOffset = 0;
+  };
+  var enlargeOutput = function() {
+    var outputSize = output.length + outputBlockSize;
+    var newoutput = new Uint8Array(outputSize);
+    newoutput.set(output);
+    output = newoutput;
+    outputBlockSize = outputBlockSize << 1;
+  };
+  var enlargeBuffer = function() {
+    var bufferSize = buffer.length + bufferBlockSize;
+    var newbuffer = new Uint8Array(bufferSize);
+    newbuffer.set(buffer);
+    buffer = newbuffer;
+    bufferBlockSize = bufferBlockSize << 1;
+  };
+  var pushCode = function(code, last) {
+    var newlength = dict[last].byteLength + 1;
+    while (bufferOffset + newlength > buffer.length) enlargeBuffer();
+    var newdict = buffer.subarray(bufferOffset, bufferOffset + newlength);
+    newdict.set(dict[last]);
+    newdict[newlength - 1] = dict[code][0];
+    bufferOffset += newlength;
+    dict.push(newdict);
+  };
+  var code;
+  var last;
+  fill();
+  while (true) {
+    last = code;
+    code = readCode(codeSize);
+    if (code === clearCode) {
+      clear();
+      continue;
+    }
+    if (code === eoiCode) break;
+    if (code < dict.length) {
+      if (last !== clearCode) {
+        pushCode(code, last);
+      }
+    } else {
+      if (code !== dict.length) throw new Error("Invalid LZW code.");
+      pushCode(last, last);
+    }
+    var newsize = dict[code].length;
+    while (outputOffset + newsize > output.length) enlargeOutput();
+    output.set(dict[code], outputOffset);
+    outputOffset += newsize;
+    if (dict.length === 1 << codeSize && codeSize < 12) {
+      codeSize++;
+    }
+  }
+  return output.subarray(0, outputOffset);
+};
+var lzwDecode_1 = lzwDecode;
+
+var bitsToNum = function(ba) {
+  return ba.reduce(function(s, n) {
+    return s * 2 + n;
+  }, 0);
+};
+var byteToBitArr = function(bite) {
+  var a = [];
+  for (var i = 7; i >= 0; i--) {
+    a.push(!!(bite & (1 << i)));
+  }
+  return a;
+};
+var parseGIF = function(st, handler) {
+  handler || (handler = {});
+  var parseCT = function(entries) {
+    var ct = [];
+    for (var i = 0; i < entries; i++) {
+      ct.push(st.readBytes(3));
+    }
+    return ct;
+  };
+  var readSubBlocks = function() {
+    var size,
+      data,
+      offset = 0;
+    var bufsize = 8192;
+    data = new Uint8Array(bufsize);
+    var resizeBuffer = function() {
+      var newdata = new Uint8Array(data.length + bufsize);
+      newdata.set(data);
+      data = newdata;
+    };
+    do {
+      size = st.readByte();
+      while (offset + size > data.length) resizeBuffer();
+      data.set(st.readBytes(size), offset);
+      offset += size;
+    } while (size !== 0);
+    return data.subarray(0, offset);
+  };
+  var parseHeader = function() {
+    var hdr = {};
+    hdr.sig = st.read(3);
+    hdr.ver = st.read(3);
+    if (hdr.sig !== "GIF") throw new Error("Not a GIF file.");
+    hdr.width = st.readUnsigned();
+    hdr.height = st.readUnsigned();
+    var bits = byteToBitArr(st.readByte());
+    hdr.gctFlag = bits.shift();
+    hdr.colorRes = bitsToNum(bits.splice(0, 3));
+    hdr.sorted = bits.shift();
+    hdr.gctSize = bitsToNum(bits.splice(0, 3));
+    hdr.bgColor = st.readByte();
+    hdr.pixelAspectRatio = st.readByte();
+    if (hdr.gctFlag) {
+      hdr.gct = parseCT(1 << (hdr.gctSize + 1));
+    }
+    handler.hdr && handler.hdr(hdr);
+  };
+  var parseExt = function(block) {
+    var parseGCExt = function(block) {
+      var blockSize = st.readByte();
+      var bits = byteToBitArr(st.readByte());
+      block.reserved = bits.splice(0, 3);
+      block.disposalMethod = bitsToNum(bits.splice(0, 3));
+      block.userInput = bits.shift();
+      block.transparencyGiven = bits.shift();
+      block.delayTime = st.readUnsigned();
+      block.transparencyIndex = st.readByte();
+      block.terminator = st.readByte();
+      handler.gce && handler.gce(block);
+    };
+    var parseComExt = function(block) {
+      block.comment = readSubBlocks();
+      handler.com && handler.com(block);
+    };
+    var parsePTExt = function(block) {
+      var blockSize = st.readByte();
+      block.ptHeader = st.readBytes(12);
+      block.ptData = readSubBlocks();
+      handler.pte && handler.pte(block);
+    };
+    var parseAppExt = function(block) {
+      var parseNetscapeExt = function(block) {
+        var blockSize = st.readByte();
+        block.unknown = st.readByte();
+        block.iterations = st.readUnsigned();
+        block.terminator = st.readByte();
+        handler.app && handler.app.NETSCAPE && handler.app.NETSCAPE(block);
+      };
+      var parseUnknownAppExt = function(block) {
+        block.appData = readSubBlocks();
+        handler.app && handler.app[block.identifier] && handler.app[block.identifier](block);
+      };
+      var blockSize = st.readByte();
+      block.identifier = st.read(8);
+      block.authCode = st.read(3);
+      switch (block.identifier) {
+        case "NETSCAPE":
+          parseNetscapeExt(block);
+          break;
+        default:
+          parseUnknownAppExt(block);
+          break;
+      }
+    };
+    var parseUnknownExt = function(block) {
+      block.data = readSubBlocks();
+      handler.unknown && handler.unknown(block);
+    };
+    block.label = st.readByte();
+    switch (block.label) {
+      case 0xf9:
+        block.extType = "gce";
+        parseGCExt(block);
+        break;
+      case 0xfe:
+        block.extType = "com";
+        parseComExt(block);
+        break;
+      case 0x01:
+        block.extType = "pte";
+        parsePTExt(block);
+        break;
+      case 0xff:
+        block.extType = "app";
+        parseAppExt(block);
+        break;
+      default:
+        block.extType = "unknown";
+        parseUnknownExt(block);
+        break;
+    }
+  };
+  var parseImg = function(img) {
+    var deinterlace = function(pixels, width) {
+      var newPixels = new Array(pixels.length);
+      var rows = pixels.length / width;
+      var cpRow = function(toRow, fromRow) {
+        var fromPixels = pixels.slice(fromRow * width, (fromRow + 1) * width);
+        newPixels.splice.apply(newPixels, [toRow * width, width].concat(fromPixels));
+      };
+      var offsets = [0, 4, 2, 1];
+      var steps = [8, 8, 4, 2];
+      var fromRow = 0;
+      for (var pass = 0; pass < 4; pass++) {
+        for (var toRow = offsets[pass]; toRow < rows; toRow += steps[pass]) {
+          cpRow(toRow, fromRow);
+          fromRow++;
+        }
+      }
+      return newPixels;
+    };
+    img.leftPos = st.readUnsigned();
+    img.topPos = st.readUnsigned();
+    img.width = st.readUnsigned();
+    img.height = st.readUnsigned();
+    var bits = byteToBitArr(st.readByte());
+    img.lctFlag = bits.shift();
+    img.interlaced = bits.shift();
+    img.sorted = bits.shift();
+    img.reserved = bits.splice(0, 2);
+    img.lctSize = bitsToNum(bits.splice(0, 3));
+    if (img.lctFlag) {
+      img.lct = parseCT(1 << (img.lctSize + 1));
+    }
+    img.lzwMinCodeSize = st.readByte();
+    var lzwData = readSubBlocks();
+    img.pixels = lzwDecode_1(img.lzwMinCodeSize, lzwData);
+    if (img.interlaced) {
+      img.pixels = deinterlace(img.pixels, img.width);
+    }
+    handler.img && handler.img(img);
+  };
+  var parseBlock = function() {
+    var block = {};
+    block.sentinel = st.readByte();
+    switch (String.fromCharCode(block.sentinel)) {
+      case "!":
+        block.type = "ext";
+        parseExt(block);
+        break;
+      case ",":
+        block.type = "img";
+        parseImg(block);
+        break;
+      case ";":
+        block.type = "eof";
+        handler.eof && handler.eof(block);
+        break;
+      default:
+        throw new Error("Unknown block: 0x" + block.sentinel.toString(16));
+    }
+    if (block.type !== "eof") setTimeout(parseBlock, 0);
+  };
+  var parse = function() {
+    parseHeader();
+    setTimeout(parseBlock, 0);
+  };
+  parse();
+};
+var parseGif = parseGIF;
+
+var sibgif = createCommonjsModule(function(module, exports) {
+  (function(root, factory) {
+    {
+      module.exports = factory();
+    }
+  })(commonjsGlobal, function() {
+    {
+      var Stream = Stream_1;
+      var parseGIF = parseGif;
+    }
+    var SuperGif = function(opts) {
+      var options = {
+        vp_l: 0,
+        vp_t: 0,
+        vp_w: null,
+        vp_h: null,
+        c_w: null,
+        c_h: null
+      };
+      for (var i in opts) {
+        options[i] = opts[i];
+      }
+      if (options.vp_w && options.vp_h) options.is_vp = true;
+      var stream;
+      var hdr;
+      var loadError = null;
+      var loading = false;
+      var transparency = null;
+      var delay = null;
+      var disposalMethod = null;
+      var disposalRestoreFromIdx = null;
+      var lastDisposalMethod = null;
+      var frame = null;
+      var lastImg = null;
+      var playing = true;
+      var ctx_scaled = false;
+      var frames = [];
+      var frameOffsets = [];
+      var gif = options.gif;
+      if (typeof options.gif == "undefined" && !!options.url) {
+        gif = document.createElement("img");
+        gif.src = options.url;
+      }
+      if (typeof options.auto_play == "undefined")
+        options.auto_play = !gif.getAttribute("data-autoplay") || gif.getAttribute("data-autoplay") == "1";
+      var onEndListener = options.hasOwnProperty("on_end") ? options.on_end : null;
+      var loopDelay = options.hasOwnProperty("loop_delay") ? options.loop_delay : 0;
+      var overrideLoopMode = options.hasOwnProperty("loop_mode") ? options.loop_mode : "auto";
+      var drawWhileLoading = options.hasOwnProperty("draw_while_loading") ? options.draw_while_loading : true;
+      var showProgressBar = drawWhileLoading
+        ? options.hasOwnProperty("show_progress_bar")
+          ? options.show_progress_bar
+          : true
+        : false;
+      var progressBarHeight = options.hasOwnProperty("progressbar_height") ? options.progressbar_height : 25;
+      var progressBarBackgroundColor = options.hasOwnProperty("progressbar_background_color")
+        ? options.progressbar_background_color
+        : "rgba(255,255,255,0.4)";
+      var progressBarForegroundColor = options.hasOwnProperty("progressbar_foreground_color")
+        ? options.progressbar_foreground_color
+        : "rgba(255,0,22,.8)";
+      var clear = function() {
+        transparency = null;
+        delay = null;
+        lastDisposalMethod = disposalMethod;
+        disposalMethod = null;
+        frame = null;
+      };
+      var handler = function() {
+        return {
+          hdr: withProgress(doHdr),
+          gce: withProgress(doGCE),
+          com: withProgress(doNothing),
+          app: {
+            NETSCAPE: withProgress(doNothing)
+          },
+          img: withProgress(doImg, true),
+          eof: function(block) {
+            pushFrame();
+            doDecodeProgress(false);
+            if (!(options.c_w && options.c_h)) {
+              canvas.width = hdr.width * get_canvas_scale();
+              canvas.height = hdr.height * get_canvas_scale();
+            }
+            player.init();
+            loading = false;
+            if (load_callback) {
+              load_callback(loadError, gif);
+            }
+          }
+        };
+      };
+      var doParse = function() {
+        try {
+          parseGIF(stream, handler());
+        } catch (err) {
+          doLoadError("parse");
+        }
+      };
+      var setSizes = function(w, h) {
+        canvas.width = w * get_canvas_scale();
+        canvas.height = h * get_canvas_scale();
+        toolbar.style.minWidth = w * get_canvas_scale() + "px";
+        tmpCanvas.width = w;
+        tmpCanvas.height = h;
+        tmpCanvas.style.width = w + "px";
+        tmpCanvas.style.height = h + "px";
+        tmpCanvas.getContext("2d").setTransform(1, 0, 0, 1, 0, 0);
+      };
+      var setFrameOffset = function(frame, offset) {
+        if (!frameOffsets[frame]) {
+          frameOffsets[frame] = offset;
+          return;
+        }
+        if (typeof offset.x !== "undefined") {
+          frameOffsets[frame].x = offset.x;
+        }
+        if (typeof offset.y !== "undefined") {
+          frameOffsets[frame].y = offset.y;
+        }
+      };
+      var doShowProgress = function(pos, length, draw) {
+        if (draw && showProgressBar) {
+          var height = progressBarHeight;
+          var left, mid, top, width;
+          if (options.is_vp) {
+            if (!ctx_scaled) {
+              top = options.vp_t + options.vp_h - height;
+              height = height;
+              left = options.vp_l;
+              mid = left + (pos / length) * options.vp_w;
+              width = canvas.width;
+            } else {
+              top = (options.vp_t + options.vp_h - height) / get_canvas_scale();
+              height = height / get_canvas_scale();
+              left = options.vp_l / get_canvas_scale();
+              mid = left + (pos / length) * (options.vp_w / get_canvas_scale());
+              width = canvas.width / get_canvas_scale();
+            }
+          } else {
+            top = (canvas.height - height) / (ctx_scaled ? get_canvas_scale() : 1);
+            mid = ((pos / length) * canvas.width) / (ctx_scaled ? get_canvas_scale() : 1);
+            width = canvas.width / (ctx_scaled ? get_canvas_scale() : 1);
+            height /= ctx_scaled ? get_canvas_scale() : 1;
+          }
+          ctx.fillStyle = progressBarBackgroundColor;
+          ctx.fillRect(mid, top, width - mid, height);
+          ctx.fillStyle = progressBarForegroundColor;
+          ctx.fillRect(0, top, mid, height);
+        }
+      };
+      var doLoadError = function(originOfError) {
+        var drawError = function() {
+          ctx.fillStyle = "black";
+          ctx.fillRect(0, 0, options.c_w ? options.c_w : hdr.width, options.c_h ? options.c_h : hdr.height);
+          ctx.strokeStyle = "red";
+          ctx.lineWidth = 3;
+          ctx.moveTo(0, 0);
+          ctx.lineTo(options.c_w ? options.c_w : hdr.width, options.c_h ? options.c_h : hdr.height);
+          ctx.moveTo(0, options.c_h ? options.c_h : hdr.height);
+          ctx.lineTo(options.c_w ? options.c_w : hdr.width, 0);
+          ctx.stroke();
+        };
+        loadError = originOfError;
+        hdr = {
+          width: gif.width,
+          height: gif.height
+        };
+        frames = [];
+        drawError();
+      };
+      var doHdr = function(_hdr) {
+        hdr = _hdr;
+        setSizes(hdr.width, hdr.height);
+      };
+      var doGCE = function(gce) {
+        pushFrame();
+        clear();
+        transparency = gce.transparencyGiven ? gce.transparencyIndex : null;
+        delay = gce.delayTime;
+        disposalMethod = gce.disposalMethod;
+      };
+      var pushFrame = function() {
+        if (!frame) return;
+        var newFrame = {
+          data: frame.getImageData(0, 0, hdr.width, hdr.height),
+          delay: delay
+        };
+        if (options.includeDataURL) {
+          newFrame.dataURL = tmpCanvas.toDataURL();
+        }
+        frames.push(newFrame);
+        frameOffsets.push({ x: 0, y: 0 });
+      };
+      var doImg = function(img) {
+        if (!frame) frame = tmpCanvas.getContext("2d");
+        var currIdx = frames.length;
+        var ct = img.lctFlag ? img.lct : hdr.gct;
+        if (currIdx > 0) {
+          if (lastDisposalMethod === 3) {
+            if (disposalRestoreFromIdx !== null) {
+              frame.putImageData(frames[disposalRestoreFromIdx].data, 0, 0);
+            } else {
+              frame.clearRect(lastImg.leftPos, lastImg.topPos, lastImg.width, lastImg.height);
+            }
+          } else {
+            disposalRestoreFromIdx = currIdx - 1;
+          }
+          if (lastDisposalMethod === 2) {
+            frame.clearRect(lastImg.leftPos, lastImg.topPos, lastImg.width, lastImg.height);
+          }
+        }
+        var imgData = frame.getImageData(img.leftPos, img.topPos, img.width, img.height);
+        for (var i = 0; i < img.pixels.length; i++) {
+          var pixel = img.pixels[i];
+          if (pixel !== transparency) {
+            var pix = ct[pixel];
+            var idx = i * 4;
+            imgData.data[idx] = pix[0];
+            imgData.data[idx + 1] = pix[1];
+            imgData.data[idx + 2] = pix[2];
+            imgData.data[idx + 3] = 255;
+          }
+        }
+        frame.putImageData(imgData, img.leftPos, img.topPos);
+        if (!ctx_scaled) {
+          ctx.scale(get_canvas_scale(), get_canvas_scale());
+          ctx_scaled = true;
+        }
+        if (drawWhileLoading) {
+          ctx.drawImage(tmpCanvas, 0, 0);
+          drawWhileLoading = options.auto_play;
+        }
+        lastImg = img;
+      };
+      var player = (function() {
+        var i = -1;
+        var iterationCount = 0;
+        var getNextFrameNo = function() {
+          var delta = 1;
+          return (i + delta + frames.length) % frames.length;
+        };
+        var stepFrame = function(amount) {
+          i = i + amount;
+          putFrame();
+        };
+        var step = (function() {
+          var stepping = false;
+          var completeLoop = function() {
+            if (onEndListener !== null) onEndListener(gif);
+            iterationCount++;
+            if (overrideLoopMode !== false || iterationCount < 0) {
+              doStep();
+            } else {
+              stepping = false;
+              playing = false;
+            }
+          };
+          var doStep = function() {
+            stepping = playing;
+            if (!stepping) return;
+            stepFrame(1);
+            var delay = frames[i].delay * 10;
+            if (!delay) delay = 100;
+            var nextFrameNo = getNextFrameNo();
+            if (nextFrameNo === 0) {
+              delay += loopDelay;
+              setTimeout(completeLoop, delay);
+            } else {
+              setTimeout(doStep, delay);
+            }
+          };
+          return function() {
+            if (!stepping) setTimeout(doStep, 0);
+          };
+        })();
+        var putFrame = function() {
+          var offset;
+          i = parseInt(i, 10);
+          if (i > frames.length - 1) {
+            i = 0;
+          }
+          if (i < 0) {
+            i = 0;
+          }
+          offset = frameOffsets[i];
+          tmpCanvas.getContext("2d").putImageData(frames[i].data, offset.x, offset.y);
+          ctx.globalCompositeOperation = "copy";
+          ctx.drawImage(tmpCanvas, 0, 0);
+        };
+        var play = function() {
+          playing = true;
+          step();
+        };
+        var pause = function() {
+          playing = false;
+        };
+        return {
+          init: function() {
+            if (loadError) return;
+            if (!(options.c_w && options.c_h)) {
+              ctx.scale(get_canvas_scale(), get_canvas_scale());
+            }
+            if (options.auto_play) {
+              step();
+            } else {
+              i = 0;
+              putFrame();
+            }
+          },
+          step: step,
+          play: play,
+          pause: pause,
+          playing: playing,
+          move_relative: stepFrame,
+          current_frame: function() {
+            return i;
+          },
+          frames: function() {
+            return frames;
+          },
+          length: function() {
+            return frames.length;
+          },
+          move_to: function(frame_idx) {
+            i = frame_idx;
+            putFrame();
+          }
+        };
+      })();
+      var doDecodeProgress = function(draw) {
+        doShowProgress(stream.pos, stream.data.length, draw);
+      };
+      var doNothing = function() {};
+      var withProgress = function(fn, draw) {
+        return function(block) {
+          fn(block);
+          doDecodeProgress(draw);
+        };
+      };
+      var init = function() {
+        var parent = gif.parentNode;
+        var div = document.createElement("div");
+        canvas = document.createElement("canvas");
+        ctx = canvas.getContext("2d");
+        toolbar = document.createElement("div");
+        tmpCanvas = document.createElement("canvas");
+        div.width = canvas.width = gif.width;
+        div.height = canvas.height = gif.height;
+        toolbar.style.minWidth = gif.width + "px";
+        div.className = "jsgif";
+        toolbar.className = "jsgif_toolbar";
+        div.appendChild(canvas);
+        div.appendChild(toolbar);
+        if (parent) {
+          parent.insertBefore(div, gif);
+          parent.removeChild(gif);
+        }
+        if (options.c_w && options.c_h) setSizes(options.c_w, options.c_h);
+        initialized = true;
+      };
+      var get_canvas_scale = function() {
+        var scale;
+        if (options.max_width && hdr && hdr.width > options.max_width) {
+          scale = options.max_width / hdr.width;
+        } else {
+          scale = 1;
+        }
+        return scale;
+      };
+      var canvas, ctx, toolbar, tmpCanvas;
+      var initialized = false;
+      var load_callback = false;
+      var load_setup = function(callback) {
+        if (loading) return false;
+        if (callback) {
+          load_callback = callback;
+        } else {
+          load_callback = false;
+        }
+        loading = true;
+        frames = [];
+        clear();
+        disposalRestoreFromIdx = null;
+        lastDisposalMethod = null;
+        frame = null;
+        lastImg = null;
+        return true;
+      };
+      return {
+        play: player.play,
+        pause: player.pause,
+        move_relative: player.move_relative,
+        move_to: player.move_to,
+        get_frames: function() {
+          return player.frames();
+        },
+        get_playing: function() {
+          return playing;
+        },
+        get_canvas: function() {
+          return canvas;
+        },
+        get_canvas_scale: function() {
+          return get_canvas_scale();
+        },
+        get_loading: function() {
+          return loading;
+        },
+        get_auto_play: function() {
+          return options.auto_play;
+        },
+        get_length: function() {
+          return player.length();
+        },
+        get_current_frame: function() {
+          return player.current_frame();
+        },
+        load_url: function(src, callback) {
+          if (!load_setup(callback)) return;
+          var h = new XMLHttpRequest();
+          h.open("GET", src, true);
+          if ("overrideMimeType" in h) {
+            h.overrideMimeType("text/plain; charset=x-user-defined");
+          } else if ("responseType" in h) {
+            h.responseType = "arraybuffer";
+          } else {
+            h.setRequestHeader("Accept-Charset", "x-user-defined");
+          }
+          h.onloadstart = function() {
+            if (!initialized) init();
+          };
+          h.onload = function(e) {
+            if (this.status != 200) {
+              doLoadError("xhr - response");
+            }
+            if (!("response" in this)) {
+              this.response = new VBArray(this.responseText)
+                .toArray()
+                .map(String.fromCharCode)
+                .join("");
+            }
+            var data = this.response;
+            if (data instanceof ArrayBuffer) {
+              data = new Uint8Array(data);
+            }
+            stream = new Stream(data);
+            setTimeout(doParse, 0);
+          };
+          h.onprogress = function(e) {
+            if (e.lengthComputable) doShowProgress(e.loaded, e.total, true);
+          };
+          h.onerror = function() {
+            doLoadError("xhr");
+          };
+          h.send();
+        },
+        load: function(callback) {
+          this.load_url(gif.getAttribute("data-animated-src") || gif.src, callback);
+        },
+        load_raw: function(arr, callback) {
+          if (!load_setup(callback)) return;
+          if (!initialized) init();
+          stream = new Stream(arr);
+          setTimeout(doParse, 0);
+        },
+        set_frame_offset: setFrameOffset
+      };
+    };
+    return SuperGif;
+  });
+});
+
+navigator.getUserMedia =
+  navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+
+var ImageController = (function(_Controller) {
+  _inheritsLoose(ImageController, _Controller);
+  function ImageController(object, property, opts) {
+    var _this;
+    _this = _Controller.call(this, object, property) || this;
+    var defaultOptions;
+    var disableVideo = false;
+    if (opts.defaults) {
+      disableVideo = opts.disableVideo;
+      defaultOptions = opts.defaults;
+    } else {
+      defaultOptions = opts;
+    }
+    _this.__controlContainer = document.createElement("div");
+    dom.addClass(_this.__controlContainer, "image-picker");
+    _this.videoStreams = [];
+    _this.__selectedInputContainer = _this.__controlContainer.appendChild(document.createElement("div"));
+    dom.addClass(_this.__selectedInputContainer, "selected-image");
+    _this.__swatches = _this.__controlContainer.appendChild(document.createElement("div"));
+    dom.addClass(_this.__swatches, "image-swatches");
+    _this.__img = _this.__selectedInputContainer.appendChild(document.createElement("img"));
+    _this.__img.crossOrigin = "anonymous";
+    _this.__video = _this.__selectedInputContainer.appendChild(document.createElement("video"));
+    _this.__input = _this.__controlContainer.appendChild(document.createElement("input"));
+    _this.__swatchButtons = _this.__swatches.appendChild(document.createElement("div"));
+    dom.addClass(_this.__swatchButtons, "swatch-buttons");
+    _this.__swatchImages = _this.__swatches.appendChild(document.createElement("div"));
+    _this.__disableVideo = disableVideo;
+    dom.addClass(_this.__swatchImages, "swatch-images");
+    _this.__useCamera = navigator.getUserMedia && !disableVideo;
+    if (_this.__useCamera) {
+      _this.__camera = _this.__swatchButtons.appendChild(document.createElement("div"));
+      _this.__cameraTitle = _this.__camera.appendChild(document.createElement("span"));
+      _this.__cameraTitle.innerHTML = "Video";
+      _this.__cameraIcon = _this.__camera.appendChild(document.createElement("div"));
+      dom.addClass(_this.__cameraIcon, "camera-icon");
+      dom.addClass(_this.__camera, "camera-button");
+    }
+    _this.__plus = _this.__swatchButtons.appendChild(document.createElement("div"));
+    _this.__plusTitle = _this.__plus.appendChild(document.createElement("span"));
+    _this.__plusTitle.innerHTML = "Image";
+    _this.__plusIcon = _this.__plus.appendChild(document.createElement("div"));
+    dom.addClass(_this.__plusIcon, "new-image-icon");
+    dom.addClass(_this.__plus, "new-image-button");
+    defaultOptions.forEach(function(option) {
+      _this.addSwatch(option.src, option.videoSrc);
+    });
+    _this.__video.className = _this.__img.className = "content";
+    _this.__video.crossOrigin = "anonymous";
+    _this.__video.setAttribute("playsinline", true);
+    _this.__input.type = "file";
+    _this.__gifImg = _this.__selectedInputContainer.appendChild(document.createElement("img"));
+    _this.__gifImg.crossOrigin = "anonymous";
+    dom.addClass(_this.__gifImg, "content gif-img");
+    _this.__glGif = new sibgif({
+      gif: _this.__gifImg
+    });
+    _this.__gifNeedsInitializing = true;
+    _this.initializeValue();
+    if (_this.__useCamera) {
+      dom.bind(_this.__camera, "click", onCameraClick.bind(_assertThisInitialized(_this)));
+    }
+    dom.bind(_this.__plus, "click", chooseImage.bind(_assertThisInitialized(_this)));
+    dom.bind(_this.__input, "change", inputChange.bind(_assertThisInitialized(_this)));
+    dom.bind(_this.__img, "dragover", onDragOver.bind(_assertThisInitialized(_this)));
+    dom.bind(_this.__img, "dragleave", onDragLeave.bind(_assertThisInitialized(_this)));
+    dom.bind(_this.__img, "drop", onDrop.bind(_assertThisInitialized(_this)));
+    dom.bind(_this.__video, "dragover", onDragOver.bind(_assertThisInitialized(_this)));
+    dom.bind(_this.__video, "dragleave", onDragLeave.bind(_assertThisInitialized(_this)));
+    dom.bind(_this.__video, "drop", onDrop.bind(_assertThisInitialized(_this)));
+    function chooseImage() {
+      this.__input.click();
+    }
+    function inputChange(e) {
+      var file = e.target.files[0];
+      file.isSaved = false;
+      this.parseFile(file);
+    }
+    function onDragOver(e) {
+      e.preventDefault();
+      e.target.classList.add("dragover");
+    }
+    function onDragLeave(e) {
+      e.target.classList.remove("dragover");
+    }
+    function onDrop(e) {
+      e.target.classList.remove("dragover");
+      var file = e.originalEvent.dataTransfer.files[0];
+      file.isSaved = false;
+      this.parseFile(file);
+    }
+    function onCameraClick() {
+      var _this2 = this;
+      navigator.mediaDevices
+        .getUserMedia({
+          video: true
+        })
+        .then(function(localMediaStream) {
+          _this2.killStream();
+          _this2.videoStream = localMediaStream;
+          _this2.setValue({
+            type: "video-stream",
+            value: localMediaStream,
+            domElement: _this2.__video
+          });
+        })
+        ["catch"](function(err) {
+          _this2.killStream();
+        });
+    }
+    _this.domElement.appendChild(_this.__controlContainer);
+    return _this;
+  }
+  var _proto = ImageController.prototype;
+  _proto.killStream = function killStream() {
+    if (!this.videoStream) return;
+    this.videoStream.getTracks().forEach(function(track) {
+      return track.stop();
+    });
+  };
+  _proto.destruct = function destruct() {
+    this.killStream();
+  };
+  _proto.initializeValue = function initializeValue() {
+    var asset = this.getValue();
+    if (!asset) {
+      return;
+    }
+    if (asset.type === "gif") {
+      if (this.__gifNeedsInitializing) {
+        this.setImage(asset.url, true);
+      } else {
+        this.setValue({
+          url: asset.url,
+          type: asset.type,
+          domElement: this.__glGif.get_canvas()
+        });
+      }
+    } else if (asset.type === "image") {
+      this.setValue({
+        url: asset.url,
+        type: asset.type,
+        domElement: this.__img
+      });
+    } else if (asset.type === "video") {
+      this.setValue({
+        url: asset.url,
+        type: asset.type,
+        domElement: this.__video
+      });
+    }
+  };
+  _proto.updateDisplay = function updateDisplay() {
+    var asset = this.getValue();
+    if (!asset) {
+      return;
+    }
+    if (asset.type === "image") {
+      this.setImage(asset.url, false);
+    } else if (asset.type === "gif") {
+      this.setImage(asset.url, true);
+    } else if (asset.type === "video") {
+      this.setVideo(asset.url);
+    } else if (asset.type === "video-stream") {
+      this.setVideo(asset.value);
+    }
+  };
+  _proto.parseFile = function parseFile(file) {
+    var type = file.type.split("/")[0];
+    if (this.__glGif) this.__glGif.pause();
+    if (type === "image") {
+      var _url = file.urlOverride || URL.createObjectURL(file);
+      var isAnimated = file.type.split("/")[1] === "gif" || file.animatedOverride;
+      if (!this.__disableVideo && isAnimated) {
+        if (this.__gifNeedsInitializing) {
+          this.setImage(_url, true);
+        } else {
+          this.setValue({
+            url: _url,
+            type: "gif",
+            domElement: this.__glGif.get_canvas()
+          });
+        }
+      } else if (!isAnimated) {
+        this.setValue({
+          url: _url,
+          type: "image",
+          domElement: this.__img
+        });
+        this.setImage(_url, false);
+      }
+    } else if (!this.__disableVideo && type === "video") {
+      this.setValue({
+        url: url,
+        type: "video",
+        domElement: this.__video
+      });
+      this.setVideo();
+    }
+  };
+  _proto.setImage = function setImage(url, isAnimated) {
+    var _this3 = this;
+    if (this.__skipSetImage) {
+      this.__skipSetImage = false;
+      return;
+    }
+    this.__isVideo = false;
+    this.__isAnimated = isAnimated;
+    if (isAnimated) {
+      this.__img.src = "";
+      this.__img.style.display = "none";
+      this.__gifImg.src = url;
+      if (this.__glGif.get_canvas()) {
+        this.__glGif.get_canvas().style.display = "block";
+      }
+      this.__glGif.load(function(err) {
+        if (!err) {
+          _this3.__glGif.play()["catch"](function(e) {
+            return console.log(e);
+          });
+          if (_this3.__gifNeedsInitializing) {
+            _this3.__gifNeedsInitializing = false;
+            _this3.__skipSetImage = true;
+            _this3.setValue({
+              url: url,
+              type: "gif",
+              domElement: _this3.__glGif.get_canvas()
+            });
+          }
+        }
+      });
+    } else {
+      if (this.__glGif.get_canvas()) {
+        this.__glGif.get_canvas().style.display = "none";
+      }
+      this.__img.src = url;
+      this.__img.style.display = "block";
+    }
+    this.__video.style.display = "none";
+    this.__video.src = "";
+  };
+  _proto.setVideo = function setVideo() {
+    var asset = this.getValue();
+    if (asset.type === "video-stream") {
+      this.__video.srcObject = asset.value;
+    } else {
+      this.killStream();
+      this.__video.src = asset.url;
+    }
+    this.__isVideo = true;
+    this.__isAnimated = true;
+    this.__video.loop = true;
+    this.__video.volume = 0;
+    this.__video.play()["catch"](function(e) {
+      console.log(e, e.message, e.name);
+    });
+    this.__img.src = "data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=";
+    this.__img.style.display = "none";
+    if (this.__glGif.get_canvas()) {
+      this.__glGif.get_canvas().style.display = "none";
+    }
+    this.__video.style.display = "block";
+  };
+  _proto.addSwatch = function addSwatch(src, videoSrc) {
+    var _this4 = this;
+    var swatch = this.__swatchImages.appendChild(document.createElement("img"));
+    swatch.src = src;
+    swatch.videoSrc = videoSrc;
+    swatch.className = "swatch";
+    dom.bind(swatch, "click", function() {
+      if (videoSrc) {
+        _this4.setValue({
+          url: videoSrc,
+          type: "video",
+          domElement: _this4.__video
+        });
+      } else {
+        var isAnimated = src.split(".").pop() === "gif";
+        if (isAnimated) {
+          if (_this4.__gifNeedsInitializing) {
+            _this4.setImage(url, true);
+          } else {
+            _this4.setValue({
+              url: src,
+              type: "gif",
+              domElement: _this4.__glGif.get_canvas()
+            });
+          }
+        } else {
+          _this4.setValue({
+            url: src,
+            type: "image",
+            domElement: _this4.__img
+          });
+        }
+      }
+    });
+  };
+  return ImageController;
+})(Controller);
+
+var ArrayController = (function(_Controller) {
+  _inheritsLoose(ArrayController, _Controller);
+  function ArrayController(object, property) {
+    var _this2;
+    _this2 = _Controller.call(this, object, property) || this;
+    var _this = _assertThisInitialized(_this2);
+    _this2.__div = document.createElement("div");
+    _this2.__inputs = [];
+    _this2.__new = document.createElement("input");
+    _this2.__new.setAttribute("type", "text");
+    dom.bind(_this2.__new, "keydown", function(e) {
+      if (e.keyCode === 13) {
+        var values = _this.getValue();
+        values.push(_this.__new.value);
+        _this.__new.value = "";
+        _this.updateDisplay();
+      }
+    });
+    _this2.__div.appendChild(_this2.__new);
+    _this2.updateDisplay();
+    _this2.domElement.appendChild(_this2.__div);
+    return _this2;
+  }
+  var _proto = ArrayController.prototype;
+  _proto.updateDisplay = function updateDisplay() {
+    for (var i = 0; i < this.__inputs.length; i++) {
+      if (dom.isActive(this.__inputs[i])) {
+        return;
+      }
+    }
+    var _this = this;
+    this.__inputs.forEach(function(i) {
+      _this.__div.removeChild(i.parentElement);
+    });
+    this.__inputs = [];
+    this.getValue().forEach(function(v) {
+      var group = document.createElement("div");
+      dom.addClass(group, "array-input");
+      var input = document.createElement("input");
+      group.appendChild(input);
+      input.setAttribute("type", "text");
+      input.value = v;
+      var remove = document.createElement("span");
+      remove.innerHTML = "&nbsp;";
+      dom.addClass(remove, "remove-icon");
+      group.appendChild(remove);
+      dom.bind(remove, "click", onRemove);
+      dom.bind(input, "keyup", onChange);
+      dom.bind(input, "change", onChange);
+      dom.bind(input, "blur", onBlur);
+      dom.bind(input, "keydown", function(e) {
+        if (e.keyCode === 13) {
+          this.blur();
+        }
+      });
+      _this.__div.insertBefore(group, _this.__new);
+      _this.__inputs.push(input);
+    });
+    function onRemove(e) {
+      var _loop = function _loop(_i) {
+        if (_this.__inputs[_i].parentElement === e.target.parentElement) {
+          var values = _this.getValue().filter(function(v) {
+            return v !== _this.__inputs[_i].value;
+          });
+          _this.setValue(values);
+        }
+      };
+      for (var _i = 0; _i < _this.__inputs.length; _i++) {
+        _loop(_i);
+      }
+    }
+    function onChange() {
+      if (_this.__changing) {
+        return;
+      }
+      _this.__changing = true;
+      var values = _this.__inputs.map(function(i) {
+        return i.value;
+      });
+      _this.setValue(values);
+      _this.__changing = false;
+    }
+    function onBlur() {
+      if (_this.__onFinishChange) {
+        _this.__onFinishChange.call(_this, _this.getValue());
+      }
+    }
+  };
+  return ArrayController;
+})(Controller);
+
 var saveDialogueContents =
   '<div id="dg-save" class="dg dialogue">\n  Here\'s the new load parameter for your <code>GUI</code>\'s constructor:\n\n  <textarea id="dg-new-constructor"></textarea>\n\n  <div id="dg-save-locally">\n    <input id="dg-local-storage" type="checkbox"> Automatically save values to <code>localStorage</code> on exit.\n\n    <div id="dg-local-explain">\n      The values saved to <code>localStorage</code> will override those passed to <code>dat.GUI</code>\'s constructor.\n      This makes it easier to work incrementally, but <code>localStorage</code> is fragile, and your friends may not see\n      the same values you do.\n    </div>\n  </div>\n</div>\n';
 
+function pos2vec(pos, min, max) {
+  return [pos[0] * (max[0] - min[0]) + min[0], pos[1] * (max[1] - min[1]) + min[1]];
+}
+function vec2pos(vec, min, max) {
+  return [(vec[0] - min[0]) / (max[0] - min[0]), (vec[1] - min[1]) / (max[1] - min[1])];
+}
+var VectorController = (function(_Controller) {
+  _inheritsLoose(VectorController, _Controller);
+  function VectorController(object, property, min, max) {
+    var _this2;
+    if (min === void 0) {
+      min = [0, 0];
+    }
+    if (max === void 0) {
+      max = [1, 1];
+    }
+    _this2 =
+      _Controller.call(this, object, property, {
+        min: min,
+        max: max
+      }) || this;
+    _this2.__min = min;
+    _this2.__max = max;
+    _this2.__vec = _this2.getValue();
+    _this2.__temp = [0, 0];
+    var _this = _assertThisInitialized(_this2);
+    _this2.domElement = document.createElement("div");
+    dom.makeSelectable(_this2.domElement, false);
+    _this2.__selector = document.createElement("div");
+    _this2.__selector.className = "vector-selector";
+    _this2.__pos_field = document.createElement("div");
+    _this2.__pos_field.className = "saturation-field";
+    _this2.__field_knob = document.createElement("div");
+    _this2.__field_knob.className = "field-knob";
+    dom.bind(_this2.__selector, "mousedown", function() {
+      dom.addClass(this, "drag").bind(window, "mouseup", function() {
+        dom.removeClass(_this.__selector, "drag");
+      });
+    });
+    dom.bind(_this2.__selector, "touchstart", function() {
+      dom.addClass(this, "drag").bind(window, "touchend", function() {
+        dom.removeClass(_this.__selector, "drag");
+      });
+    });
+    Common.extend(_this2.__selector.style, {
+      width: "52px",
+      height: "52px",
+      padding: "3px",
+      backgroundColor: "#222",
+      boxShadow: "0px 1px 3px rgba(0,0,0,0.3)"
+    });
+    Common.extend(_this2.__field_knob.style, {
+      position: "absolute",
+      width: "12px",
+      height: "12px",
+      borderRadius: "12px",
+      zIndex: 1
+    });
+    Common.extend(_this2.__pos_field.style, {
+      width: "50px",
+      height: "50px",
+      marginRight: "3px",
+      display: "inline-block",
+      cursor: "pointer"
+    });
+    dom.bind(_this2.__pos_field, "mousedown", fieldDown);
+    dom.bind(_this2.__pos_field, "touchstart", fieldDown);
+    dom.bind(_this2.__field_knob, "mousedown", fieldDown);
+    dom.bind(_this2.__field_knob, "touchstart", fieldDown);
+    function fieldDown(e) {
+      setSV(e);
+      dom.bind(window, "mousemove", setSV);
+      dom.bind(window, "touchmove", setSV);
+      dom.bind(window, "mouseup", fieldUpSV);
+      dom.bind(window, "touchend", fieldUpSV);
+    }
+    function fieldUpSV() {
+      dom.unbind(window, "mousemove", setSV);
+      dom.unbind(window, "touchmove", setSV);
+      dom.unbind(window, "mouseup", fieldUpSV);
+      dom.unbind(window, "touchend", fieldUpSV);
+      onFinish();
+    }
+    function onFinish() {
+      if (_this.__onFinishChange) {
+        _this.__onFinishChange.call(_this, _this.__vec);
+      }
+    }
+    _this2.__selector.appendChild(_this2.__field_knob);
+    _this2.__selector.appendChild(_this2.__pos_field);
+    _this2.domElement.appendChild(_this2.__selector);
+    _this2.updateDisplay();
+    function setSV(e) {
+      if (e.type.indexOf("touch") === -1) {
+        e.preventDefault();
+      }
+      var fieldRect = _this.__pos_field.getBoundingClientRect();
+      var _ref = (e.touches && e.touches[0]) || e,
+        clientX = _ref.clientX,
+        clientY = _ref.clientY;
+      var x = (clientX - fieldRect.left) / (fieldRect.right - fieldRect.left);
+      var y = 1 - (clientY - fieldRect.top) / (fieldRect.bottom - fieldRect.top);
+      if (x > 1) {
+        x = 1;
+      } else if (x < 0) {
+        x = 0;
+      }
+      if (y > 1) {
+        y = 1;
+      } else if (y < 0) {
+        y = 0;
+      }
+      _this.__vec = pos2vec([x, y], _this.__min, _this.__max);
+      _this.setValue(_this.__vec);
+      return false;
+    }
+    return _this2;
+  }
+  var _proto = VectorController.prototype;
+  _proto.updateDisplay = function updateDisplay() {
+    this.__vec = this.getValue();
+    var offset = vec2pos(this.__vec, this.__min, this.__max);
+    Common.extend(this.__field_knob.style, {
+      marginLeft: 50 * offset[0] - 7 + "px",
+      marginTop: 50 * (1 - offset[1]) - 7 + "px"
+    });
+    this.__temp[0] = 1;
+    this.__temp[1] = 1;
+  };
+  return VectorController;
+})(Controller);
+
 var ControllerFactory = function ControllerFactory(object, property) {
   var initialValue = object[property];
-  if (Common.isArray(arguments[2]) || Common.isObject(arguments[2])) {
+  if (
+    arguments.length <= 3 &&
+    arguments[2] != null &&
+    (Common.isArray(arguments[2]) || Common.isObject(arguments[2]))
+  ) {
     return new OptionController(object, property, arguments[2]);
   }
   if (Common.isNumber(initialValue)) {
@@ -1787,8 +3201,17 @@ var ControllerFactory = function ControllerFactory(object, property) {
   ) {
     return new ColorController(object, property);
   }
+  if (Common.isArray(initialValue) && initialValue.length === 2) {
+    if (arguments.length > 3) {
+      return new VectorController(object, property, arguments[2], arguments[3]);
+    }
+    return new VectorController(object, property);
+  }
   if (Common.isString(initialValue)) {
     return new StringController(object, property);
+  }
+  if (Common.isFunction(initialValue) && arguments[2] !== undefined) {
+    return new TabbedController(object, property, "", arguments[2] || 0, arguments[3] || "Object");
   }
   if (Common.isFunction(initialValue)) {
     return new FunctionController(object, property, "");
@@ -1796,19 +3219,191 @@ var ControllerFactory = function ControllerFactory(object, property) {
   if (Common.isBoolean(initialValue)) {
     return new BooleanController(object, property);
   }
+  if (Common.isArray(initialValue)) {
+    return new ArrayController(object, property);
+  }
   return null;
 };
 
-function requestAnimationFrame(callback, element) {
+var NumberControllerAnimator = (function(_NumberController) {
+  _inheritsLoose(NumberControllerAnimator, _NumberController);
+  function NumberControllerAnimator(object, property, params) {
+    var _this2;
+    _this2 = _NumberController.call(this, object, property, params) || this;
+    var _this = _assertThisInitialized(_this2);
+    dom.addClass(_this2.domElement, "button-container");
+    _this2.__animationMode = null;
+    _this2.__sineButton = document.createElement("button");
+    dom.addClass(_this2.__sineButton, "sine-button");
+    _this2.__sawButton = document.createElement("button");
+    dom.addClass(_this2.__sawButton, "saw-button");
+    dom.bind(_this2.__sawButton, "click", toggleSaw);
+    dom.bind(_this2.__sineButton, "click", toggleSine);
+    function toggleSaw(e) {
+      e.stopPropagation();
+      e.preventDefault();
+      if (_this.__animationMode === "saw") {
+        stopAnimating();
+        dom.removeClass(_this.__sawButton, "saw-button--activated");
+      } else {
+        if (_this.__animationMode === "sine") {
+          dom.removeClass(_this.__sineButton, "sine-button--activated");
+        }
+        _this.__animationMode = "saw";
+        dom.addClass(_this.__sawButton, "saw-button--activated");
+        animate();
+      }
+    }
+    function toggleSine(e) {
+      e.stopPropagation();
+      e.preventDefault();
+      if (_this.__animationMode === "sine") {
+        stopAnimating();
+        dom.removeClass(_this.__sineButton, "sine-button--activated");
+      } else {
+        if (_this.__animationMode === "saw") {
+          dom.removeClass(_this.__sawButton, "saw-button--activated");
+        }
+        _this.__animationMode = "sine";
+        dom.addClass(_this.__sineButton, "sine-button--activated");
+        animate();
+      }
+    }
+    function animate() {
+      if (_this.__animationMode === null) return;
+      var percent;
+      if (_this.__animationMode === "sine") {
+        percent = Math.sin(Date.now() / 1000) / 2 + 0.5;
+      } else if (_this.__animationMode === "saw") {
+        percent = (Date.now() / 2000) % 1;
+      }
+      if (_this.__min !== undefined && _this.__max !== undefined) {
+        _this.setValue((_this.__max - _this.__min) * percent + _this.__min);
+      } else {
+        _this.setValue(percent);
+      }
+      requestAnimationFrame(animate);
+    }
+    function stopAnimating() {
+      _this.__animationMode = null;
+    }
+    _this2.updateDisplay();
+    _this2.domElement.appendChild(_this2.__sawButton);
+    _this2.domElement.appendChild(_this2.__sineButton);
+    return _this2;
+  }
+  return NumberControllerAnimator;
+})(NumberController);
+
+var GradientController = (function(_Controller) {
+  _inheritsLoose(GradientController, _Controller);
+  function GradientController(object, property, params) {
+    var _this2;
+    _this2 = _Controller.call(this, object, property) || this;
+    var _this = _assertThisInitialized(_this2);
+    _this2.domElement = document.createElement("div");
+    dom.makeSelectable(_this2.domElement, false);
+    _this2.__selector = document.createElement("div");
+    _this2.__selector.className = "selector";
+    _this2.__saturation_field = document.createElement("div");
+    _this2.__saturation_field.className = "saturation-field";
+    _this2.__input = document.createElement("input");
+    _this2.__input.type = "text";
+    _this2.__input_textShadow = "1px 1px 2px";
+    dom.bind(_this2.__input, "keydown", function(e) {
+      if (e.keyCode === 13) {
+        onBlur.call(this);
+      }
+    });
+    dom.bind(_this2.__input, "blur", onBlur);
+    function onBlur() {
+      var value = JSON.parse(this.value);
+      _this.setValue(value);
+    }
+    dom.bind(_this2.__selector, "mousedown", function() {
+      dom.addClass(this, "drag").bind(window, "mouseup", function() {
+        dom.removeClass(_this.__selector, "drag");
+      });
+    });
+    var valueField = document.createElement("div");
+    Common.extend(_this2.__selector.style, {
+      width: "150px",
+      padding: "0px",
+      lineHeight: "18px",
+      backgroundColor: "#222",
+      boxShadow: "0px 1px 3px rgba(0,0,0,0.3)"
+    });
+    for (var i = 0; i < params.length; i++) {
+      var item = document.createElement("canvas");
+      item.value = params[i];
+      item.width = 150;
+      item.height = 18;
+      var context = item.getContext("2d");
+      var grd = context.createLinearGradient(0, 0, 150, 0);
+      for (var key in params[i]) {
+        grd.addColorStop(key, params[i][key]);
+      }
+      dom.bind(item, "click", function() {
+        _this.setValue(this.value);
+        _this.updateDisplay();
+        onFinish();
+      });
+      context.fillStyle = grd;
+      context.fillRect(0, 0, item.width, item.height);
+      Common.extend(item.style, {
+        width: "150px"
+      });
+      _this2.__saturation_field.appendChild(item);
+    }
+    _this2.__selector.appendChild(_this2.__saturation_field);
+    _this2.domElement.appendChild(_this2.__input);
+    _this2.domElement.appendChild(_this2.__selector);
+    function onFinish() {
+      if (_this.__onFinishChange) {
+        _this.__onFinishChange.call(_this, _this.getValue());
+      }
+    }
+    _this2.updateDisplay();
+    return _this2;
+  }
+  var _proto = GradientController.prototype;
+  _proto.updateDisplay = function updateDisplay() {
+    var value = this.getValue();
+    var arr = [];
+    for (var key in value) {
+      arr.push({
+        percent: key,
+        color: value[key]
+      });
+    }
+    arr.sort(function(a, b) {
+      return a.percent - b.percent;
+    });
+    this.__input.value = JSON.stringify(value);
+    var backgroundColor = "-webkit-linear-gradient(left";
+    for (var i = 0; i < arr.length; i++) {
+      backgroundColor += ", " + arr[i].color + " " + arr[i].percent * 100 + "%";
+    }
+    backgroundColor += ")";
+    Common.extend(this.__input.style, {
+      background: backgroundColor,
+      color: "#fff",
+      textShadow: this.__input_textShadow + " #000"
+    });
+  };
+  return GradientController;
+})(Controller);
+
+function requestAnimationFrame$1(callback, element) {
   setTimeout(callback, 1000 / 60);
 }
-var requestAnimationFrame$1 =
+var requestAnimationFrame$2 =
   window.requestAnimationFrame ||
   window.webkitRequestAnimationFrame ||
   window.mozRequestAnimationFrame ||
   window.oRequestAnimationFrame ||
   window.msRequestAnimationFrame ||
-  requestAnimationFrame;
+  requestAnimationFrame$1;
 
 var CenteredDiv = (function() {
   function CenteredDiv() {
@@ -2200,7 +3795,8 @@ var GUI = function GUI(pars) {
   params = Common.defaults(params, {
     closeOnTop: false,
     autoPlace: true,
-    width: GUI.DEFAULT_WIDTH
+    width: GUI.DEFAULT_WIDTH,
+    showCloseButton: true
   });
   params = Common.defaults(params, {
     resizable: params.autoPlace,
@@ -2222,10 +3818,35 @@ var GUI = function GUI(pars) {
   if (params.autoPlace && Common.isUndefined(params.scrollable)) {
     params.scrollable = true;
   }
-  var useLocalStorage = SUPPORTS_LOCAL_STORAGE && localStorage.getItem(getLocalStorageHash(this, "isLocal")) === "true";
-  var saveToLocalStorage;
+  var useLocalStorage =
+    SUPPORTS_LOCAL_STORAGE && window.localStorage.getItem(getLocalStorageHash(this, "isLocal")) === "true";
+  this.saveToLocalStorageIfPossible = function() {
+    if (SUPPORTS_LOCAL_STORAGE && window.localStorage.getItem(getLocalStorageHash(_this, "isLocal")) === "true") {
+      window.localStorage.setItem(getLocalStorageHash(_this, "gui"), JSON.stringify(_this.getSaveObject()));
+    }
+  };
   var titleRow;
   Object.defineProperties(this, {
+    lightTheme: {
+      set: function set(v) {
+        params.lightTheme = v;
+        if (v) dom.addClass(_this.domElement, GUI.CLASS_LIGHT_THEME);
+        else dom.removeClass(_this.domElement, GUI.CLASS_LIGHT_THEME);
+      },
+      get: function get() {
+        return params.lightTheme;
+      }
+    },
+    showCloseButton: {
+      set: function set(v) {
+        params.showCloseButton = v;
+        if (v) dom.removeClass(_this.__closeButton, GUI.CLASS_DISPLAY_NONE);
+        else dom.addClass(_this.__closeButton, GUI.CLASS_DISPLAY_NONE);
+      },
+      get: function get() {
+        return params.showCloseButton;
+      }
+    },
     parent: {
       get: function get() {
         return params.parent;
@@ -2283,6 +3904,21 @@ var GUI = function GUI(pars) {
         }
       }
     },
+    title: {
+      get: function get() {
+        return params.title;
+      },
+      set: function set(v) {
+        params.title = v;
+        if (titleRow) {
+          if (Common.isString(params.title)) {
+            titleRow.setAttribute("title", params.title);
+          } else {
+            titleRow.removeAttribute("title");
+          }
+        }
+      }
+    },
     closed: {
       get: function get() {
         return params.closed;
@@ -2313,11 +3949,11 @@ var GUI = function GUI(pars) {
         if (SUPPORTS_LOCAL_STORAGE) {
           useLocalStorage = bool;
           if (bool) {
-            dom.bind(window, "unload", saveToLocalStorage);
+            dom.bind(window, "unload", _this.saveToLocalStorageIfPossible);
           } else {
-            dom.unbind(window, "unload", saveToLocalStorage);
+            dom.unbind(window, "unload", _this.saveToLocalStorageIfPossible);
           }
-          localStorage.setItem(getLocalStorageHash(_this, "isLocal"), bool);
+          window.localStorage.setItem(getLocalStorageHash(_this, "isLocal"), bool);
         }
       }
     }
@@ -2326,10 +3962,13 @@ var GUI = function GUI(pars) {
     this.closed = params.closed || false;
     dom.addClass(this.domElement, GUI.CLASS_MAIN);
     dom.makeSelectable(this.domElement, false);
+    if (params.lightTheme) {
+      dom.addClass(this.domElement, GUI.CLASS_LIGHT_THEME);
+    }
     if (SUPPORTS_LOCAL_STORAGE) {
       if (useLocalStorage) {
         _this.useLocalStorage = true;
-        var savedGui = localStorage.getItem(getLocalStorageHash(this, "gui"));
+        var savedGui = window.localStorage.getItem(getLocalStorageHash(this, "gui"));
         if (savedGui) {
           params.load = JSON.parse(savedGui);
         }
@@ -2345,6 +3984,9 @@ var GUI = function GUI(pars) {
       dom.addClass(this.__closeButton, GUI.CLASS_CLOSE_BOTTOM);
       this.domElement.appendChild(this.__closeButton);
     }
+    if (!params.showCloseButton) {
+      dom.addClass(this.__closeButton, GUI.CLASS_DISPLAY_NONE);
+    }
     dom.bind(this.__closeButton, "click", function() {
       _this.closed = !_this.closed;
     });
@@ -2355,6 +3997,9 @@ var GUI = function GUI(pars) {
     var titleRowName = document.createTextNode(params.name);
     dom.addClass(titleRowName, "controller-name");
     titleRow = addRow(_this, titleRowName);
+    if (Common.isString(params.title)) {
+      titleRow.setAttribute("title", params.title);
+    }
     var onClickTitle = function onClickTitle(e) {
       e.preventDefault();
       _this.closed = !_this.closed;
@@ -2394,12 +4039,6 @@ var GUI = function GUI(pars) {
   if (params.resizable) {
     addResizeHandle(this);
   }
-  saveToLocalStorage = function saveToLocalStorage() {
-    if (SUPPORTS_LOCAL_STORAGE && localStorage.getItem(getLocalStorageHash(_this, "isLocal")) === "true") {
-      localStorage.setItem(getLocalStorageHash(_this, "gui"), JSON.stringify(_this.getSaveObject()));
-    }
-  };
-  this.saveToLocalStorageIfPossible = saveToLocalStorage;
   function resetWidth() {
     var root = _this.getRoot();
     root.width += 1;
@@ -2433,20 +4072,26 @@ GUI.CLASS_CLOSE_BUTTON = "close-button";
 GUI.CLASS_CLOSE_TOP = "close-top";
 GUI.CLASS_CLOSE_BOTTOM = "close-bottom";
 GUI.CLASS_DRAG = "drag";
+GUI.CLASS_DISPLAY_NONE = "display-none";
+GUI.CLASS_LIGHT_THEME = "light-theme";
 GUI.DEFAULT_WIDTH = 245;
-GUI.TEXT_CLOSED = "Close Controls";
-GUI.TEXT_OPEN = "Open Controls";
+GUI.TEXT_CLOSED = "Close View Controls";
+GUI.TEXT_OPEN = "Open View Controls";
 GUI._keydownHandler = function(e) {
-  if (document.activeElement.type !== "text" && (e.which === HIDE_KEY_CODE || e.keyCode === HIDE_KEY_CODE)) {
+  if (
+    document.activeElement &&
+    document.activeElement.type !== "text" &&
+    (e.which === HIDE_KEY_CODE || e.keyCode === HIDE_KEY_CODE)
+  ) {
     GUI.toggleHide();
   }
 };
 dom.bind(window, "keydown", GUI._keydownHandler, false);
 Common.extend(GUI.prototype, {
-  add: function add(object, property) {
-    return _add(this, object, property, {
+  add: function add(object, property, label) {
+    return _add(this, object, property, label, {
       custom: object instanceof CustomController,
-      factoryArgs: Array.prototype.slice.call(arguments, 2)
+      factoryArgs: Array.prototype.slice.call(arguments, 3)
     });
   },
   openExportWindow: function openExportWindow(title, content) {
@@ -2471,8 +4116,8 @@ Common.extend(GUI.prototype, {
   plugins: {
     autocomplete: autocomplete
   },
-  addColor: function addColor(object, property) {
-    return _add(this, object, property, {
+  addColor: function addColor(object, property, label) {
+    return _add(this, object, property, label, {
       color: true
     });
   },
@@ -2497,7 +4142,26 @@ Common.extend(GUI.prototype, {
       factoryArgs: Array.prototype.slice.call(arguments, 2)
     });
   },
+  addGradient: function addGradient(object, property, label) {
+    return _add(this, object, property, label, {
+      gradient: true,
+      factoryArgs: Array.prototype.slice.call(arguments, 3)
+    });
+  },
+  addImage: function addImage(object, property, label) {
+    return _add(this, object, property, label, {
+      factoryArgs: Array.prototype.slice.call(arguments, 3),
+      image: true
+    });
+  },
   remove: function remove(controller) {
+    var lIndex = this.__listening.indexOf(controller);
+    if (lIndex !== -1) {
+      this.__listening.splice(lIndex, 1);
+    }
+    if (controller.destruct) {
+      controller.destruct();
+    }
     this.__ul.removeChild(controller.__li);
     this.__controllers.splice(this.__controllers.indexOf(controller), 1);
     var _this = this;
@@ -2516,19 +4180,23 @@ Common.extend(GUI.prototype, {
       autoPlaceContainer.removeChild(this.domElement);
     }
     var _this = this;
-    Common.each(this.__folders, function(subfolder) {
-      _this.removeFolder(subfolder);
+    Common.each(this.__folders, function(folder, name) {
+      _this.removeFolder(name);
     });
     dom.unbind(window, "keydown", GUI._keydownHandler, false);
     removeListeners(this);
+    for (var i = this.__listening.length - 1; i >= 0; i--) {
+      this.__listening.splice(i, 1);
+    }
   },
-  addFolder: function addFolder(name) {
+  addFolder: function addFolder(name, title) {
     if (this.__folders[name] !== undefined) {
       throw new Error('You already have a folder in this GUI by the name "' + name + '"');
     }
     var newGuiParams = {
       name: name,
-      parent: this
+      parent: this,
+      title: title
     };
     newGuiParams.autoPlace = this.autoPlace;
     if (this.load && this.load.folders && this.load.folders[name]) {
@@ -2541,7 +4209,13 @@ Common.extend(GUI.prototype, {
     dom.addClass(li, "folder");
     return gui;
   },
-  removeFolder: function removeFolder(folder) {
+  removeFolder: function removeFolder(name) {
+    var folder = this.__folders[name];
+    if (!folder) {
+      console.error('There is no folder in this GUI by the name "' + name + '"');
+      return;
+    }
+    folder.close();
     this.__ul.removeChild(folder.domElement.parentElement);
     delete this.__folders[folder.name];
     if (this.load && this.load.folders && this.load.folders[folder.name]) {
@@ -2568,9 +4242,15 @@ Common.extend(GUI.prototype, {
   show: function show() {
     this.domElement.style.display = "";
   },
+  onFinishRevert: function onFinishRevert(fn) {
+    this.__onFinishRevert = fn;
+    return this;
+  },
   onResize: function onResize() {
     var root = this.getRoot();
     if (root.scrollable) {
+      var _dom$getOffset = dom.getOffset(root.__ul),
+        top = _dom$getOffset.top;
       var h = 0;
       Common.each(root.__ul.childNodes, function(node) {
         if (!(root.autoPlace && node === root.__save_row)) {
@@ -2661,15 +4341,16 @@ Common.extend(GUI.prototype, {
     this.saveToLocalStorageIfPossible();
   },
   revert: function revert(gui) {
+    var _this = this.getRoot();
     Common.each(
       this.__controllers,
       function(controller) {
         if (!this.getRoot().load.remembered) {
-          controller.setValue(controller.initialValue);
+          controller.setValue(controller.initialValue, true);
         } else {
           recallSavedValue(gui || this.getRoot(), controller);
         }
-        if (controller.__onFinishChange) {
+        if (!_this.__onFinishRevert && controller.__onFinishChange) {
           controller.__onFinishChange.call(controller, controller.getValue());
         }
       },
@@ -2681,13 +4362,19 @@ Common.extend(GUI.prototype, {
     if (!gui) {
       markPresetModified(this.getRoot(), false);
     }
+    if (_this === this && _this.__onFinishRevert) {
+      _this.__onFinishRevert.call(_this);
+    }
   },
   deleteSave: function deleteSave() {
-    if (this.preset === DEFAULT_DEFAULT_PRESET_NAME || !confirm('Delete preset "' + this.preset + '". Are you sure?')) {
+    if (this.preset === DEFAULT_DEFAULT_PRESET_NAME) {
       return;
     }
+    var opt = this.__preset_select[this.__preset_select.selectedIndex];
+    this.__preset_select.removeChild(opt);
+    this.__preset_select.selectedIndex = 0;
     delete this.load.remembered[this.preset];
-    this.preset = removeCurrentPresetOption(this);
+    this.preset = DEFAULT_DEFAULT_PRESET_NAME;
     this.saveToLocalStorageIfPossible();
   },
   listen: function listen(controller) {
@@ -2741,7 +4428,7 @@ function augmentController(gui, li, controller) {
       if (arguments.length > 1) {
         var nextSibling = controller.__li.nextElementSibling;
         controller.remove();
-        return _add(gui, controller.object, controller.property, {
+        return _add(gui, controller.object, controller.property, controller.label, {
           before: nextSibling,
           factoryArgs: [Common.toArray(arguments)]
         });
@@ -2749,7 +4436,7 @@ function augmentController(gui, li, controller) {
       if (Common.isArray(_options) || Common.isObject(_options)) {
         var _nextSibling = controller.__li.nextElementSibling;
         controller.remove();
-        return _add(gui, controller.object, controller.property, {
+        return _add(gui, controller.object, controller.property, controller.label, {
           before: _nextSibling,
           factoryArgs: [_options]
         });
@@ -2757,6 +4444,14 @@ function augmentController(gui, li, controller) {
     },
     name: function name(_name) {
       controller.__li.firstElementChild.firstElementChild.innerHTML = _name;
+      return controller;
+    },
+    title: function title(v) {
+      if (Common.isString(v)) {
+        controller.__li.setAttribute("title", v);
+      } else {
+        controller.__li.removeAttribute("title");
+      }
       return controller;
     },
     listen: function listen(forceUpdateDisplay) {
@@ -2786,13 +4481,29 @@ function augmentController(gui, li, controller) {
     });
     dom.addClass(li, "has-slider");
     controller.domElement.insertBefore(box.domElement, controller.domElement.firstElementChild);
+    var animateButtons = new NumberControllerAnimator(controller.object, controller.property, {
+      min: controller.__min,
+      max: controller.__max,
+      step: controller.__step
+    });
+    Common.each(["updateDisplay", "onChange", "onFinishChange", "step"], function(method) {
+      var pc = controller[method];
+      var pb = animateButtons[method];
+      controller[method] = animateButtons[method] = function() {
+        var args = Array.prototype.slice.call(arguments);
+        pb.apply(animateButtons, args);
+        return pc.apply(controller, args);
+      };
+    });
+    dom.addClass(li, "has-animate-buttons");
+    controller.domElement.insertBefore(animateButtons.domElement, controller.domElement.firstElementChild);
   } else if (controller instanceof NumberControllerBox) {
     var r = function r(returned) {
       if (Common.isNumber(controller.__min) && Common.isNumber(controller.__max)) {
         var oldName = controller.__li.firstElementChild.firstElementChild.innerHTML;
         var wasListening = controller.__gui.__listening.indexOf(controller) > -1;
         controller.remove();
-        var newController = _add(gui, controller.object, controller.property, {
+        var newController = _add(gui, controller.object, controller.property, controller.label, {
           before: controller.__li.nextElementSibling,
           factoryArgs: [controller.__min, controller.__max, controller.__step]
         });
@@ -2817,7 +4528,7 @@ function augmentController(gui, li, controller) {
     dom.bind(controller.__checkbox, "click", function(e) {
       e.stopPropagation();
     });
-  } else if (controller instanceof FunctionController) {
+  } else if (controller instanceof FunctionController || controller instanceof TabbedController) {
     dom.bind(li, "click", function() {
       dom.fakeEvent(controller.__button, "click");
     });
@@ -2837,6 +4548,19 @@ function augmentController(gui, li, controller) {
       controller.updateDisplay
     );
     controller.updateDisplay();
+  } else if (controller instanceof ArrayController) {
+    dom.addClass(li, "array");
+    controller.updateDisplay = Common.compose(
+      function(val) {
+        li.style.height = (controller.__inputs.length + 1) * 26 + "px";
+      },
+      controller.updateDisplay
+    );
+    controller.updateDisplay();
+  } else if (controller instanceof GradientController) {
+    li.style.borderLeft = "3px solid #2FA1D6";
+  } else if (controller instanceof VectorController) {
+    dom.addClass(li, "vector");
   } else if (controller instanceof FileController) {
     dom.addClass(li, "file");
   }
@@ -2873,12 +4597,12 @@ function recallSavedValue(gui, controller) {
       if (preset[matchedIndex] && preset[matchedIndex][controller.property] !== undefined) {
         var value = preset[matchedIndex][controller.property];
         controller.initialValue = value;
-        controller.setValue(value);
+        controller.setValue(value, true);
       }
     }
   }
 }
-function _add(gui, object, property, params) {
+function _add(gui, object, property, label, params) {
   if (!(object instanceof CustomController) && !params.custom && object[property] === undefined) {
     throw new Error('Object "' + object + '" has no property "' + property + '"');
   }
@@ -2886,6 +4610,10 @@ function _add(gui, object, property, params) {
   var value = object[property];
   if (params.color) {
     controller = new ColorController(object, property);
+  } else if (params.gradient) {
+    controller = new GradientController(object, property, params.factoryArgs[0]);
+  } else if (params.image) {
+    controller = new ImageController(object, property, params.factoryArgs[0]);
   } else if (params.plotter) {
     controller = new PlotterController(object, property, params);
     gui.listen(controller);
@@ -2913,7 +4641,9 @@ function _add(gui, object, property, params) {
         ? object.domElement
         : new CustomController(object).domElement
       : document.createElement("span");
-  if (!params.custom) {
+  if (label !== null) {
+    name.innerHTML = label;
+  } else if (!params.custom) {
     name.innerHTML = controller.property;
   }
   dom.addClass(name, "property-name");
@@ -2928,6 +4658,8 @@ function _add(gui, object, property, params) {
     dom.addClass(li, "plotter");
   } else if (controller instanceof FileController) {
     dom.addClass(li, "file");
+  } else if (controller instanceof ImageController) {
+    dom.addClass(li, "image");
   } else {
     dom.addClass(li, typeof controller.getValue());
   }
@@ -2936,7 +4668,8 @@ function _add(gui, object, property, params) {
   return controller;
 }
 function getLocalStorageHash(gui, key) {
-  return document.location.href + "." + key;
+  var namespace = window.localStorage.getItem("dat.gui.namespace") || document.location.href;
+  return "dat.gui." + namespace + "." + key;
 }
 function addPresetOption(gui, name, setSelected) {
   var opt = document.createElement("option");
@@ -2946,10 +4679,6 @@ function addPresetOption(gui, name, setSelected) {
   if (setSelected) {
     gui.__preset_select.selectedIndex = gui.__preset_select.length - 1;
   }
-}
-function removeCurrentPresetOption(gui) {
-  gui.__preset_select.removeChild(gui.__preset_select.options[gui.__preset_select.selectedIndex]);
-  return gui.__preset_select.options[gui.__preset_select.selectedIndex].value;
 }
 function showHideExplain(gui, explain) {
   explain.style.display = gui.useLocalStorage ? "block" : "none";
@@ -3003,7 +4732,7 @@ function addSaveMenu(gui) {
     var localStorageCheckBox = document.getElementById("dg-local-storage");
     var saveLocally = document.getElementById("dg-save-locally");
     saveLocally.style.display = "block";
-    if (localStorage.getItem(getLocalStorageHash(gui, "isLocal")) === "true") {
+    if (window.localStorage.getItem(getLocalStorageHash(gui, "isLocal")) === "true") {
       localStorageCheckBox.setAttribute("checked", "checked");
     }
     showHideExplain(gui, explain);
@@ -3037,6 +4766,13 @@ function addSaveMenu(gui) {
     gui.revert();
   });
   dom.bind(button4, "click", function() {
+    if (gui.preset === DEFAULT_DEFAULT_PRESET_NAME) {
+      alert("Default preset can't be deleted.");
+      return;
+    }
+    if (!confirm('Are you sure you want to delete preset "' + gui.preset + '"?')) {
+      return;
+    }
     gui.deleteSave();
   });
 }
@@ -3104,7 +4840,7 @@ function setPresetSelectIndex(gui) {
 }
 function updateDisplays(controllerArray) {
   if (controllerArray.length !== 0) {
-    requestAnimationFrame$1.call(window, function() {
+    requestAnimationFrame$2.call(window, function() {
       updateDisplays(controllerArray);
     });
   }
@@ -3127,10 +4863,13 @@ var controllers = {
   NumberControllerBox: NumberControllerBox,
   NumberControllerSlider: NumberControllerSlider,
   FunctionController: FunctionController,
+  TabbedController: TabbedController,
   ColorController: ColorController,
   FileController: FileController,
   PlotterController: PlotterController,
-  CustomController: CustomController
+  CustomController: CustomController,
+  ImageController: ImageController,
+  ArrayController: ArrayController
 };
 var dom$1 = {
   dom: dom

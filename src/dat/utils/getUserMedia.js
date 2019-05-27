@@ -11,4 +11,5 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+navigator.getUserMedia =
+  navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;

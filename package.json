@@ -16,7 +16,9 @@
     "build-docs": "jsdoc2md -f src/dat/gui/GUI.js src/dat/controllers/Controller.js src/dat/controllers/NumberController.js | replace-between --target API.md --token API",
     "build-all": "npm run prettier && npm run fix && npm run update-banner && npm run build && npm run build-docs",
     "lint": "eslint --report-unused-disable-directives src tests/*.html example.html",
+    "stylelint": "stylelint src tests/*.css",
     "fix": "eslint --fix -c eslint-config-ignore-all-errors.json5 src tests/*.html example.html && npm run prettier",
+    "stylefix": "prettier --write src/dat/gui/*.scss tests/*.css && stylelint --fix src tests/*.css",
     "update-banner": "node util/__patch_licenseBanner_in_js.js",
     "preversion": "npm run lint",
     "version": "npm run build && git add -A build",
@@ -48,8 +50,8 @@
     "concurrently": "4.1.0",
     "eslint": "5.16.0",
     "eslint-config-airbnb-base": "13.1.0",
-    "eslint-plugin-import": "2.17.2",
     "eslint-plugin-html": "5.0.5",
+    "eslint-plugin-import": "2.17.2",
     "extend": "3.0.2",
     "globby": "9.2.0",
     "jsdoc-to-markdown": "5.0.0",
@@ -66,6 +68,10 @@
     "rollup-plugin-sass": "1.2.2",
     "rollup-plugin-uglify": "6.0.2",
     "serve": "11.0.0",
+    "stylelint": "^10.0.1",
+    "stylelint-config-recommended-scss": "^3.3.0",
+    "stylelint-config-standard": "^18.3.0",
+    "stylelint-scss": "^3.6.1",
     "uglify-js": "3.5.14"
   },
   "eslintConfig": {
@@ -113,6 +119,18 @@
         }
       ],
       "guard-for-in": "warn"
+    }
+  },
+  "stylelint": {
+    "extends": [
+      "stylelint-config-standard",
+       "stylelint-config-recommended-scss"
+      ],
+    "defaultSeverity": "warning",
+    "rules": {
+      "block-no-empty": null,
+      "color-hex-case": "upper",
+      "color-hex-length": "long"
     }
   },
   "dependencies": {

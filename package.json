@@ -16,14 +16,14 @@
     "build-docs": "jsdoc2md -f src/dat/gui/GUI.js src/dat/controllers/Controller.js src/dat/controllers/NumberController.js | replace-between --target API.md --token API",
     "build-all": "npm run prettier && npm run fix && npm run update-banner && npm run build && npm run build-docs",
     "lint": "eslint --report-unused-disable-directives src tests/*.html example.html",
-    "stylelint": "stylelint src tests/*.css",
+    "stylelint": "stylelint src tests",
     "fix": "eslint --fix -c eslint-config-ignore-all-errors.json5 src tests/*.html example.html && npm run prettier",
-    "stylefix": "prettier --write src/dat/gui/*.scss tests/*.css && stylelint --fix src tests/*.css",
+    "stylefix": "prettier --write **/*.scss **/*.css && stylelint --fix **/*.css **/*.scss",
     "update-banner": "node util/__patch_licenseBanner_in_js.js",
     "preversion": "npm run lint",
     "version": "npm run build && git add -A build",
     "postversion": "git push && git push --tags && npm publish",
-    "prettier": "prettier --print-width 120 --write *.js **/*.js **/*.ts tests/*.html example.html",
+    "prettier": "prettier --print-width 120 --write *.js **/*.js **/*.ts **/*.css **/*.scss **/*.html",
     "pub": "npm publish --access public"
   },
   "repository": {

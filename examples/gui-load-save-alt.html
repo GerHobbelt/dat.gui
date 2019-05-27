@@ -1,69 +1,72 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>dat.GUI - remember() after adding controllers</title>
+  <head>
+    <title>dat.GUI - remember() after adding controllers</title>
 
-  <link rel='icon' type='image/png' href='assets/favicon.png'/>
+    <link rel="icon" type="image/png" href="assets/favicon.png" />
 
-  <link href="examples.css" media="screen" rel="stylesheet" type="text/css" />
+    <link href="examples.css" media="screen" rel="stylesheet" type="text/css" />
 
-  <!-- data-main attribute tells require.js to load examples/init.js after require.js loads. -->
-  <script data-main='init' src='assets/require-plus-config.js'></script>
-</head>
-<body>
-  <div class="demo-info">
-    <blockquote>
-      <h1>Warning</h1>
+    <!-- data-main attribute tells require.js to load examples/init.js after require.js loads. -->
+    <script data-main="init" src="assets/require-plus-config.js"></script>
+  </head>
+  <body>
+    <div class="demo-info">
+      <blockquote>
+        <h1>Warning</h1>
+        <p>
+          The documentation hints (through the code examples there) that you should invoke
+          <code>.remember()</code> <em>before</em> you add the related controllers, but the new
+          <def>dat.GUI</def> supports both ways &mdash; any not-yet-remembered objects/controllers will be updated to
+          their saved state by the <code>.remember()</code> call.
+        </p>
+      </blockquote>
+
+      <h1>About this example</h1>
+      <p>This example shows the original <code>remember()</code>-before-adding-controllers way of coding.</p>
       <p>
-        The documentation hints (through the code examples there) that you should invoke
-        <code>.remember()</code> <em>before</em> you add the related controllers, but the new <def>dat.GUI</def> supports
-        both ways &mdash; any not-yet-remembered objects/controllers will be updated to their saved 
-        state by the <code>.remember()</code> call.
+        See <a href="gui-load-save.html"><code>gui-load-save.html</code></a> for example code which has that call order
+        inverted.
       </p>
-    </blockquote>
 
-    <h1>About this example</h1>
-    <p>
-      This example shows the original <code>remember()</code>-before-adding-controllers way of coding.
-    </p>
-    <p>
-      See <a href="gui-load-save.html"><code>gui-load-save.html</code></a> for example code which has
-      that call order inverted.
-    </p>
+      <h2>Notes about the display below</h2>
+      <p>
+        Below the object data members, which are linked to dat.GUI controllers, are displayed; note that display update
+        delays are due to the relatively low display refresh rate.
+      </p>
+    </div>
 
-    <h2>Notes about the display below</h2>
-    <p>
-      Below the object data members, which are linked to dat.GUI controllers, are displayed; note that display update delays are due to the relatively low display refresh rate.
-    </p>
-  </div>
+    <script type="text/javascript">
+      require(["domReady", "dat.GUI", "testbed"], function(domReady, dat, testbed) {
+        "use strict";
 
-  <script type="text/javascript">
-require(['domReady', 'dat.GUI', 'testbed'], function (domReady, dat, testbed) {
-  'use strict';
+        domReady(function() {
+          //This function is called once the DOM is ready.
+          //It will be safe to query the DOM and manipulate
+          //DOM nodes in this function.
+          var obj = {
+            x: 5,
+            y: 5,
+            z: 5
+          };
+          var gui = new dat.gui.GUI();
 
-  domReady(function () {
-    //This function is called once the DOM is ready.
-    //It will be safe to query the DOM and manipulate
-    //DOM nodes in this function.
-    var obj = { 
-      x: 5,
-      y: 5,
-      z: 5,
-    };
-    var gui = new dat.gui.GUI();
+          // WARNING: the documentation hints (through the code examples there) that you should invoke
+          // `.remember()` **before** you add the related controllers.
+          gui.remember(obj);
 
-    // WARNING: the documentation hints (through the code examples there) that you should invoke
-    // `.remember()` **before** you add the related controllers.
-    gui.remember(obj);
+          gui.addAs(obj, "x", "numberBox");
+          gui.addAs(obj, "y", "numberBox", -10, 100, 5);
+          gui
+            .add(obj, "z")
+            .min(-10)
+            .max(100)
+            .step(5);
 
-    gui.addAs(obj, 'x', 'numberBox');
-    gui.addAs(obj, 'y', 'numberBox', -10, 100, 5);
-    gui.add(obj, 'z').min(-10).max(100).step(5);
-
-	// ---------------------------------------------------------------
-    testbed.init(obj, document);
-  });
-});
-  </script>
-</body>
+          // ---------------------------------------------------------------
+          testbed.init(obj, document);
+        });
+      });
+    </script>
+  </body>
 </html>

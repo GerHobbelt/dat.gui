@@ -1,46 +1,48 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>dat.GUI - image controller</title>
+  <head>
+    <title>dat.GUI - image controller</title>
 
-  <link rel='icon' type='image/png' href='assets/favicon.png'/>
+    <link rel="icon" type="image/png" href="assets/favicon.png" />
 
-  <link href="examples.css" media="screen" rel="stylesheet" type="text/css" />
+    <link href="examples.css" media="screen" rel="stylesheet" type="text/css" />
 
-  <!-- data-main attribute tells require.js to load examples/init.js after require.js loads. -->
-  <script data-main='init' src='assets/require-plus-config.js'></script>
-</head>
-<body>
-  <div class="demo-info">
-    <h1>About this example</h1>
-    <p>
-      This example shows the dat.GUI controller for images, i.e. members which contain image URIs (UI: checkbox; API: <code>.add(object, "member")</code>).
-    </p>
+    <!-- data-main attribute tells require.js to load examples/init.js after require.js loads. -->
+    <script data-main="init" src="assets/require-plus-config.js"></script>
+  </head>
+  <body>
+    <div class="demo-info">
+      <h1>About this example</h1>
+      <p>
+        This example shows the dat.GUI controller for images, i.e. members which contain image URIs (UI: checkbox; API:
+        <code>.add(object, "member")</code>).
+      </p>
 
-    <h2>Notes about the display below</h2>
-    <p>
-      Below the object data members, which are linked to dat.GUI controllers, are displayed; note that display update delays are due to the relatively low display refresh rate.
-    </p>
-  </div>
+      <h2>Notes about the display below</h2>
+      <p>
+        Below the object data members, which are linked to dat.GUI controllers, are displayed; note that display update
+        delays are due to the relatively low display refresh rate.
+      </p>
+    </div>
 
-  <script type="text/javascript">
-require(['domReady', 'dat.GUI', 'testbed'], function (domReady, dat, testbed) {
-  'use strict';
+    <script type="text/javascript">
+      require(["domReady", "dat.GUI", "testbed"], function(domReady, dat, testbed) {
+        "use strict";
 
-  domReady(function () {
-    //This function is called once the DOM is ready.
-    //It will be safe to query the DOM and manipulate
-    //DOM nodes in this function.
-    var obj = { 
-		x: 'assets/profile.png'
-	};
-    var gui = new dat.gui.GUI();
-    gui.add(obj, 'x');
+        domReady(function() {
+          //This function is called once the DOM is ready.
+          //It will be safe to query the DOM and manipulate
+          //DOM nodes in this function.
+          var obj = {
+            x: "assets/profile.png"
+          };
+          var gui = new dat.gui.GUI();
+          gui.add(obj, "x");
 
-	// ---------------------------------------------------------------
-    testbed.init(obj, document);
-  });
-});
-  </script>
-</body>
+          // ---------------------------------------------------------------
+          testbed.init(obj, document);
+        });
+      });
+    </script>
+  </body>
 </html>

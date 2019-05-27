@@ -1,73 +1,80 @@
 <!DOCTYPE html>
 <html>
-<head>
-</head>
-<body>
-  <div id="helvetica-demo">
-  </div>
+  <head> </head>
+  <body>
+    <div id="helvetica-demo"></div>
 
-  <script type="text/javascript" src="../build/dat.GUI.js"></script>
-  <script type="text/javascript" src="./gui.js"></script>
-  <script type="text/javascript" src="./improvedNoise.js"></script>
-  <script type="text/javascript" src="./demo.js"></script>
-  <script type="text/javascript">
-    var obj = new FizzyText("message", "Arial");
-    
-    var obj2 = {
-      x: 5,
+    <script type="text/javascript" src="../build/dat.GUI.js"></script>
+    <script type="text/javascript" src="./gui.js"></script>
+    <script type="text/javascript" src="./improvedNoise.js"></script>
+    <script type="text/javascript" src="./demo.js"></script>
+    <script type="text/javascript">
+      var obj = new FizzyText("message", "Arial");
 
-      message: "message",
-      maxSize: 0,
-      growthSpeed: 0,
-      speed: 0,
-      font: "Times",
-      allFonts: ["Times", "Courier", "Verdana"],
-      noiseStrength: 0,
-      displayOutline: true,
-      explode: function (state) {
-      },
-      fgcolor: "#f00",
-      bgcolor: "#000", /* black */
-      regular_number: 5,
-      regular_number2: -155,
-      regular_number3: 0,
-    };
-    for (var key in obj2) {
-      if (obj[key] === undefined) {
-        obj[key] = obj2[key];
+      var obj2 = {
+        x: 5,
+
+        message: "message",
+        maxSize: 0,
+        growthSpeed: 0,
+        speed: 0,
+        font: "Times",
+        allFonts: ["Times", "Courier", "Verdana"],
+        noiseStrength: 0,
+        displayOutline: true,
+        explode: function(state) {},
+        fgcolor: "#f00",
+        bgcolor: "#000" /* black */,
+        regular_number: 5,
+        regular_number2: -155,
+        regular_number3: 0
+      };
+      for (var key in obj2) {
+        if (obj[key] === undefined) {
+          obj[key] = obj2[key];
+        }
       }
-    }
 
-    var gui = new datGUI();
+      var gui = new datGUI();
 
-    gui.add(obj, 'x').name('foo');
+      gui.add(obj, "x").name("foo");
 
-    // Text field
-    gui.add(obj, 'message');
+      // Text field
+      gui.add(obj, "message");
 
-    // Sliders with min + max
-    gui.add(obj, 'maxSize').min(0.5).max(7);
-    gui.add(obj, 'growthSpeed').min(0.01).max(1).step(0.05);
-    gui.add(obj, 'speed', 0.1, 2, 0.05); // shorthand for min/max/step
-    gui.add(obj, 'font', obj.allFonts ); // Font toggle
+      // Sliders with min + max
+      gui
+        .add(obj, "maxSize")
+        .min(0.5)
+        .max(7);
+      gui
+        .add(obj, "growthSpeed")
+        .min(0.01)
+        .max(1)
+        .step(0.05);
+      gui.add(obj, "speed", 0.1, 2, 0.05); // shorthand for min/max/step
+      gui.add(obj, "font", obj.allFonts); // Font toggle
 
-    // Sliders with min, max and increment.
-    gui.add(obj, 'noiseStrength', 10, 100, 5);
+      // Sliders with min, max and increment.
+      gui.add(obj, "noiseStrength", 10, 100, 5);
 
-    // Boolean checkbox
-    gui.add(obj, 'displayOutline');
+      // Boolean checkbox
+      gui.add(obj, "displayOutline");
 
-    // Fires a function called 'explode'
-    gui.add(obj, 'explode').name('Explode!'); // Specify a custom name.
+      // Fires a function called 'explode'
+      gui.add(obj, "explode").name("Explode!"); // Specify a custom name.
 
-    // Colors
-    gui.addAs(obj, 'fgcolor', 'color');
-    gui.addAs(obj, 'bgcolor', gui.findController('color'));
+      // Colors
+      gui.addAs(obj, "fgcolor", "color");
+      gui.addAs(obj, "bgcolor", gui.findController("color"));
 
-    // Numbers without range
-    gui.add(obj, 'regular_number').name('just a number...');
-    gui.add(obj, 'regular_number2').name('a negative number...');
-    gui.add(obj, 'regular_number3').name('exponential growth').mode('exp');
-  </script>
-</body>
+      // Numbers without range
+      gui.add(obj, "regular_number").name("just a number...");
+      gui.add(obj, "regular_number2").name("a negative number...");
+      gui
+        .add(obj, "regular_number3")
+        .name("exponential growth")
+        .mode("exp");
+    </script>
+  </body>
 </html>

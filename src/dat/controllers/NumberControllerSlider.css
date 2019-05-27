@@ -12,29 +12,29 @@
  */
 
 .slider {
-  box-shadow: inset 0 2px 4px rgba(0,0,0,0.15);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15);
   height: 1em;
   border-radius: 1em;
-  background-color: #eee;
+  background-color: #EEEEEE;
   padding: 0 0.5em;
   overflow: hidden;
 }
 
 .slider-fg {
   padding: 1px 0 2px 0;
-  background-color: #aaa;
+  background-color: #AAAAAA;
   height: 1em;
   margin-left: -0.5em;
   padding-right: 0.5em;
   border-radius: 1em 0 0 1em;
 }
 
-.slider-fg:after {
+.slider-fg::after {
   display: inline-block;
   border-radius: 1em;
-  background-color: #fff;
-  border:  1px solid #aaa;
-  content: '';
+  background-color: #FFFFFF;
+  border: 1px solid #AAAAAA;
+  content: "";
   float: right;
   margin-right: -1em;
   margin-top: -1px;

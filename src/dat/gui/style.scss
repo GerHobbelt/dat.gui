@@ -1,20 +1,20 @@
-$background-color: #FAFAFA; // #1a1a1a;
+$background-color: #fafafa; // #1a1a1a;
 
 $hover-darken: 5%;
 $border-darken: 7%;
 $active-darken: 10%;
 
-$number-color: #2FA1D6;
+$number-color: #2fa1d6;
 $boolean-color: #806787;
-$string-color: #1ED36F;
-$function-color: #E61D5F;
-$file-color: #E6D21D;
-$save-row-color: #DAD5CB;
+$string-color: #1ed36f;
+$function-color: #e61d5f;
+$file-color: #e6d21d;
+$save-row-color: #dad5cb;
 $save-row-border-color: #806787;
 $button-color: darken($save-row-color, 10%);
 $border-color: darken($background-color, $border-darken);
 $input-color: darken($background-color, 8.5%);
-$array-color: #1ED36F;
+$array-color: #1ed36f;
 
 @mixin transition($prop, $time, $curve) {
   -webkit-transition: $prop $time $curve;
@@ -37,17 +37,14 @@ $array-color: #1ED36F;
   line-height: 7px;
   padding: 4px 4px 5px 4px;
   background: $button-color;
-  color: #FFFFFF;
+  color: #ffffff;
   text-shadow: 0 1px 0 darken($button-color, 10%);
   box-shadow: 0 -1px 0 darken($button-color, 10%);
   cursor: pointer;
 }
 
 @mixin gears() {
-  background:
-    $button-color
-    url(assets/gears.png)
-    2px 1px no-repeat;
+  background: $button-color url(assets/gears.png) 2px 1px no-repeat;
   height: 7px;
   width: 8px;
 }
@@ -90,8 +87,8 @@ $array-color: #1ED36F;
     &.save-row {
       line-height: 25px;
       background: $save-row-color;
-      border: 0; 
-	  //border-bottom: 1px solid "white";
+      border: 0;
+      //border-bottom: 1px solid "white";
 
       select {
         margin-left: 5px;
@@ -120,10 +117,10 @@ $array-color: #1ED36F;
 
     &.title {
       padding-left: 16px;
-      background: #E8E8E8;
+      background: #e8e8e8;
       //background:
       //  #000000
-	  //  // assets/title-background.png
+      //  // assets/title-background.png
       //  url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlI+hKgFxoCgAOw==)
       //  6px 10px no-repeat;
       cursor: pointer;
@@ -189,7 +186,7 @@ $array-color: #1ED36F;
 
     &.function:hover,
     &.boolean:hover {
-      background: #EEEEEE; // #111;
+      background: #eeeeee; // #111;
     }
   }
 
@@ -221,7 +218,7 @@ $array-color: #1ED36F;
 
       &:focus {
         background: darken($input-color, $active-darken);
-        color: #FFFFFF;
+        color: #ffffff;
       }
     }
 
@@ -265,12 +262,12 @@ $array-color: #1ED36F;
 }
 
 .autocomplete .group {
-  background: #EEEEEE;
+  background: #eeeeee;
 }
 
 .autocomplete > div:hover:not(.group),
 .autocomplete > div.selected {
-  background: #81CA91;
+  background: #81ca91;
   cursor: pointer;
 }
 
@@ -279,23 +276,23 @@ $array-color: #1ED36F;
 .dg {
   &.light-theme.main {
     &.taller-than-window .close-button {
-      border-top: 1px solid #DDDDDD;
+      border-top: 1px solid #dddddd;
     }
 
     .close-button {
-      background-color: #E8E8E8;
+      background-color: #e8e8e8;
     }
 
     .close-button:hover {
-      background-color: #DDDDDD;
+      background-color: #dddddd;
     }
 
     &::-webkit-scrollbar {
-      background: #FAFAFA;
+      background: #fafafa;
     }
 
     &::-webkit-scrollbar-thumb {
-      background: #BBBBBB;
+      background: #bbbbbb;
     }
   }
 
@@ -305,8 +302,8 @@ $array-color: #1ED36F;
     text-shadow: none !important;
 
     li:not(.folder) {
-      background: #FAFAFA;
-      border-bottom: 1px solid #DDDDDD;
+      background: #fafafa;
+      border-bottom: 1px solid #dddddd;
     }
 
     li.save-row .button {
@@ -314,10 +311,7 @@ $array-color: #1ED36F;
     }
 
     li.title {
-      background:
-        #E8E8E8
-        url(assets/light-title.png)
-        6px 10px no-repeat;
+      background: #e8e8e8 url(assets/light-title.png) 6px 10px no-repeat;
     }
 
     .closed li.title {
@@ -326,33 +320,33 @@ $array-color: #1ED36F;
 
     .cr.function:hover,
     .cr.boolean:hover {
-      background: #FFFFFF;
+      background: #ffffff;
     }
 
     .c input[type="text"] {
-      background: #E9E9E9;
+      background: #e9e9e9;
     }
 
     .c input[type="text"]:hover {
-      background: #EEEEEE;
+      background: #eeeeee;
     }
 
     .c input[type="text"]:focus {
-      background: #EEEEEE;
+      background: #eeeeee;
       color: #555555;
     }
 
     .c .slider {
-      background: #E9E9E9;
+      background: #e9e9e9;
     }
 
     .c .slider:hover {
-      background: #EEEEEE;
+      background: #eeeeee;
     }
 
     li.save-row .button,
     li.save-row .button.gears {
-      background-color: #BBBBBB;
+      background-color: #bbbbbb;
 
       /* box-shadow: none; */
     }
@@ -364,9 +358,7 @@ $array-color: #1ED36F;
 }
 
 .remove-icon {
-  background:
-    url(assets/light-remove.png)
-    no-repeat;
+  background: url(assets/light-remove.png) no-repeat;
   width: 8px;
   height: 8px;
   display: inline-block;

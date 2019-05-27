@@ -188,9 +188,14 @@ const GUI = function(pars) {
 
   // Not part of params because I don't want people passing this in via
   // constructor. Should be a 'remembered' value.
-  let useLocalStorage = SUPPORTS_LOCAL_STORAGE && localStorage.getItem(getLocalStorageHash(this, "isLocal")) === "true";
+  let useLocalStorage = SUPPORTS_LOCAL_STORAGE && window.localStorage.getItem(getLocalStorageHash(this, "isLocal")) === "true";
 
-  let saveToLocalStorage;
+  this.saveToLocalStorageIfPossible = function() {
+    if (SUPPORTS_LOCAL_STORAGE && window.localStorage.getItem(getLocalStorageHash(_this, "isLocal")) === "true") {
+      window.localStorage.setItem(getLocalStorageHash(_this, "gui"), JSON.stringify(_this.getSaveObject()));
+    }
+  };
+
   let titleRow;
 
   Object.defineProperties(
@@ -391,11 +396,11 @@ const GUI = function(pars) {
           if (SUPPORTS_LOCAL_STORAGE) {
             useLocalStorage = bool;
             if (bool) {
-              dom.bind(window, "unload", saveToLocalStorage);
+              dom.bind(window, "unload", _this.saveToLocalStorageIfPossible);
             } else {
-              dom.unbind(window, "unload", saveToLocalStorage);
+              dom.unbind(window, "unload", _this.saveToLocalStorageIfPossible);
             }
-            localStorage.setItem(getLocalStorageHash(_this, "isLocal"), bool);
+            window.localStorage.setItem(getLocalStorageHash(_this, "isLocal"), bool);
           }
         }
       }
@@ -418,7 +423,7 @@ const GUI = function(pars) {
       if (useLocalStorage) {
         _this.useLocalStorage = true;
 
-        const savedGui = localStorage.getItem(getLocalStorageHash(this, "gui"));
+        const savedGui = window.localStorage.getItem(getLocalStorageHash(this, "gui"));
 
         if (savedGui) {
           params.load = JSON.parse(savedGui);
@@ -452,7 +457,7 @@ const GUI = function(pars) {
     const titleRowName = document.createTextNode(params.name);
     dom.addClass(titleRowName, "controller-name");
 
-    const titleRow = addRow(_this, titleRowName);
+    titleRow = addRow(_this, titleRowName);
 
     if (common.isString(params.title)) {
       titleRow.setAttribute("title", params.title);
@@ -511,15 +516,6 @@ const GUI = function(pars) {
     addResizeHandle(this);
   }
 
-  saveToLocalStorage = function() {
-    if (SUPPORTS_LOCAL_STORAGE && localStorage.getItem(getLocalStorageHash(_this, "isLocal")) === "true") {
-      localStorage.setItem(getLocalStorageHash(_this, "gui"), JSON.stringify(_this.getSaveObject()));
-    }
-  };
-
-  // expose this method publicly
-  this.saveToLocalStorageIfPossible = saveToLocalStorage;
-
   function resetWidth() {
     const root = _this.getRoot();
     root.width += 1;
@@ -567,9 +563,9 @@ GUI.TEXT_OPEN = "Open View Controls";
 
 GUI._keydownHandler = function(e) {
   if (
-    document.activeElement &&
-    document.activeElement.type !== "text" &&
-    (e.which === HIDE_KEY_CODE || e.keyCode === HIDE_KEY_CODE)
+    document.activeElement
+    && document.activeElement.type !== "text"
+    && (e.which === HIDE_KEY_CODE || e.keyCode === HIDE_KEY_CODE)
   ) {
     GUI.toggleHide();
   }
@@ -736,7 +732,6 @@ common.extend(
       });
     },
 
-
     /**
      * @param object
      * @param property
@@ -749,7 +744,6 @@ common.extend(
         factoryArgs: Array.prototype.slice.call(arguments, 3)
       });
     },
-
 
     /**
      * @param object
@@ -794,8 +788,8 @@ common.extend(
     destroy: function() {
       if (this.parent) {
         throw new Error(
-          "Only the root GUI should be removed with .destroy(). " +
-            "For subfolders, use gui.removeFolder(folder) instead."
+          "Only the root GUI should be removed with .destroy(). "
+            + "For subfolders, use gui.removeFolder(folder) instead."
         );
       }
 
@@ -905,6 +899,9 @@ common.extend(
       });
     },
 
+    /**
+     * Opens the GUI.
+     */
     open: function() {
       this.closed = false;
     },
@@ -1107,22 +1104,18 @@ common.extend(
     },
 
     deleteSave: function() {
-      if (this.preset === DEFAULT_DEFAULT_PRESET_NAME) {
-        alert("Default preset can't be deleted.");
-        return;
-      }
       // Not allowed to remove Default preset
-      if (!confirm(`Delete preset "${this.preset}". Are you sure?`)) {
+      if (this.preset === DEFAULT_DEFAULT_PRESET_NAME) {
         return;
       }
-      
-      // TODO: clean this up: deletePresetOption *or* removeCurrentPresetOption 
+
+
       const opt = this.__preset_select[this.__preset_select.selectedIndex];
-      deletePresetOption(this, opt);
+  // delete preset option
+  this.__preset_select.removeChild(opt);
+  this.__preset_select.selectedIndex = 0;
       delete this.load.remembered[this.preset];
-      this.preset = removeCurrentPresetOption(this);
-      // --------------- end TODO ---------------------------
-      
+      this.preset = DEFAULT_DEFAULT_PRESET_NAME;
       this.saveToLocalStorageIfPossible();
     },
 
@@ -1493,7 +1486,7 @@ function add(gui, object, property, label, params) {
       : document.createElement("span");
   if (label !== null) {
     name.innerHTML = label;
-  } else     if (!params.custom) {
+  } else if (!params.custom) {
     name.innerHTML = controller.property;
   }
 
@@ -1528,7 +1521,7 @@ function add(gui, object, property, label, params) {
 
 function getLocalStorageHash(gui, key) {
   // This deals with multiple GUI's IFF every GUI has its own namespace:
-  const namespace = localStorage.getItem("dat.gui.namespace") || document.location.href;
+  const namespace = window.localStorage.getItem("dat.gui.namespace") || document.location.href;
   return "dat.gui." + namespace + "." + key;
 }
 
@@ -1540,18 +1533,6 @@ function addPresetOption(gui, name, setSelected) {
   if (setSelected) {
     gui.__preset_select.selectedIndex = gui.__preset_select.length - 1;
   }
-}
-
-// TODO: cleanup: removeCurrentPresetOption *or* deletePresetOption:
-
-function removeCurrentPresetOption(gui) {
-  gui.__preset_select.removeChild(gui.__preset_select.options[gui.__preset_select.selectedIndex]);
-  return gui.__preset_select.options[gui.__preset_select.selectedIndex].value;
-}
-
-function deletePresetOption(gui, name) {
-  gui.__preset_select.removeChild(name);
-  gui.__preset_select.selectedIndex = 0;
 }
 
 function showHideExplain(gui, explain) {
@@ -1624,7 +1605,7 @@ function addSaveMenu(gui) {
 
     saveLocally.style.display = "block";
 
-    if (localStorage.getItem(getLocalStorageHash(gui, "isLocal")) === "true") {
+    if (window.localStorage.getItem(getLocalStorageHash(gui, "isLocal")) === "true") {
       localStorageCheckBox.setAttribute("checked", "checked");
     }
 
@@ -1668,10 +1649,15 @@ function addSaveMenu(gui) {
   });
 
   dom.bind(button4, "click", function() {
-    // TODO: clean up: confirm either here *or* in deleteSave() itself:
-    if (confirm("Are you sure you want to delete this preset?")) {
-    gui.deleteSave();
-    }
+      if (gui.preset === DEFAULT_DEFAULT_PRESET_NAME) {
+        alert("Default preset can't be deleted.");
+        return;
+      }
+      if (!confirm(`Are you sure you want to delete preset "${gui.preset}"?`)) {
+        return;
+      }
+
+      gui.deleteSave();
   });
 
   // div.appendChild(button2);

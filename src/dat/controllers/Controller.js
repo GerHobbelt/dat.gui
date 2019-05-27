@@ -175,7 +175,7 @@ class Controller {
     this._readonly = ro;
     return this;
   }
-  
+
   borderColor(color) {
     this.__li.style.borderLeftColor = color;
     return this;

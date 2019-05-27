@@ -56,11 +56,11 @@ const ControllerFactory = function(object, property) {
   }
 
   if (
-    (common.isArray(initialValue) && initialValue.length >= 3 && initialValue.length <= 4) ||
-    (common.isObject(initialValue) && initialValue.h && initialValue.s && initialValue.v) ||
-    (common.isString(initialValue) &&
-      initialValue[0] === "#" &&
-      (initialValue.length === 4 || initialValue.length === 7))
+    (common.isArray(initialValue) && initialValue.length >= 3 && initialValue.length <= 4)
+    || (common.isObject(initialValue) && initialValue.h && initialValue.s && initialValue.v)
+    || (common.isString(initialValue)
+      && initialValue[0] === "#"
+      && (initialValue.length === 4 || initialValue.length === 7))
   ) {
     return new ColorController(object, property);
   }

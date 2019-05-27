@@ -55,7 +55,7 @@ export const controllers = {
   PlotterController: PlotterController,
   CustomController: CustomController,
   ImageController: ImageController,
-  ArrayController: ArrayController,
+  ArrayController: ArrayController
 };
 
 export const dom = { dom: domImport };

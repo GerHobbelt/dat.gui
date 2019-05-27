@@ -88,20 +88,6 @@ class NumberControllerBox extends NumberController {
     dom.bind(this.__input, "wheel", onWheel);
     dom.bind(this.__input, "keydown", onKeyDown, false, true);
 
-    // TODO: clean up: mouewheel event or wheel event: ^^^^^^^^^^^ & vvvvvvvvvvvvv
-    const mousewheelevt = /Firefox/i.test(navigator.userAgent) ? "DOMMouseScroll" : "mousewheel";
-    dom.bind(this.__input, mousewheelevt, onMouseWheel);
-
-    function onMouseWheel(e) {
-      let value = _this.getValue();
-      const delta = (e.deltaY || -e.wheelDelta || e.detail) >> 10 || 1;
-      e.preventDefault();
-
-      if (delta < 0) value += _this.__impliedStep;
-      else value -= _this.__impliedStep;
-      _this.setValue(value);
-    }
-
     function onChange() {
       let { value } = _this.__input;
       if (params && _this.__suffix) {

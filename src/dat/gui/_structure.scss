@@ -76,7 +76,7 @@ $button-height: 20px;
       /* TODO, these are style notes */
       cursor: pointer;
       text-align: center;
-      background-color: #CCCCCC; // #000
+      background-color: #cccccc; // #000
 
       &.close-top {
         position: relative;
@@ -87,7 +87,7 @@ $button-height: 20px;
       }
 
       &:hover {
-        background-color: #DDDDDD; // #111
+        background-color: #dddddd; // #111
       }
 
       &.display-none {
@@ -201,11 +201,11 @@ $button-height: 20px;
 
   /** Shorter number boxes when slider is present. */
   .has-slider {
-   input[type=text],
+    input[type="text"],
     input[type="number"] {
       width: 30%;
 
-    // display: none;
+      // display: none;
       margin-left: 0;
     }
   }

@@ -68,7 +68,7 @@ class ImageController extends Controller {
     dom.addClass(this.__plusIcon, "new-image-icon");
     dom.addClass(this.__plus, "new-image-button");
 
-    defaultOptions.forEach(option => {
+    defaultOptions.forEach((option) => {
       this.addSwatch(option.src, option.videoSrc);
     });
 
@@ -129,7 +129,7 @@ class ImageController extends Controller {
     function onCameraClick() {
       navigator.mediaDevices
         .getUserMedia({ video: true })
-        .then(localMediaStream => {
+        .then((localMediaStream) => {
           this.killStream();
           this.videoStream = localMediaStream;
           this.setValue({
@@ -138,7 +138,7 @@ class ImageController extends Controller {
             domElement: this.__video
           });
         })
-        .catch(err => {
+        .catch((err) => {
           this.killStream();
         });
     }
@@ -252,7 +252,7 @@ class ImageController extends Controller {
       if (this.__glGif.get_canvas()) {
         this.__glGif.get_canvas().style.display = "block";
       }
-      this.__glGif.load(err => {
+      this.__glGif.load((err) => {
         if (!err) {
           this.__glGif.play().catch(e => console.log(e));
           if (this.__gifNeedsInitializing) {
@@ -293,7 +293,7 @@ class ImageController extends Controller {
     this.__isAnimated = true;
     this.__video.loop = true;
     this.__video.volume = 0;
-    this.__video.play().catch(e => {
+    this.__video.play().catch((e) => {
       console.log(e, e.message, e.name);
     });
     this.__img.src = "data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=";

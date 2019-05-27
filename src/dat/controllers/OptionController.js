@@ -19,7 +19,7 @@ import common from "../utils/common";
  * @class Provides a select input to alter the property of an object, using a
  * list of accepted values.
  *
- * @extends dat.controllers.Controller
+ * @extends Controller
  *
  * @param {Object} object The object to be manipulated
  * @param {string} property The name of the property to be manipulated

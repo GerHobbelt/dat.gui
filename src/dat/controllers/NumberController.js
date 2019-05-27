@@ -26,7 +26,7 @@ function numDecimals(x) {
 /**
  * @class Represents a given property of an object that is a number.
  *
- * @extends dat.controllers.Controller
+ * @extends Controller
  *
  * @param {Object} object The object to be manipulated
  * @param {string} property The name of the property to be manipulated

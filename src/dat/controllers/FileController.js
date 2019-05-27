@@ -17,7 +17,7 @@ import dom from "../dom/dom";
 /**
  * @class Provides a file input.
  *
- * @extends dat.controllers.Controller
+ * @extends Controller
  *
  * @param {Object} object The object to be manipulated
  * @param {string} property The name of the property to be manipulated

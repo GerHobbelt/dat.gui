@@ -17,7 +17,7 @@ import Plotter from "../utils/plotter";
 /**
  * @class Provides a canvas that graphically displays the value of the object property at the specified interval
  *
- * @extends dat.controllers.Controller
+ * @extends Controller
  *
  * @param {Object} object The object to be manipulated
  * @param {string} property The name of the property to be manipulated

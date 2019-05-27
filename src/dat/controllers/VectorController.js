@@ -32,6 +32,9 @@ function vec2pos(vec, min, max) {
 
 /**
  * @class Represents a given property of an object that is a 2D vector.
+ *
+ * @extends Controller
+ *
  * @param {Object} object
  * @param {string} property
  */

@@ -16,6 +16,14 @@ import Controller from "./Controller";
 import dom from "../dom/dom";
 import "../utils/getUserMedia";
 
+/**
+ * @class Represents a given property of an object that is an image.
+ *
+ * @extends Controller
+ *
+ * @param {Object} object
+ * @param {string} property
+ */
 class ImageController extends Controller {
   constructor(object, property, opts) {
     super(object, property);

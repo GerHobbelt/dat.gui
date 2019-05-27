@@ -17,7 +17,7 @@ import dom from "../dom/dom";
 /**
  * @class Provides a GUI interface to fire a specified method, a property of an object.
  *
- * @extends dat.controllers.Controller
+ * @extends Controller
  *
  * @param {Object} object The object to be manipulated
  * @param {string} property The name of the property to be manipulated

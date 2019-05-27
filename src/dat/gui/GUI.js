@@ -96,7 +96,7 @@ const hideableGuis = [];
  * @param {String} [params.name] The name of this GUI.
  * @param {Object} [params.load] JSON object representing the saved state of this GUI.
  * @param {Object} [params.object] Providing your object will create a controller for each property automatically
- * @param {dat.gui.GUI} [params.parent] The GUI I'm nested in.
+ * @param {GUI} [params.parent] The GUI I'm nested in.
  * @param {Boolean} [params.autoPlace=true]
  * @param {Boolean} [params.hideable=true] If true, GUI is shown/hidden by <kbd>h</kbd> keypress.
  * @param {Boolean} [params.closed=false] If true, starts closed
@@ -237,7 +237,7 @@ const GUI = function(pars) {
 
       /**
        * The parent <code>GUI</code>
-       * @type dat.gui.GUI
+       * @type GUI
        */
       parent: {
         get: function() {
@@ -816,7 +816,7 @@ common.extend(
      * Creates a new subfolder GUI instance.
      * @param name
      * @param [title]
-     * @returns {dat.gui.GUI} The new folder.
+     * @returns {GUI} The new folder.
      * @throws {Error} if this GUI already has a folder by the specified
      * name
      * @instance
@@ -861,7 +861,7 @@ common.extend(
 
     /**
      * Removes a subfolder GUI instance.
-     * @param {dat.gui.GUI} folder The folder to remove.
+     * @param {GUI} folder The folder to remove.
      * @instance
      */
     removeFolder: function(name) {
@@ -1008,7 +1008,7 @@ common.extend(
     },
 
     /**
-     * @returns {dat.gui.GUI} the topmost parent GUI of a nested GUI.
+     * @returns {GUI} the topmost parent GUI of a nested GUI.
      * @instance
      */
     getRoot: function() {

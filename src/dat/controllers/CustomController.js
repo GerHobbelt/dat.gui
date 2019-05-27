@@ -15,6 +15,9 @@ import Controller from "./Controller";
 
 /**
  * @class Represents a custom controller.
+ *
+ * @extends Controller
+ *
  * @param {Object} object
  * @param {string} property
  */

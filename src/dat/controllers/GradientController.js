@@ -15,6 +15,14 @@ import Controller from "./Controller";
 import dom from "../dom/dom";
 import common from "../utils/common";
 
+/**
+ * @class Represents a given property of an object that is a color gradient.
+ *
+ * @extends Controller
+ *
+ * @param {Object} object
+ * @param {string} property
+ */
 class GradientController extends Controller {
   constructor(object, property, params) {
     super(object, property);

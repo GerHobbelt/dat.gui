@@ -14,6 +14,19 @@
 import NumberController from "./NumberController";
 import dom from "../dom/dom";
 
+/**
+ * @class TBD
+ *
+ * @extends Controller
+ * @extends NumberController
+ *
+ * @param {Object} object The object to be manipulated
+ * @param {string} property The name of the property to be manipulated
+ * @param {Object} [params] Optional parameters
+ * @param {Number} [params.min] Minimum allowed value
+ * @param {Number} [params.max] Maximum allowed value
+ * @param {Number} [params.step] Increment by which to change value
+ */
 class NumberControllerAnimator extends NumberController {
   constructor(object, property, params) {
     super(object, property, params);

@@ -25,8 +25,8 @@ function map(v, i1, i2, o1, o2) {
  * <code>&lt;div&gt;</code> tags, <strong>not</strong> the html5
  * <code>&lt;slider&gt;</code> element.
  *
- * @extends dat.controllers.Controller
- * @extends dat.controllers.NumberController
+ * @extends Controller
+ * @extends NumberController
  *
  * @param {Object} object The object to be manipulated
  * @param {string} property The name of the property to be manipulated

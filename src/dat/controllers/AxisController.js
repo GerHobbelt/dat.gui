@@ -19,7 +19,7 @@ import dom from "../dom/dom";
  * contains a minimum and maximum, and provides a 2D axis slider elment
  * with which to manipulate it.
  *
- * @extends dat.controllers.Controller
+ * @extends Controller
  *
  * @param {Object} object The object to be manipulated
  * @param {string} property The name of the projerty to be manipulated

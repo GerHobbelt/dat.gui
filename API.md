@@ -15,7 +15,7 @@ manipulate variables and fire functions on the fly.</p>
 <dt><a href="#Controller">Controller</a></dt>
 <dd><p>An &quot;abstract&quot; class that represents a given property of an object.</p>
 </dd>
-<dt><a href="#NumberController">NumberController</a> ⇐ <code>dat.controllers.Controller</code></dt>
+<dt><a href="#NumberController">NumberController</a> ⇐ <code><a href="#Controller">Controller</a></code></dt>
 <dd><p>Represents a given property of an object that is a number.</p>
 </dd>
 </dl>
@@ -66,7 +66,7 @@ manipulate variables and fire functions on the fly.
     * [.domElement](#GUI+domElement) : <code>DOMElement</code>
     * [.lightTheme](#GUI+lightTheme) : <code>Boolean</code>
     * [.showCloseButton](#GUI+showCloseButton) : <code>Boolean</code>
-    * [.parent](#GUI+parent) : <code>dat.gui.GUI</code>
+    * [.parent](#GUI+parent) : [<code>GUI</code>](#GUI)
     * [.autoPlace](#GUI+autoPlace) : <code>Boolean</code>
     * [.closeOnTop](#GUI+closeOnTop) : <code>Boolean</code>
     * [.preset](#GUI+preset) : <code>String</code>
@@ -85,14 +85,14 @@ manipulate variables and fire functions on the fly.
     * [.addImage(object, property)](#GUI+addImage) ⇒ <code>dat.controllers.ImageController</code>
     * [.remove(controller)](#GUI+remove)
     * [.destroy()](#GUI+destroy)
-    * [.addFolder(name, [title])](#GUI+addFolder) ⇒ <code>dat.gui.GUI</code>
+    * [.addFolder(name, [title])](#GUI+addFolder) ⇒ [<code>GUI</code>](#GUI)
     * [.removeFolder(folder)](#GUI+removeFolder)
     * [.open()](#GUI+open)
     * [.close()](#GUI+close)
     * [.hide()](#GUI+hide)
     * [.show()](#GUI+show)
     * [.remember(...objects)](#GUI+remember)
-    * [.getRoot()](#GUI+getRoot) ⇒ <code>dat.gui.GUI</code>
+    * [.getRoot()](#GUI+getRoot) ⇒ [<code>GUI</code>](#GUI)
     * [.getSaveObject()](#GUI+getSaveObject) ⇒ <code>Object</code>
 
 <a name="new_GUI_new"></a>
@@ -105,7 +105,7 @@ manipulate variables and fire functions on the fly.
 | [params.name] | <code>String</code> |  | The name of this GUI. |
 | [params.load] | <code>Object</code> |  | JSON object representing the saved state of this GUI. |
 | [params.object] | <code>Object</code> |  | Providing your object will create a controller for each property automatically |
-| [params.parent] | <code>dat.gui.GUI</code> |  | The GUI I'm nested in. |
+| [params.parent] | [<code>GUI</code>](#GUI) |  | The GUI I'm nested in. |
 | [params.autoPlace] | <code>Boolean</code> | <code>true</code> |  |
 | [params.hideable] | <code>Boolean</code> | <code>true</code> | If true, GUI is shown/hidden by <kbd>h</kbd> keypress. |
 | [params.closed] | <code>Boolean</code> | <code>false</code> | If true, starts closed |
@@ -142,7 +142,7 @@ Toggles open/close button
 **Kind**: instance property of [<code>GUI</code>](#GUI)  
 <a name="GUI+parent"></a>
 
-### gui.parent : <code>dat.gui.GUI</code>
+### gui.parent : [<code>GUI</code>](#GUI)
 The parent <code>GUI</code>
 
 **Kind**: instance property of [<code>GUI</code>](#GUI)  
@@ -364,11 +364,11 @@ For subfolders, use `gui.removeFolder(folder)` instead.
 **Kind**: instance method of [<code>GUI</code>](#GUI)  
 <a name="GUI+addFolder"></a>
 
-### gui.addFolder(name, [title]) ⇒ <code>dat.gui.GUI</code>
+### gui.addFolder(name, [title]) ⇒ [<code>GUI</code>](#GUI)
 Creates a new subfolder GUI instance.
 
 **Kind**: instance method of [<code>GUI</code>](#GUI)  
-**Returns**: <code>dat.gui.GUI</code> - The new folder.  
+**Returns**: [<code>GUI</code>](#GUI) - The new folder.  
 **Throws**:
 
 - <code>Error</code> if this GUI already has a folder by the specified
@@ -389,7 +389,7 @@ Removes a subfolder GUI instance.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| folder | <code>dat.gui.GUI</code> | The folder to remove. |
+| folder | [<code>GUI</code>](#GUI) | The folder to remove. |
 
 <a name="GUI+open"></a>
 
@@ -434,9 +434,9 @@ of the list.
 
 <a name="GUI+getRoot"></a>
 
-### gui.getRoot() ⇒ <code>dat.gui.GUI</code>
+### gui.getRoot() ⇒ [<code>GUI</code>](#GUI)
 **Kind**: instance method of [<code>GUI</code>](#GUI)  
-**Returns**: <code>dat.gui.GUI</code> - the topmost parent GUI of a nested GUI.  
+**Returns**: [<code>GUI</code>](#GUI) - the topmost parent GUI of a nested GUI.  
 <a name="GUI+getSaveObject"></a>
 
 ### gui.getSaveObject() ⇒ <code>Object</code>
@@ -632,17 +632,35 @@ Set readonly mode
 
 <a name="NumberController"></a>
 
-## NumberController ⇐ <code>dat.controllers.Controller</code>
+## NumberController ⇐ [<code>Controller</code>](#Controller)
 Represents a given property of an object that is a number.
 
 **Kind**: global class  
-**Extends**: <code>dat.controllers.Controller</code>  
+**Extends**: [<code>Controller</code>](#Controller)  
 
-* [NumberController](#NumberController) ⇐ <code>dat.controllers.Controller</code>
+* [NumberController](#NumberController) ⇐ [<code>Controller</code>](#Controller)
     * [new NumberController(object, property, [params])](#new_NumberController_new)
+    * [.domElement](#Controller+domElement) : <code>DOMElement</code>
+    * [.object](#Controller+object) : <code>Object</code>
+    * [.property](#Controller+property) : <code>String</code>
+    * [._readonly](#Controller+_readonly) : <code>Object</code>
+    * [.forceUpdateDisplay](#Controller+forceUpdateDisplay) : <code>boolean</code>
     * [.min(minValue)](#NumberController+min) ⇒ <code>dat.controllers.NumberController</code>
     * [.max(maxValue)](#NumberController+max) ⇒ <code>dat.controllers.NumberController</code>
     * [.step(stepValue)](#NumberController+step) ⇒ <code>dat.controllers.NumberController</code>
+    * [.options(options)](#Controller+options) ⇒ [<code>Controller</code>](#Controller)
+    * [.name(name)](#Controller+name) ⇒ [<code>Controller</code>](#Controller)
+    * [.listen(forceUpdateDisplay)](#Controller+listen) ⇒ [<code>Controller</code>](#Controller)
+    * [.remove()](#Controller+remove) ⇒ [<code>Controller</code>](#Controller)
+    * [.hide()](#Controller+hide)
+    * [.show()](#Controller+show)
+    * [.onChange(fnc)](#Controller+onChange) ⇒ [<code>Controller</code>](#Controller)
+    * [.onFinishChange(fnc)](#Controller+onFinishChange) ⇒ [<code>Controller</code>](#Controller)
+    * [.setValue(newValue)](#Controller+setValue)
+    * [.getValue()](#Controller+getValue) ⇒ <code>Object</code>
+    * [.updateDisplay()](#Controller+updateDisplay) ⇒ [<code>Controller</code>](#Controller)
+    * [.isModified()](#Controller+isModified) ⇒ <code>Boolean</code>
+    * [.readonly(ro)](#Controller+readonly) ⇒ <code>dat.controllers.StringController</code>
 
 <a name="new_NumberController_new"></a>
 
@@ -657,6 +675,41 @@ Represents a given property of an object that is a number.
 | [params.max] | <code>Number</code> | Maximum allowed value |
 | [params.step] | <code>Number</code> | Increment by which to change value |
 
+<a name="Controller+domElement"></a>
+
+### numberController.domElement : <code>DOMElement</code>
+Those who extend this class will put their DOM elements in here.
+
+**Kind**: instance property of [<code>NumberController</code>](#NumberController)  
+**Overrides**: [<code>domElement</code>](#Controller+domElement)  
+<a name="Controller+object"></a>
+
+### numberController.object : <code>Object</code>
+The object to manipulate
+
+**Kind**: instance property of [<code>NumberController</code>](#NumberController)  
+**Overrides**: [<code>object</code>](#Controller+object)  
+<a name="Controller+property"></a>
+
+### numberController.property : <code>String</code>
+The name of the property to manipulate
+
+**Kind**: instance property of [<code>NumberController</code>](#NumberController)  
+**Overrides**: [<code>property</code>](#Controller+property)  
+<a name="Controller+_readonly"></a>
+
+### numberController.\_readonly : <code>Object</code>
+Readonly field
+
+**Kind**: instance property of [<code>NumberController</code>](#NumberController)  
+**Overrides**: [<code>\_readonly</code>](#Controller+_readonly)  
+<a name="Controller+forceUpdateDisplay"></a>
+
+### numberController.forceUpdateDisplay : <code>boolean</code>
+Whether to force update a display, even when input is active.
+
+**Kind**: instance property of [<code>NumberController</code>](#NumberController)  
+**Overrides**: [<code>forceUpdateDisplay</code>](#Controller+forceUpdateDisplay)  
 <a name="NumberController+min"></a>
 
 ### numberController.min(minValue) ⇒ <code>dat.controllers.NumberController</code>
@@ -695,6 +748,139 @@ difference otherwise stepValue is 1</code>
 | Param | Type | Description |
 | --- | --- | --- |
 | stepValue | <code>Number</code> | The step value for dat.controllers.NumberController |
+
+<a name="Controller+options"></a>
+
+### numberController.options(options) ⇒ [<code>Controller</code>](#Controller)
+**Kind**: instance method of [<code>NumberController</code>](#NumberController)  
+**Overrides**: [<code>options</code>](#Controller+options)  
+
+| Param | Type |
+| --- | --- |
+| options | <code>Array</code> \| <code>Object</code> | 
+
+<a name="Controller+name"></a>
+
+### numberController.name(name) ⇒ [<code>Controller</code>](#Controller)
+Sets the name of the controller.
+
+**Kind**: instance method of [<code>NumberController</code>](#NumberController)  
+**Overrides**: [<code>name</code>](#Controller+name)  
+
+| Param | Type |
+| --- | --- |
+| name | <code>string</code> | 
+
+<a name="Controller+listen"></a>
+
+### numberController.listen(forceUpdateDisplay) ⇒ [<code>Controller</code>](#Controller)
+Sets controller to listen for changes on its underlying object.
+
+**Kind**: instance method of [<code>NumberController</code>](#NumberController)  
+**Overrides**: [<code>listen</code>](#Controller+listen)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| forceUpdateDisplay | <code>boolean</code> | Whether to force update a display, even when input is active (default: false). |
+
+<a name="Controller+remove"></a>
+
+### numberController.remove() ⇒ [<code>Controller</code>](#Controller)
+Removes the controller from its parent GUI.
+
+**Kind**: instance method of [<code>NumberController</code>](#NumberController)  
+**Overrides**: [<code>remove</code>](#Controller+remove)  
+<a name="Controller+hide"></a>
+
+### numberController.hide()
+Hides the controller on it's parent GUI.
+
+**Kind**: instance method of [<code>NumberController</code>](#NumberController)  
+**Overrides**: [<code>hide</code>](#Controller+hide)  
+<a name="Controller+show"></a>
+
+### numberController.show()
+Shows the controller on it's parent GUI.
+
+**Kind**: instance method of [<code>NumberController</code>](#NumberController)  
+**Overrides**: [<code>show</code>](#Controller+show)  
+<a name="Controller+onChange"></a>
+
+### numberController.onChange(fnc) ⇒ [<code>Controller</code>](#Controller)
+Specify that a function fire every time someone changes the value with
+this Controller.
+
+**Kind**: instance method of [<code>NumberController</code>](#NumberController)  
+**Overrides**: [<code>onChange</code>](#Controller+onChange)  
+**Returns**: [<code>Controller</code>](#Controller) - this  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| fnc | <code>function</code> | This function will be called whenever the value is modified via this Controller. |
+
+<a name="Controller+onFinishChange"></a>
+
+### numberController.onFinishChange(fnc) ⇒ [<code>Controller</code>](#Controller)
+Specify that a function fire every time someone "finishes" changing
+the value wih this Controller. Useful for values that change
+incrementally like numbers or strings.
+
+**Kind**: instance method of [<code>NumberController</code>](#NumberController)  
+**Overrides**: [<code>onFinishChange</code>](#Controller+onFinishChange)  
+**Returns**: [<code>Controller</code>](#Controller) - this  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| fnc | <code>function</code> | This function will be called whenever someone "finishes" changing the value via this Controller. |
+
+<a name="Controller+setValue"></a>
+
+### numberController.setValue(newValue)
+Change the value of <code>object[property]</code>
+
+**Kind**: instance method of [<code>NumberController</code>](#NumberController)  
+**Overrides**: [<code>setValue</code>](#Controller+setValue)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| newValue | <code>Object</code> | The new value of <code>object[property]</code> |
+
+<a name="Controller+getValue"></a>
+
+### numberController.getValue() ⇒ <code>Object</code>
+Gets the value of <code>object[property]</code>
+
+**Kind**: instance method of [<code>NumberController</code>](#NumberController)  
+**Overrides**: [<code>getValue</code>](#Controller+getValue)  
+**Returns**: <code>Object</code> - The current value of <code>object[property]</code>  
+<a name="Controller+updateDisplay"></a>
+
+### numberController.updateDisplay() ⇒ [<code>Controller</code>](#Controller)
+Refreshes the visual display of a Controller in order to keep sync
+with the object's current value.
+
+**Kind**: instance method of [<code>NumberController</code>](#NumberController)  
+**Overrides**: [<code>updateDisplay</code>](#Controller+updateDisplay)  
+**Returns**: [<code>Controller</code>](#Controller) - this  
+<a name="Controller+isModified"></a>
+
+### numberController.isModified() ⇒ <code>Boolean</code>
+**Kind**: instance method of [<code>NumberController</code>](#NumberController)  
+**Overrides**: [<code>isModified</code>](#Controller+isModified)  
+**Returns**: <code>Boolean</code> - true if the value has deviated from initialValue  
+<a name="Controller+readonly"></a>
+
+### numberController.readonly(ro) ⇒ <code>dat.controllers.StringController</code>
+Set readonly mode
+
+**Kind**: instance method of [<code>NumberController</code>](#NumberController)  
+**Default**: <code>false</code>  
+**Overrides**: [<code>readonly</code>](#Controller+readonly)  
+**Returns**: <code>dat.controllers.StringController</code> - this  
+
+| Param | Type |
+| --- | --- |
+| ro | <code>Number</code> | 
 
 <a name="autoPlaceVirgin"></a>
 

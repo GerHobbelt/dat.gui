@@ -133,5 +133,9 @@
       "color-hex-case": "upper",
       "color-hex-length": "long"
     }
+  },
+  "dependencies": {
+    "nan": "^2.14.0",
+    "wsgif": "^1.0.0"
   }
 }

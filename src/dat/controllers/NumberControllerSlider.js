@@ -48,9 +48,23 @@ class NumberControllerSlider extends NumberController {
     dom.bind(this.__background, "mousedown", onMouseDown);
     dom.bind(this.__background, "touchstart", onTouchStart, false, true);
     dom.bind(this.__background, "wheel", onWheel);
+    // TODO: clean up: wheel *or* mousewheel event ^^^^ & vvvvvvvvvv
+    const mousewheelevt = /Firefox/i.test(navigator.userAgent) ? "DOMMouseScroll" : "mousewheel";
+    dom.bind(this.__background, mousewheelevt, onMouseWheel);
 
     dom.addClass(this.__background, "slider");
     dom.addClass(this.__foreground, "slider-fg");
+
+    function onMouseWheel(e) {
+      let value = _this.getValue();
+      const delta = (e.deltaY || -e.wheelDelta || e.detail) >> 10 || 1;
+      e.preventDefault();
+      document.activeElement.blur();
+
+      if (delta < 0) value += _this.__impliedStep;
+      else value -= _this.__impliedStep;
+      _this.setValue(value);
+    }
 
     function onMouseDown(e) {
       document.activeElement.blur();
@@ -61,9 +75,46 @@ class NumberControllerSlider extends NumberController {
       onMouseDrag(e);
     }
 
-    function onMouseDrag(e) {
-      e.preventDefault();
+    function onTouchStart(e) {
+      if (e.touches.length !== 1) {
+        return;
+      }
 
+      document.activeElement.blur();
+
+      dom.bind(window, "touchmove", onTouchMove);
+      dom.bind(window, "touchend", onTouchEnd);
+
+      _this.__activeTouch = e.targetTouches[0];
+
+      onTouchMove(e);
+    }
+
+    function onMouseDrag(e) {
+      // e.preventDefault();
+
+      onDrag(e.clientX);
+    }
+
+    //function onTouchMove(e) {
+    //  const { clientX } = e.touches[0];
+    //  const bgRect = _this.__background.getBoundingClientRect();
+    //
+    //  _this.setValue(map(clientX, bgRect.left, bgRect.right, _this.__min, _this.__max));
+    //}
+    function onTouchMove(e) {
+      // e.preventDefault();
+
+      const changed = e.changedTouches;
+
+      for (let i = 0; i < changed.length; i++) {
+        if (changed[i].identifier === _this.__activeTouch.identifier) {
+          onDrag(changed[i].clientX);
+        }
+      }
+    }
+
+    function onDrag(clientX) {
       const bgRect = _this.__background.getBoundingClientRect();
 
       if (!_this._readonly) {
@@ -102,6 +153,9 @@ class NumberControllerSlider extends NumberController {
     function onTouchEnd() {
       dom.unbind(window, "touchmove", onTouchMove);
       dom.unbind(window, "touchend", onTouchEnd);
+
+      _this.__activeTouch = null;
+
       if (_this.__onFinishChange) {
         _this.__onFinishChange.call(_this, _this.getValue());
       }

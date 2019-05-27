@@ -118,12 +118,12 @@ class Controller {
    *
    * @param {Object} newValue The new value of <code>object[property]</code>
    */
-  setValue(newValue) {
+  setValue(newValue, disableOnChange = false) {
     const __newValue = this.__transformOutput(newValue);
-
+    const oldValue = this.object[this.property];
     this.object[this.property] = __newValue;
-    if (this.__onChange) {
-      this.__onChange.call(this, __newValue);
+    if (this.__onChange && !disableOnChange) {
+      this.__onChange.call(this, __newValue, oldValue);
     }
 
     this.updateDisplay();
@@ -173,6 +173,16 @@ class Controller {
    */
   readonly(ro) {
     this._readonly = ro;
+    return this;
+  }
+  
+  borderColor(color) {
+    this.__li.style.borderLeftColor = color;
+    return this;
+  }
+
+  borderWidth(px) {
+    this.__li.style.borderLeftWidth = px + "px";
     return this;
   }
 }

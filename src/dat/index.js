@@ -23,10 +23,13 @@ import NumberController from "./controllers/NumberController";
 import NumberControllerBox from "./controllers/NumberControllerBox";
 import NumberControllerSlider from "./controllers/NumberControllerSlider";
 import FunctionController from "./controllers/FunctionController";
+import TabbedController from "./controllers/TabbedController";
 import ColorController from "./controllers/ColorController";
 import FileController from "./controllers/FileController";
 import PlotterController from "./controllers/PlotterController";
 import CustomController from "./controllers/CustomController";
+import ImageController from "./controllers/ImageController";
+import ArrayController from "./controllers/ArrayController";
 
 import domImport from "./dom/dom";
 import GUIImport from "./gui/GUI";
@@ -46,10 +49,13 @@ export const controllers = {
   NumberControllerBox: NumberControllerBox,
   NumberControllerSlider: NumberControllerSlider,
   FunctionController: FunctionController,
+  TabbedController: TabbedController,
   ColorController: ColorController,
   FileController: FileController,
   PlotterController: PlotterController,
-  CustomController: CustomController
+  CustomController: CustomController,
+  ImageController: ImageController,
+  ArrayController: ArrayController,
 };
 
 export const dom = { dom: domImport };

@@ -72,11 +72,11 @@ class OptionController extends Controller {
     this.domElement.appendChild(this.__select);
   }
 
-  setValue(v) {
+  setValue(v, disableOnChange = false) {
     if (this._readonly) return this.getValue();
-    const toReturn = super.setValue(v);
+    const toReturn = super.setValue(v, disableOnChange);
 
-    if (this.__onFinishChange) {
+    if (this.__onFinishChange && !disableOnChange) {
       this.__onFinishChange.call(this, this.getValue());
     }
     return toReturn;

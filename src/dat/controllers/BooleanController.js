@@ -46,9 +46,9 @@ class BooleanController extends Controller {
     this.updateDisplay();
   }
 
-  setValue(v) {
-    const toReturn = super.setValue(v);
-    if (this.__onFinishChange) {
+  setValue(v, disableOnChange = false) {
+    const toReturn = super.setValue(v, disableOnChange);
+    if (this.__onFinishChange && !disableOnChange) {
       this.__onFinishChange.call(this, this.getValue());
     }
     this.__prev = this.getValue();

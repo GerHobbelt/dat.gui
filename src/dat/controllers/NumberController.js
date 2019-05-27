@@ -20,7 +20,7 @@ function numDecimals(x) {
     return _x.length - _x.indexOf(".") - 1;
   }
 
-  return 0;
+  return 2;
 }
 
 /**
@@ -59,7 +59,7 @@ class NumberController extends Controller {
     this.__precision = numDecimals(this.__impliedStep);
   }
 
-  setValue(v) {
+  setValue(v, disableOnChange = false) {
     let _v = v;
 
     if (this.__min !== undefined && _v < this.__min) {
@@ -72,7 +72,7 @@ class NumberController extends Controller {
       _v = Math.round(_v / this.__step) * this.__step;
     }
 
-    return super.setValue(_v);
+    return super.setValue(_v, disableOnChange);
   }
 
   /**

@@ -33,11 +33,17 @@ function roundToDecimal(value, decimals) {
  * @param {Number} [params.min] Minimum allowed value
  * @param {Number} [params.max] Maximum allowed value
  * @param {Number} [params.step] Increment by which to change value
+ * @param {string} [params.suffix] Suffix for the value
+ *
+ * @member dat.controllers
  */
 class NumberControllerBox extends NumberController {
   constructor(object, property, params) {
     super(object, property, params);
 
+    const _params = params || {};
+
+    this.__suffix = _params.suffix ? _params.suffix : "";
     this.__truncationSuspended = false;
 
     const _this = this;
@@ -82,8 +88,26 @@ class NumberControllerBox extends NumberController {
     dom.bind(this.__input, "wheel", onWheel);
     dom.bind(this.__input, "keydown", onKeyDown, false, true);
 
+    // TODO: clean up: mouewheel event or wheel event: ^^^^^^^^^^^ & vvvvvvvvvvvvv
+    const mousewheelevt = /Firefox/i.test(navigator.userAgent) ? "DOMMouseScroll" : "mousewheel";
+    dom.bind(this.__input, mousewheelevt, onMouseWheel);
+
+    function onMouseWheel(e) {
+      let value = _this.getValue();
+      const delta = (e.deltaY || -e.wheelDelta || e.detail) >> 10 || 1;
+      e.preventDefault();
+
+      if (delta < 0) value += _this.__impliedStep;
+      else value -= _this.__impliedStep;
+      _this.setValue(value);
+    }
+
     function onChange() {
-      const attempted = parseFloat(_this.__input.value);
+      let { value } = _this.__input;
+      if (params && _this.__suffix) {
+        value = value.replace(_this.__suffix, "");
+      }
+      const attempted = parseFloat(value);
       if (!common.isNaN(attempted) && !_this._readonly) {
         _this.setValue(attempted);
       }
@@ -158,12 +182,14 @@ class NumberControllerBox extends NumberController {
   }
 
   updateDisplay() {
+    // if (dom.isActive(this.__input)) return this; // prevent number from updating if user is trying to manually update
     if (this.__input === document.activeElement) {
       return;
     }
+
     this.__input.value = this.__truncationSuspended
       ? this.getValue()
-      : roundToDecimal(this.getValue(), this.__precision);
+      : roundToDecimal(this.getValue(), this.__precision) + this.__suffix;
     return super.updateDisplay();
   }
 }

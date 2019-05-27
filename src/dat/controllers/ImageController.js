@@ -23,6 +23,8 @@ import "../utils/getUserMedia";
  *
  * @param {Object} object
  * @param {string} property
+ *
+ * @member dat.controllers
  */
 class ImageController extends Controller {
   constructor(object, property, opts) {

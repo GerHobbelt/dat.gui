@@ -34,12 +34,22 @@ import ArrayController from "./controllers/ArrayController";
 import domImport from "./dom/dom";
 import GUIImport from "./gui/GUI";
 
+/** @module dat */
+
+/**
+ * [color description]
+ * @type {Object}
+ */
 export const color = {
   Color: Color,
   math: math,
   interpret: interpret
 };
 
+/**
+ * [controllers description]
+ * @type {Object}
+ */
 export const controllers = {
   Controller: Controller,
   BooleanController: BooleanController,
@@ -58,16 +68,32 @@ export const controllers = {
   ArrayController: ArrayController
 };
 
+/**
+ * [dom description]
+ * @type {Object}
+ */
 export const dom = { dom: domImport };
 
+/**
+ * [gui description]
+ * @type {Object}
+ */
 export const gui = { GUI: GUIImport };
 
+/**
+ * [GUI description]
+ * @type {[type]}
+ */
 export const GUI = GUIImport;
 
-export default {
+/**
+ * TBD
+ */
+const datGUI = {
   color,
   controllers,
   dom,
   gui,
   GUI
 };
+export default datGUI;

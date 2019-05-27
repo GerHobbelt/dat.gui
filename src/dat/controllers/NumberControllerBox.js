@@ -24,8 +24,8 @@ function roundToDecimal(value, decimals) {
  * @class Represents a given property of an object that is a number and
  * provides an input element with which to manipulate it.
  *
- * @extends dat.controllers.Controller
- * @extends dat.controllers.NumberController
+ * @extends Controller
+ * @extends NumberController
  *
  * @param {Object} object The object to be manipulated
  * @param {string} property The name of the property to be manipulated

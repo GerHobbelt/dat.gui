@@ -20,6 +20,8 @@ import Controller from "./Controller";
  *
  * @param {Object} object
  * @param {string} property
+ *
+ * @member dat.controllers
  */
 class CustomController extends Controller {
   constructor(object, property) {

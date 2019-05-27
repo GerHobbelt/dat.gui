@@ -21,6 +21,8 @@ import dom from "../dom/dom";
  *
  * @param {Object} object The object to be manipulated
  * @param {string} property The name of the property to be manipulated
+ *
+ * @member dat.controllers
  */
 class TabbedController extends Controller {
   constructor(object, property, text, tabs, displayName) {

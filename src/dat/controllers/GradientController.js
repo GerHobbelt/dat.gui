@@ -22,6 +22,8 @@ import common from "../utils/common";
  *
  * @param {Object} object
  * @param {string} property
+ *
+ * @member dat.controllers
  */
 class GradientController extends Controller {
   constructor(object, property, params) {

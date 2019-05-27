@@ -22,6 +22,8 @@ import Plotter from "../utils/plotter";
  * @param {Object} object The object to be manipulated
  * @param {string} property The name of the property to be manipulated
  * @param {Object} params Contains the max and period properties
+ *
+ * @member dat.controllers
  */
 class PlotterController extends Controller {
   constructor(object, property, params) {

@@ -26,6 +26,8 @@ import dom from "../dom/dom";
  * @param {Number} [params.min] Minimum allowed value
  * @param {Number} [params.max] Maximum allowed value
  * @param {Number} [params.step] Increment by which to change value
+ *
+ * @member dat.controllers
  */
 class NumberControllerAnimator extends NumberController {
   constructor(object, property, params) {

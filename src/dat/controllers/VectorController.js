@@ -37,6 +37,8 @@ function vec2pos(vec, min, max) {
  *
  * @param {Object} object
  * @param {string} property
+ *
+ * @member dat.controllers
  */
 class VectorController extends Controller {
   constructor(object, property, min = [0, 0], max = [1, 1]) {

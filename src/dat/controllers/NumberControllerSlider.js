@@ -147,8 +147,6 @@ class NumberControllerSlider extends NumberController {
       }
     }
 
-
-
     this.updateDisplay();
 
     this.__background.appendChild(this.__foreground);

@@ -633,7 +633,6 @@ common.extend(
       });
     },
 
-
     /**
      * @param object
      * @param property
@@ -681,7 +680,6 @@ common.extend(
             "For subfolders, use gui.removeFolder(folder) instead."
         );
       }
-
 
       if (this.autoPlace) {
         autoPlaceContainer.removeChild(this.domElement);
@@ -768,9 +766,9 @@ common.extend(
       // Do we have saved appearance data for this folder?
       if (
         // Anything loaded?
-        this.load && 
+        this.load &&
         // Was my parent a dead-end?
-        this.load.folders && 
+        this.load.folders &&
         this.load.folders[folder.name]
       ) {
         delete this.load.folders[folder.name];
@@ -1077,8 +1075,8 @@ function augmentController(gui, li, controller) {
           controller.remove();
 
           return add(gui, controller.object, controller.property, controller.label, {
-          before: nextSibling,
-          factoryArgs: [common.toArray(arguments)]
+            before: nextSibling,
+            factoryArgs: [common.toArray(arguments)]
           });
         }
 
@@ -1087,9 +1085,9 @@ function augmentController(gui, li, controller) {
           controller.remove();
 
           return add(gui, controller.object, controller.property, controller.label, {
-          before: nextSibling,
-          factoryArgs: [options]
-        });
+            before: nextSibling,
+            factoryArgs: [options]
+          });
         }
       },
 
@@ -1100,15 +1098,15 @@ function augmentController(gui, li, controller) {
        */
       name: function(name) {
         controller.__li.firstElementChild.firstElementChild.innerHTML = name;
-      return controller;
-    },
+        return controller;
+      },
 
-    title: function(v) {
-      if (common.isString(v)) {
-        controller.__li.setAttribute("title", v);
-      } else {
-        controller.__li.removeAttribute("title");
-      }
+      title: function(v) {
+        if (common.isString(v)) {
+          controller.__li.setAttribute("title", v);
+        } else {
+          controller.__li.removeAttribute("title");
+        }
         return controller;
       },
 

@@ -48,7 +48,7 @@ export const controllers = {
   FunctionController: FunctionController,
   TabbedController: TabbedController,
   ColorController: ColorController,
-  ImageController: ImageController
+  ImageController: ImageController,
   ArrayController: ArrayController
 };
 

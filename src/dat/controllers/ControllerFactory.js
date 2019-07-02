@@ -52,7 +52,7 @@ const ControllerFactory = function(object, property) {
     return new StringController(object, property);
   }
 
-  if (common.isFunction(initialValue)) {
+  if (common.isFunction(initialValue) || common.isAsyncFunction(initialValue)) {
     return new FunctionController(object, property, '');
   }
 

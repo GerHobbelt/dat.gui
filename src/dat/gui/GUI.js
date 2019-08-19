@@ -1341,7 +1341,7 @@ function addResizeHandle(gui) {
   }
 
   function dragStop() {
-    dom.removeClass(gui.__closeButton, GUI.CLASS_DRAG);
+    // dom.removeClass(gui.__closeButton, GUI.CLASS_DRAG);
     dom.unbind(window, 'mousemove', drag);
     dom.unbind(window, 'mouseup', dragStop);
   }
@@ -1351,7 +1351,7 @@ function addResizeHandle(gui) {
 
     pmouseX = e.clientX;
 
-    dom.addClass(gui.__closeButton, GUI.CLASS_DRAG);
+    // dom.addClass(gui.__closeButton, GUI.CLASS_DRAG);
     dom.bind(window, 'mousemove', drag);
     dom.bind(window, 'mouseup', dragStop);
 
@@ -1359,7 +1359,7 @@ function addResizeHandle(gui) {
   }
 
   dom.bind(gui.__resize_handle, 'mousedown', dragStart);
-  dom.bind(gui.__closeButton, 'mousedown', dragStart);
+  // dom.bind(gui.__closeButton, 'mousedown', dragStart);
 
   gui.domElement.insertBefore(gui.__resize_handle, gui.domElement.firstElementChild);
 }

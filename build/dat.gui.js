@@ -2454,20 +2454,17 @@ function addResizeHandle(gui) {
     return false;
   }
   function dragStop() {
-    dom.removeClass(gui.__closeButton, GUI.CLASS_DRAG);
     dom.unbind(window, 'mousemove', drag);
     dom.unbind(window, 'mouseup', dragStop);
   }
   function dragStart(e) {
     e.preventDefault();
     pmouseX = e.clientX;
-    dom.addClass(gui.__closeButton, GUI.CLASS_DRAG);
     dom.bind(window, 'mousemove', drag);
     dom.bind(window, 'mouseup', dragStop);
     return false;
   }
   dom.bind(gui.__resize_handle, 'mousedown', dragStart);
-  dom.bind(gui.__closeButton, 'mousedown', dragStart);
   gui.domElement.insertBefore(gui.__resize_handle, gui.domElement.firstElementChild);
 }
 function setWidth(gui, w) {

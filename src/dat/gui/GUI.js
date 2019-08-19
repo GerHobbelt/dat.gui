@@ -268,6 +268,9 @@ const GUI = function(pars) {
         set: function(v) {
           // TODO Check for collisions among sibling folders
           params.name = v;
+          if (_this.__closeButton) {
+            _this.__closeButton.innerHTML = params.name;
+          }
           if (titleRow) {
             titleRow.innerHTML = params.name;
           }
@@ -295,7 +298,12 @@ const GUI = function(pars) {
           this.onResize();
 
           if (_this.__closeButton) {
-            _this.__closeButton.innerHTML = v ? GUI.TEXT_OPEN : GUI.TEXT_CLOSED;
+            // _this.__closeButton.innerHTML = v ? GUI.TEXT_OPEN : GUI.TEXT_CLOSED;
+            if (params.name) {
+              _this.__closeButton.innerHTML = params.name;
+            } else {
+              _this.__closeButton.innerHTML = v ? GUI.TEXT_OPEN : GUI.TEXT_CLOSED;
+            }
           }
         }
       },
@@ -355,7 +363,12 @@ const GUI = function(pars) {
     }
 
     this.__closeButton = document.createElement('div');
-    this.__closeButton.innerHTML = GUI.TEXT_CLOSED;
+    if (params.name) {
+      this.__closeButton.innerHTML = params.name;
+    } else {
+      this.__closeButton.innerHTML = GUI.TEXT_CLOSED;
+    }
+
     dom.addClass(this.__closeButton, GUI.CLASS_CLOSE_BUTTON);
     if (params.closeOnTop) {
       dom.addClass(this.__closeButton, GUI.CLASS_CLOSE_TOP);

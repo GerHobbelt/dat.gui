@@ -180,7 +180,7 @@ var Common = {
     return obj === false || obj === true;
   },
   isFunction: function isFunction(obj) {
-    return Object.prototype.toString.call(obj) === '[object Function]';
+    return obj instanceof Function;
   }
 };
 
@@ -678,8 +678,9 @@ Object.defineProperty(Color.prototype, 'a', {
 });
 Object.defineProperty(Color.prototype, 'hex', {
   get: function get$$1() {
-    if (!this.__state.space !== 'HEX') {
+    if (this.__state.space !== 'HEX') {
       this.__state.hex = ColorMath.rgb_to_hex(this.r, this.g, this.b);
+      this.__state.space = 'HEX';
     }
     return this.__state.hex;
   },
@@ -1774,6 +1775,9 @@ var GUI = function GUI(pars) {
       },
       set: function set$$1(v) {
         params.name = v;
+        if (_this.__closeButton) {
+          _this.__closeButton.innerHTML = params.name;
+        }
         if (titleRow) {
           titleRow.innerHTML = params.name;
         }
@@ -1792,7 +1796,11 @@ var GUI = function GUI(pars) {
         }
         this.onResize();
         if (_this.__closeButton) {
-          _this.__closeButton.innerHTML = v ? GUI.TEXT_OPEN : GUI.TEXT_CLOSED;
+          if (params.name) {
+            _this.__closeButton.innerHTML = params.name;
+          } else {
+            _this.__closeButton.innerHTML = v ? GUI.TEXT_OPEN : GUI.TEXT_CLOSED;
+          }
         }
       }
     },
@@ -1832,7 +1840,11 @@ var GUI = function GUI(pars) {
       }
     }
     this.__closeButton = document.createElement('div');
-    this.__closeButton.innerHTML = GUI.TEXT_CLOSED;
+    if (params.name) {
+      this.__closeButton.innerHTML = params.name;
+    } else {
+      this.__closeButton.innerHTML = GUI.TEXT_CLOSED;
+    }
     dom.addClass(this.__closeButton, GUI.CLASS_CLOSE_BUTTON);
     if (params.closeOnTop) {
       dom.addClass(this.__closeButton, GUI.CLASS_CLOSE_TOP);

@@ -180,7 +180,7 @@ var Common = {
     return obj === false || obj === true;
   },
   isFunction: function isFunction(obj) {
-    return Object.prototype.toString.call(obj) === '[object Function]';
+    return obj instanceof Function;
   }
 };
 
@@ -678,8 +678,9 @@ Object.defineProperty(Color.prototype, 'a', {
 });
 Object.defineProperty(Color.prototype, 'hex', {
   get: function get$$1() {
-    if (!this.__state.space !== 'HEX') {
+    if (this.__state.space !== 'HEX') {
       this.__state.hex = ColorMath.rgb_to_hex(this.r, this.g, this.b);
+      this.__state.space = 'HEX';
     }
     return this.__state.hex;
   },
@@ -718,7 +719,7 @@ var Controller = function () {
       if (this.__onChange) {
         this.__onChange.call(this, newValue);
       }
-      this.updateDisplay();
+      this.updateDisplay(true);
       return this;
     }
   }, {
@@ -728,7 +729,7 @@ var Controller = function () {
     }
   }, {
     key: 'updateDisplay',
-    value: function updateDisplay() {
+    value: function updateDisplay(force) {
       return this;
     }
   }, {
@@ -993,10 +994,10 @@ var OptionController = function (_Controller) {
     }
   }, {
     key: 'updateDisplay',
-    value: function updateDisplay() {
-      if (dom.isActive(this.__select)) return this;
+    value: function updateDisplay(force) {
+      if (!force && dom.isActive(this.__select)) return this;
       this.__select.value = this.getValue();
-      return get(OptionController.prototype.__proto__ || Object.getPrototypeOf(OptionController.prototype), 'updateDisplay', this).call(this);
+      return get(OptionController.prototype.__proto__ || Object.getPrototypeOf(OptionController.prototype), 'updateDisplay', this).call(this, force);
     }
   }]);
   return OptionController;
@@ -1155,11 +1156,22 @@ var NumberControllerBox = function (_NumberController) {
     dom.bind(_this2.__input, 'blur', onBlur);
     dom.bind(_this2.__input, 'mousedown', onMouseDown);
     dom.bind(_this2.__input, 'keydown', function (e) {
-      if (e.keyCode === 13) {
-        _this.__truncationSuspended = true;
-        this.blur();
-        _this.__truncationSuspended = false;
-        onFinish();
+      var step = _this.__step || 1;
+      switch (e.keyCode) {
+        case 13:
+          _this.__truncationSuspended = true;
+          this.blur();
+          _this.__truncationSuspended = false;
+          onFinish();
+          break;
+        case 38:
+          var newVal = _this.getValue() + step;
+          _this.setValue(newVal);
+          break;
+        case 40:
+          var newVal = _this.getValue() - step;
+          _this.setValue(newVal);
+          break;
       }
     });
     _this2.updateDisplay();
@@ -1168,7 +1180,8 @@ var NumberControllerBox = function (_NumberController) {
   }
   createClass(NumberControllerBox, [{
     key: 'updateDisplay',
-    value: function updateDisplay() {
+    value: function updateDisplay(force) {
+      if (!force && dom.isActive(this.__input)) return this;
       this.__input.value = this.__truncationSuspended ? this.getValue() : roundToDecimal(this.getValue(), this.__precision);
       return get(NumberControllerBox.prototype.__proto__ || Object.getPrototypeOf(NumberControllerBox.prototype), 'updateDisplay', this).call(this);
     }

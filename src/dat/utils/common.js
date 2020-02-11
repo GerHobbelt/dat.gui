@@ -149,7 +149,7 @@ const Common = {
   },
 
   isFunction: function(obj) {
-    return Object.prototype.toString.call(obj) === '[object Function]';
+    return obj instanceof Function;
   },
 
   supportsPassive: function() {
@@ -167,7 +167,6 @@ const Common = {
     }
     return supportsPassive;
   }
-
 };
 
 export default Common;

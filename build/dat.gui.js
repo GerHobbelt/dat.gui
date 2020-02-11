@@ -185,7 +185,7 @@ var Common = {
     return obj === false || obj === true;
   },
   isFunction: function isFunction(obj) {
-    return Object.prototype.toString.call(obj) === '[object Function]';
+    return obj instanceof Function;
   },
   supportsPassive: function supportsPassive() {
     var supportsPassive = false;
@@ -697,8 +697,9 @@ Object.defineProperty(Color.prototype, 'a', {
 });
 Object.defineProperty(Color.prototype, 'hex', {
   get: function get$$1() {
-    if (!this.__state.space !== 'HEX') {
+    if (this.__state.space !== 'HEX') {
       this.__state.hex = ColorMath.rgb_to_hex(this.r, this.g, this.b);
+      this.__state.space = 'HEX';
     }
     return this.__state.hex;
   },
@@ -1595,59 +1596,6 @@ function hueGradient(elem) {
   elem.style.cssText += 'background: linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);';
 }
 
-var css = {
-  load: function load(url, indoc) {
-    var doc = indoc || document;
-    var link = doc.createElement('link');
-    link.type = 'text/css';
-    link.rel = 'stylesheet';
-    link.href = url;
-    doc.getElementsByTagName('head')[0].appendChild(link);
-  },
-  inject: function inject(cssContent, indoc) {
-    var doc = indoc || document;
-    var injected = document.createElement('style');
-    injected.type = 'text/css';
-    injected.innerHTML = cssContent;
-    var head = doc.getElementsByTagName('head')[0];
-    try {
-      head.appendChild(injected);
-    } catch (e) {
-    }
-  }
-};
-
-var saveDialogContents = "<div id=\"dg-save\" class=\"dg dialogue\">\n\n  Here's the new load parameter for your <code>GUI</code>'s constructor:\n\n  <textarea id=\"dg-new-constructor\"></textarea>\n\n  <div id=\"dg-save-locally\">\n\n    <input id=\"dg-local-storage\" type=\"checkbox\"/> Automatically save\n    values to <code>localStorage</code> on exit.\n\n    <div id=\"dg-local-explain\">The values saved to <code>localStorage</code> will\n      override those passed to <code>dat.GUI</code>'s constructor. This makes it\n      easier to work incrementally, but <code>localStorage</code> is fragile,\n      and your friends may not see the same values you do.\n\n    </div>\n\n  </div>\n\n</div>";
-
-var ControllerFactory = function ControllerFactory(object, property) {
-  var initialValue = object[property];
-  if (Common.isArray(arguments[2]) || Common.isObject(arguments[2])) {
-    return new OptionController(object, property, arguments[2]);
-  }
-  if (Common.isNumber(initialValue)) {
-    if (Common.isNumber(arguments[2]) && Common.isNumber(arguments[3])) {
-      if (Common.isNumber(arguments[4])) {
-        return new NumberControllerSlider(object, property, arguments[2], arguments[3], arguments[4]);
-      }
-      return new NumberControllerSlider(object, property, arguments[2], arguments[3]);
-    }
-    if (Common.isNumber(arguments[4])) {
-      return new NumberControllerBox(object, property, { min: arguments[2], max: arguments[3], step: arguments[4] });
-    }
-    return new NumberControllerBox(object, property, { min: arguments[2], max: arguments[3] });
-  }
-  if (Common.isString(initialValue)) {
-    return new StringController(object, property);
-  }
-  if (Common.isFunction(initialValue)) {
-    return new FunctionController(object, property, '');
-  }
-  if (Common.isBoolean(initialValue)) {
-    return new BooleanController(object, property);
-  }
-  return null;
-};
-
 var plotter = function plotter(fg, bg, type) {
   var round = Math.round;
   var PR = round(window.devicePixelRatio || 1);
@@ -1716,6 +1664,62 @@ var PlotterController = function (_Controller) {
   }]);
   return PlotterController;
 }(Controller);
+
+var css = {
+  load: function load(url, indoc) {
+    var doc = indoc || document;
+    var link = doc.createElement('link');
+    link.type = 'text/css';
+    link.rel = 'stylesheet';
+    link.href = url;
+    doc.getElementsByTagName('head')[0].appendChild(link);
+  },
+  inject: function inject(cssContent, indoc) {
+    var doc = indoc || document;
+    var injected = document.createElement('style');
+    injected.type = 'text/css';
+    injected.innerHTML = cssContent;
+    var head = doc.getElementsByTagName('head')[0];
+    try {
+      head.appendChild(injected);
+    } catch (e) {
+    }
+  }
+};
+
+var saveDialogContents = "<div id=\"dg-save\" class=\"dg dialogue\">\n\n  Here's the new load parameter for your <code>GUI</code>'s constructor:\n\n  <textarea id=\"dg-new-constructor\"></textarea>\n\n  <div id=\"dg-save-locally\">\n\n    <input id=\"dg-local-storage\" type=\"checkbox\"/> Automatically save\n    values to <code>localStorage</code> on exit.\n\n    <div id=\"dg-local-explain\">The values saved to <code>localStorage</code> will\n      override those passed to <code>dat.GUI</code>'s constructor. This makes it\n      easier to work incrementally, but <code>localStorage</code> is fragile,\n      and your friends may not see the same values you do.\n\n    </div>\n\n  </div>\n\n</div>";
+
+var ControllerFactory = function ControllerFactory(object, property) {
+  var initialValue = object[property];
+  if (Common.isArray(arguments[2]) || Common.isObject(arguments[2])) {
+    return new OptionController(object, property, arguments[2]);
+  }
+  if (Common.isNumber(initialValue)) {
+    if (Common.isNumber(arguments[2]) && Common.isNumber(arguments[3])) {
+      if (Common.isNumber(arguments[4])) {
+        return new NumberControllerSlider(object, property, arguments[2], arguments[3], arguments[4]);
+      }
+      return new NumberControllerSlider(object, property, arguments[2], arguments[3]);
+    }
+    if (Common.isNumber(arguments[4])) {
+      return new NumberControllerBox(object, property, { min: arguments[2], max: arguments[3], step: arguments[4] });
+    }
+    return new NumberControllerBox(object, property, { min: arguments[2], max: arguments[3] });
+  }
+  if (Common.isArray(initialValue) && initialValue.length >= 3 && initialValue.length <= 4 || Common.isObject(initialValue) && initialValue.h && initialValue.s && initialValue.v || Common.isString(initialValue) && initialValue[0] === '#' && (initialValue.length === 4 || initialValue.length === 7)) {
+    return new ColorController(object, property);
+  }
+  if (Common.isString(initialValue)) {
+    return new StringController(object, property);
+  }
+  if (Common.isFunction(initialValue)) {
+    return new FunctionController(object, property, '');
+  }
+  if (Common.isBoolean(initialValue)) {
+    return new BooleanController(object, property);
+  }
+  return null;
+};
 
 function requestAnimationFrame(callback) {
   setTimeout(callback, 1000 / 60);
@@ -2039,6 +2043,11 @@ var GUI = function GUI(pars) {
   }
   if (!params.parent) {
     resetWidth();
+  }
+  if (Common.isObject(params.object)) {
+    Common.each(params.object, function (property, propertyName) {
+      _this.add(params.object, propertyName);
+    });
   }
 };
 GUI.toggleHide = function () {
@@ -2676,7 +2685,8 @@ var controllers = {
   NumberControllerBox: NumberControllerBox,
   NumberControllerSlider: NumberControllerSlider,
   FunctionController: FunctionController,
-  ColorController: ColorController
+  ColorController: ColorController,
+  PlotterController: PlotterController
 };
 var dom$1 = { dom: dom };
 var gui = { GUI: GUI };

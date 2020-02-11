@@ -1186,7 +1186,6 @@ function add(gui, object, property, params) {
   }
 
   let controller;
-  let value = object[property];
 
   if (params.color) {
     controller = new ColorController(object, property);

@@ -11,9 +11,9 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import Controller from './Controller';
-import dom from '../dom/dom';
-import common from '../utils/common';
+import Controller from "./Controller";
+import dom from "../dom/dom";
+import common from "../utils/common";
 
 /**
  * @class Provides a select input to alter the property of an object, using a
@@ -38,27 +38,27 @@ class OptionController extends Controller {
      * The drop down menu
      * @ignore
      */
-    this.__select = document.createElement('select');
+    this.__select = document.createElement("select");
 
     if (common.isArray(options)) {
       const map = {};
-      common.each(options, function(element) {
+      common.each(options, function (element) {
         map[element] = element;
       });
       options = map;
     }
 
-    common.each(options, function(value, key) {
-      const opt = document.createElement('option');
+    common.each(options, function (value, key) {
+      const opt = document.createElement("option");
       opt.innerHTML = key;
-      opt.setAttribute('value', value);
+      opt.setAttribute("value", value);
       _this.__select.appendChild(opt);
     });
 
     // Acknowledge original value
     this.updateDisplay();
 
-    dom.bind(this.__select, 'change', function() {
+    dom.bind(this.__select, "change", function () {
       const desiredValue = this.options[this.selectedIndex].value;
       _this.setValue(desiredValue);
     });
@@ -75,8 +75,8 @@ class OptionController extends Controller {
     return toReturn;
   }
 
-  updateDisplay() {
-    if (dom.isActive(this.__select)) return this; // prevent number from updating if user is trying to manually update
+  updateDisplay(force) {
+    if (!force && dom.isActive(this.__select)) return this; // prevent number from updating if user is trying to manually update
     this.__select.value = this.getValue();
     return super.updateDisplay();
   }

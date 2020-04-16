@@ -25,7 +25,7 @@ class Controller {
      * Those who extend this class will put their DOM elements in here.
      * @type {DOMElement}
      */
-    this.domElement = document.createElement('div');
+    this.domElement = document.createElement("div");
 
     /**
      * The object to manipulate
@@ -92,7 +92,7 @@ class Controller {
       this.__onChange.call(this, newValue);
     }
 
-    this.updateDisplay();
+    this.updateDisplay(true);
     return this;
   }
 
@@ -110,7 +110,7 @@ class Controller {
    * with the object's current value.
    * @returns {Controller} this
    */
-  updateDisplay() {
+  updateDisplay(force) {
     return this;
   }
 

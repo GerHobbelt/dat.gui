@@ -1,7 +1,3 @@
-Tseting......
-
-
-
 # dat.GUI
 A lightweight graphical user interface for changing variables in JavaScript. 
 

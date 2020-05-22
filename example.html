@@ -84,6 +84,15 @@
       obj.plotter = Math.sin(angle) + 1.5;
     }, 10);
 
+    let functionObj = {
+      f: function() { console.log('f run'); },
+      a: async function a () { console.log('async a run'); }
+    };
+
+    var f6 = gui.add(functionObj, 'f', 'f-button-text');
+    var a1 = gui.add(functionObj, 'a', 'async-button-text');
+    var a2 = gui.add(functionObj, 'a');
+
     </script>
   </body>
 </html>

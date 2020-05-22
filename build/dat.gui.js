@@ -1,6 +1,6 @@
 /**
  * dat-gui JavaScript Controller Library
- * http://code.google.com/p/dat-gui
+ * https://github.com/dataarts/dat.gui
  *
  * Copyright 2011 Data Arts Team, Google Creative Lab
  *
@@ -700,46 +700,46 @@ var Controller = function () {
   function Controller(object, property) {
     classCallCheck(this, Controller);
     this.initialValue = object[property];
-    this.domElement = document.createElement('div');
+    this.domElement = document.createElement("div");
     this.object = object;
     this.property = property;
     this.__onChange = undefined;
     this.__onFinishChange = undefined;
   }
   createClass(Controller, [{
-    key: 'onChange',
+    key: "onChange",
     value: function onChange(fnc) {
       this.__onChange = fnc;
       return this;
     }
   }, {
-    key: 'onFinishChange',
+    key: "onFinishChange",
     value: function onFinishChange(fnc) {
       this.__onFinishChange = fnc;
       return this;
     }
   }, {
-    key: 'setValue',
+    key: "setValue",
     value: function setValue(newValue) {
       this.object[this.property] = newValue;
       if (this.__onChange) {
         this.__onChange.call(this, newValue);
       }
-      this.updateDisplay();
+      this.updateDisplay(true);
       return this;
     }
   }, {
-    key: 'getValue',
+    key: "getValue",
     value: function getValue() {
       return this.object[this.property];
     }
   }, {
-    key: 'updateDisplay',
-    value: function updateDisplay() {
+    key: "updateDisplay",
+    value: function updateDisplay(force) {
       return this;
     }
   }, {
-    key: 'isModified',
+    key: "isModified",
     value: function isModified() {
       return this.initialValue !== this.getValue();
     }
@@ -967,7 +967,7 @@ var OptionController = function (_Controller) {
     var _this2 = possibleConstructorReturn(this, (OptionController.__proto__ || Object.getPrototypeOf(OptionController)).call(this, object, property));
     var options = opts;
     var _this = _this2;
-    _this2.__select = document.createElement('select');
+    _this2.__select = document.createElement("select");
     if (Common.isArray(options)) {
       var map = {};
       Common.each(options, function (element) {
@@ -976,13 +976,13 @@ var OptionController = function (_Controller) {
       options = map;
     }
     Common.each(options, function (value, key) {
-      var opt = document.createElement('option');
+      var opt = document.createElement("option");
       opt.innerHTML = key;
-      opt.setAttribute('value', value);
+      opt.setAttribute("value", value);
       _this.__select.appendChild(opt);
     });
     _this2.updateDisplay();
-    dom.bind(_this2.__select, 'change', function () {
+    dom.bind(_this2.__select, "change", function () {
       var desiredValue = this.options[this.selectedIndex].value;
       _this.setValue(desiredValue);
     });
@@ -990,20 +990,20 @@ var OptionController = function (_Controller) {
     return _this2;
   }
   createClass(OptionController, [{
-    key: 'setValue',
+    key: "setValue",
     value: function setValue(v) {
-      var toReturn = get(OptionController.prototype.__proto__ || Object.getPrototypeOf(OptionController.prototype), 'setValue', this).call(this, v);
+      var toReturn = get(OptionController.prototype.__proto__ || Object.getPrototypeOf(OptionController.prototype), "setValue", this).call(this, v);
       if (this.__onFinishChange) {
         this.__onFinishChange.call(this, this.getValue());
       }
       return toReturn;
     }
   }, {
-    key: 'updateDisplay',
-    value: function updateDisplay() {
-      if (dom.isActive(this.__select)) return this;
+    key: "updateDisplay",
+    value: function updateDisplay(force) {
+      if (!force && dom.isActive(this.__select)) return this;
       this.__select.value = this.getValue();
-      return get(OptionController.prototype.__proto__ || Object.getPrototypeOf(OptionController.prototype), 'updateDisplay', this).call(this);
+      return get(OptionController.prototype.__proto__ || Object.getPrototypeOf(OptionController.prototype), "updateDisplay", this).call(this);
     }
   }]);
   return OptionController;
@@ -1147,21 +1147,21 @@ var NumberControllerBox = function (_NumberController) {
       prevY = e.clientY;
     }
     function onMouseUp() {
-      dom.unbind(window, 'mousemove', onMouseDrag);
-      dom.unbind(window, 'mouseup', onMouseUp);
+      dom.unbind(window, "mousemove", onMouseDrag);
+      dom.unbind(window, "mouseup", onMouseUp);
       onFinish();
     }
     function onMouseDown(e) {
-      dom.bind(window, 'mousemove', onMouseDrag);
-      dom.bind(window, 'mouseup', onMouseUp);
+      dom.bind(window, "mousemove", onMouseDrag);
+      dom.bind(window, "mouseup", onMouseUp);
       prevY = e.clientY;
     }
-    _this2.__input = document.createElement('input');
-    _this2.__input.setAttribute('type', 'text');
-    dom.bind(_this2.__input, 'change', onChange);
-    dom.bind(_this2.__input, 'blur', onBlur);
-    dom.bind(_this2.__input, 'mousedown', onMouseDown);
-    dom.bind(_this2.__input, 'keydown', function (e) {
+    _this2.__input = document.createElement("input");
+    _this2.__input.setAttribute("type", "text");
+    dom.bind(_this2.__input, "change", onChange);
+    dom.bind(_this2.__input, "blur", onBlur);
+    dom.bind(_this2.__input, "mousedown", onMouseDown);
+    dom.bind(_this2.__input, "keydown", function (e) {
       if (e.keyCode === 13) {
         _this.__truncationSuspended = true;
         this.blur();
@@ -1174,10 +1174,11 @@ var NumberControllerBox = function (_NumberController) {
     return _this2;
   }
   createClass(NumberControllerBox, [{
-    key: 'updateDisplay',
-    value: function updateDisplay() {
+    key: "updateDisplay",
+    value: function updateDisplay(force) {
+      if (!force && dom.isActive(this.__input)) return this;
       this.__input.value = this.__truncationSuspended ? this.getValue() : roundToDecimal(this.getValue(), this.__precision);
-      return get(NumberControllerBox.prototype.__proto__ || Object.getPrototypeOf(NumberControllerBox.prototype), 'updateDisplay', this).call(this);
+      return get(NumberControllerBox.prototype.__proto__ || Object.getPrototypeOf(NumberControllerBox.prototype), "updateDisplay", this).call(this);
     }
   }]);
   return NumberControllerBox;
@@ -1293,126 +1294,126 @@ var ColorController = function (_Controller) {
     _this2.__color = new Color(_this2.getValue());
     _this2.__temp = new Color(0);
     var _this = _this2;
-    _this2.domElement = document.createElement('div');
+    _this2.domElement = document.createElement("div");
     dom.makeSelectable(_this2.domElement, false);
-    _this2.__selector = document.createElement('div');
-    _this2.__selector.className = 'selector';
-    _this2.__saturation_field = document.createElement('div');
-    _this2.__saturation_field.className = 'saturation-field';
-    _this2.__field_knob = document.createElement('div');
-    _this2.__field_knob.className = 'field-knob';
-    _this2.__field_knob_border = '2px solid ';
-    _this2.__hue_knob = document.createElement('div');
-    _this2.__hue_knob.className = 'hue-knob';
-    _this2.__hue_field = document.createElement('div');
-    _this2.__hue_field.className = 'hue-field';
-    _this2.__input = document.createElement('input');
-    _this2.__input.type = 'text';
-    _this2.__input_textShadow = '0 1px 1px ';
-    dom.bind(_this2.__input, 'keydown', function (e) {
+    _this2.__selector = document.createElement("div");
+    _this2.__selector.className = "selector";
+    _this2.__saturation_field = document.createElement("div");
+    _this2.__saturation_field.className = "saturation-field";
+    _this2.__field_knob = document.createElement("div");
+    _this2.__field_knob.className = "field-knob";
+    _this2.__field_knob_border = "2px solid ";
+    _this2.__hue_knob = document.createElement("div");
+    _this2.__hue_knob.className = "hue-knob";
+    _this2.__hue_field = document.createElement("div");
+    _this2.__hue_field.className = "hue-field";
+    _this2.__input = document.createElement("input");
+    _this2.__input.type = "text";
+    _this2.__input_textShadow = "0 1px 1px ";
+    dom.bind(_this2.__input, "keydown", function (e) {
       if (e.keyCode === 13) {
         onBlur.call(this);
       }
     });
-    dom.bind(_this2.__input, 'blur', onBlur);
-    dom.bind(_this2.__selector, 'mousedown', function ()        {
-      dom.addClass(this, 'drag').bind(window, 'mouseup', function ()        {
-        dom.removeClass(_this.__selector, 'drag');
+    dom.bind(_this2.__input, "blur", onBlur);
+    dom.bind(_this2.__selector, "mousedown", function () {
+      dom.addClass(this, "drag").bind(window, "mouseup", function () {
+        dom.removeClass(_this.__selector, "drag");
       });
     });
-    dom.bind(_this2.__selector, 'touchstart', function ()        {
-      dom.addClass(this, 'drag').bind(window, 'touchend', function ()        {
-        dom.removeClass(_this.__selector, 'drag');
+    dom.bind(_this2.__selector, "touchstart", function () {
+      dom.addClass(this, "drag").bind(window, "touchend", function () {
+        dom.removeClass(_this.__selector, "drag");
       });
     });
-    var valueField = document.createElement('div');
+    var valueField = document.createElement("div");
     Common.extend(_this2.__selector.style, {
-      width: '122px',
-      height: '102px',
-      padding: '3px',
-      backgroundColor: '#222',
-      boxShadow: '0px 1px 3px rgba(0,0,0,0.3)'
+      width: "122px",
+      height: "102px",
+      padding: "3px",
+      backgroundColor: "#222",
+      boxShadow: "0px 1px 3px rgba(0,0,0,0.3)"
     });
     Common.extend(_this2.__field_knob.style, {
-      position: 'absolute',
-      width: '12px',
-      height: '12px',
-      border: _this2.__field_knob_border + (_this2.__color.v < 0.5 ? '#fff' : '#000'),
-      boxShadow: '0px 1px 3px rgba(0,0,0,0.5)',
-      borderRadius: '12px',
+      position: "absolute",
+      width: "12px",
+      height: "12px",
+      border: _this2.__field_knob_border + (_this2.__color.v < 0.5 ? "#fff" : "#000"),
+      boxShadow: "0px 1px 3px rgba(0,0,0,0.5)",
+      borderRadius: "12px",
       zIndex: 1
     });
     Common.extend(_this2.__hue_knob.style, {
-      position: 'absolute',
-      width: '15px',
-      height: '2px',
-      borderRight: '4px solid #fff',
+      position: "absolute",
+      width: "15px",
+      height: "2px",
+      borderRight: "4px solid #fff",
       zIndex: 1
     });
     Common.extend(_this2.__saturation_field.style, {
-      width: '100px',
-      height: '100px',
-      border: '1px solid #555',
-      marginRight: '3px',
-      display: 'inline-block',
-      cursor: 'pointer'
+      width: "100px",
+      height: "100px",
+      border: "1px solid #555",
+      marginRight: "3px",
+      display: "inline-block",
+      cursor: "pointer"
     });
     Common.extend(valueField.style, {
-      width: '100%',
-      height: '100%',
-      background: 'none'
+      width: "100%",
+      height: "100%",
+      background: "none"
     });
-    linearGradient(valueField, 'top', 'rgba(0,0,0,0)', '#000');
+    linearGradient(valueField, "top", "rgba(0,0,0,0)", "#000");
     Common.extend(_this2.__hue_field.style, {
-      width: '15px',
-      height: '100px',
-      border: '1px solid #555',
-      cursor: 'ns-resize',
-      position: 'absolute',
-      top: '3px',
-      right: '3px'
+      width: "15px",
+      height: "100px",
+      border: "1px solid #555",
+      cursor: "ns-resize",
+      position: "absolute",
+      top: "3px",
+      right: "3px"
     });
     hueGradient(_this2.__hue_field);
     Common.extend(_this2.__input.style, {
-      outline: 'none',
-      textAlign: 'center',
-      color: '#fff',
+      outline: "none",
+      textAlign: "center",
+      color: "#fff",
       border: 0,
-      fontWeight: 'bold',
-      textShadow: _this2.__input_textShadow + 'rgba(0,0,0,0.7)'
+      fontWeight: "bold",
+      textShadow: _this2.__input_textShadow + "rgba(0,0,0,0.7)"
     });
-    dom.bind(_this2.__saturation_field, 'mousedown', fieldDown);
-    dom.bind(_this2.__saturation_field, 'touchstart', fieldDown);
-    dom.bind(_this2.__field_knob, 'mousedown', fieldDown);
-    dom.bind(_this2.__field_knob, 'touchstart', fieldDown);
-    dom.bind(_this2.__hue_field, 'mousedown', fieldDownH);
-    dom.bind(_this2.__hue_field, 'touchstart', fieldDownH);
+    dom.bind(_this2.__saturation_field, "mousedown", fieldDown);
+    dom.bind(_this2.__saturation_field, "touchstart", fieldDown);
+    dom.bind(_this2.__field_knob, "mousedown", fieldDown);
+    dom.bind(_this2.__field_knob, "touchstart", fieldDown);
+    dom.bind(_this2.__hue_field, "mousedown", fieldDownH);
+    dom.bind(_this2.__hue_field, "touchstart", fieldDownH);
     function fieldDown(e) {
       setSV(e);
-      dom.bind(window, 'mousemove', setSV);
-      dom.bind(window, 'touchmove', setSV);
-      dom.bind(window, 'mouseup', fieldUpSV);
-      dom.bind(window, 'touchend', fieldUpSV);
+      dom.bind(window, "mousemove", setSV);
+      dom.bind(window, "touchmove", setSV);
+      dom.bind(window, "mouseup", fieldUpSV);
+      dom.bind(window, "touchend", fieldUpSV);
     }
     function fieldDownH(e) {
       setH(e);
-      dom.bind(window, 'mousemove', setH);
-      dom.bind(window, 'touchmove', setH);
-      dom.bind(window, 'mouseup', fieldUpH);
-      dom.bind(window, 'touchend', fieldUpH);
+      dom.bind(window, "mousemove", setH);
+      dom.bind(window, "touchmove", setH);
+      dom.bind(window, "mouseup", fieldUpH);
+      dom.bind(window, "touchend", fieldUpH);
     }
     function fieldUpSV() {
-      dom.unbind(window, 'mousemove', setSV);
-      dom.unbind(window, 'touchmove', setSV);
-      dom.unbind(window, 'mouseup', fieldUpSV);
-      dom.unbind(window, 'touchend', fieldUpSV);
+      dom.unbind(window, "mousemove", setSV);
+      dom.unbind(window, "touchmove", setSV);
+      dom.unbind(window, "mouseup", fieldUpSV);
+      dom.unbind(window, "touchend", fieldUpSV);
       onFinish();
     }
     function fieldUpH() {
-      dom.unbind(window, 'mousemove', setH);
-      dom.unbind(window, 'touchmove', setH);
-      dom.unbind(window, 'mouseup', fieldUpH);
-      dom.unbind(window, 'touchend', fieldUpH);
+      dom.unbind(window, "mousemove", setH);
+      dom.unbind(window, "touchmove", setH);
+      dom.unbind(window, "mouseup", fieldUpH);
+      dom.unbind(window, "touchend", fieldUpH);
       onFinish();
     }
     function onBlur() {
@@ -1438,7 +1439,7 @@ var ColorController = function (_Controller) {
     _this2.domElement.appendChild(_this2.__selector);
     _this2.updateDisplay();
     function setSV(e) {
-      if (e.type.indexOf('touch') === -1) {
+      if (e.type.indexOf("touch") === -1) {
         e.preventDefault();
       }
       var fieldRect = _this.__saturation_field.getBoundingClientRect();
@@ -1463,7 +1464,7 @@ var ColorController = function (_Controller) {
       return false;
     }
     function setH(e) {
-      if (e.type.indexOf('touch') === -1) {
+      if (e.type.indexOf("touch") === -1) {
         e.preventDefault();
       }
       var fieldRect = _this.__hue_field.getBoundingClientRect();
@@ -1482,8 +1483,9 @@ var ColorController = function (_Controller) {
     return _this2;
   }
   createClass(ColorController, [{
-    key: 'updateDisplay',
-    value: function updateDisplay() {
+    key: "updateDisplay",
+    value: function updateDisplay(force) {
+      if (!force && dom.isActive(this.__input)) return this;
       var i = interpret(this.getValue());
       if (i !== false) {
         var mismatch = false;
@@ -1502,39 +1504,39 @@ var ColorController = function (_Controller) {
       var flip = this.__color.v < 0.5 || this.__color.s > 0.5 ? 255 : 0;
       var _flip = 255 - flip;
       Common.extend(this.__field_knob.style, {
-        marginLeft: 100 * this.__color.s - 7 + 'px',
-        marginTop: 100 * (1 - this.__color.v) - 7 + 'px',
+        marginLeft: 100 * this.__color.s - 7 + "px",
+        marginTop: 100 * (1 - this.__color.v) - 7 + "px",
         backgroundColor: this.__temp.toHexString(),
-        border: this.__field_knob_border + 'rgb(' + flip + ',' + flip + ',' + flip + ')'
+        border: this.__field_knob_border + "rgb(" + flip + "," + flip + "," + flip + ")"
       });
-      this.__hue_knob.style.marginTop = (1 - this.__color.h / 360) * 100 + 'px';
+      this.__hue_knob.style.marginTop = (1 - this.__color.h / 360) * 100 + "px";
       this.__temp.s = 1;
       this.__temp.v = 1;
-      linearGradient(this.__saturation_field, 'left', '#fff', this.__temp.toHexString());
+      linearGradient(this.__saturation_field, "left", "#fff", this.__temp.toHexString());
       this.__input.value = this.__color.toString();
       Common.extend(this.__input.style, {
         backgroundColor: this.__color.toHexString(),
-        color: 'rgb(' + flip + ',' + flip + ',' + flip + ')',
-        textShadow: this.__input_textShadow + 'rgba(' + _flip + ',' + _flip + ',' + _flip + ',.7)'
+        color: "rgb(" + flip + "," + flip + "," + flip + ")",
+        textShadow: this.__input_textShadow + "rgba(" + _flip + "," + _flip + "," + _flip + ",.7)"
       });
     }
   }]);
   return ColorController;
 }(Controller);
-var vendors = ['-moz-', '-o-', '-webkit-', '-ms-', ''];
+var vendors = ["-moz-", "-o-", "-webkit-", "-ms-", ""];
 function linearGradient(elem, x, a, b) {
-  elem.style.background = '';
+  elem.style.background = "";
   Common.each(vendors, function (vendor) {
-    elem.style.cssText += 'background: ' + vendor + 'linear-gradient(' + x + ', ' + a + ' 0%, ' + b + ' 100%); ';
+    elem.style.cssText += "background: " + vendor + "linear-gradient(" + x + ", " + a + " 0%, " + b + " 100%); ";
   });
 }
 function hueGradient(elem) {
-  elem.style.background = '';
-  elem.style.cssText += 'background: -moz-linear-gradient(top,  #ff0000 0%, #ff00ff 17%, #0000ff 34%, #00ffff 50%, #00ff00 67%, #ffff00 84%, #ff0000 100%);';
-  elem.style.cssText += 'background: -webkit-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);';
-  elem.style.cssText += 'background: -o-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);';
-  elem.style.cssText += 'background: -ms-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);';
-  elem.style.cssText += 'background: linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);';
+  elem.style.background = "";
+  elem.style.cssText += "background: -moz-linear-gradient(top,  #ff0000 0%, #ff00ff 17%, #0000ff 34%, #00ffff 50%, #00ff00 67%, #ffff00 84%, #ff0000 100%);";
+  elem.style.cssText += "background: -webkit-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
+  elem.style.cssText += "background: -o-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
+  elem.style.cssText += "background: -ms-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
+  elem.style.cssText += "background: linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
 }
 
 var css = {
@@ -2176,7 +2178,7 @@ function markPresetModified(gui, modified) {
 function augmentController(gui, li, controller) {
   controller.__li = li;
   controller.__gui = gui;
-  Common.extend(controller,                                   {
+  Common.extend(controller, {
     options: function options(_options) {
       if (arguments.length > 1) {
         var nextSibling = controller.__li.nextElementSibling;

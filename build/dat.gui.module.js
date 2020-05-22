@@ -48,7 +48,6 @@ function colorToString(color, forceCSSHex) {
   return "unknown format";
 }
 
-var ARR_EACH = Array.prototype.forEach;
 var ARR_SLICE = Array.prototype.slice;
 var Common = {
   BREAK: {},
@@ -100,7 +99,7 @@ var Common = {
     if (!obj) {
       return;
     }
-    if (ARR_EACH && obj.forEach && obj.forEach === ARR_EACH) {
+    if (obj.forEach) {
       obj.forEach(itr, scope);
     } else if (obj.length === obj.length + 0) {
       var key;
@@ -492,7 +491,8 @@ var ColorMath = {
     return (hex >> (componentIndex * 8)) & 0xff;
   },
   hex_with_component: function hex_with_component(hex, componentIndex, value) {
-    return (value << (tmpComponent = componentIndex * 8)) | (hex & ~(0xff << tmpComponent));
+    value = (value << (tmpComponent = componentIndex * 8)) | (hex & ~(0xff << tmpComponent));
+    return value;
   },
 };
 
@@ -590,8 +590,9 @@ Object.defineProperty(Color.prototype, "a", {
 });
 Object.defineProperty(Color.prototype, "hex", {
   get: function get() {
-    if (!this.__state.space !== "HEX") {
+    if (this.__state.space !== "HEX") {
       this.__state.hex = ColorMath.rgb_to_hex(this.r, this.g, this.b);
+      this.__state.space = "HEX";
     }
     return this.__state.hex;
   },
@@ -693,7 +694,9 @@ function cssValueToPixels(val) {
 }
 var dom = {
   makeSelectable: function makeSelectable(elem, selectable) {
-    if (elem === undefined || elem.style === undefined) return;
+    if (elem === undefined || elem.style === undefined) {
+      return;
+    }
     elem.onselectstart = selectable
       ? function () {
           return false;
@@ -1574,10 +1577,10 @@ var css = {
   },
 };
 
-var saveDialogContents =
-  '<div id="dg-save" class="dg dialogue">\n\n  Here\'s the new load parameter for your <code>GUI</code>\'s constructor:\n\n  <textarea id="dg-new-constructor"></textarea>\n\n  <div id="dg-save-locally">\n\n    <input id="dg-local-storage" type="checkbox"/> Automatically save\n    values to <code>localStorage</code> on exit.\n\n    <div id="dg-local-explain">The values saved to <code>localStorage</code> will\n      override those passed to <code>dat.GUI</code>\'s constructor. This makes it\n      easier to work incrementally, but <code>localStorage</code> is fragile,\n      and your friends may not see the same values you do.\n\n    </div>\n\n  </div>\n\n</div>';
+var saveDialogueContents =
+  '<div id="dg-save" class="dg dialogue">\n  Here\'s the new load parameter for your <code>GUI</code>\'s constructor:\n\n  <textarea id="dg-new-constructor"></textarea>\n\n  <div id="dg-save-locally">\n    <input id="dg-local-storage" type="checkbox"> Automatically save values to <code>localStorage</code> on exit.\n\n    <div id="dg-local-explain">\n      The values saved to <code>localStorage</code> will override those passed to <code>dat.GUI</code>\'s constructor.\n      This makes it easier to work incrementally, but <code>localStorage</code> is fragile, and your friends may not see\n      the same values you do.\n    </div>\n  </div>\n</div>\n';
 
-function requestAnimationFrame(callback) {
+function requestAnimationFrame(callback, element) {
   setTimeout(callback, 1000 / 60);
 }
 var requestAnimationFrame$1 =
@@ -2041,7 +2044,7 @@ Common.extend(GUI.prototype, {
   remember: function remember() {
     if (Common.isUndefined(SAVE_DIALOGUE)) {
       SAVE_DIALOGUE = new CenteredDiv();
-      SAVE_DIALOGUE.domElement.innerHTML = saveDialogContents;
+      SAVE_DIALOGUE.domElement.innerHTML = saveDialogueContents;
     }
     if (this.parent) {
       throw new Error("You can only call remember on a top level GUI.");
@@ -2535,7 +2538,7 @@ var gui = {
   GUI: GUI,
 };
 var GUI$1 = GUI;
-var index = {
+var datGUI = {
   color: color,
   controllers: controllers,
   dom: dom$1,
@@ -2543,5 +2546,5 @@ var index = {
   GUI: GUI$1,
 };
 
-export default index;
+export default datGUI;
 export { GUI$1 as GUI, color, controllers, dom$1 as dom, gui };

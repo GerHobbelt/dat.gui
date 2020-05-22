@@ -150,6 +150,10 @@ const Common = {
 
   isFunction: function(obj) {
     return obj instanceof Function;
+  },
+
+  isAsyncFunction: function(obj) {
+    return Object.prototype.toString.call(obj) === '[object AsyncFunction]';
   }
 
 };

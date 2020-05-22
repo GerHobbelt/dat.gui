@@ -52,6 +52,8 @@ const ControllerFactory = function(object, property) {
     return new StringController(object, property);
   }
 
+  // TODO: check that the isFunction() API also recognizes async functions properly.
+  //if (common.isFunction(initialValue) || common.isAsyncFunction(initialValue)) {
   if (common.isFunction(initialValue)) {
     return new FunctionController(object, property, arguments[2]);
   }

@@ -63,9 +63,10 @@ class NumberControllerSlider extends NumberController {
 
       const bgRect = _this.__background.getBoundingClientRect();
 
-      _this.setValue(
-        map(e.clientX, bgRect.left, bgRect.right, _this.__min, _this.__max)
-      );
+      if (!_this._readonly)
+        _this.setValue(
+          map(e.clientX, bgRect.left, bgRect.right, _this.__min, _this.__max)
+        );
 
       return false;
     }
@@ -89,9 +90,10 @@ class NumberControllerSlider extends NumberController {
       const clientX = e.touches[0].clientX;
       const bgRect = _this.__background.getBoundingClientRect();
 
-      _this.setValue(
-        map(clientX, bgRect.left, bgRect.right, _this.__min, _this.__max)
-      );
+      if (!_this._readonly)
+        _this.setValue(
+          map(clientX, bgRect.left, bgRect.right, _this.__min, _this.__max)
+        );
     }
 
     function onTouchEnd() {

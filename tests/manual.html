@@ -1,113 +1,109 @@
 <!DOCTYPE html>
 <html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript" src="../build/dat.gui.js"></script>
+    <script type="text/javascript">
+      $.noConflict();
+      jQuery(document).ready(function ($) {
+        const gui = new dat.GUI();
+        const obj = {
+          text: "Some text",
+          number: 1,
+          slider: 5,
+          checkbox: true,
+          button: function () {},
+          select: "One",
+          plotter: 0,
+          color0: "#ff0000",
+          color1: [0, 128, 255],
+          color2: [0, 128, 255, 0.4],
+          color3: {
+            h: 350,
+            s: 0.9,
+            v: 0.3,
+          },
+        };
 
-<head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <script type="text/javascript" src="jquery.js"></script>
-  <script type="text/javascript" src="../build/dat.gui.js"></script>
-  <script type="text/javascript">
-    $.noConflict();
-    jQuery(document).ready(function($) {
-      var gui = new dat.GUI;
-      var obj = {
-        text: 'Some text',
-        number: 1,
-        slider: 5,
-        checkbox: true,
-        button: function() {},
-        select: 'One',
-        plotter: 0,
-        color0: '#ff0000',
-        color1: [0, 128, 255],
-        color2: [0, 128, 255, 0.4],
-        color3: {
-          h: 350,
-          s: 0.9,
-          v: 0.3
+        const controllers = [];
+
+        // Show preset bar
+        gui.remember(obj);
+
+        // Add our controllers
+        const f1 = gui.addFolder("Text");
+        controllers.push(f1.add(obj, "text")); // StringController
+        controllers.push(f1.add(obj, "select", ["One", "Two", "Three"])); // OptionController
+        f1.open();
+
+        const f2 = gui.addFolder("Number");
+        controllers.push(f2.add(obj, "number")); // NumberControllerBox
+        controllers.push(f2.add(obj, "slider", 0, 9)); // NumberControllerSlider
+        f2.open();
+
+        const f3 = gui.addFolder("Other");
+        controllers.push(f3.add(obj, "checkbox")); // BooleanController
+        controllers.push(f3.add(obj, "button")); // FunctionController
+        controllers.push(f3.addPlotter(obj, "plotter", 3, 0)); // PlotterController
+        f3.open();
+
+        const f4 = gui.addFolder("Colour");
+        controllers.push(f4.add(obj, "color0")); // ColorController
+        controllers.push(f4.add(obj, "color1")); // ColorController
+        controllers.push(f4.add(obj, "color2")); // ColorController
+        controllers.push(f4.add(obj, "color3")); // ColorController
+        f4.open();
+
+        /*
+         * Listen for the change events and log the output
+         */
+        for (let i = 0; i < controllers.length; i++) {
+          controllers[i].onChange(function (val) {
+            console.log(this.property, "onChange:", val);
+          });
+          controllers[i].onFinishChange(function (val) {
+            console.log(this.property, "onFinishChange:", val);
+          });
         }
-      };
 
-      var controllers = [];
+        /*
+         * Genrate a sine wave for PlotterController
+         */
+        let angle = 0;
+        const max = Math.PI * 2;
+        setInterval(function () {
+          angle += 0.05;
+          if (angle > max) {
+            angle = 0;
+          }
 
-      // Show preset bar
-      gui.remember(obj);
+          obj.plotter = Math.sin(angle) + 1.5;
+        }, 10);
 
-      // Add our controllers
-      var f1 = gui.addFolder('Text');
-      controllers.push(f1.add(obj, 'text')); // StringController
-      controllers.push(f1.add(obj, 'select', ['One', 'Two', 'Three'])); // OptionController
-      f1.open();
-
-      var f2 = gui.addFolder('Number');
-      controllers.push(f2.add(obj, 'number')); // NumberControllerBox
-      controllers.push(f2.add(obj, 'slider', 0, 9)); // NumberControllerSlider
-      f2.open();
-
-      var f3 = gui.addFolder('Other');
-      controllers.push(f3.add(obj, 'checkbox')); // BooleanController
-      controllers.push(f3.add(obj, 'button')); // FunctionController
-      controllers.push(f3.addPlotter(obj, 'plotter', 3, 0)); // PlotterController
-      f3.open();
-
-      var f4 = gui.addFolder('Colour');
-      controllers.push(f4.add(obj, 'color0')); // ColorController
-      controllers.push(f4.add(obj, 'color1')); // ColorController
-      controllers.push(f4.add(obj, 'color2')); // ColorController
-      controllers.push(f4.add(obj, 'color3')); // ColorController
-      f4.open();
-
-      /*
-       * Listen for the change events and log the output
-       */
-      for (var i = 0; i < controllers.length; i++) {
-        controllers[i].onChange(function(val) {
-          console.log(this.property, 'onChange:', val);
+        // Example of passing your object directly into the constructor
+        const obj2 = {
+          text: "Some text 2",
+          number: 1,
+          checkbox: true,
+          button: function () {},
+          color0: "#ff0000",
+          color1: [0, 128, 255],
+          color2: [0, 128, 255, 0.4],
+          color3: {
+            h: 350,
+            s: 0.9,
+            v: 0.3,
+          },
+        };
+        new dat.GUI({
+          object: obj2,
         });
-        controllers[i].onFinishChange(function(val) {
-          console.log(this.property, 'onFinishChange:', val);
-        });
-      }
-
-      /*
-       * Genrate a sine wave for PlotterController
-       */
-      var angle = 0,
-        max = Math.PI * 2;
-      setInterval(function() {
-        angle += 0.05;
-        if (angle > max) {
-          angle = 0;
-        }
-
-        obj.plotter = Math.sin(angle) + 1.5;
-      }, 10);
-
-      // Example of passing your object directly into the constructor
-      var obj2 = {
-        text: 'Some text 2',
-        number: 1,
-        checkbox: true,
-        button: function() {},
-        color0: '#ff0000',
-        color1: [0, 128, 255],
-        color2: [0, 128, 255, 0.4],
-        color3: {
-          h: 350,
-          s: 0.9,
-          v: 0.3
-        }
-      }
-      new dat.GUI({
-        object: obj2
       });
+    </script>
+  </head>
 
-    });
-  </script>
-
-</head>
-
-<body>
-  <div>The menus should be right there -></div>
-</body>
-
+  <body>
+    <div>The menus should be right there -></div>
+  </body>
 </html>

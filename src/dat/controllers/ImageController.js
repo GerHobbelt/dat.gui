@@ -1,8 +1,8 @@
 /**
- * dat-gui JavaScript Controller Library
- * https://github.com/dataarts/dat.gui
+ * dat.GUI JavaScript Controller Library
+ * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2020 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -11,9 +11,9 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import Controller from './Controller';
-import dom from '../dom/dom';
-import common from '../utils/common';
+import Controller from "./Controller";
+import dom from "../dom/dom";
+import common from "../utils/common";
 
 /**
  * @class Represents a image loaded throught its path, contains
@@ -33,30 +33,30 @@ class ImageController extends Controller {
 
     const _this = this;
 
-    this.__image = document.createElement('img');
-    this.__imagePreview = document.createElement('img');
-    this.__input = document.createElement('input');
+    this.__image = document.createElement("img");
+    this.__imagePreview = document.createElement("img");
+    this.__input = document.createElement("input");
 
     common.extend(this.__imagePreview.style, {
-      display: 'block',
-      width: 'calc(100% + 5px)',
-      padding: '4px 0',
-      marginLeft: '-5px'
+      display: "block",
+      width: "calc(100% + 5px)",
+      padding: "4px 0",
+      marginLeft: "-5px",
     });
 
     common.extend(this.__input.style, {
-      position: 'absolute',
-      top: '0',
-      left: '0',
-      width: '100%',
-      height: '100%',
-      opacity: '0',
-      cursor: 'pointer',
+      position: "absolute",
+      top: "0",
+      left: "0",
+      width: "100%",
+      height: "100%",
+      opacity: "0",
+      cursor: "pointer",
     });
 
-    dom.bind(this.__image, 'load', imageLoaded);
-    dom.bind(this.__input, 'change', fileUploaded);
-    dom.bind(this.__fileReader, 'loadend', fileLoaded);
+    dom.bind(this.__image, "load", imageLoaded);
+    dom.bind(this.__input, "change", fileUploaded);
+    dom.bind(this.__fileReader, "loadend", fileLoaded);
 
     function imageLoaded() {
       _this.__imagePreview.src = _this.__image.src;
@@ -80,7 +80,7 @@ class ImageController extends Controller {
 
     this.__image.src = object[property];
     this.__imagePreview.src = object[property];
-    this.__input.type = 'file';
+    this.__input.type = "file";
 
     this.domElement.appendChild(this.__imagePreview);
     this.domElement.appendChild(this.__input);

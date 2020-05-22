@@ -1,8 +1,8 @@
 /**
- * dat-gui JavaScript Controller Library
- * https://github.com/dataarts/dat.gui
+ * dat.GUI JavaScript Controller Library
+ * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2020 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import common from "../utils/common";
  * @param {Object} object The object to be manipulated
  * @param {string} property The name of the property to be manipulated
  * @param {Object|string[]} options A map of labels to acceptable values, or
-* a list of acceptable string values.
+ * a list of acceptable string values.
  */
 class OptionController extends Controller {
   constructor(object, property, opts) {
@@ -58,10 +58,16 @@ class OptionController extends Controller {
     // Acknowledge original value
     this.updateDisplay();
 
-    dom.bind(this.__select, "change", function () {
-      const desiredValue = this.options[this.selectedIndex].value;
-      _this.setValue(desiredValue);
-    }, false, true);
+    dom.bind(
+      this.__select,
+      "change",
+      function () {
+        const desiredValue = this.options[this.selectedIndex].value;
+        _this.setValue(desiredValue);
+      },
+      false,
+      true
+    );
 
     this.domElement.appendChild(this.__select);
   }

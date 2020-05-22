@@ -12,7 +12,10 @@ Get started with dat.GUI by reading the [tutorial](http://workshop.chromeexperim
 or the [API documentation](API.md).
 
 
+
+
 ## MacroMan's extra features
+
 * Added hide/show methods to all Controllers ([#93](https://github.com/dataarts/dat.gui/issues/93)).
 * Delete button added to preset menu ([#215](https://github.com/dataarts/dat.gui/issues/215)).
 * Pass passive option to most event listeners to improve scroll performance ([#193](https://github.com/dataarts/dat.gui/issues/193)).
@@ -27,21 +30,30 @@ See [API.md](API.md) for usage
 
 
 ## Packaged Builds
+
 The easiest way to use dat.GUI in your code is by using the built source at [`build/dat.gui.min.js`](build/dat.gui.min.js). This built JavaScript file bundles all the necessary dependencies to run dat.GUI.
 
 In your `head` tag, include the following code:
+
 ```html
 <script type="text/javascript" src="dat.gui.min.js"></script>
 ```
 
+
 ## Example code
+
 See `tests/manual.html` for an example of each type of controller.
+
 
 ## Installing from npm
 
+Install the module:
+
 ```bash
-$ npm install --save @macroman/dat.gui
+$ npm install --save dat.gui
 ```
+
+Use it:
 
 ```js
 // CommonJS:
@@ -53,22 +65,31 @@ import * as dat from 'dat.gui';
 const gui = new dat.GUI();
 ```
 
+
+
+
 ## Directory Contents
 
 ```
-├── build - Compiled source code.
-├── src - Source files.
-└── tests - Tests.
+├── build - Concatenated source code for browsers.
+├── src - source code in commonjs format.
+└── tests - [QUnit](https://github.com/jquery/qunit) test suite.
 ```
+
 
 ## Building your own dat.GUI
 
 In the terminal, enter the following:
 
-```
+```bash
 $ npm install
 $ npm run build
 ```
+
+This will create a rolled-up build of dat.GUI at `build/dat.gui.js` and its
+minified version at `build/dat.gui.min.js`.
+
+
 
 ## Running tests
 
@@ -87,15 +108,22 @@ In the terminal, enter `npm run dev` and open http://localhost:8080/tests/
 
 
 ## Working with Content Security Policy
+
 If you're using a server with a Content Security Policy in place that blocks 'unsafe-inline', you will have problems when dat.gui.js tries to inject style information. To get around this, load 'build/dat.gui.css' as an external style sheet.
 
+
 ## Changes
+
 View the [Change Log](CHANGELOG.md)
 
+
 ## Thanks
+
 The following libraries / open-source projects were used in the development of dat.GUI:
+
  * [Rollup](https://rollupjs.org)
  * [Sass](http://sass-lang.com/)
  * [Node.js](http://nodejs.org/)
  * [QUnit](https://github.com/jquery/qunit) / [jquery](http://jquery.com/)
  * [stats.js](http://mrdoob.github.io/stats.js/)
+

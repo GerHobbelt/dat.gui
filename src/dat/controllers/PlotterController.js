@@ -1,8 +1,8 @@
 /**
- * dat-gui JavaScript Controller Library
+ * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2020 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -11,8 +11,8 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import Controller from './Controller';
-import Plotter from '../utils/plotter';
+import Controller from "./Controller";
+import Plotter from "../utils/plotter";
 
 /**
  * @class Provides a canvas that graphically displays the value of the object property at the specified interval
@@ -33,7 +33,7 @@ class PlotterController extends Controller {
     this.max = params.max || 3;
 
     /** The containing li will have this class added */
-    this.liClass = params.liClass || 'plotter';
+    this.liClass = params.liClass || "plotter";
 
     /** Refresh rate. Value of 0 disables auto-refresh */
     this.period = params.period || 0;
@@ -44,7 +44,7 @@ class PlotterController extends Controller {
     /** Allows acurate timing for the period to be checked during animation frame */
     this.lastUpdate = Date.now();
 
-    this.__panel = new Plotter(params.fgColor || '#fff', params.bgColor || '#000', params.type || 'line');
+    this.__panel = new Plotter(params.fgColor || "#fff", params.bgColor || "#000", params.type || "line");
     this.domElement.appendChild(this.__panel.dom);
   }
 
@@ -53,7 +53,7 @@ class PlotterController extends Controller {
     if (this.period < 1 && value !== this.prevValue) {
       /* Update only on value change when auto-refresh is off */
       this.__panel.update(value, this.max);
-    } else if ((Date.now() - this.lastUpdate) > this.period) {
+    } else if (Date.now() - this.lastUpdate > this.period) {
       /* Update if elapsed time since last update is greater than the period */
       this.__panel.update(value, this.max);
       this.lastUpdate = Date.now() * 2 - this.lastUpdate - this.period;
@@ -63,7 +63,6 @@ class PlotterController extends Controller {
 
     return super.updateDisplay();
   }
-
 }
 
 export default PlotterController;

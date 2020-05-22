@@ -1,8 +1,8 @@
 /**
- * dat-gui JavaScript Controller Library
- * https://github.com/dataarts/dat.gui
+ * dat.GUI JavaScript Controller Library
+ * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2020 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -11,8 +11,8 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import Controller from './Controller';
-import dom from '../dom/dom';
+import Controller from "./Controller";
+import dom from "../dom/dom";
 
 /**
  * @class Provides a text input to alter the string property of an object.
@@ -29,8 +29,7 @@ class StringController extends Controller {
     const _this = this;
 
     function onChange() {
-      if (!_this._readonly)
-        _this.setValue(_this.__input.value);
+      if (!_this._readonly) _this.setValue(_this.__input.value);
     }
 
     function onBlur() {
@@ -39,17 +38,23 @@ class StringController extends Controller {
       }
     }
 
-    this.__input = document.createElement('input');
-    this.__input.setAttribute('type', 'text');
+    this.__input = document.createElement("input");
+    this.__input.setAttribute("type", "text");
 
-    dom.bind(this.__input, 'keyup', onChange, false, true);
-    dom.bind(this.__input, 'change', onChange, false, true);
-    dom.bind(this.__input, 'blur', onBlur, false, true);
-    dom.bind(this.__input, 'keydown', function(e) {
-      if (e.keyCode === 13) {
-        this.blur();
-      }
-    }, false, true);
+    dom.bind(this.__input, "keyup", onChange, false, true);
+    dom.bind(this.__input, "change", onChange, false, true);
+    dom.bind(this.__input, "blur", onBlur, false, true);
+    dom.bind(
+      this.__input,
+      "keydown",
+      function (e) {
+        if (e.keyCode === 13) {
+          this.blur();
+        }
+      },
+      false,
+      true
+    );
 
     this.updateDisplay();
 

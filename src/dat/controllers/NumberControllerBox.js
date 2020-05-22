@@ -1,8 +1,8 @@
 /**
- * dat-gui JavaScript Controller Library
- * https://github.com/dataarts/dat.gui
+ * dat.GUI JavaScript Controller Library
+ * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2020 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,12 +55,12 @@ class NumberControllerBox extends NumberController {
 
     // Makes it so manually specified values are not truncated.
 
-    dom.bind(this.__input, 'focus', onFocus, false, true);
-    dom.bind(this.__input, 'change', onChange, false, true);
-    dom.bind(this.__input, 'blur', onBlur, false, true);
-    dom.bind(this.__input, 'mousedown', onMouseDown, false, true);
-    dom.bind(this.__input, 'wheel', onWheel);
-    dom.bind(this.__input, 'keydown', onKeyDown, false, true);
+    dom.bind(this.__input, "focus", onFocus, false, true);
+    dom.bind(this.__input, "change", onChange, false, true);
+    dom.bind(this.__input, "blur", onBlur, false, true);
+    dom.bind(this.__input, "mousedown", onMouseDown, false, true);
+    dom.bind(this.__input, "wheel", onWheel);
+    dom.bind(this.__input, "keydown", onKeyDown, false, true);
 
     function onChange() {
       const attempted = parseFloat(_this.__input.value);
@@ -98,37 +98,34 @@ class NumberControllerBox extends NumberController {
     }
 
     function onMouseDown(e) {
-      dom.bind(window, 'mousemove', onMouseDrag, false, true);
-      dom.bind(window, 'mouseup', onMouseUp, false, true);
+      dom.bind(window, "mousemove", onMouseDrag, false, true);
+      dom.bind(window, "mouseup", onMouseUp, false, true);
       prevY = e.clientY;
     }
 
     function onKeyDown(e) {
       // TODO: pick one of the two keyboard switch-case handlers below:
       if (1) {
-      const step = _this.__step || 1;
-      switch (e.keyCode) {
-        case 13:
-          _this.__truncationSuspended = true;
-          this.blur();
-          _this.__truncationSuspended = false;
-          onFinish();
-          break;
-        case 38:
-          var newVal = _this.getValue() + step;
-          _this.setValue(newVal);
-          break;
-        case 40: // down
-          var newVal = _this.getValue() - step;
-          _this.setValue(newVal);
-          break;
-      }
-      
+        const step = _this.__step || 1;
+        switch (e.keyCode) {
+          case 13:
+            _this.__truncationSuspended = true;
+            this.blur();
+            _this.__truncationSuspended = false;
+            onFinish();
+            break;
+          case 38:
+            var newVal = _this.getValue() + step;
+            _this.setValue(newVal);
+            break;
+          case 40: // down
+            var newVal = _this.getValue() - step;
+            _this.setValue(newVal);
+            break;
+        }
       } else {
-      
-      switch (e.key) {
-        case 'Enter':
-          {
+        switch (e.key) {
+          case "Enter": {
             // When pressing enter, you can be as precise as you want.
             _this.__truncationSuspended = true;
             this.blur();
@@ -136,28 +133,24 @@ class NumberControllerBox extends NumberController {
             onFinish();
             break;
           }
-        case 'ArrowUp':
-          {
+          case "ArrowUp": {
             _this.setValue(_this.getValue() + _this.__impliedStep);
             break;
           }
-        case 'ArrowDown':
-          {
+          case "ArrowDown": {
             _this.setValue(_this.getValue() - _this.__impliedStep);
             break;
           }
-        default:
-          {
+          default: {
             break;
           }
-      }
-      
+        }
       }
     }
 
     function onWheel(e) {
       e.preventDefault();
-      const direction = (-e.deltaY >> 10) || 1;
+      const direction = -e.deltaY >> 10 || 1;
       _this.setValue(_this.getValue() + direction * _this.__impliedStep);
     }
 
@@ -167,7 +160,7 @@ class NumberControllerBox extends NumberController {
   }
 
   updateDisplay(force) {
-    // TODO: next two statements are from different fixes for the same problem: 
+    // TODO: next two statements are from different fixes for the same problem:
     // no updating while editing number field. See which one works best.
     if (!force && dom.isActive(this.__input)) return this;
     if (this.__suspendUpdate) return;
@@ -180,4 +173,3 @@ class NumberControllerBox extends NumberController {
 }
 
 export default NumberControllerBox;
-

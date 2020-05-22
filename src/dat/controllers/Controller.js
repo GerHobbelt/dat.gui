@@ -1,8 +1,8 @@
 /**
- * dat-gui JavaScript Controller Library
- * https://github.com/dataarts/dat.gui
+ * dat.GUI JavaScript Controller Library
+ * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2020 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,25 +61,25 @@ class Controller {
     this.__onFinishChange = undefined;
 
     /**
-    * Whether to force update a display, even when input is active.
-    * @type boolean
-    */
+     * Whether to force update a display, even when input is active.
+     * @type boolean
+     */
     this.forceUpdateDisplay = false;
   }
 
   /**
-  * Hides the controller on it's parent GUI.
-  */
+   * Hides the controller on it's parent GUI.
+   */
   hide() {
-    this.domElement.parentNode.parentNode.style.display = 'none';
+    this.domElement.parentNode.parentNode.style.display = "none";
     return this;
   }
 
   /**
-  * Shows the controller on it's parent GUI.
-  */
+   * Shows the controller on it's parent GUI.
+   */
   show() {
-    this.domElement.parentNode.parentNode.style.display = '';
+    this.domElement.parentNode.parentNode.style.display = "";
     return this;
   }
 
@@ -153,7 +153,7 @@ class Controller {
   /**
    * Set readonly mode
    *
-   * @param {Number} ro 
+   * @param {Number} ro
    * @default false
    * @returns {dat.controllers.StringController} this
    */

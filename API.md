@@ -41,10 +41,9 @@ manipulate variables and fire functions on the fly.
     * [.load](#GUI+load) : <code>Object</code>
     * [.useLocalStorage](#GUI+useLocalStorage) : <code>Boolean</code>
     * [.add(object, property, [min], [max], [step])](#GUI+add) ⇒ [<code>Controller</code>](#Controller)
-    * [.add(object, property, values)](#GUI+add2) ⇒ [<code>Controller</code>](#Controller)
     * [.addColor(object, property)](#GUI+addColor) ⇒ [<code>Controller</code>](#Controller)
-    * [.addImage(object, property)](#GUI+addImage) ⇒ [<code>Controller</code>](#Controller)
     * [.addPlotter(object, property, max, period, type, fgColor, bgColor)](#GUI+addPlotter) ⇒ [<code>Controller</code>](#Controller)
+    * [.addImage(object, property)](#GUI+addImage) ⇒ [<code>Controller</code>](#Controller)
     * [.remove(controller)](#GUI+remove)
     * [.destroy()](#GUI+destroy)
     * [.addFolder(name)](#GUI+addFolder) ⇒ <code>dat.gui.GUI</code>
@@ -65,6 +64,7 @@ manipulate variables and fire functions on the fly.
 | [params] | <code>Object</code> |  |  |
 | [params.name] | <code>String</code> |  | The name of this GUI. |
 | [params.load] | <code>Object</code> |  | JSON object representing the saved state of this GUI. |
+| [params.object] | <code>Object</code> |  | Providing your object will create a controller for each property automatically |
 | [params.parent] | <code>dat.gui.GUI</code> |  | The GUI I'm nested in. |
 | [params.autoPlace] | <code>Boolean</code> | <code>true</code> |  |
 | [params.hideable] | <code>Boolean</code> | <code>true</code> | If true, GUI is shown/hidden by <kbd>h</kbd> keypress. |
@@ -174,28 +174,6 @@ gui.add(person, 'name');
 var person = {age: 45};
 gui.add(person, 'age', 0, 100);
 ```
-<a name="GUI+addColor2"></a>
-
-### gui.add(object, property, values) ⇒ [<code>Controller</code>](#Controller)
-Adds a new [Controller](#Controller) to the GUI. The type of controller created
-is a `<select>` dropdown.
-
-**Kind**: instance method of [<code>GUI</code>](#GUI)  
-**Returns**: [<code>Controller</code>](#Controller) - The controller that was added to the GUI.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| object | <code>Object</code> | The object to be manipulated |
-| property | <code>String</code> | The name of the property to be manipulated |
-| values | <code>Array|Object</code> | Array or Dictionary of possible options' values |
-
-**Example**  
-```js
-// Add a dropdown controller.
-var person = {name: 'Sam'};
-gui.add(person, 'name', ['Sam', 'Alex', 'Ray']);
-gui.add(person, 'name', {'Sam': 'Sammy', 'Alex': 'Alexis', 'Ray': 'Riley'});
-```
 <a name="GUI+addColor"></a>
 
 ### gui.addColor(object, property) ⇒ [<code>Controller</code>](#Controller)
@@ -222,24 +200,6 @@ gui.addColor(palette, 'color2');
 gui.addColor(palette, 'color3');
 gui.addColor(palette, 'color4');
 ```
-<a name="GUI+addImage"></a>
-
-### gui.addImage(object, property) ⇒ [<code>Controller</code>](#Controller)
-Adds an image controller to the GUI.
-
-**Kind**: instance method of [<code>GUI</code>](#GUI)  
-**Returns**: [<code>Controller</code>](#Controller) - The controller that was added to the GUI.  
-
-| Param |
-| --- |
-| object | 
-| property | 
-
-**Example**  
-```js
-var images = { path1: 'myImage.png'};
-gui.addImage(images, 'path1');
-```
 <a name="GUI+addPlotter"></a>
 
 ### gui.addPlotter(object, property, max, period, type, fgColor, bgColor) ⇒ [<code>Controller</code>](#Controller)
@@ -265,6 +225,24 @@ var obj = {
 };
 gui.addPlotter(obj, 'value', 10, 100);
 gui.addPlotter(obj, 'value', 10, 0);
+```
+<a name="GUI+addImage"></a>
+
+### gui.addImage(object, property) ⇒ [<code>Controller</code>](#Controller)
+Adds an image controller to the GUI.
+
+**Kind**: instance method of [<code>GUI</code>](#GUI)  
+**Returns**: [<code>Controller</code>](#Controller) - The controller that was added to the GUI.  
+
+| Param |
+| --- |
+| object | 
+| property | 
+
+**Example**  
+```js
+var images = { path1: 'myImage.png'};
+gui.addImage(images, 'path1');
 ```
 <a name="GUI+remove"></a>
 
@@ -359,6 +337,7 @@ An "abstract" class that represents a given property of an object.
     * [.domElement](#Controller+domElement) : <code>DOMElement</code>
     * [.object](#Controller+object) : <code>Object</code>
     * [.property](#Controller+property) : <code>String</code>
+    * [._readonly](#Controller+_readonly) : <code>Object</code>
     * [.forceUpdateDisplay](#Controller+forceUpdateDisplay) : <code>boolean</code>
     * [.options(options)](#Controller+options) ⇒ [<code>Controller</code>](#Controller)
     * [.name(name)](#Controller+name) ⇒ [<code>Controller</code>](#Controller)
@@ -372,6 +351,7 @@ An "abstract" class that represents a given property of an object.
     * [.getValue()](#Controller+getValue) ⇒ <code>Object</code>
     * [.updateDisplay()](#Controller+updateDisplay) ⇒ [<code>Controller</code>](#Controller)
     * [.isModified()](#Controller+isModified) ⇒ <code>boolean</code>
+    * [.readonly(ro)](#Controller+readonly) ⇒ <code>dat.controllers.StringController</code>
 
 <a name="new_Controller_new"></a>
 
@@ -398,6 +378,12 @@ The object to manipulate
 
 ### controller.property : <code>String</code>
 The name of the property to manipulate
+
+**Kind**: instance property of [<code>Controller</code>](#Controller)  
+<a name="Controller+_readonly"></a>
+
+### controller.\_readonly : <code>Object</code>
+Readonly field
 
 **Kind**: instance property of [<code>Controller</code>](#Controller)  
 <a name="Controller+forceUpdateDisplay"></a>
@@ -513,6 +499,19 @@ with the object's current value.
 ### controller.isModified() ⇒ <code>boolean</code>
 **Kind**: instance method of [<code>Controller</code>](#Controller)  
 **Returns**: <code>boolean</code> - true if the value has deviated from initialValue  
+<a name="Controller+readonly"></a>
+
+### controller.readonly(ro) ⇒ <code>dat.controllers.StringController</code>
+Set readonly mode
+
+**Kind**: instance method of [<code>Controller</code>](#Controller)  
+**Default**: <code>false</code>  
+**Returns**: <code>dat.controllers.StringController</code> - this  
+
+| Param | Type |
+| --- | --- |
+| ro | <code>Number</code> | 
+
 <a name="NumberController"></a>
 
 ## NumberController ⇐ <code>dat.controllers.Controller</code>

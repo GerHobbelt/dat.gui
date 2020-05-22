@@ -1,8 +1,8 @@
 /**
- * dat-gui JavaScript Controller Library
- * https://github.com/dataarts/dat.gui
+ * dat.GUI JavaScript Controller Library
+ * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2020 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,26 +55,50 @@ class ColorController extends Controller {
     this.__input.type = "text";
     this.__input_textShadow = "0 1px 1px ";
 
-    dom.bind(this.__input, "keydown", function (e) {
-      if (e.keyCode === 13) {
-        // on enter
-        onBlur.call(this);
-      }
-    }, false, true);
+    dom.bind(
+      this.__input,
+      "keydown",
+      function (e) {
+        if (e.keyCode === 13) {
+          // on enter
+          onBlur.call(this);
+        }
+      },
+      false,
+      true
+    );
 
-    dom.bind(this.__input, 'blur', onBlur, false, true);
+    dom.bind(this.__input, "blur", onBlur, false, true);
 
-    dom.bind(this.__selector, "mousedown", function (/* e */) {
-      dom.addClass(this, "drag").bind(window, "mouseup", function (/* e */) {
-        dom.removeClass(_this.__selector, "drag");
-      });
-    }, false, true);
+    dom.bind(
+      this.__selector,
+      "mousedown",
+      function (/* e */) {
+        dom.addClass(this, "drag").bind(window, "mouseup", function (/* e */) {
+          dom.removeClass(_this.__selector, "drag");
+        });
+      },
+      false,
+      true
+    );
 
-    dom.bind(this.__selector, "touchstart", function (/* e */) {
-      dom.addClass(this, "drag").bind(window, "touchend", function (/* e */) {
-        dom.removeClass(_this.__selector, "drag");
-        }, false, true);
-    }, false, true);
+    dom.bind(
+      this.__selector,
+      "touchstart",
+      function (/* e */) {
+        dom.addClass(this, "drag").bind(
+          window,
+          "touchend",
+          function (/* e */) {
+            dom.removeClass(_this.__selector, "drag");
+          },
+          false,
+          true
+        );
+      },
+      false,
+      true
+    );
 
     const valueField = document.createElement("div");
 
@@ -90,8 +114,7 @@ class ColorController extends Controller {
       position: "absolute",
       width: "12px",
       height: "12px",
-      border:
-        this.__field_knob_border + (this.__color.v < 0.5 ? "#fff" : "#000"),
+      border: this.__field_knob_border + (this.__color.v < 0.5 ? "#fff" : "#000"),
       boxShadow: "0px 1px 3px rgba(0,0,0,0.5)",
       borderRadius: "12px",
       zIndex: 1,
@@ -157,18 +180,18 @@ class ColorController extends Controller {
 
     function fieldDown(e) {
       setSV(e);
-      dom.bind(window, 'mousemove', setSV);
-      dom.bind(window, 'touchmove', setSV);
-      dom.bind(window, 'mouseup', fieldUpSV, false, true);
-      dom.bind(window, 'touchend', fieldUpSV, false, true);
+      dom.bind(window, "mousemove", setSV);
+      dom.bind(window, "touchmove", setSV);
+      dom.bind(window, "mouseup", fieldUpSV, false, true);
+      dom.bind(window, "touchend", fieldUpSV, false, true);
     }
 
     function fieldDownH(e) {
       setH(e);
-      dom.bind(window, 'mousemove', setH);
-      dom.bind(window, 'touchmove', setH);
-      dom.bind(window, 'mouseup', fieldUpH, false, true);
-      dom.bind(window, 'touchend', fieldUpH, false, true);
+      dom.bind(window, "mousemove", setH);
+      dom.bind(window, "touchmove", setH);
+      dom.bind(window, "mouseup", fieldUpH, false, true);
+      dom.bind(window, "touchend", fieldUpH, false, true);
     }
 
     function fieldUpSV() {
@@ -222,8 +245,7 @@ class ColorController extends Controller {
       const fieldRect = _this.__saturation_field.getBoundingClientRect();
       const { clientX, clientY } = (e.touches && e.touches[0]) || e;
       let s = (clientX - fieldRect.left) / (fieldRect.right - fieldRect.left);
-      let v =
-        1 - (clientY - fieldRect.top) / (fieldRect.bottom - fieldRect.top);
+      let v = 1 - (clientY - fieldRect.top) / (fieldRect.bottom - fieldRect.top);
 
       if (v > 1) {
         v = 1;
@@ -252,8 +274,7 @@ class ColorController extends Controller {
 
       const fieldRect = _this.__hue_field.getBoundingClientRect();
       const { clientY } = (e.touches && e.touches[0]) || e;
-      let h =
-        1 - (clientY - fieldRect.top) / (fieldRect.bottom - fieldRect.top);
+      let h = 1 - (clientY - fieldRect.top) / (fieldRect.bottom - fieldRect.top);
 
       if (h > 1) {
         h = 1;
@@ -311,15 +332,7 @@ class ColorController extends Controller {
       marginLeft: 100 * this.__color.s - 7 + "px",
       marginTop: 100 * (1 - this.__color.v) - 7 + "px",
       backgroundColor: this.__temp.toHexString(),
-      border:
-        this.__field_knob_border +
-        "rgb(" +
-        flip +
-        "," +
-        flip +
-        "," +
-        flip +
-        ")",
+      border: this.__field_knob_border + "rgb(" + flip + "," + flip + "," + flip + ")",
     });
 
     this.__hue_knob.style.marginTop = (1 - this.__color.h / 360) * 100 + "px";
@@ -327,27 +340,14 @@ class ColorController extends Controller {
     this.__temp.s = 1;
     this.__temp.v = 1;
 
-    linearGradient(
-      this.__saturation_field,
-      "left",
-      "#fff",
-      this.__temp.toHexString()
-    );
+    linearGradient(this.__saturation_field, "left", "#fff", this.__temp.toHexString());
 
     this.__input.value = this.__color.toString();
 
     common.extend(this.__input.style, {
       backgroundColor: this.__color.toHexString(),
       color: "rgb(" + flip + "," + flip + "," + flip + ")",
-      textShadow:
-        this.__input_textShadow +
-        "rgba(" +
-        _flip +
-        "," +
-        _flip +
-        "," +
-        _flip +
-        ",.7)",
+      textShadow: this.__input_textShadow + "rgba(" + _flip + "," + _flip + "," + _flip + ",.7)",
     });
   }
 }
@@ -357,16 +357,7 @@ const vendors = ["-moz-", "-o-", "-webkit-", "-ms-", ""];
 function linearGradient(elem, x, a, b) {
   elem.style.background = "";
   common.each(vendors, function (vendor) {
-    elem.style.cssText +=
-      "background: " +
-      vendor +
-      "linear-gradient(" +
-      x +
-      ", " +
-      a +
-      " 0%, " +
-      b +
-      " 100%); ";
+    elem.style.cssText += "background: " + vendor + "linear-gradient(" + x + ", " + a + " 0%, " + b + " 100%); ";
   });
 }
 

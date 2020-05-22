@@ -1,15 +1,19 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <link rel="stylesheet" href="build/dat.gui.css" />
   </head>
   <body>
+    <center>
+      <h1>Example Page</h1>
+      <div id="example"></div>
+    </center>
     <script type="text/javascript" src="build/dat.gui.js"></script>
     <script type="text/javascript">
-      var obj = {
+      /* eslint-disable no-console, camelcase */
+
+      const obj = {
         message: "Hello World",
         displayOutline: false,
 
@@ -31,18 +35,19 @@
         color2: [0, 128, 255, 0.3], // RGB with alpha
         color3: { h: 350, s: 0.9, v: 0.3 }, // Hue, saturation, value
 
-        imagePath1: 'https://images.unsplash.com/photo-1516222338250-863216ce01ea?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=467&q=50'
+        imagePath1:
+          "https://images.unsplash.com/photo-1516222338250-863216ce01ea?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=467&q=50",
 
-      plotter: 0
+        plotter: 0,
       };
 
-      var gui = new dat.gui.GUI();
+      const gui = new dat.gui.GUI();
 
       gui.remember(obj);
 
       gui.add(obj, "message");
       gui.add(obj, "displayOutline");
-    gui.add(obj, 'explode', { text: 'wat' });
+      gui.add(obj, "explode", { text: "wat" });
 
       gui.add(obj, "maxSize").min(-10).max(10).step(0.25).listen();
       gui.add(obj, "height").step(5); // Increment amount
@@ -53,46 +58,49 @@
       // Choose from named values
       gui.add(obj, "speed", { Stopped: 0, Slow: 0.1, Fast: 5 });
 
-      var f1 = gui.addFolder("Colors");
+      const f1 = gui.addFolder("Colors");
       f1.addColor(obj, "color0");
       f1.addColor(obj, "color1");
       f1.addColor(obj, "color2");
       f1.addColor(obj, "color3");
 
-      var f2 = gui.addFolder("Another Folder");
+      const f2 = gui.addFolder("Another Folder");
       f2.add(obj, "noiseStrength");
 
-      var f3 = f2.addFolder("Nested Folder");
+      const f3 = f2.addFolder("Nested Folder");
       f3.add(obj, "growthSpeed");
 
-    var f4 = gui.addFolder('Image');
-    f4.addImage(obj, 'imagePath1');
+      const f4 = gui.addFolder("Image");
+      f4.addImage(obj, "imagePath1");
 
-    var f5 = gui.addFolder('Custom Controllers');
-    plotter = new dat.controllers.PlotterController(obj, 'plotter');
-    f5.add(plotter, { liClass: 'plotter' });
-    plotter.listen();
+      const f5 = gui.addFolder("Custom Controllers");
+      plotter = new dat.controllers.PlotterController(obj, "plotter");
+      f5.add(plotter, { liClass: "plotter" });
+      plotter.listen();
 
-    var angle = 0,
-      max = Math.PI * 2;
-    setInterval(function() {
-      angle += 0.05;
-      if (angle > max) {
-        angle = 0;
-      }
+      let angle = 0;
+      const max = Math.PI * 2;
+      setInterval(function () {
+        angle += 0.05;
+        if (angle > max) {
+          angle = 0;
+        }
 
-      obj.plotter = Math.sin(angle) + 1.5;
-    }, 10);
+        obj.plotter = Math.sin(angle) + 1.5;
+      }, 10);
 
-    let functionObj = {
-      f: function() { console.log('f run'); },
-      a: async function a () { console.log('async a run'); }
-    };
+      const functionObj = {
+        f: function () {
+          console.log("f run");
+        },
+        a: async function a() {
+          console.log("async a run");
+        },
+      };
 
-    var f6 = gui.add(functionObj, 'f', 'f-button-text');
-    var a1 = gui.add(functionObj, 'a', 'async-button-text');
-    var a2 = gui.add(functionObj, 'a');
-
+      const f6 = gui.add(functionObj, "f", "f-button-text");
+      const a1 = gui.add(functionObj, "a", "async-button-text");
+      const a2 = gui.add(functionObj, "a");
     </script>
   </body>
 </html>

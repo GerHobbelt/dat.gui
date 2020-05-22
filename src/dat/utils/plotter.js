@@ -1,8 +1,8 @@
 /**
- * dat-gui JavaScript Controller Library
+ * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2020 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
  */
-const plotter = function(fg, bg, type) {
+const plotter = function (fg, bg, type) {
   let min = Infinity;
   let max = 0;
   const round = Math.round;
@@ -52,13 +52,13 @@ const plotter = function(fg, bg, type) {
   const GRAPH_WIDTH = 154 * PR;
   const GRAPH_HEIGHT = 54 * PR;
 
-  const canvas = document.createElement('canvas');
+  const canvas = document.createElement("canvas");
   canvas.width = WIDTH;
   canvas.height = HEIGHT;
 
-  const context = canvas.getContext('2d');
-  context.font = 'bold ' + (9 * PR) + 'px Helvetica,Arial,sans-serif';
-  context.textBaseline = 'top';
+  const context = canvas.getContext("2d");
+  context.font = "bold " + 9 * PR + "px Helvetica,Arial,sans-serif";
+  context.textBaseline = "top";
 
   context.fillStyle = bg;
   context.fillRect(0, 0, WIDTH, HEIGHT);
@@ -72,7 +72,7 @@ const plotter = function(fg, bg, type) {
 
   return {
     dom: canvas,
-    update: function(value, maxValue) {
+    update: function (value, maxValue) {
       min = Math.min(min, value);
       max = Math.max(max, value);
 
@@ -80,7 +80,17 @@ const plotter = function(fg, bg, type) {
       context.fillStyle = fg;
 
       // Move graph over 1px
-      context.drawImage(canvas, GRAPH_X + PR, GRAPH_Y, GRAPH_WIDTH - PR, GRAPH_HEIGHT, GRAPH_X, GRAPH_Y, GRAPH_WIDTH - PR, GRAPH_HEIGHT);
+      context.drawImage(
+        canvas,
+        GRAPH_X + PR,
+        GRAPH_Y,
+        GRAPH_WIDTH - PR,
+        GRAPH_HEIGHT,
+        GRAPH_X,
+        GRAPH_Y,
+        GRAPH_WIDTH - PR,
+        GRAPH_HEIGHT
+      );
 
       // Draw fg color
       context.fillRect(GRAPH_X + GRAPH_WIDTH - PR, GRAPH_Y, PR, GRAPH_HEIGHT);
@@ -89,23 +99,18 @@ const plotter = function(fg, bg, type) {
       context.globalAlpha = 0.9;
 
       // Blank out above the value
-      context.fillRect(
-        GRAPH_X + GRAPH_WIDTH - PR,
-        GRAPH_Y,
-        PR,
-        round((1 - (value / maxValue)) * GRAPH_HEIGHT)
-      );
+      context.fillRect(GRAPH_X + GRAPH_WIDTH - PR, GRAPH_Y, PR, round((1 - value / maxValue) * GRAPH_HEIGHT));
 
       // Blank out below the value if line
-      if (type === 'line') {
+      if (type === "line") {
         context.fillRect(
           GRAPH_X + GRAPH_WIDTH - PR,
-          round((1 - (value / maxValue)) * GRAPH_HEIGHT) + PR + 3,
+          round((1 - value / maxValue) * GRAPH_HEIGHT) + PR + 3,
           PR,
           round((value / maxValue) * GRAPH_HEIGHT)
         );
       }
-    }
+    },
   };
 };
 

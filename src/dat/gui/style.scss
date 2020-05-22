@@ -73,6 +73,10 @@ $input-color: lighten($background-color, 8.5%);
       border-radius: 5px;
       background: lighten($background-color, 30%);
     }
+    // Firefox
+    scrollbar-width: none;
+    // IE, Edge
+    -ms-overflow-style: none;
 
   }
 

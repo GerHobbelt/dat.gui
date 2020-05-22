@@ -270,6 +270,9 @@ const GUI = function(pars) {
         set: function(v) {
           // TODO Check for collisions among sibling folders
           params.name = v;
+          if (_this.__closeButton) {
+            _this.__closeButton.innerHTML = params.name;
+          }
           if (titleRow) {
             titleRow.innerHTML = params.name;
           }
@@ -297,7 +300,12 @@ const GUI = function(pars) {
           this.onResize();
 
           if (_this.__closeButton) {
-            _this.__closeButton.innerHTML = v ? GUI.TEXT_OPEN : GUI.TEXT_CLOSED;
+            // _this.__closeButton.innerHTML = v ? GUI.TEXT_OPEN : GUI.TEXT_CLOSED;
+            if (params.name) {
+              _this.__closeButton.innerHTML = params.name;
+            } else {
+              _this.__closeButton.innerHTML = v ? GUI.TEXT_OPEN : GUI.TEXT_CLOSED;
+            }
           }
         }
       },
@@ -355,6 +363,11 @@ const GUI = function(pars) {
     }
 
     this.__closeButton = document.createElement('div');
+    if (params.name) {
+      this.__closeButton.innerHTML = params.name;
+    } else {
+      this.__closeButton.innerHTML = GUI.TEXT_CLOSED;
+    }
     this.closed = params.closed || false;
     dom.addClass(this.__closeButton, GUI.CLASS_CLOSE_BUTTON);
     if (params.closeOnTop) {
@@ -1084,7 +1097,7 @@ function augmentController(gui, li, controller) {
   } else if (controller instanceof ColorController) {
     dom.addClass(li, 'color');
     controller.updateDisplay = common.compose(function(val) {
-      li.style.borderLeftColor = controller.__color.toString();
+      li.style.borderLeftColor = controller.__color.toHexString();
       return val;
     }, controller.updateDisplay);
 
@@ -1368,7 +1381,7 @@ function addResizeHandle(gui) {
   }
 
   function dragStop() {
-    dom.removeClass(gui.__closeButton, GUI.CLASS_DRAG);
+    // dom.removeClass(gui.__closeButton, GUI.CLASS_DRAG);
     dom.unbind(window, 'mousemove', drag);
     dom.unbind(window, 'mouseup', dragStop);
   }
@@ -1378,7 +1391,7 @@ function addResizeHandle(gui) {
 
     pmouseX = e.clientX;
 
-    dom.addClass(gui.__closeButton, GUI.CLASS_DRAG);
+    // dom.addClass(gui.__closeButton, GUI.CLASS_DRAG);
     dom.bind(window, 'mousemove', drag);
     dom.bind(window, 'mouseup', dragStop);
 
@@ -1386,7 +1399,7 @@ function addResizeHandle(gui) {
   }
 
   dom.bind(gui.__resize_handle, 'mousedown', dragStart);
-  dom.bind(gui.__closeButton, 'mousedown', dragStart);
+  // dom.bind(gui.__closeButton, 'mousedown', dragStart);
 
   gui.domElement.insertBefore(gui.__resize_handle, gui.domElement.firstElementChild);
 }

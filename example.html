@@ -27,7 +27,7 @@
 
         type: "three",
 
-        explode: function() {
+        explode: function () {
           alert("Bang!");
         },
 
@@ -39,9 +39,9 @@
           0.25: "rgb(0,0,255)",
           0.55: "rgb(0,255,0)",
           0.85: "yellow",
-          1.0: "rgb(255,0,0)"
+          1.0: "rgb(255,0,0)",
         },
-        array: ["one", "two"]
+        array: ["one", "two"],
       };
 
       const asUsual = true;
@@ -52,15 +52,15 @@
         width: "100%",
 
         nameMaper: {
-          maxSize: "最大值"
-        }
+          maxSize: "最大值",
+        },
       });
 
       if (!asUsual) {
         document.getElementById("example").appendChild(gui.domElement);
       }
 
-      gui.onFinishRevert(function() {
+      gui.onFinishRevert(function () {
         console.log("finished reverting");
       });
 
@@ -69,17 +69,14 @@
       gui.add(obj, "vector");
       gui.add(obj, "message");
       const control = gui.add(obj, "displayOutline");
-      control.onChange(function(newValue, oldValue) {
+      control.onChange(function (newValue, oldValue) {
         console.log(newValue, oldValue);
       });
-      control.onFinishChange(function(newValue, oldValue) {
+      control.onFinishChange(function (newValue, oldValue) {
         console.log("finish change");
       });
 
-      const controller = gui
-        .add(obj, "explode")
-        .borderColor("red")
-        .borderWidth(10);
+      const controller = gui.add(obj, "explode").borderColor("red").borderWidth(10);
       console.log(controller.__li.style);
 
       gui.add(obj, "maxSize", -10, 10, 0.05);
@@ -107,11 +104,11 @@
       const f2 = gui.addFolder("Another Folder");
       const test = f2.add(obj, "noiseStrength");
 
-      test.onChange(function() {
+      test.onChange(function () {
         console.log("nested change");
       });
 
-      test.onFinishChange(function() {
+      test.onFinishChange(function () {
         console.log("nested change finish");
       });
 
@@ -124,14 +121,14 @@
             0.25: "rgb(0,0,255)",
             0.55: "rgb(0,255,0)",
             0.85: "yellow",
-            1.0: "rgb(255,0,0)"
+            1.0: "rgb(255,0,0)",
           },
           {
             0: "rgb(255,0,0)",
-            1.0: "rgb(0,0,255)"
-          }
+            1.0: "rgb(0,0,255)",
+          },
         ])
-        .onFinishChange(function() {
+        .onFinishChange(function () {
           console.log(obj.gradient);
         });
     </script>

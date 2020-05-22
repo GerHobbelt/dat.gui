@@ -20,7 +20,7 @@ const INTERPRETATIONS = [
     litmus: common.isString,
     conversions: {
       THREE_CHAR_HEX: {
-        read: function(original) {
+        read: function (original) {
           const test = original.match(/^#([A-F0-9])([A-F0-9])([A-F0-9])$/i);
           if (test === null) {
             return false;
@@ -36,16 +36,16 @@ const INTERPRETATIONS = [
                 test[2].toString() +
                 test[3].toString() +
                 test[3].toString(),
-              0
-            )
+              16
+            ),
           };
         },
 
-        write: toString
+        write: toString,
       },
 
       SIX_CHAR_HEX: {
-        read: function(original) {
+        read: function (original) {
           const test = original.match(/^#([A-F0-9]{6})$/i);
           if (test === null) {
             return false;
@@ -53,15 +53,15 @@ const INTERPRETATIONS = [
 
           return {
             space: "HEX",
-            hex: parseInt("0x" + test[1].toString(), 0)
+            hex: parseInt("0x" + test[1].toString(), 16),
           };
         },
 
-        write: toString
+        write: toString,
       },
 
       CSS_RGB: {
-        read: function(original) {
+        read: function (original) {
           const test = original.match(/^rgb\(\s*(.+)\s*,\s*(.+)\s*,\s*(.+)\s*\)/);
           if (test === null) {
             return false;
@@ -71,15 +71,15 @@ const INTERPRETATIONS = [
             space: "RGB",
             r: parseFloat(test[1]),
             g: parseFloat(test[2]),
-            b: parseFloat(test[3])
+            b: parseFloat(test[3]),
           };
         },
 
-        write: toString
+        write: toString,
       },
 
       CSS_RGBA: {
-        read: function(original) {
+        read: function (original) {
           const test = original.match(/^rgba\(\s*(.+)\s*,\s*(.+)\s*,\s*(.+)\s*,\s*(.+)\s*\)/);
           if (test === null) {
             return false;
@@ -90,13 +90,13 @@ const INTERPRETATIONS = [
             r: parseFloat(test[1]),
             g: parseFloat(test[2]),
             b: parseFloat(test[3]),
-            a: parseFloat(test[4])
+            a: parseFloat(test[4]),
           };
         },
 
-        write: toString
-      }
-    }
+        write: toString,
+      },
+    },
   },
 
   // Numbers
@@ -105,19 +105,19 @@ const INTERPRETATIONS = [
 
     conversions: {
       HEX: {
-        read: function(original) {
+        read: function (original) {
           return {
             space: "HEX",
             hex: original,
-            conversionName: "HEX"
+            conversionName: "HEX",
           };
         },
 
-        write: function(color) {
+        write: function (color) {
           return color.hex;
-        }
-      }
-    }
+        },
+      },
+    },
   },
 
   // Arrays
@@ -125,7 +125,7 @@ const INTERPRETATIONS = [
     litmus: common.isArray,
     conversions: {
       RGB_ARRAY: {
-        read: function(original) {
+        read: function (original) {
           if (original.length !== 3) {
             return false;
           }
@@ -134,32 +134,32 @@ const INTERPRETATIONS = [
             space: "RGB",
             r: original[0],
             g: original[1],
-            b: original[2]
+            b: original[2],
           };
         },
 
-        write: function(color) {
+        write: function (color) {
           return [color.r, color.g, color.b];
-        }
+        },
       },
 
       RGBA_ARRAY: {
-        read: function(original) {
+        read: function (original) {
           if (original.length !== 4) return false;
           return {
             space: "RGB",
             r: original[0],
             g: original[1],
             b: original[2],
-            a: original[3]
+            a: original[3],
           };
         },
 
-        write: function(color) {
+        write: function (color) {
           return [color.r, color.g, color.b, color.a];
-        }
-      }
-    }
+        },
+      },
+    },
   },
 
   // Objects
@@ -167,7 +167,7 @@ const INTERPRETATIONS = [
     litmus: common.isObject,
     conversions: {
       RGBA_OBJ: {
-        read: function(original) {
+        read: function (original) {
           if (
             common.isNumber(original.r) &&
             common.isNumber(original.g) &&
@@ -179,46 +179,46 @@ const INTERPRETATIONS = [
               r: original.r,
               g: original.g,
               b: original.b,
-              a: original.a
+              a: original.a,
             };
           }
           return false;
         },
 
-        write: function(color) {
+        write: function (color) {
           return {
             r: color.r,
             g: color.g,
             b: color.b,
-            a: color.a
+            a: color.a,
           };
-        }
+        },
       },
 
       RGB_OBJ: {
-        read: function(original) {
+        read: function (original) {
           if (common.isNumber(original.r) && common.isNumber(original.g) && common.isNumber(original.b)) {
             return {
               space: "RGB",
               r: original.r,
               g: original.g,
-              b: original.b
+              b: original.b,
             };
           }
           return false;
         },
 
-        write: function(color) {
+        write: function (color) {
           return {
             r: color.r,
             g: color.g,
-            b: color.b
+            b: color.b,
           };
-        }
+        },
       },
 
       HSVA_OBJ: {
-        read: function(original) {
+        read: function (original) {
           if (
             common.isNumber(original.h) &&
             common.isNumber(original.s) &&
@@ -230,57 +230,57 @@ const INTERPRETATIONS = [
               h: original.h,
               s: original.s,
               v: original.v,
-              a: original.a
+              a: original.a,
             };
           }
           return false;
         },
 
-        write: function(color) {
+        write: function (color) {
           return {
             h: color.h,
             s: color.s,
             v: color.v,
-            a: color.a
+            a: color.a,
           };
-        }
+        },
       },
 
       HSV_OBJ: {
-        read: function(original) {
+        read: function (original) {
           if (common.isNumber(original.h) && common.isNumber(original.s) && common.isNumber(original.v)) {
             return {
               space: "HSV",
               h: original.h,
               s: original.s,
-              v: original.v
+              v: original.v,
             };
           }
           return false;
         },
 
-        write: function(color) {
+        write: function (color) {
           return {
             h: color.h,
             s: color.s,
-            v: color.v
+            v: color.v,
           };
-        }
-      }
-    }
-  }
+        },
+      },
+    },
+  },
 ];
 
 let result;
 let toReturn;
 
-const interpret = function() {
+const interpret = function () {
   toReturn = false;
 
   const original = arguments.length > 1 ? common.toArray(arguments) : arguments[0];
-  common.each(INTERPRETATIONS, function(family) {
+  common.each(INTERPRETATIONS, function (family) {
     if (family.litmus(original)) {
-      common.each(family.conversions, function(conversion, conversionName) {
+      common.each(family.conversions, function (conversion, conversionName) {
         result = conversion.read(original);
 
         if (toReturn === false && result !== false) {

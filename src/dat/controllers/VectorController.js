@@ -63,14 +63,14 @@ class VectorController extends Controller {
     this.__field_knob = document.createElement("div");
     this.__field_knob.className = "field-knob";
 
-    dom.bind(this.__selector, "mousedown", function(/* e */) {
-      dom.addClass(this, "drag").bind(window, "mouseup", function(/* e */) {
+    dom.bind(this.__selector, "mousedown", function (/* e */) {
+      dom.addClass(this, "drag").bind(window, "mouseup", function (/* e */) {
         dom.removeClass(_this.__selector, "drag");
       });
     });
 
-    dom.bind(this.__selector, "touchstart", function(/* e */) {
-      dom.addClass(this, "drag").bind(window, "touchend", function(/* e */) {
+    dom.bind(this.__selector, "touchstart", function (/* e */) {
+      dom.addClass(this, "drag").bind(window, "touchend", function (/* e */) {
         dom.removeClass(_this.__selector, "drag");
       });
     });
@@ -80,7 +80,7 @@ class VectorController extends Controller {
       height: "52px",
       padding: "3px",
       backgroundColor: "#222",
-      boxShadow: "0px 1px 3px rgba(0,0,0,0.3)"
+      boxShadow: "0px 1px 3px rgba(0,0,0,0.3)",
     });
 
     common.extend(this.__field_knob.style, {
@@ -88,7 +88,7 @@ class VectorController extends Controller {
       width: "12px",
       height: "12px",
       borderRadius: "12px",
-      zIndex: 1
+      zIndex: 1,
     });
 
     common.extend(this.__pos_field.style, {
@@ -96,7 +96,7 @@ class VectorController extends Controller {
       height: "50px",
       marginRight: "3px",
       display: "inline-block",
-      cursor: "pointer"
+      cursor: "pointer",
     });
 
     dom.bind(this.__pos_field, "mousedown", fieldDown);
@@ -167,7 +167,7 @@ class VectorController extends Controller {
     const offset = vec2pos(this.__vec, this.__min, this.__max);
     common.extend(this.__field_knob.style, {
       marginLeft: 50 * offset[0] - 7 + "px",
-      marginTop: 50 * (1 - offset[1]) - 7 + "px"
+      marginTop: 50 * (1 - offset[1]) - 7 + "px",
     });
 
     this.__temp[0] = 1;

@@ -16,12 +16,12 @@ import common from "../utils/common";
 const EVENT_MAP = {
   HTMLEvents: ["change"],
   MouseEvents: ["click", "mousemove", "mousedown", "mouseup", "mouseover", "wheel"],
-  KeyboardEvents: ["keydown"]
+  KeyboardEvents: ["keydown"],
 };
 
 const EVENT_MAP_INV = {};
-common.each(EVENT_MAP, function(v, k) {
-  common.each(v, function(e) {
+common.each(EVENT_MAP, function (v, k) {
+  common.each(v, function (e) {
     EVENT_MAP_INV[e] = k;
   });
 });
@@ -54,16 +54,16 @@ const dom = {
    * @param elem
    * @param selectable
    */
-  makeSelectable: function(elem, selectable) {
+  makeSelectable: function (elem, selectable) {
     if (elem === undefined || elem.style === undefined) {
       return;
     }
 
     elem.onselectstart = selectable
-      ? function() {
+      ? function () {
           return false;
         }
-      : function() {};
+      : function () {};
 
     elem.style.MozUserSelect = selectable ? "auto" : "none";
     elem.style.KhtmlUserSelect = selectable ? "auto" : "none";
@@ -76,7 +76,7 @@ const dom = {
    * @param horizontal
    * @param vert
    */
-  makeFullscreen: function(elem, hor, vert) {
+  makeFullscreen: function (elem, hor, vert) {
     let vertical = vert;
     let horizontal = hor;
 
@@ -106,7 +106,7 @@ const dom = {
    * @param eventType
    * @param params
    */
-  fakeEvent: function(elem, eventType, pars, aux) {
+  fakeEvent: function (elem, eventType, pars, aux) {
     const params = pars || {};
     const className = EVENT_MAP_INV[eventType];
     if (!className) {
@@ -145,7 +145,7 @@ const dom = {
           shiftKey: false,
           metaKey: false,
           keyCode: undefined,
-          charCode: undefined
+          charCode: undefined,
         });
         init(
           eventType,
@@ -177,7 +177,7 @@ const dom = {
    * @param func
    * @param bool
    */
-  bind: function(elem, event, func, newBool, newPassive) {
+  bind: function (elem, event, func, newBool, newPassive) {
     const bool = newBool || false;
     const passive = newPassive || false;
     if (elem.addEventListener) {
@@ -196,7 +196,7 @@ const dom = {
    * @param func
    * @param bool
    */
-  unbind: function(elem, event, func, newBool) {
+  unbind: function (elem, event, func, newBool) {
     const bool = newBool || false;
     if (elem.removeEventListener) {
       elem.removeEventListener(event, func, bool);
@@ -211,17 +211,14 @@ const dom = {
    * @param elem
    * @param className
    */
-  addClass: function(elem, className) {
+  addClass: function (elem, className) {
     if (elem.className === undefined) {
       elem.className = className;
     } else if (elem.className !== className) {
       const classes = elem.className.split(/ +/);
       if (classes.indexOf(className) === -1) {
         classes.push(className);
-        elem.className = classes
-          .join(" ")
-          .replace(/^\s+/, "")
-          .replace(/\s+$/, "");
+        elem.className = classes.join(" ").replace(/^\s+/, "").replace(/\s+$/, "");
       }
     }
     return dom;
@@ -232,7 +229,7 @@ const dom = {
    * @param elem
    * @param className
    */
-  removeClass: function(elem, className) {
+  removeClass: function (elem, className) {
     if (className) {
       if (elem.className === className) {
         elem.removeAttribute("class");
@@ -250,7 +247,7 @@ const dom = {
     return dom;
   },
 
-  hasClass: function(elem, className) {
+  hasClass: function (elem, className) {
     return new RegExp("(?:^|\\s+)" + className + "(?:\\s+|$)").test(elem.className) || false;
   },
 
@@ -258,7 +255,7 @@ const dom = {
    *
    * @param elem
    */
-  getWidth: function(elem) {
+  getWidth: function (elem) {
     const style = getComputedStyle(elem);
 
     return (
@@ -274,7 +271,7 @@ const dom = {
    *
    * @param elem
    */
-  getHeight: function(elem) {
+  getHeight: function (elem) {
     const style = getComputedStyle(elem);
 
     return (
@@ -290,7 +287,7 @@ const dom = {
    *
    * @param el
    */
-  getOffset: function(el) {
+  getOffset: function (el) {
     let elem = el;
     const offset = { left: 0, top: 0 };
     if (elem.offsetParent) {
@@ -308,9 +305,9 @@ const dom = {
    *
    * @param elem
    */
-  isActive: function(elem) {
+  isActive: function (elem) {
     return elem === document.activeElement && (elem.type || elem.href);
-  }
+  },
 };
 
 export default dom;

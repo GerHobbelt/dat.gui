@@ -44,13 +44,13 @@ class OptionController extends Controller {
 
     if (common.isArray(options)) {
       const map = {};
-      common.each(options, function(element) {
+      common.each(options, function (element) {
         map[element] = element;
       });
       options = map;
     }
 
-    common.each(options, function(value, key) {
+    common.each(options, function (value, key) {
       const opt = document.createElement("option");
       opt.innerHTML = key;
       opt.setAttribute("value", value);
@@ -63,7 +63,7 @@ class OptionController extends Controller {
     dom.bind(
       this.__select,
       "change",
-      function() {
+      function () {
         const desiredValue = this.options[this.selectedIndex].value;
         _this.setValue(desiredValue);
       },

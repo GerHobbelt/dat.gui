@@ -23,13 +23,13 @@ const ARR_SLICE = Array.prototype.slice;
 const Common = {
   BREAK: {},
 
-  extend: function(target) {
+  extend: function (target) {
     this.each(
       ARR_SLICE.call(arguments, 1),
-      function(obj) {
+      function (obj) {
         const keys = this.isObject(obj) ? Object.keys(obj) : [];
         keys.forEach(
-          function(key) {
+          function (key) {
             if (!this.isUndefined(obj[key])) {
               target[key] = obj[key];
             }
@@ -42,13 +42,13 @@ const Common = {
     return target;
   },
 
-  defaults: function(target) {
+  defaults: function (target) {
     this.each(
       ARR_SLICE.call(arguments, 1),
-      function(obj) {
+      function (obj) {
         const keys = this.isObject(obj) ? Object.keys(obj) : [];
         keys.forEach(
-          function(key) {
+          function (key) {
             if (this.isUndefined(target[key])) {
               target[key] = obj[key];
             }
@@ -61,9 +61,9 @@ const Common = {
     return target;
   },
 
-  compose: function() {
+  compose: function () {
     const toCall = ARR_SLICE.call(arguments);
-    return function() {
+    return function () {
       let args = ARR_SLICE.call(arguments);
       for (let i = toCall.length - 1; i >= 0; i--) {
         args = [toCall[i].apply(this, args)];
@@ -72,7 +72,7 @@ const Common = {
     };
   },
 
-  each: function(obj, itr, scope) {
+  each: function (obj, itr, scope) {
     if (!obj) {
       return;
     }
@@ -98,7 +98,7 @@ const Common = {
     }
   },
 
-  defer: function(fnc) {
+  defer: function (fnc) {
     setTimeout(fnc, 0);
   },
 
@@ -106,10 +106,10 @@ const Common = {
    * If the function is called repeatedly, wait until threshold passes
    * until we execute the function.
    */
-  debounce: function(func, threshold, callImmediately) {
+  debounce: function (func, threshold, callImmediately) {
     let timeout;
 
-    return function() {
+    return function () {
       const obj = this;
       const args = arguments;
       function delayed() {
@@ -128,57 +128,57 @@ const Common = {
     };
   },
 
-  toArray: function(obj) {
+  toArray: function (obj) {
     if (obj.toArray) return obj.toArray();
     return ARR_SLICE.call(obj);
   },
 
-  isUndefined: function(obj) {
+  isUndefined: function (obj) {
     return obj === undefined;
   },
 
-  isNull: function(obj) {
+  isNull: function (obj) {
     return obj === null;
   },
 
-  isNaN: function(obj) {
+  isNaN: function (obj) {
     return isNaN(obj);
   },
 
   // isArray: Array.isArray || function(obj) {
-  isArray: function(obj) {
+  isArray: function (obj) {
     // return obj.constructor === Array;
     return obj != null && obj.length >= 0 && typeof obj === "object";
   },
 
-  isObject: function(obj) {
+  isObject: function (obj) {
     return obj === Object(obj);
   },
 
-  isNumber: function(obj) {
+  isNumber: function (obj) {
     return obj === obj + 0;
   },
 
-  isString: function(obj) {
+  isString: function (obj) {
     return obj === obj + "";
   },
 
-  isBoolean: function(obj) {
+  isBoolean: function (obj) {
     return obj === false || obj === true;
   },
 
-  isFunction: function(obj) {
+  isFunction: function (obj) {
     return Object.prototype.toString.call(obj) === "[object Function]";
   },
 
-  supportsPassive: function() {
+  supportsPassive: function () {
     let supportsPassive = false;
     try {
       const opts = Object.defineProperty({}, "passive", {
-        get: function() {
+        get: function () {
           supportsPassive = true;
           return false; // make lint happy: return a value
-        }
+        },
       });
       window.addEventListener("testPassive", null, opts);
       window.removeEventListener("testPassive", null, opts);
@@ -186,7 +186,7 @@ const Common = {
       // Do nothing
     }
     return supportsPassive;
-  }
+  },
 };
 
 export default Common;

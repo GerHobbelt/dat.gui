@@ -23,7 +23,7 @@ import ColorController from "./ColorController";
 import ArrayController from "./ArrayController";
 import common from "../utils/common";
 
-const ControllerFactory = function(object, property) {
+const ControllerFactory = function (object, property) {
   const initialValue = object[property];
 
   // Providing options?

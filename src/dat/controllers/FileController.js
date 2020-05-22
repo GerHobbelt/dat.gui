@@ -32,7 +32,7 @@ class FileController extends Controller {
 
     function onChange(e) {
       const fileReader = new FileReader();
-      fileReader.addEventListener("load", function(file) {
+      fileReader.addEventListener("load", function (file) {
         _this.fire(fileReader.result);
       });
 

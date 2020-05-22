@@ -11,6 +11,8 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
+import SuperGif from "wsgif";
+
 function colorToString(color, forceCSSHex) {
   var colorFormat = color.__state.conversionName.toString();
   var r = Math.round(color.r);
@@ -63,10 +65,10 @@ var Common = {
   extend: function extend(target) {
     this.each(
       ARR_SLICE.call(arguments, 1),
-      function(obj) {
+      function (obj) {
         var keys = this.isObject(obj) ? Object.keys(obj) : [];
         keys.forEach(
-          function(key) {
+          function (key) {
             if (!this.isUndefined(obj[key])) {
               target[key] = obj[key];
             }
@@ -80,10 +82,10 @@ var Common = {
   defaults: function defaults(target) {
     this.each(
       ARR_SLICE.call(arguments, 1),
-      function(obj) {
+      function (obj) {
         var keys = this.isObject(obj) ? Object.keys(obj) : [];
         keys.forEach(
-          function(key) {
+          function (key) {
             if (this.isUndefined(target[key])) {
               target[key] = obj[key];
             }
@@ -96,7 +98,7 @@ var Common = {
   },
   compose: function compose() {
     var toCall = ARR_SLICE.call(arguments);
-    return function() {
+    return function () {
       var args = ARR_SLICE.call(arguments);
       for (var i = toCall.length - 1; i >= 0; i--) {
         args = [toCall[i].apply(this, args)];
@@ -131,7 +133,7 @@ var Common = {
   },
   debounce: function debounce(func, threshold, callImmediately) {
     var timeout;
-    return function() {
+    return function () {
       var obj = this;
       var args = arguments;
       function delayed() {
@@ -156,15 +158,15 @@ var Common = {
   isNull: function isNull(obj) {
     return obj === null;
   },
-  isNaN: (function(_isNaN) {
+  isNaN: (function (_isNaN) {
     function isNaN(_x) {
       return _isNaN.apply(this, arguments);
     }
-    isNaN.toString = function() {
+    isNaN.toString = function () {
       return _isNaN.toString();
     };
     return isNaN;
-  })(function(obj) {
+  })(function (obj) {
     return isNaN(obj);
   }),
   isArray: function isArray(obj) {
@@ -192,13 +194,13 @@ var Common = {
         get: function get() {
           supportsPassive = true;
           return false;
-        }
+        },
       });
       window.addEventListener("testPassive", null, opts);
       window.removeEventListener("testPassive", null, opts);
     } catch (e) {}
     return supportsPassive;
-  }
+  },
 };
 
 var INTERPRETATIONS = [
@@ -221,11 +223,11 @@ var INTERPRETATIONS = [
                 test[2].toString() +
                 test[3].toString() +
                 test[3].toString(),
-              0
-            )
+              16
+            ),
           };
         },
-        write: colorToString
+        write: colorToString,
       },
       SIX_CHAR_HEX: {
         read: function read(original) {
@@ -235,10 +237,10 @@ var INTERPRETATIONS = [
           }
           return {
             space: "HEX",
-            hex: parseInt("0x" + test[1].toString(), 0)
+            hex: parseInt("0x" + test[1].toString(), 16),
           };
         },
-        write: colorToString
+        write: colorToString,
       },
       CSS_RGB: {
         read: function read(original) {
@@ -250,10 +252,10 @@ var INTERPRETATIONS = [
             space: "RGB",
             r: parseFloat(test[1]),
             g: parseFloat(test[2]),
-            b: parseFloat(test[3])
+            b: parseFloat(test[3]),
           };
         },
-        write: colorToString
+        write: colorToString,
       },
       CSS_RGBA: {
         read: function read(original) {
@@ -266,12 +268,12 @@ var INTERPRETATIONS = [
             r: parseFloat(test[1]),
             g: parseFloat(test[2]),
             b: parseFloat(test[3]),
-            a: parseFloat(test[4])
+            a: parseFloat(test[4]),
           };
         },
-        write: colorToString
-      }
-    }
+        write: colorToString,
+      },
+    },
   },
   {
     litmus: Common.isNumber,
@@ -281,14 +283,14 @@ var INTERPRETATIONS = [
           return {
             space: "HEX",
             hex: original,
-            conversionName: "HEX"
+            conversionName: "HEX",
           };
         },
         write: function write(color) {
           return color.hex;
-        }
-      }
-    }
+        },
+      },
+    },
   },
   {
     litmus: Common.isArray,
@@ -302,12 +304,12 @@ var INTERPRETATIONS = [
             space: "RGB",
             r: original[0],
             g: original[1],
-            b: original[2]
+            b: original[2],
           };
         },
         write: function write(color) {
           return [color.r, color.g, color.b];
-        }
+        },
       },
       RGBA_ARRAY: {
         read: function read(original) {
@@ -317,14 +319,14 @@ var INTERPRETATIONS = [
             r: original[0],
             g: original[1],
             b: original[2],
-            a: original[3]
+            a: original[3],
           };
         },
         write: function write(color) {
           return [color.r, color.g, color.b, color.a];
-        }
-      }
-    }
+        },
+      },
+    },
   },
   {
     litmus: Common.isObject,
@@ -342,7 +344,7 @@ var INTERPRETATIONS = [
               r: original.r,
               g: original.g,
               b: original.b,
-              a: original.a
+              a: original.a,
             };
           }
           return false;
@@ -352,9 +354,9 @@ var INTERPRETATIONS = [
             r: color.r,
             g: color.g,
             b: color.b,
-            a: color.a
+            a: color.a,
           };
-        }
+        },
       },
       RGB_OBJ: {
         read: function read(original) {
@@ -363,7 +365,7 @@ var INTERPRETATIONS = [
               space: "RGB",
               r: original.r,
               g: original.g,
-              b: original.b
+              b: original.b,
             };
           }
           return false;
@@ -372,9 +374,9 @@ var INTERPRETATIONS = [
           return {
             r: color.r,
             g: color.g,
-            b: color.b
+            b: color.b,
           };
-        }
+        },
       },
       HSVA_OBJ: {
         read: function read(original) {
@@ -389,7 +391,7 @@ var INTERPRETATIONS = [
               h: original.h,
               s: original.s,
               v: original.v,
-              a: original.a
+              a: original.a,
             };
           }
           return false;
@@ -399,9 +401,9 @@ var INTERPRETATIONS = [
             h: color.h,
             s: color.s,
             v: color.v,
-            a: color.a
+            a: color.a,
           };
-        }
+        },
       },
       HSV_OBJ: {
         read: function read(original) {
@@ -410,7 +412,7 @@ var INTERPRETATIONS = [
               space: "HSV",
               h: original.h,
               s: original.s,
-              v: original.v
+              v: original.v,
             };
           }
           return false;
@@ -419,21 +421,21 @@ var INTERPRETATIONS = [
           return {
             h: color.h,
             s: color.s,
-            v: color.v
+            v: color.v,
           };
-        }
-      }
-    }
-  }
+        },
+      },
+    },
+  },
 ];
 var result;
 var toReturn;
 var interpret = function interpret() {
   toReturn = false;
   var original = arguments.length > 1 ? Common.toArray(arguments) : arguments[0];
-  Common.each(INTERPRETATIONS, function(family) {
+  Common.each(INTERPRETATIONS, function (family) {
     if (family.litmus(original)) {
-      Common.each(family.conversions, function(conversion, conversionName) {
+      Common.each(family.conversions, function (conversion, conversionName) {
         result = conversion.read(original);
         if (toReturn === false && result !== false) {
           toReturn = result;
@@ -456,11 +458,18 @@ var ColorMath = {
     var p = v * (1.0 - s);
     var q = v * (1.0 - f * s);
     var t = v * (1.0 - (1.0 - f) * s);
-    var c = [[v, t, p], [q, v, p], [p, v, t], [p, q, v], [t, p, v], [v, p, q]][hi];
+    var c = [
+      [v, t, p],
+      [q, v, p],
+      [p, v, t],
+      [p, q, v],
+      [t, p, v],
+      [v, p, q],
+    ][hi];
     return {
       r: c[0] * 255,
       g: c[1] * 255,
-      b: c[2] * 255
+      b: c[2] * 255,
     };
   },
   rgb_to_hsv: function rgb_to_hsv(r, g, b) {
@@ -475,7 +484,7 @@ var ColorMath = {
       return {
         h: NaN,
         s: 0,
-        v: 0
+        v: 0,
       };
     }
     if (r === max) {
@@ -492,7 +501,7 @@ var ColorMath = {
     return {
       h: h * 360,
       s: s,
-      v: max / 255
+      v: max / 255,
     };
   },
   rgb_to_hex: function rgb_to_hex(r, g, b) {
@@ -507,10 +516,10 @@ var ColorMath = {
   hex_with_component: function hex_with_component(hex, componentIndex, value) {
     value = (value << (tmpComponent = componentIndex * 8)) | (hex & ~(0xff << tmpComponent));
     return value;
-  }
+  },
 };
 
-var Color = (function() {
+var Color = (function () {
   function Color() {
     this.__state = interpret.apply(this, arguments);
     if (this.__state === false) {
@@ -545,7 +554,7 @@ function defineRGBComponent(target, component, componentHexIndex) {
         this.__state.space = "RGB";
       }
       this.__state[component] = v;
-    }
+    },
   });
 }
 function defineHSVComponent(target, component) {
@@ -563,10 +572,10 @@ function defineHSVComponent(target, component) {
         this.__state.space = "HSV";
       }
       this.__state[component] = v;
-    }
+    },
   });
 }
-Color.recalculateRGB = function(color, component, componentHexIndex) {
+Color.recalculateRGB = function (color, component, componentHexIndex) {
   if (color.__state.space === "HEX") {
     color.__state[component] = ColorMath.component_from_hex(color.__state.hex, componentHexIndex);
   } else if (color.__state.space === "HSV") {
@@ -575,11 +584,11 @@ Color.recalculateRGB = function(color, component, componentHexIndex) {
     throw new Error("Corrupted color state");
   }
 };
-Color.recalculateHSV = function(color) {
+Color.recalculateHSV = function (color) {
   var result = ColorMath.rgb_to_hsv(color.r, color.g, color.b);
   Common.extend(color.__state, {
     s: result.s,
-    v: result.v
+    v: result.v,
   });
   if (!Common.isNaN(result.h)) {
     color.__state.h = result.h;
@@ -600,7 +609,7 @@ Object.defineProperty(Color.prototype, "a", {
   },
   set: function set(v) {
     this.__state.a = v;
-  }
+  },
 });
 Object.defineProperty(Color.prototype, "hex", {
   get: function get() {
@@ -612,10 +621,10 @@ Object.defineProperty(Color.prototype, "hex", {
   set: function set(v) {
     this.__state.space = "HEX";
     this.__state.hex = v;
-  }
+  },
 });
 
-var Controller = (function() {
+var Controller = (function () {
   function Controller(object, property) {
     this.initialValue = object[property];
     this.domElement = document.createElement("div");
@@ -624,10 +633,10 @@ var Controller = (function() {
     this._readonly = false;
     this.__onChange = undefined;
     this.__onFinishChange = undefined;
-    this.__transformInput = function(x) {
+    this.__transformInput = function (x) {
       return x;
     };
-    this.__transformOutput = function(x) {
+    this.__transformOutput = function (x) {
       return x;
     };
     this.forceUpdateDisplay = false;
@@ -719,11 +728,11 @@ function _assertThisInitialized(self) {
 var EVENT_MAP = {
   HTMLEvents: ["change"],
   MouseEvents: ["click", "mousemove", "mousedown", "mouseup", "mouseover", "wheel"],
-  KeyboardEvents: ["keydown"]
+  KeyboardEvents: ["keydown"],
 };
 var EVENT_MAP_INV = {};
-Common.each(EVENT_MAP, function(v, k) {
-  Common.each(v, function(e) {
+Common.each(EVENT_MAP, function (v, k) {
+  Common.each(v, function (e) {
     EVENT_MAP_INV[e] = k;
   });
 });
@@ -744,10 +753,10 @@ var dom = {
       return;
     }
     elem.onselectstart = selectable
-      ? function() {
+      ? function () {
           return false;
         }
-      : function() {};
+      : function () {};
     elem.style.MozUserSelect = selectable ? "auto" : "none";
     elem.style.KhtmlUserSelect = selectable ? "auto" : "none";
     elem.unselectable = selectable ? "on" : "off";
@@ -810,7 +819,7 @@ var dom = {
           shiftKey: false,
           metaKey: false,
           keyCode: undefined,
-          charCode: undefined
+          charCode: undefined,
         });
         init(
           eventType,
@@ -841,7 +850,7 @@ var dom = {
       var listenerArg = Common.supportsPassive()
         ? {
             capture: bool,
-            passive: passive
+            passive: passive,
           }
         : bool;
       elem.addEventListener(event, func, listenerArg);
@@ -866,10 +875,7 @@ var dom = {
       var classes = elem.className.split(/ +/);
       if (classes.indexOf(className) === -1) {
         classes.push(className);
-        elem.className = classes
-          .join(" ")
-          .replace(/^\s+/, "")
-          .replace(/\s+$/, "");
+        elem.className = classes.join(" ").replace(/^\s+/, "").replace(/\s+$/, "");
       }
     }
     return dom;
@@ -918,7 +924,7 @@ var dom = {
     var elem = el;
     var offset = {
       left: 0,
-      top: 0
+      top: 0,
     };
     if (elem.offsetParent) {
       do {
@@ -931,10 +937,10 @@ var dom = {
   },
   isActive: function isActive(elem) {
     return elem === document.activeElement && (elem.type || elem.href);
-  }
+  },
 };
 
-var BooleanController = (function(_Controller) {
+var BooleanController = (function (_Controller) {
   _inheritsLoose(BooleanController, _Controller);
   function BooleanController(object, property) {
     var _this2;
@@ -979,7 +985,7 @@ var BooleanController = (function(_Controller) {
   return BooleanController;
 })(Controller);
 
-var OptionController = (function(_Controller) {
+var OptionController = (function (_Controller) {
   _inheritsLoose(OptionController, _Controller);
   function OptionController(object, property, opts) {
     var _this2;
@@ -989,12 +995,12 @@ var OptionController = (function(_Controller) {
     _this2.__select = document.createElement("select");
     if (Common.isArray(options)) {
       var map = {};
-      Common.each(options, function(element) {
+      Common.each(options, function (element) {
         map[element] = element;
       });
       options = map;
     }
-    Common.each(options, function(value, key) {
+    Common.each(options, function (value, key) {
       var opt = document.createElement("option");
       opt.innerHTML = key;
       opt.setAttribute("value", value);
@@ -1004,7 +1010,7 @@ var OptionController = (function(_Controller) {
     dom.bind(
       _this2.__select,
       "change",
-      function() {
+      function () {
         var desiredValue = this.options[this.selectedIndex].value;
         _this.setValue(desiredValue);
       },
@@ -1034,7 +1040,7 @@ var OptionController = (function(_Controller) {
   return OptionController;
 })(Controller);
 
-var StringController = (function(_Controller) {
+var StringController = (function (_Controller) {
   _inheritsLoose(StringController, _Controller);
   function StringController(object, property) {
     var _this2;
@@ -1082,7 +1088,7 @@ function numDecimals(x) {
   }
   return 2;
 }
-var NumberController = (function(_Controller) {
+var NumberController = (function (_Controller) {
   _inheritsLoose(NumberController, _Controller);
   function NumberController(object, property, params) {
     var _this;
@@ -1141,7 +1147,7 @@ function roundToDecimal(value, decimals) {
   var tenTo = Math.pow(10, decimals);
   return Math.round(value * tenTo) / tenTo;
 }
-var NumberControllerBox = (function(_NumberController) {
+var NumberControllerBox = (function (_NumberController) {
   _inheritsLoose(NumberControllerBox, _NumberController);
   function NumberControllerBox(object, property, params) {
     var _this2;
@@ -1163,10 +1169,10 @@ var NumberControllerBox = (function(_NumberController) {
       "style",
       "position:absolute;right:0;height:10px;top:15px;background-color: #555;border: none;"
     );
-    dom.bind(_this2.__up, "mousedown", function() {
+    dom.bind(_this2.__up, "mousedown", function () {
       _this.setValue(_this.getValue() + _this.__impliedStep);
     });
-    dom.bind(_this2.__down, "mousedown", function() {
+    dom.bind(_this2.__down, "mousedown", function () {
       _this.setValue(_this.getValue() - _this.__impliedStep);
     });
     dom.bind(_this2.__input, "change", onChange, false, true);
@@ -1221,8 +1227,6 @@ var NumberControllerBox = (function(_NumberController) {
         case 40:
           _this.setValue(_this.getValue() - _this.__impliedStep);
           break;
-        default:
-          break;
       }
     }
     function onWheel(e) {
@@ -1252,7 +1256,7 @@ var NumberControllerBox = (function(_NumberController) {
 function map(v, i1, i2, o1, o2) {
   return o1 + (o2 - o1) * ((v - i1) / (i2 - i1));
 }
-var NumberControllerSlider = (function(_NumberController) {
+var NumberControllerSlider = (function (_NumberController) {
   _inheritsLoose(NumberControllerSlider, _NumberController);
   function NumberControllerSlider(object, property, min, max, step) {
     var _this2;
@@ -1260,7 +1264,7 @@ var NumberControllerSlider = (function(_NumberController) {
       _NumberController.call(this, object, property, {
         min: min,
         max: max,
-        step: step
+        step: step,
       }) || this;
     var _this = _assertThisInitialized(_this2);
     _this2.__background = document.createElement("div");
@@ -1341,7 +1345,7 @@ var NumberControllerSlider = (function(_NumberController) {
   return NumberControllerSlider;
 })(NumberController);
 
-var FunctionController = (function(_Controller) {
+var FunctionController = (function (_Controller) {
   _inheritsLoose(FunctionController, _Controller);
   function FunctionController(object, property, text) {
     var _this2;
@@ -1349,11 +1353,11 @@ var FunctionController = (function(_Controller) {
     var _this = _assertThisInitialized(_this2);
     _this2.__button = document.createElement("div");
     _this2.__button.innerHTML = text === undefined ? "Fire" : text;
-    dom.bind(_this2.__button, "click", function(e) {
+    dom.bind(_this2.__button, "click", function (e) {
       e.preventDefault();
       _this.fire();
       dom.addClass(_this.__button.parentElement.parentElement.parentElement, "function--active");
-      setTimeout(function() {
+      setTimeout(function () {
         dom.removeClass(_this.__button.parentElement.parentElement.parentElement, "function--active");
       }, 100);
       return false;
@@ -1375,7 +1379,7 @@ var FunctionController = (function(_Controller) {
   return FunctionController;
 })(Controller);
 
-var TabbedController = (function(_Controller) {
+var TabbedController = (function (_Controller) {
   _inheritsLoose(TabbedController, _Controller);
   function TabbedController(object, property, text, tabs, displayName) {
     var _this2;
@@ -1383,7 +1387,7 @@ var TabbedController = (function(_Controller) {
     var _this = _assertThisInitialized(_this2);
     _this2.__button = document.createElement("div");
     _this2.__button.innerHTML = text === undefined ? "Fire" : text;
-    dom.bind(_this2.__button, "click", function(e) {
+    dom.bind(_this2.__button, "click", function (e) {
       e.preventDefault();
       _this.fire();
       return false;
@@ -1408,7 +1412,7 @@ var TabbedController = (function(_Controller) {
   return TabbedController;
 })(Controller);
 
-var ColorController = (function(_Controller) {
+var ColorController = (function (_Controller) {
   _inheritsLoose(ColorController, _Controller);
   function ColorController(object, property) {
     var _this2;
@@ -1435,7 +1439,7 @@ var ColorController = (function(_Controller) {
     dom.bind(
       _this2.__input,
       "keydown",
-      function(e) {
+      function (e) {
         if (e.keyCode === 13) {
           onBlur.call(this);
         }
@@ -1447,8 +1451,8 @@ var ColorController = (function(_Controller) {
     dom.bind(
       _this2.__selector,
       "mousedown",
-      function() {
-        dom.addClass(this, "drag").bind(window, "mouseup", function() {
+      function () {
+        dom.addClass(this, "drag").bind(window, "mouseup", function () {
           dom.removeClass(_this.__selector, "drag");
         });
       },
@@ -1458,11 +1462,11 @@ var ColorController = (function(_Controller) {
     dom.bind(
       _this2.__selector,
       "touchstart",
-      function() {
+      function () {
         dom.addClass(this, "drag").bind(
           window,
           "touchend",
-          function() {
+          function () {
             dom.removeClass(_this.__selector, "drag");
           },
           false,
@@ -1478,7 +1482,7 @@ var ColorController = (function(_Controller) {
       height: "102px",
       padding: "3px",
       backgroundColor: "#222",
-      boxShadow: "0px 1px 3px rgba(0,0,0,0.3)"
+      boxShadow: "0px 1px 3px rgba(0,0,0,0.3)",
     });
     Common.extend(_this2.__field_knob.style, {
       position: "absolute",
@@ -1487,14 +1491,14 @@ var ColorController = (function(_Controller) {
       border: _this2.__field_knob_border + (_this2.__color.v < 0.5 ? "#fff" : "#000"),
       boxShadow: "0px 1px 3px rgba(0,0,0,0.5)",
       borderRadius: "12px",
-      zIndex: 1
+      zIndex: 1,
     });
     Common.extend(_this2.__hue_knob.style, {
       position: "absolute",
       width: "15px",
       height: "2px",
       borderRight: "4px solid #fff",
-      zIndex: 1
+      zIndex: 1,
     });
     Common.extend(_this2.__saturation_field.style, {
       width: "100px",
@@ -1502,12 +1506,12 @@ var ColorController = (function(_Controller) {
       border: "1px solid #555",
       marginRight: "3px",
       display: "inline-block",
-      cursor: "pointer"
+      cursor: "pointer",
     });
     Common.extend(valueField.style, {
       width: "100%",
       height: "100%",
-      background: "none"
+      background: "none",
     });
     linearGradient(valueField, "top", "rgba(0,0,0,0)", "#000");
     Common.extend(_this2.__hue_field.style, {
@@ -1517,7 +1521,7 @@ var ColorController = (function(_Controller) {
       cursor: "ns-resize",
       position: "absolute",
       top: "3px",
-      right: "3px"
+      right: "3px",
     });
     hueGradient(_this2.__hue_field);
     Common.extend(_this2.__input.style, {
@@ -1526,7 +1530,7 @@ var ColorController = (function(_Controller) {
       color: "#fff",
       border: 0,
       fontWeight: "bold",
-      textShadow: _this2.__input_textShadow + "rgba(0,0,0,0.7)"
+      textShadow: _this2.__input_textShadow + "rgba(0,0,0,0.7)",
     });
     dom.bind(_this2.__saturation_field, "mousedown", fieldDown);
     dom.bind(_this2.__saturation_field, "touchstart", fieldDown);
@@ -1635,7 +1639,7 @@ var ColorController = (function(_Controller) {
       var mismatch = false;
       Common.each(
         Color.COMPONENTS,
-        function(component) {
+        function (component) {
           if (
             !Common.isUndefined(i[component]) &&
             !Common.isUndefined(this.__color.__state[component]) &&
@@ -1659,7 +1663,7 @@ var ColorController = (function(_Controller) {
       marginLeft: 100 * this.__color.s - 7 + "px",
       marginTop: 100 * (1 - this.__color.v) - 7 + "px",
       backgroundColor: this.__temp.toHexString(),
-      border: this.__field_knob_border + "rgb(" + flip + "," + flip + "," + flip + ")"
+      border: this.__field_knob_border + "rgb(" + flip + "," + flip + "," + flip + ")",
     });
     this.__hue_knob.style.marginTop = (1 - this.__color.h / 360) * 100 + "px";
     this.__temp.s = 1;
@@ -1669,7 +1673,7 @@ var ColorController = (function(_Controller) {
     Common.extend(this.__input.style, {
       backgroundColor: this.__color.toHexString(),
       color: "rgb(" + flip + "," + flip + "," + flip + ")",
-      textShadow: this.__input_textShadow + "rgba(" + _flip + "," + _flip + "," + _flip + ",.7)"
+      textShadow: this.__input_textShadow + "rgba(" + _flip + "," + _flip + "," + _flip + ",.7)",
     });
   };
   return ColorController;
@@ -1677,7 +1681,7 @@ var ColorController = (function(_Controller) {
 var vendors = ["-moz-", "-o-", "-webkit-", "-ms-", ""];
 function linearGradient(elem, x, a, b) {
   elem.style.background = "";
-  Common.each(vendors, function(vendor) {
+  Common.each(vendors, function (vendor) {
     elem.style.cssText += "background: " + vendor + "linear-gradient(" + x + ", " + a + " 0%, " + b + " 100%); ";
   });
 }
@@ -1695,7 +1699,7 @@ function hueGradient(elem) {
     "background: linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
 }
 
-var FileController = (function(_Controller) {
+var FileController = (function (_Controller) {
   _inheritsLoose(FileController, _Controller);
   function FileController(object, property) {
     var _this2;
@@ -1703,7 +1707,7 @@ var FileController = (function(_Controller) {
     var _this = _assertThisInitialized(_this2);
     function onChange(e) {
       var fileReader = new FileReader();
-      fileReader.addEventListener("load", function(file) {
+      fileReader.addEventListener("load", function (file) {
         _this.fire(fileReader.result);
       });
       var file = e.target.files[0];
@@ -1778,11 +1782,11 @@ var plotter = function plotter(fg, bg, type) {
           round((value / maxValue) * GRAPH_HEIGHT)
         );
       }
-    }
+    },
   };
 };
 
-var PlotterController = (function(_Controller) {
+var PlotterController = (function (_Controller) {
   _inheritsLoose(PlotterController, _Controller);
   function PlotterController(object, property, params) {
     var _this;
@@ -1810,7 +1814,7 @@ var PlotterController = (function(_Controller) {
   return PlotterController;
 })(Controller);
 
-var CustomController = (function(_Controller) {
+var CustomController = (function (_Controller) {
   _inheritsLoose(CustomController, _Controller);
   function CustomController(object, property) {
     var _this;
@@ -1821,823 +1825,10 @@ var CustomController = (function(_Controller) {
   return CustomController;
 })(Controller);
 
-var commonjsGlobal =
-  typeof globalThis !== "undefined"
-    ? globalThis
-    : typeof window !== "undefined"
-    ? window
-    : typeof global !== "undefined"
-    ? global
-    : typeof self !== "undefined"
-    ? self
-    : {};
-
-function createCommonjsModule(fn, module) {
-  return (module = { exports: {} }), fn(module, module.exports), module.exports;
-}
-
-var Stream = function(data) {
-  this.data = data;
-  this.len = this.data.length;
-  this.pos = 0;
-  this.readByte = function() {
-    if (this.pos >= this.data.length) {
-      throw new Error("Attempted to read past end of stream.");
-    }
-    if (data instanceof Uint8Array) return data[this.pos++];
-    else return data.charCodeAt(this.pos++) & 0xff;
-  };
-  this.readBytes = function(n) {
-    var bytes = [];
-    for (var i = 0; i < n; i++) {
-      bytes.push(this.readByte());
-    }
-    return bytes;
-  };
-  this.read = function(n) {
-    var s = "";
-    for (var i = 0; i < n; i++) {
-      s += String.fromCharCode(this.readByte());
-    }
-    return s;
-  };
-  this.readUnsigned = function() {
-    var a = this.readBytes(2);
-    return (a[1] << 8) + a[0];
-  };
-};
-var Stream_1 = Stream;
-
-var lzwDecode = function(minCodeSize, data) {
-  var pos = 0;
-  var readCode = function(size) {
-    var code = 0;
-    for (var i = 0; i < size; i++) {
-      if (data[pos >> 3] & (1 << (pos & 7))) {
-        code |= 1 << i;
-      }
-      pos++;
-    }
-    return code;
-  };
-  var clearCode = 1 << minCodeSize;
-  var eoiCode = clearCode + 1;
-  var codeSize = minCodeSize + 1;
-  var outputBlockSize = 4096,
-    bufferBlockSize = 4096;
-  var output = new Uint8Array(outputBlockSize),
-    buffer = new Uint8Array(bufferBlockSize),
-    dict = [];
-  var bufferOffset = 0,
-    outputOffset = 0;
-  var fill = function() {
-    for (var i = 0; i < clearCode; i++) {
-      dict[i] = new Uint8Array(1);
-      dict[i][0] = i;
-    }
-    dict[clearCode] = new Uint8Array(0);
-    dict[eoiCode] = null;
-  };
-  var clear = function() {
-    var keep = clearCode + 2;
-    dict.splice(keep, dict.length - keep);
-    codeSize = minCodeSize + 1;
-    bufferOffset = 0;
-  };
-  var enlargeOutput = function() {
-    var outputSize = output.length + outputBlockSize;
-    var newoutput = new Uint8Array(outputSize);
-    newoutput.set(output);
-    output = newoutput;
-    outputBlockSize = outputBlockSize << 1;
-  };
-  var enlargeBuffer = function() {
-    var bufferSize = buffer.length + bufferBlockSize;
-    var newbuffer = new Uint8Array(bufferSize);
-    newbuffer.set(buffer);
-    buffer = newbuffer;
-    bufferBlockSize = bufferBlockSize << 1;
-  };
-  var pushCode = function(code, last) {
-    var newlength = dict[last].byteLength + 1;
-    while (bufferOffset + newlength > buffer.length) enlargeBuffer();
-    var newdict = buffer.subarray(bufferOffset, bufferOffset + newlength);
-    newdict.set(dict[last]);
-    newdict[newlength - 1] = dict[code][0];
-    bufferOffset += newlength;
-    dict.push(newdict);
-  };
-  var code;
-  var last;
-  fill();
-  while (true) {
-    last = code;
-    code = readCode(codeSize);
-    if (code === clearCode) {
-      clear();
-      continue;
-    }
-    if (code === eoiCode) break;
-    if (code < dict.length) {
-      if (last !== clearCode) {
-        pushCode(code, last);
-      }
-    } else {
-      if (code !== dict.length) throw new Error("Invalid LZW code.");
-      pushCode(last, last);
-    }
-    var newsize = dict[code].length;
-    while (outputOffset + newsize > output.length) enlargeOutput();
-    output.set(dict[code], outputOffset);
-    outputOffset += newsize;
-    if (dict.length === 1 << codeSize && codeSize < 12) {
-      codeSize++;
-    }
-  }
-  return output.subarray(0, outputOffset);
-};
-var lzwDecode_1 = lzwDecode;
-
-var bitsToNum = function(ba) {
-  return ba.reduce(function(s, n) {
-    return s * 2 + n;
-  }, 0);
-};
-var byteToBitArr = function(bite) {
-  var a = [];
-  for (var i = 7; i >= 0; i--) {
-    a.push(!!(bite & (1 << i)));
-  }
-  return a;
-};
-var parseGIF = function(st, handler) {
-  handler || (handler = {});
-  var parseCT = function(entries) {
-    var ct = [];
-    for (var i = 0; i < entries; i++) {
-      ct.push(st.readBytes(3));
-    }
-    return ct;
-  };
-  var readSubBlocks = function() {
-    var size,
-      data,
-      offset = 0;
-    var bufsize = 8192;
-    data = new Uint8Array(bufsize);
-    var resizeBuffer = function() {
-      var newdata = new Uint8Array(data.length + bufsize);
-      newdata.set(data);
-      data = newdata;
-    };
-    do {
-      size = st.readByte();
-      while (offset + size > data.length) resizeBuffer();
-      data.set(st.readBytes(size), offset);
-      offset += size;
-    } while (size !== 0);
-    return data.subarray(0, offset);
-  };
-  var parseHeader = function() {
-    var hdr = {};
-    hdr.sig = st.read(3);
-    hdr.ver = st.read(3);
-    if (hdr.sig !== "GIF") throw new Error("Not a GIF file.");
-    hdr.width = st.readUnsigned();
-    hdr.height = st.readUnsigned();
-    var bits = byteToBitArr(st.readByte());
-    hdr.gctFlag = bits.shift();
-    hdr.colorRes = bitsToNum(bits.splice(0, 3));
-    hdr.sorted = bits.shift();
-    hdr.gctSize = bitsToNum(bits.splice(0, 3));
-    hdr.bgColor = st.readByte();
-    hdr.pixelAspectRatio = st.readByte();
-    if (hdr.gctFlag) {
-      hdr.gct = parseCT(1 << (hdr.gctSize + 1));
-    }
-    handler.hdr && handler.hdr(hdr);
-  };
-  var parseExt = function(block) {
-    var parseGCExt = function(block) {
-      var blockSize = st.readByte();
-      var bits = byteToBitArr(st.readByte());
-      block.reserved = bits.splice(0, 3);
-      block.disposalMethod = bitsToNum(bits.splice(0, 3));
-      block.userInput = bits.shift();
-      block.transparencyGiven = bits.shift();
-      block.delayTime = st.readUnsigned();
-      block.transparencyIndex = st.readByte();
-      block.terminator = st.readByte();
-      handler.gce && handler.gce(block);
-    };
-    var parseComExt = function(block) {
-      block.comment = readSubBlocks();
-      handler.com && handler.com(block);
-    };
-    var parsePTExt = function(block) {
-      var blockSize = st.readByte();
-      block.ptHeader = st.readBytes(12);
-      block.ptData = readSubBlocks();
-      handler.pte && handler.pte(block);
-    };
-    var parseAppExt = function(block) {
-      var parseNetscapeExt = function(block) {
-        var blockSize = st.readByte();
-        block.unknown = st.readByte();
-        block.iterations = st.readUnsigned();
-        block.terminator = st.readByte();
-        handler.app && handler.app.NETSCAPE && handler.app.NETSCAPE(block);
-      };
-      var parseUnknownAppExt = function(block) {
-        block.appData = readSubBlocks();
-        handler.app && handler.app[block.identifier] && handler.app[block.identifier](block);
-      };
-      var blockSize = st.readByte();
-      block.identifier = st.read(8);
-      block.authCode = st.read(3);
-      switch (block.identifier) {
-        case "NETSCAPE":
-          parseNetscapeExt(block);
-          break;
-        default:
-          parseUnknownAppExt(block);
-          break;
-      }
-    };
-    var parseUnknownExt = function(block) {
-      block.data = readSubBlocks();
-      handler.unknown && handler.unknown(block);
-    };
-    block.label = st.readByte();
-    switch (block.label) {
-      case 0xf9:
-        block.extType = "gce";
-        parseGCExt(block);
-        break;
-      case 0xfe:
-        block.extType = "com";
-        parseComExt(block);
-        break;
-      case 0x01:
-        block.extType = "pte";
-        parsePTExt(block);
-        break;
-      case 0xff:
-        block.extType = "app";
-        parseAppExt(block);
-        break;
-      default:
-        block.extType = "unknown";
-        parseUnknownExt(block);
-        break;
-    }
-  };
-  var parseImg = function(img) {
-    var deinterlace = function(pixels, width) {
-      var newPixels = new Array(pixels.length);
-      var rows = pixels.length / width;
-      var cpRow = function(toRow, fromRow) {
-        var fromPixels = pixels.slice(fromRow * width, (fromRow + 1) * width);
-        newPixels.splice.apply(newPixels, [toRow * width, width].concat(fromPixels));
-      };
-      var offsets = [0, 4, 2, 1];
-      var steps = [8, 8, 4, 2];
-      var fromRow = 0;
-      for (var pass = 0; pass < 4; pass++) {
-        for (var toRow = offsets[pass]; toRow < rows; toRow += steps[pass]) {
-          cpRow(toRow, fromRow);
-          fromRow++;
-        }
-      }
-      return newPixels;
-    };
-    img.leftPos = st.readUnsigned();
-    img.topPos = st.readUnsigned();
-    img.width = st.readUnsigned();
-    img.height = st.readUnsigned();
-    var bits = byteToBitArr(st.readByte());
-    img.lctFlag = bits.shift();
-    img.interlaced = bits.shift();
-    img.sorted = bits.shift();
-    img.reserved = bits.splice(0, 2);
-    img.lctSize = bitsToNum(bits.splice(0, 3));
-    if (img.lctFlag) {
-      img.lct = parseCT(1 << (img.lctSize + 1));
-    }
-    img.lzwMinCodeSize = st.readByte();
-    var lzwData = readSubBlocks();
-    img.pixels = lzwDecode_1(img.lzwMinCodeSize, lzwData);
-    if (img.interlaced) {
-      img.pixels = deinterlace(img.pixels, img.width);
-    }
-    handler.img && handler.img(img);
-  };
-  var parseBlock = function() {
-    var block = {};
-    block.sentinel = st.readByte();
-    switch (String.fromCharCode(block.sentinel)) {
-      case "!":
-        block.type = "ext";
-        parseExt(block);
-        break;
-      case ",":
-        block.type = "img";
-        parseImg(block);
-        break;
-      case ";":
-        block.type = "eof";
-        handler.eof && handler.eof(block);
-        break;
-      default:
-        throw new Error("Unknown block: 0x" + block.sentinel.toString(16));
-    }
-    if (block.type !== "eof") setTimeout(parseBlock, 0);
-  };
-  var parse = function() {
-    parseHeader();
-    setTimeout(parseBlock, 0);
-  };
-  parse();
-};
-var parseGif = parseGIF;
-
-var sibgif = createCommonjsModule(function(module, exports) {
-  (function(root, factory) {
-    {
-      module.exports = factory();
-    }
-  })(commonjsGlobal, function() {
-    {
-      var Stream = Stream_1;
-      var parseGIF = parseGif;
-    }
-    var SuperGif = function(opts) {
-      var options = {
-        vp_l: 0,
-        vp_t: 0,
-        vp_w: null,
-        vp_h: null,
-        c_w: null,
-        c_h: null
-      };
-      for (var i in opts) {
-        options[i] = opts[i];
-      }
-      if (options.vp_w && options.vp_h) options.is_vp = true;
-      var stream;
-      var hdr;
-      var loadError = null;
-      var loading = false;
-      var transparency = null;
-      var delay = null;
-      var disposalMethod = null;
-      var disposalRestoreFromIdx = null;
-      var lastDisposalMethod = null;
-      var frame = null;
-      var lastImg = null;
-      var playing = true;
-      var ctx_scaled = false;
-      var frames = [];
-      var frameOffsets = [];
-      var gif = options.gif;
-      if (typeof options.gif == "undefined" && !!options.url) {
-        gif = document.createElement("img");
-        gif.src = options.url;
-      }
-      if (typeof options.auto_play == "undefined")
-        options.auto_play = !gif.getAttribute("data-autoplay") || gif.getAttribute("data-autoplay") == "1";
-      var onEndListener = options.hasOwnProperty("on_end") ? options.on_end : null;
-      var loopDelay = options.hasOwnProperty("loop_delay") ? options.loop_delay : 0;
-      var overrideLoopMode = options.hasOwnProperty("loop_mode") ? options.loop_mode : "auto";
-      var drawWhileLoading = options.hasOwnProperty("draw_while_loading") ? options.draw_while_loading : true;
-      var showProgressBar = drawWhileLoading
-        ? options.hasOwnProperty("show_progress_bar")
-          ? options.show_progress_bar
-          : true
-        : false;
-      var progressBarHeight = options.hasOwnProperty("progressbar_height") ? options.progressbar_height : 25;
-      var progressBarBackgroundColor = options.hasOwnProperty("progressbar_background_color")
-        ? options.progressbar_background_color
-        : "rgba(255,255,255,0.4)";
-      var progressBarForegroundColor = options.hasOwnProperty("progressbar_foreground_color")
-        ? options.progressbar_foreground_color
-        : "rgba(255,0,22,.8)";
-      var clear = function() {
-        transparency = null;
-        delay = null;
-        lastDisposalMethod = disposalMethod;
-        disposalMethod = null;
-        frame = null;
-      };
-      var handler = function() {
-        return {
-          hdr: withProgress(doHdr),
-          gce: withProgress(doGCE),
-          com: withProgress(doNothing),
-          app: {
-            NETSCAPE: withProgress(doNothing)
-          },
-          img: withProgress(doImg, true),
-          eof: function(block) {
-            pushFrame();
-            doDecodeProgress(false);
-            if (!(options.c_w && options.c_h)) {
-              canvas.width = hdr.width * get_canvas_scale();
-              canvas.height = hdr.height * get_canvas_scale();
-            }
-            player.init();
-            loading = false;
-            if (load_callback) {
-              load_callback(loadError, gif);
-            }
-          }
-        };
-      };
-      var doParse = function() {
-        try {
-          parseGIF(stream, handler());
-        } catch (err) {
-          doLoadError("parse");
-        }
-      };
-      var setSizes = function(w, h) {
-        canvas.width = w * get_canvas_scale();
-        canvas.height = h * get_canvas_scale();
-        toolbar.style.minWidth = w * get_canvas_scale() + "px";
-        tmpCanvas.width = w;
-        tmpCanvas.height = h;
-        tmpCanvas.style.width = w + "px";
-        tmpCanvas.style.height = h + "px";
-        tmpCanvas.getContext("2d").setTransform(1, 0, 0, 1, 0, 0);
-      };
-      var setFrameOffset = function(frame, offset) {
-        if (!frameOffsets[frame]) {
-          frameOffsets[frame] = offset;
-          return;
-        }
-        if (typeof offset.x !== "undefined") {
-          frameOffsets[frame].x = offset.x;
-        }
-        if (typeof offset.y !== "undefined") {
-          frameOffsets[frame].y = offset.y;
-        }
-      };
-      var doShowProgress = function(pos, length, draw) {
-        if (draw && showProgressBar) {
-          var height = progressBarHeight;
-          var left, mid, top, width;
-          if (options.is_vp) {
-            if (!ctx_scaled) {
-              top = options.vp_t + options.vp_h - height;
-              height = height;
-              left = options.vp_l;
-              mid = left + (pos / length) * options.vp_w;
-              width = canvas.width;
-            } else {
-              top = (options.vp_t + options.vp_h - height) / get_canvas_scale();
-              height = height / get_canvas_scale();
-              left = options.vp_l / get_canvas_scale();
-              mid = left + (pos / length) * (options.vp_w / get_canvas_scale());
-              width = canvas.width / get_canvas_scale();
-            }
-          } else {
-            top = (canvas.height - height) / (ctx_scaled ? get_canvas_scale() : 1);
-            mid = ((pos / length) * canvas.width) / (ctx_scaled ? get_canvas_scale() : 1);
-            width = canvas.width / (ctx_scaled ? get_canvas_scale() : 1);
-            height /= ctx_scaled ? get_canvas_scale() : 1;
-          }
-          ctx.fillStyle = progressBarBackgroundColor;
-          ctx.fillRect(mid, top, width - mid, height);
-          ctx.fillStyle = progressBarForegroundColor;
-          ctx.fillRect(0, top, mid, height);
-        }
-      };
-      var doLoadError = function(originOfError) {
-        var drawError = function() {
-          ctx.fillStyle = "black";
-          ctx.fillRect(0, 0, options.c_w ? options.c_w : hdr.width, options.c_h ? options.c_h : hdr.height);
-          ctx.strokeStyle = "red";
-          ctx.lineWidth = 3;
-          ctx.moveTo(0, 0);
-          ctx.lineTo(options.c_w ? options.c_w : hdr.width, options.c_h ? options.c_h : hdr.height);
-          ctx.moveTo(0, options.c_h ? options.c_h : hdr.height);
-          ctx.lineTo(options.c_w ? options.c_w : hdr.width, 0);
-          ctx.stroke();
-        };
-        loadError = originOfError;
-        hdr = {
-          width: gif.width,
-          height: gif.height
-        };
-        frames = [];
-        drawError();
-      };
-      var doHdr = function(_hdr) {
-        hdr = _hdr;
-        setSizes(hdr.width, hdr.height);
-      };
-      var doGCE = function(gce) {
-        pushFrame();
-        clear();
-        transparency = gce.transparencyGiven ? gce.transparencyIndex : null;
-        delay = gce.delayTime;
-        disposalMethod = gce.disposalMethod;
-      };
-      var pushFrame = function() {
-        if (!frame) return;
-        var newFrame = {
-          data: frame.getImageData(0, 0, hdr.width, hdr.height),
-          delay: delay
-        };
-        if (options.includeDataURL) {
-          newFrame.dataURL = tmpCanvas.toDataURL();
-        }
-        frames.push(newFrame);
-        frameOffsets.push({ x: 0, y: 0 });
-      };
-      var doImg = function(img) {
-        if (!frame) frame = tmpCanvas.getContext("2d");
-        var currIdx = frames.length;
-        var ct = img.lctFlag ? img.lct : hdr.gct;
-        if (currIdx > 0) {
-          if (lastDisposalMethod === 3) {
-            if (disposalRestoreFromIdx !== null) {
-              frame.putImageData(frames[disposalRestoreFromIdx].data, 0, 0);
-            } else {
-              frame.clearRect(lastImg.leftPos, lastImg.topPos, lastImg.width, lastImg.height);
-            }
-          } else {
-            disposalRestoreFromIdx = currIdx - 1;
-          }
-          if (lastDisposalMethod === 2) {
-            frame.clearRect(lastImg.leftPos, lastImg.topPos, lastImg.width, lastImg.height);
-          }
-        }
-        var imgData = frame.getImageData(img.leftPos, img.topPos, img.width, img.height);
-        for (var i = 0; i < img.pixels.length; i++) {
-          var pixel = img.pixels[i];
-          if (pixel !== transparency) {
-            var pix = ct[pixel];
-            var idx = i * 4;
-            imgData.data[idx] = pix[0];
-            imgData.data[idx + 1] = pix[1];
-            imgData.data[idx + 2] = pix[2];
-            imgData.data[idx + 3] = 255;
-          }
-        }
-        frame.putImageData(imgData, img.leftPos, img.topPos);
-        if (!ctx_scaled) {
-          ctx.scale(get_canvas_scale(), get_canvas_scale());
-          ctx_scaled = true;
-        }
-        if (drawWhileLoading) {
-          ctx.drawImage(tmpCanvas, 0, 0);
-          drawWhileLoading = options.auto_play;
-        }
-        lastImg = img;
-      };
-      var player = (function() {
-        var i = -1;
-        var iterationCount = 0;
-        var getNextFrameNo = function() {
-          var delta = 1;
-          return (i + delta + frames.length) % frames.length;
-        };
-        var stepFrame = function(amount) {
-          i = i + amount;
-          putFrame();
-        };
-        var step = (function() {
-          var stepping = false;
-          var completeLoop = function() {
-            if (onEndListener !== null) onEndListener(gif);
-            iterationCount++;
-            if (overrideLoopMode !== false || iterationCount < 0) {
-              doStep();
-            } else {
-              stepping = false;
-              playing = false;
-            }
-          };
-          var doStep = function() {
-            stepping = playing;
-            if (!stepping) return;
-            stepFrame(1);
-            var delay = frames[i].delay * 10;
-            if (!delay) delay = 100;
-            var nextFrameNo = getNextFrameNo();
-            if (nextFrameNo === 0) {
-              delay += loopDelay;
-              setTimeout(completeLoop, delay);
-            } else {
-              setTimeout(doStep, delay);
-            }
-          };
-          return function() {
-            if (!stepping) setTimeout(doStep, 0);
-          };
-        })();
-        var putFrame = function() {
-          var offset;
-          i = parseInt(i, 10);
-          if (i > frames.length - 1) {
-            i = 0;
-          }
-          if (i < 0) {
-            i = 0;
-          }
-          offset = frameOffsets[i];
-          tmpCanvas.getContext("2d").putImageData(frames[i].data, offset.x, offset.y);
-          ctx.globalCompositeOperation = "copy";
-          ctx.drawImage(tmpCanvas, 0, 0);
-        };
-        var play = function() {
-          playing = true;
-          step();
-        };
-        var pause = function() {
-          playing = false;
-        };
-        return {
-          init: function() {
-            if (loadError) return;
-            if (!(options.c_w && options.c_h)) {
-              ctx.scale(get_canvas_scale(), get_canvas_scale());
-            }
-            if (options.auto_play) {
-              step();
-            } else {
-              i = 0;
-              putFrame();
-            }
-          },
-          step: step,
-          play: play,
-          pause: pause,
-          playing: playing,
-          move_relative: stepFrame,
-          current_frame: function() {
-            return i;
-          },
-          frames: function() {
-            return frames;
-          },
-          length: function() {
-            return frames.length;
-          },
-          move_to: function(frame_idx) {
-            i = frame_idx;
-            putFrame();
-          }
-        };
-      })();
-      var doDecodeProgress = function(draw) {
-        doShowProgress(stream.pos, stream.data.length, draw);
-      };
-      var doNothing = function() {};
-      var withProgress = function(fn, draw) {
-        return function(block) {
-          fn(block);
-          doDecodeProgress(draw);
-        };
-      };
-      var init = function() {
-        var parent = gif.parentNode;
-        var div = document.createElement("div");
-        canvas = document.createElement("canvas");
-        ctx = canvas.getContext("2d");
-        toolbar = document.createElement("div");
-        tmpCanvas = document.createElement("canvas");
-        div.width = canvas.width = gif.width;
-        div.height = canvas.height = gif.height;
-        toolbar.style.minWidth = gif.width + "px";
-        div.className = "jsgif";
-        toolbar.className = "jsgif_toolbar";
-        div.appendChild(canvas);
-        div.appendChild(toolbar);
-        if (parent) {
-          parent.insertBefore(div, gif);
-          parent.removeChild(gif);
-        }
-        if (options.c_w && options.c_h) setSizes(options.c_w, options.c_h);
-        initialized = true;
-      };
-      var get_canvas_scale = function() {
-        var scale;
-        if (options.max_width && hdr && hdr.width > options.max_width) {
-          scale = options.max_width / hdr.width;
-        } else {
-          scale = 1;
-        }
-        return scale;
-      };
-      var canvas, ctx, toolbar, tmpCanvas;
-      var initialized = false;
-      var load_callback = false;
-      var load_setup = function(callback) {
-        if (loading) return false;
-        if (callback) {
-          load_callback = callback;
-        } else {
-          load_callback = false;
-        }
-        loading = true;
-        frames = [];
-        clear();
-        disposalRestoreFromIdx = null;
-        lastDisposalMethod = null;
-        frame = null;
-        lastImg = null;
-        return true;
-      };
-      return {
-        play: player.play,
-        pause: player.pause,
-        move_relative: player.move_relative,
-        move_to: player.move_to,
-        get_frames: function() {
-          return player.frames();
-        },
-        get_playing: function() {
-          return playing;
-        },
-        get_canvas: function() {
-          return canvas;
-        },
-        get_canvas_scale: function() {
-          return get_canvas_scale();
-        },
-        get_loading: function() {
-          return loading;
-        },
-        get_auto_play: function() {
-          return options.auto_play;
-        },
-        get_length: function() {
-          return player.length();
-        },
-        get_current_frame: function() {
-          return player.current_frame();
-        },
-        load_url: function(src, callback) {
-          if (!load_setup(callback)) return;
-          var h = new XMLHttpRequest();
-          h.open("GET", src, true);
-          if ("overrideMimeType" in h) {
-            h.overrideMimeType("text/plain; charset=x-user-defined");
-          } else if ("responseType" in h) {
-            h.responseType = "arraybuffer";
-          } else {
-            h.setRequestHeader("Accept-Charset", "x-user-defined");
-          }
-          h.onloadstart = function() {
-            if (!initialized) init();
-          };
-          h.onload = function(e) {
-            if (this.status != 200) {
-              doLoadError("xhr - response");
-            }
-            if (!("response" in this)) {
-              this.response = new VBArray(this.responseText)
-                .toArray()
-                .map(String.fromCharCode)
-                .join("");
-            }
-            var data = this.response;
-            if (data instanceof ArrayBuffer) {
-              data = new Uint8Array(data);
-            }
-            stream = new Stream(data);
-            setTimeout(doParse, 0);
-          };
-          h.onprogress = function(e) {
-            if (e.lengthComputable) doShowProgress(e.loaded, e.total, true);
-          };
-          h.onerror = function() {
-            doLoadError("xhr");
-          };
-          h.send();
-        },
-        load: function(callback) {
-          this.load_url(gif.getAttribute("data-animated-src") || gif.src, callback);
-        },
-        load_raw: function(arr, callback) {
-          if (!load_setup(callback)) return;
-          if (!initialized) init();
-          stream = new Stream(arr);
-          setTimeout(doParse, 0);
-        },
-        set_frame_offset: setFrameOffset
-      };
-    };
-    return SuperGif;
-  });
-});
-
 navigator.getUserMedia =
   navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
 
-var ImageController = (function(_Controller) {
+var ImageController = (function (_Controller) {
   _inheritsLoose(ImageController, _Controller);
   function ImageController(object, property, opts) {
     var _this;
@@ -2681,7 +1872,7 @@ var ImageController = (function(_Controller) {
     _this.__plusIcon = _this.__plus.appendChild(document.createElement("div"));
     dom.addClass(_this.__plusIcon, "new-image-icon");
     dom.addClass(_this.__plus, "new-image-button");
-    defaultOptions.forEach(function(option) {
+    defaultOptions.forEach(function (option) {
       _this.addSwatch(option.src, option.videoSrc);
     });
     _this.__video.className = _this.__img.className = "content";
@@ -2691,8 +1882,8 @@ var ImageController = (function(_Controller) {
     _this.__gifImg = _this.__selectedInputContainer.appendChild(document.createElement("img"));
     _this.__gifImg.crossOrigin = "anonymous";
     dom.addClass(_this.__gifImg, "content gif-img");
-    _this.__glGif = new sibgif({
-      gif: _this.__gifImg
+    _this.__glGif = new SuperGif({
+      gif: _this.__gifImg,
     });
     _this.__gifNeedsInitializing = true;
     _this.initializeValue();
@@ -2732,18 +1923,18 @@ var ImageController = (function(_Controller) {
       var _this2 = this;
       navigator.mediaDevices
         .getUserMedia({
-          video: true
+          video: true,
         })
-        .then(function(localMediaStream) {
+        .then(function (localMediaStream) {
           _this2.killStream();
           _this2.videoStream = localMediaStream;
           _this2.setValue({
             type: "video-stream",
             value: localMediaStream,
-            domElement: _this2.__video
+            domElement: _this2.__video,
           });
         })
-        ["catch"](function(err) {
+        ["catch"](function (err) {
           _this2.killStream();
         });
     }
@@ -2753,7 +1944,7 @@ var ImageController = (function(_Controller) {
   var _proto = ImageController.prototype;
   _proto.killStream = function killStream() {
     if (!this.videoStream) return;
-    this.videoStream.getTracks().forEach(function(track) {
+    this.videoStream.getTracks().forEach(function (track) {
       return track.stop();
     });
   };
@@ -2772,20 +1963,20 @@ var ImageController = (function(_Controller) {
         this.setValue({
           url: asset.url,
           type: asset.type,
-          domElement: this.__glGif.get_canvas()
+          domElement: this.__glGif.get_canvas(),
         });
       }
     } else if (asset.type === "image") {
       this.setValue({
         url: asset.url,
         type: asset.type,
-        domElement: this.__img
+        domElement: this.__img,
       });
     } else if (asset.type === "video") {
       this.setValue({
         url: asset.url,
         type: asset.type,
-        domElement: this.__video
+        domElement: this.__video,
       });
     }
   };
@@ -2817,14 +2008,14 @@ var ImageController = (function(_Controller) {
           this.setValue({
             url: _url,
             type: "gif",
-            domElement: this.__glGif.get_canvas()
+            domElement: this.__glGif.get_canvas(),
           });
         }
       } else if (!isAnimated) {
         this.setValue({
           url: _url,
           type: "image",
-          domElement: this.__img
+          domElement: this.__img,
         });
         this.setImage(_url, false);
       }
@@ -2832,7 +2023,7 @@ var ImageController = (function(_Controller) {
       this.setValue({
         url: url,
         type: "video",
-        domElement: this.__video
+        domElement: this.__video,
       });
       this.setVideo();
     }
@@ -2852,9 +2043,9 @@ var ImageController = (function(_Controller) {
       if (this.__glGif.get_canvas()) {
         this.__glGif.get_canvas().style.display = "block";
       }
-      this.__glGif.load(function(err) {
+      this.__glGif.load(function (err) {
         if (!err) {
-          _this3.__glGif.play()["catch"](function(e) {
+          _this3.__glGif.play()["catch"](function (e) {
             return console.log(e);
           });
           if (_this3.__gifNeedsInitializing) {
@@ -2863,7 +2054,7 @@ var ImageController = (function(_Controller) {
             _this3.setValue({
               url: url,
               type: "gif",
-              domElement: _this3.__glGif.get_canvas()
+              domElement: _this3.__glGif.get_canvas(),
             });
           }
         }
@@ -2890,7 +2081,7 @@ var ImageController = (function(_Controller) {
     this.__isAnimated = true;
     this.__video.loop = true;
     this.__video.volume = 0;
-    this.__video.play()["catch"](function(e) {
+    this.__video.play()["catch"](function (e) {
       console.log(e, e.message, e.name);
     });
     this.__img.src = "data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=";
@@ -2906,12 +2097,12 @@ var ImageController = (function(_Controller) {
     swatch.src = src;
     swatch.videoSrc = videoSrc;
     swatch.className = "swatch";
-    dom.bind(swatch, "click", function() {
+    dom.bind(swatch, "click", function () {
       if (videoSrc) {
         _this4.setValue({
           url: videoSrc,
           type: "video",
-          domElement: _this4.__video
+          domElement: _this4.__video,
         });
       } else {
         var isAnimated = src.split(".").pop() === "gif";
@@ -2922,14 +2113,14 @@ var ImageController = (function(_Controller) {
             _this4.setValue({
               url: src,
               type: "gif",
-              domElement: _this4.__glGif.get_canvas()
+              domElement: _this4.__glGif.get_canvas(),
             });
           }
         } else {
           _this4.setValue({
             url: src,
             type: "image",
-            domElement: _this4.__img
+            domElement: _this4.__img,
           });
         }
       }
@@ -2938,7 +2129,7 @@ var ImageController = (function(_Controller) {
   return ImageController;
 })(Controller);
 
-var ArrayController = (function(_Controller) {
+var ArrayController = (function (_Controller) {
   _inheritsLoose(ArrayController, _Controller);
   function ArrayController(object, property) {
     var _this2;
@@ -2948,7 +2139,7 @@ var ArrayController = (function(_Controller) {
     _this2.__inputs = [];
     _this2.__new = document.createElement("input");
     _this2.__new.setAttribute("type", "text");
-    dom.bind(_this2.__new, "keydown", function(e) {
+    dom.bind(_this2.__new, "keydown", function (e) {
       if (e.keyCode === 13) {
         var values = _this.getValue();
         values.push(_this.__new.value);
@@ -2969,11 +2160,11 @@ var ArrayController = (function(_Controller) {
       }
     }
     var _this = this;
-    this.__inputs.forEach(function(i) {
+    this.__inputs.forEach(function (i) {
       _this.__div.removeChild(i.parentElement);
     });
     this.__inputs = [];
-    this.getValue().forEach(function(v) {
+    this.getValue().forEach(function (v) {
       var group = document.createElement("div");
       dom.addClass(group, "array-input");
       var input = document.createElement("input");
@@ -2988,7 +2179,7 @@ var ArrayController = (function(_Controller) {
       dom.bind(input, "keyup", onChange);
       dom.bind(input, "change", onChange);
       dom.bind(input, "blur", onBlur);
-      dom.bind(input, "keydown", function(e) {
+      dom.bind(input, "keydown", function (e) {
         if (e.keyCode === 13) {
           this.blur();
         }
@@ -2999,7 +2190,7 @@ var ArrayController = (function(_Controller) {
     function onRemove(e) {
       var _loop = function _loop(_i) {
         if (_this.__inputs[_i].parentElement === e.target.parentElement) {
-          var values = _this.getValue().filter(function(v) {
+          var values = _this.getValue().filter(function (v) {
             return v !== _this.__inputs[_i].value;
           });
           _this.setValue(values);
@@ -3014,7 +2205,7 @@ var ArrayController = (function(_Controller) {
         return;
       }
       _this.__changing = true;
-      var values = _this.__inputs.map(function(i) {
+      var values = _this.__inputs.map(function (i) {
         return i.value;
       });
       _this.setValue(values);
@@ -3038,7 +2229,7 @@ function pos2vec(pos, min, max) {
 function vec2pos(vec, min, max) {
   return [(vec[0] - min[0]) / (max[0] - min[0]), (vec[1] - min[1]) / (max[1] - min[1])];
 }
-var VectorController = (function(_Controller) {
+var VectorController = (function (_Controller) {
   _inheritsLoose(VectorController, _Controller);
   function VectorController(object, property, min, max) {
     var _this2;
@@ -3051,7 +2242,7 @@ var VectorController = (function(_Controller) {
     _this2 =
       _Controller.call(this, object, property, {
         min: min,
-        max: max
+        max: max,
       }) || this;
     _this2.__min = min;
     _this2.__max = max;
@@ -3066,13 +2257,13 @@ var VectorController = (function(_Controller) {
     _this2.__pos_field.className = "saturation-field";
     _this2.__field_knob = document.createElement("div");
     _this2.__field_knob.className = "field-knob";
-    dom.bind(_this2.__selector, "mousedown", function() {
-      dom.addClass(this, "drag").bind(window, "mouseup", function() {
+    dom.bind(_this2.__selector, "mousedown", function () {
+      dom.addClass(this, "drag").bind(window, "mouseup", function () {
         dom.removeClass(_this.__selector, "drag");
       });
     });
-    dom.bind(_this2.__selector, "touchstart", function() {
-      dom.addClass(this, "drag").bind(window, "touchend", function() {
+    dom.bind(_this2.__selector, "touchstart", function () {
+      dom.addClass(this, "drag").bind(window, "touchend", function () {
         dom.removeClass(_this.__selector, "drag");
       });
     });
@@ -3081,21 +2272,21 @@ var VectorController = (function(_Controller) {
       height: "52px",
       padding: "3px",
       backgroundColor: "#222",
-      boxShadow: "0px 1px 3px rgba(0,0,0,0.3)"
+      boxShadow: "0px 1px 3px rgba(0,0,0,0.3)",
     });
     Common.extend(_this2.__field_knob.style, {
       position: "absolute",
       width: "12px",
       height: "12px",
       borderRadius: "12px",
-      zIndex: 1
+      zIndex: 1,
     });
     Common.extend(_this2.__pos_field.style, {
       width: "50px",
       height: "50px",
       marginRight: "3px",
       display: "inline-block",
-      cursor: "pointer"
+      cursor: "pointer",
     });
     dom.bind(_this2.__pos_field, "mousedown", fieldDown);
     dom.bind(_this2.__pos_field, "touchstart", fieldDown);
@@ -3156,7 +2347,7 @@ var VectorController = (function(_Controller) {
     var offset = vec2pos(this.__vec, this.__min, this.__max);
     Common.extend(this.__field_knob.style, {
       marginLeft: 50 * offset[0] - 7 + "px",
-      marginTop: 50 * (1 - offset[1]) - 7 + "px"
+      marginTop: 50 * (1 - offset[1]) - 7 + "px",
     });
     this.__temp[0] = 1;
     this.__temp[1] = 1;
@@ -3184,12 +2375,12 @@ var ControllerFactory = function ControllerFactory(object, property) {
       return new NumberControllerBox(object, property, {
         min: arguments[2],
         max: arguments[3],
-        step: arguments[4]
+        step: arguments[4],
       });
     }
     return new NumberControllerBox(object, property, {
       min: arguments[2],
-      max: arguments[3]
+      max: arguments[3],
     });
   }
   if (
@@ -3225,7 +2416,7 @@ var ControllerFactory = function ControllerFactory(object, property) {
   return null;
 };
 
-var NumberControllerAnimator = (function(_NumberController) {
+var NumberControllerAnimator = (function (_NumberController) {
   _inheritsLoose(NumberControllerAnimator, _NumberController);
   function NumberControllerAnimator(object, property, params) {
     var _this2;
@@ -3295,7 +2486,7 @@ var NumberControllerAnimator = (function(_NumberController) {
   return NumberControllerAnimator;
 })(NumberController);
 
-var GradientController = (function(_Controller) {
+var GradientController = (function (_Controller) {
   _inheritsLoose(GradientController, _Controller);
   function GradientController(object, property, params) {
     var _this2;
@@ -3310,7 +2501,7 @@ var GradientController = (function(_Controller) {
     _this2.__input = document.createElement("input");
     _this2.__input.type = "text";
     _this2.__input_textShadow = "1px 1px 2px";
-    dom.bind(_this2.__input, "keydown", function(e) {
+    dom.bind(_this2.__input, "keydown", function (e) {
       if (e.keyCode === 13) {
         onBlur.call(this);
       }
@@ -3320,8 +2511,8 @@ var GradientController = (function(_Controller) {
       var value = JSON.parse(this.value);
       _this.setValue(value);
     }
-    dom.bind(_this2.__selector, "mousedown", function() {
-      dom.addClass(this, "drag").bind(window, "mouseup", function() {
+    dom.bind(_this2.__selector, "mousedown", function () {
+      dom.addClass(this, "drag").bind(window, "mouseup", function () {
         dom.removeClass(_this.__selector, "drag");
       });
     });
@@ -3331,7 +2522,7 @@ var GradientController = (function(_Controller) {
       padding: "0px",
       lineHeight: "18px",
       backgroundColor: "#222",
-      boxShadow: "0px 1px 3px rgba(0,0,0,0.3)"
+      boxShadow: "0px 1px 3px rgba(0,0,0,0.3)",
     });
     for (var i = 0; i < params.length; i++) {
       var item = document.createElement("canvas");
@@ -3343,7 +2534,7 @@ var GradientController = (function(_Controller) {
       for (var key in params[i]) {
         grd.addColorStop(key, params[i][key]);
       }
-      dom.bind(item, "click", function() {
+      dom.bind(item, "click", function () {
         _this.setValue(this.value);
         _this.updateDisplay();
         onFinish();
@@ -3351,7 +2542,7 @@ var GradientController = (function(_Controller) {
       context.fillStyle = grd;
       context.fillRect(0, 0, item.width, item.height);
       Common.extend(item.style, {
-        width: "150px"
+        width: "150px",
       });
       _this2.__saturation_field.appendChild(item);
     }
@@ -3373,10 +2564,10 @@ var GradientController = (function(_Controller) {
     for (var key in value) {
       arr.push({
         percent: key,
-        color: value[key]
+        color: value[key],
       });
     }
-    arr.sort(function(a, b) {
+    arr.sort(function (a, b) {
       return a.percent - b.percent;
     });
     this.__input.value = JSON.stringify(value);
@@ -3388,7 +2579,7 @@ var GradientController = (function(_Controller) {
     Common.extend(this.__input.style, {
       background: backgroundColor,
       color: "#fff",
-      textShadow: this.__input_textShadow + " #000"
+      textShadow: this.__input_textShadow + " #000",
     });
   };
   return GradientController;
@@ -3405,7 +2596,7 @@ var requestAnimationFrame$2 =
   window.msRequestAnimationFrame ||
   requestAnimationFrame$1;
 
-var CenteredDiv = (function() {
+var CenteredDiv = (function () {
   function CenteredDiv() {
     this.backgroundElement = document.createElement("div");
     Common.extend(this.backgroundElement.style, {
@@ -3416,7 +2607,7 @@ var CenteredDiv = (function() {
       zIndex: "1000",
       opacity: 0,
       WebkitTransition: "opacity 0.2s linear",
-      transition: "opacity 0.2s linear"
+      transition: "opacity 0.2s linear",
     });
     dom.makeFullscreen(this.backgroundElement);
     this.backgroundElement.style.position = "fixed";
@@ -3427,12 +2618,12 @@ var CenteredDiv = (function() {
       zIndex: "1001",
       opacity: 0,
       WebkitTransition: "-webkit-transform 0.2s ease-out, opacity 0.2s linear",
-      transition: "transform 0.2s ease-out, opacity 0.2s linear"
+      transition: "transform 0.2s ease-out, opacity 0.2s linear",
     });
     document.body.appendChild(this.backgroundElement);
     document.body.appendChild(this.domElement);
     var _this = this;
-    dom.bind(this.backgroundElement, "click", function() {
+    dom.bind(this.backgroundElement, "click", function () {
       _this.hide();
     });
   }
@@ -3444,7 +2635,7 @@ var CenteredDiv = (function() {
     this.domElement.style.opacity = 0;
     this.domElement.style.webkitTransform = "scale(1.1)";
     this.layout();
-    Common.defer(function() {
+    Common.defer(function () {
       _this.backgroundElement.style.opacity = 1;
       _this.domElement.style.opacity = 1;
       _this.domElement.style.webkitTransform = "scale(1)";
@@ -3561,7 +2752,7 @@ function autocomplete(settings) {
     }
     var fragment = doc.createDocumentFragment();
     var prevGroup = "#9?$";
-    items.forEach(function(item) {
+    items.forEach(function (item) {
       if (item.group && item.group !== prevGroup) {
         prevGroup = item.group;
         var groupDiv = renderGroup(item.group, inputValue);
@@ -3572,7 +2763,7 @@ function autocomplete(settings) {
       }
       var div = render(item, inputValue);
       if (div) {
-        div.addEventListener("click", function(ev) {
+        div.addEventListener("click", function (ev) {
           settings.onSelect(item, input);
           clear();
           ev.preventDefault();
@@ -3634,8 +2825,8 @@ function autocomplete(settings) {
     var val = input.value;
     if (val.length >= minLen) {
       clearDebounceTimer();
-      debounceTimer = window.setTimeout(function() {
-        settings.fetch(val, function(elements) {
+      debounceTimer = window.setTimeout(function () {
+        settings.fetch(val, function (elements) {
           if (keypressCounter === savedKeypressCounter && elements) {
             items = elements;
             inputValue = val;
@@ -3651,7 +2842,7 @@ function autocomplete(settings) {
   function focus(ev) {
     var val = input.value;
     if (val.length === 0) {
-      settings.fetch(val, function(elements) {
+      settings.fetch(val, function (elements) {
         items = elements;
         inputValue = val;
         selected = items.length > 0 ? items[0] : undefined;
@@ -3734,7 +2925,7 @@ function autocomplete(settings) {
     }
   }
   function blur() {
-    setTimeout(function() {
+    setTimeout(function () {
       if (doc.activeElement !== input) {
         clear();
       }
@@ -3758,7 +2949,7 @@ function autocomplete(settings) {
   window.addEventListener("resize", resizeEventHandler);
   doc.addEventListener("scroll", scrollEventHandler, true);
   return {
-    destroy: destroy
+    destroy: destroy,
   };
 }
 
@@ -3766,7 +2957,7 @@ var CSS_NAMESPACE = "dg";
 var HIDE_KEY_CODE = 72;
 var CLOSE_BUTTON_HEIGHT = 20;
 var DEFAULT_DEFAULT_PRESET_NAME = "Default";
-var SUPPORTS_LOCAL_STORAGE = (function() {
+var SUPPORTS_LOCAL_STORAGE = (function () {
   try {
     return !!window.localStorage;
   } catch (e) {
@@ -3796,11 +2987,11 @@ var GUI = function GUI(pars) {
     closeOnTop: false,
     autoPlace: true,
     width: GUI.DEFAULT_WIDTH,
-    showCloseButton: true
+    showCloseButton: true,
   });
   params = Common.defaults(params, {
     resizable: params.autoPlace,
-    hideable: params.autoPlace
+    hideable: params.autoPlace,
   });
   if (!Common.isUndefined(params.load)) {
     if (params.preset) {
@@ -3808,7 +2999,7 @@ var GUI = function GUI(pars) {
     }
   } else {
     params.load = {
-      preset: DEFAULT_DEFAULT_PRESET_NAME
+      preset: DEFAULT_DEFAULT_PRESET_NAME,
     };
   }
   if (Common.isUndefined(params.parent) && params.hideable) {
@@ -3820,7 +3011,7 @@ var GUI = function GUI(pars) {
   }
   var useLocalStorage =
     SUPPORTS_LOCAL_STORAGE && window.localStorage.getItem(getLocalStorageHash(this, "isLocal")) === "true";
-  this.saveToLocalStorageIfPossible = function() {
+  this.saveToLocalStorageIfPossible = function () {
     if (SUPPORTS_LOCAL_STORAGE && window.localStorage.getItem(getLocalStorageHash(_this, "isLocal")) === "true") {
       window.localStorage.setItem(getLocalStorageHash(_this, "gui"), JSON.stringify(_this.getSaveObject()));
     }
@@ -3835,7 +3026,7 @@ var GUI = function GUI(pars) {
       },
       get: function get() {
         return params.lightTheme;
-      }
+      },
     },
     showCloseButton: {
       set: function set(v) {
@@ -3845,27 +3036,27 @@ var GUI = function GUI(pars) {
       },
       get: function get() {
         return params.showCloseButton;
-      }
+      },
     },
     parent: {
       get: function get() {
         return params.parent;
-      }
+      },
     },
     scrollable: {
       get: function get() {
         return params.scrollable;
-      }
+      },
     },
     autoPlace: {
       get: function get() {
         return params.autoPlace;
-      }
+      },
     },
     closeOnTop: {
       get: function get() {
         return params.closeOnTop;
-      }
+      },
     },
     preset: {
       get: function get() {
@@ -3882,7 +3073,7 @@ var GUI = function GUI(pars) {
         }
         setPresetSelectIndex(this);
         _this.revert();
-      }
+      },
     },
     width: {
       get: function get() {
@@ -3891,7 +3082,7 @@ var GUI = function GUI(pars) {
       set: function set(v) {
         params.width = v;
         setWidth(_this, v);
-      }
+      },
     },
     name: {
       get: function get() {
@@ -3902,7 +3093,7 @@ var GUI = function GUI(pars) {
         if (titleRow) {
           titleRow.innerHTML = params.name;
         }
-      }
+      },
     },
     title: {
       get: function get() {
@@ -3917,7 +3108,7 @@ var GUI = function GUI(pars) {
             titleRow.removeAttribute("title");
           }
         }
-      }
+      },
     },
     closed: {
       get: function get() {
@@ -3934,12 +3125,12 @@ var GUI = function GUI(pars) {
         if (_this.__closeButton) {
           _this.__closeButton.innerHTML = v ? GUI.TEXT_OPEN : GUI.TEXT_CLOSED;
         }
-      }
+      },
     },
     load: {
       get: function get() {
         return params.load;
-      }
+      },
     },
     useLocalStorage: {
       get: function get() {
@@ -3955,8 +3146,8 @@ var GUI = function GUI(pars) {
           }
           window.localStorage.setItem(getLocalStorageHash(_this, "isLocal"), bool);
         }
-      }
-    }
+      },
+    },
   });
   if (Common.isUndefined(params.parent)) {
     this.closed = params.closed || false;
@@ -3987,7 +3178,7 @@ var GUI = function GUI(pars) {
     if (!params.showCloseButton) {
       dom.addClass(this.__closeButton, GUI.CLASS_DISPLAY_NONE);
     }
-    dom.bind(this.__closeButton, "click", function() {
+    dom.bind(this.__closeButton, "click", function () {
       _this.closed = !_this.closed;
     });
   } else {
@@ -4028,7 +3219,7 @@ var GUI = function GUI(pars) {
       setWidth(_this, params.width);
     }
   }
-  this.__resizeHandler = function() {
+  this.__resizeHandler = function () {
     _this.onResizeDebounced();
   };
   dom.bind(window, "resize", this.__resizeHandler);
@@ -4042,7 +3233,7 @@ var GUI = function GUI(pars) {
   function resetWidth() {
     var root = _this.getRoot();
     root.width += 1;
-    Common.defer(function() {
+    Common.defer(function () {
       root.width -= 1;
     });
   }
@@ -4050,15 +3241,15 @@ var GUI = function GUI(pars) {
     resetWidth();
   }
   if (Common.isObject(params.object)) {
-    Common.each(params.object, function(property, propertyName) {
+    Common.each(params.object, function (property, propertyName) {
       _this.add(params.object, propertyName);
     });
   }
 };
 GUI.CustomController = CustomController;
-GUI.toggleHide = function() {
+GUI.toggleHide = function () {
   hide = !hide;
-  Common.each(hideableGuis, function(gui) {
+  Common.each(hideableGuis, function (gui) {
     gui.domElement.style.display = hide ? "none" : "";
   });
 };
@@ -4077,7 +3268,7 @@ GUI.CLASS_LIGHT_THEME = "light-theme";
 GUI.DEFAULT_WIDTH = 245;
 GUI.TEXT_CLOSED = "Close View Controls";
 GUI.TEXT_OPEN = "Open View Controls";
-GUI._keydownHandler = function(e) {
+GUI._keydownHandler = function (e) {
   if (
     document.activeElement &&
     document.activeElement.type !== "text" &&
@@ -4091,7 +3282,7 @@ Common.extend(GUI.prototype, {
   add: function add(object, property, label) {
     return _add(this, object, property, label, {
       custom: object instanceof CustomController,
-      factoryArgs: Array.prototype.slice.call(arguments, 3)
+      factoryArgs: Array.prototype.slice.call(arguments, 3),
     });
   },
   openExportWindow: function openExportWindow(title, content) {
@@ -4114,11 +3305,11 @@ Common.extend(GUI.prototype, {
     Editor.focus();
   },
   plugins: {
-    autocomplete: autocomplete
+    autocomplete: autocomplete,
   },
   addColor: function addColor(object, property, label) {
     return _add(this, object, property, label, {
-      color: true
+      color: true,
     });
   },
   addPlotter: function addPlotter(object, property, max, period, type, fgColor, bgColor) {
@@ -4128,30 +3319,30 @@ Common.extend(GUI.prototype, {
       period: typeof period === "number" ? period : 500,
       type: type || "line",
       fgColor: fgColor || "#fff",
-      bgColor: bgColor || "#000"
+      bgColor: bgColor || "#000",
     });
   },
   addFile: function addFile(object, property) {
     return _add(this, object, property, {
-      file: true
+      file: true,
     });
   },
   addCustomController: function addCustomController(object, property) {
     return _add(this, object, property, {
       custom: true,
-      factoryArgs: Array.prototype.slice.call(arguments, 2)
+      factoryArgs: Array.prototype.slice.call(arguments, 2),
     });
   },
   addGradient: function addGradient(object, property, label) {
     return _add(this, object, property, label, {
       gradient: true,
-      factoryArgs: Array.prototype.slice.call(arguments, 3)
+      factoryArgs: Array.prototype.slice.call(arguments, 3),
     });
   },
   addImage: function addImage(object, property, label) {
     return _add(this, object, property, label, {
       factoryArgs: Array.prototype.slice.call(arguments, 3),
-      image: true
+      image: true,
     });
   },
   remove: function remove(controller) {
@@ -4165,7 +3356,7 @@ Common.extend(GUI.prototype, {
     this.__ul.removeChild(controller.__li);
     this.__controllers.splice(this.__controllers.indexOf(controller), 1);
     var _this = this;
-    Common.defer(function() {
+    Common.defer(function () {
       _this.onResize();
     });
   },
@@ -4180,7 +3371,7 @@ Common.extend(GUI.prototype, {
       autoPlaceContainer.removeChild(this.domElement);
     }
     var _this = this;
-    Common.each(this.__folders, function(folder, name) {
+    Common.each(this.__folders, function (folder, name) {
       _this.removeFolder(name);
     });
     dom.unbind(window, "keydown", GUI._keydownHandler, false);
@@ -4196,7 +3387,7 @@ Common.extend(GUI.prototype, {
     var newGuiParams = {
       name: name,
       parent: this,
-      title: title
+      title: title,
     };
     newGuiParams.autoPlace = this.autoPlace;
     if (this.load && this.load.folders && this.load.folders[name]) {
@@ -4223,10 +3414,10 @@ Common.extend(GUI.prototype, {
     }
     removeListeners(folder);
     var _this = this;
-    Common.each(folder.__folders, function(subfolder) {
+    Common.each(folder.__folders, function (subfolder) {
       folder.removeFolder(subfolder);
     });
-    Common.defer(function() {
+    Common.defer(function () {
       _this.onResize();
     });
   },
@@ -4252,7 +3443,7 @@ Common.extend(GUI.prototype, {
       var _dom$getOffset = dom.getOffset(root.__ul),
         top = _dom$getOffset.top;
       var h = 0;
-      Common.each(root.__ul.childNodes, function(node) {
+      Common.each(root.__ul.childNodes, function (node) {
         if (!(root.autoPlace && node === root.__save_row)) {
           h += dom.getHeight(node);
         }
@@ -4266,7 +3457,7 @@ Common.extend(GUI.prototype, {
       }
     }
     if (root.__resize_handle) {
-      Common.defer(function() {
+      Common.defer(function () {
         root.__resize_handle.style.height = root.__ul.offsetHeight + "px";
       });
     }
@@ -4274,7 +3465,7 @@ Common.extend(GUI.prototype, {
       root.__closeButton.style.width = root.width + "px";
     }
   },
-  onResizeDebounced: Common.debounce(function() {
+  onResizeDebounced: Common.debounce(function () {
     this.onResize();
   }, 50),
   remember: function remember() {
@@ -4286,7 +3477,7 @@ Common.extend(GUI.prototype, {
       throw new Error("You can only call remember on a top level GUI.");
     }
     var _this = this;
-    Common.each(Array.prototype.slice.call(arguments), function(object) {
+    Common.each(Array.prototype.slice.call(arguments), function (object) {
       if (_this.__rememberedObjects.length === 0) {
         addSaveMenu(_this);
       }
@@ -4317,7 +3508,7 @@ Common.extend(GUI.prototype, {
       toReturn.remembered[this.preset] = getCurrentPreset(this);
     }
     toReturn.folders = {};
-    Common.each(this.__folders, function(element, key) {
+    Common.each(this.__folders, function (element, key) {
       toReturn.folders[key] = element.getSaveObject();
     });
     return toReturn;
@@ -4344,7 +3535,7 @@ Common.extend(GUI.prototype, {
     var _this = this.getRoot();
     Common.each(
       this.__controllers,
-      function(controller) {
+      function (controller) {
         if (!this.getRoot().load.remembered) {
           controller.setValue(controller.initialValue, true);
         } else {
@@ -4356,7 +3547,7 @@ Common.extend(GUI.prototype, {
       },
       this
     );
-    Common.each(this.__folders, function(folder) {
+    Common.each(this.__folders, function (folder) {
       folder.revert(folder);
     });
     if (!gui) {
@@ -4385,13 +3576,13 @@ Common.extend(GUI.prototype, {
     }
   },
   updateDisplay: function updateDisplay() {
-    Common.each(this.__controllers, function(controller) {
+    Common.each(this.__controllers, function (controller) {
       controller.updateDisplay();
     });
-    Common.each(this.__folders, function(folder) {
+    Common.each(this.__folders, function (folder) {
       folder.updateDisplay();
     });
-  }
+  },
 });
 function addRow(gui, newDom, liBefore) {
   var li = document.createElement("li");
@@ -4430,7 +3621,7 @@ function augmentController(gui, li, controller) {
         controller.remove();
         return _add(gui, controller.object, controller.property, controller.label, {
           before: nextSibling,
-          factoryArgs: [Common.toArray(arguments)]
+          factoryArgs: [Common.toArray(arguments)],
         });
       }
       if (Common.isArray(_options) || Common.isObject(_options)) {
@@ -4438,7 +3629,7 @@ function augmentController(gui, li, controller) {
         controller.remove();
         return _add(gui, controller.object, controller.property, controller.label, {
           before: _nextSibling,
-          factoryArgs: [_options]
+          factoryArgs: [_options],
         });
       }
     },
@@ -4462,18 +3653,18 @@ function augmentController(gui, li, controller) {
     remove: function remove() {
       controller.__gui.remove(controller);
       return controller;
-    }
+    },
   });
   if (controller instanceof NumberControllerSlider) {
     var box = new NumberControllerBox(controller.object, controller.property, {
       min: controller.__min,
       max: controller.__max,
-      step: controller.__step
+      step: controller.__step,
     });
-    Common.each(["updateDisplay", "onChange", "onFinishChange", "step", "min", "max"], function(method) {
+    Common.each(["updateDisplay", "onChange", "onFinishChange", "step", "min", "max"], function (method) {
       var pc = controller[method];
       var pb = box[method];
-      controller[method] = box[method] = function() {
+      controller[method] = box[method] = function () {
         var args = Array.prototype.slice.call(arguments);
         pb.apply(box, args);
         return pc.apply(controller, args);
@@ -4484,12 +3675,12 @@ function augmentController(gui, li, controller) {
     var animateButtons = new NumberControllerAnimator(controller.object, controller.property, {
       min: controller.__min,
       max: controller.__max,
-      step: controller.__step
+      step: controller.__step,
     });
-    Common.each(["updateDisplay", "onChange", "onFinishChange", "step"], function(method) {
+    Common.each(["updateDisplay", "onChange", "onFinishChange", "step"], function (method) {
       var pc = controller[method];
       var pb = animateButtons[method];
-      controller[method] = animateButtons[method] = function() {
+      controller[method] = animateButtons[method] = function () {
         var args = Array.prototype.slice.call(arguments);
         pb.apply(animateButtons, args);
         return pc.apply(controller, args);
@@ -4505,7 +3696,7 @@ function augmentController(gui, li, controller) {
         controller.remove();
         var newController = _add(gui, controller.object, controller.property, controller.label, {
           before: controller.__li.nextElementSibling,
-          factoryArgs: [controller.__min, controller.__max, controller.__step]
+          factoryArgs: [controller.__min, controller.__max, controller.__step],
         });
         newController.name(oldName);
         if (wasListening) newController.listen();
@@ -4513,49 +3704,37 @@ function augmentController(gui, li, controller) {
       }
       return returned;
     };
-    controller.min = Common.compose(
-      r,
-      controller.min
-    );
-    controller.max = Common.compose(
-      r,
-      controller.max
-    );
+    controller.min = Common.compose(r, controller.min);
+    controller.max = Common.compose(r, controller.max);
   } else if (controller instanceof BooleanController) {
-    dom.bind(li, "click", function() {
+    dom.bind(li, "click", function () {
       dom.fakeEvent(controller.__checkbox, "click");
     });
-    dom.bind(controller.__checkbox, "click", function(e) {
+    dom.bind(controller.__checkbox, "click", function (e) {
       e.stopPropagation();
     });
   } else if (controller instanceof FunctionController || controller instanceof TabbedController) {
-    dom.bind(li, "click", function() {
+    dom.bind(li, "click", function () {
       dom.fakeEvent(controller.__button, "click");
     });
-    dom.bind(li, "mouseover", function() {
+    dom.bind(li, "mouseover", function () {
       dom.addClass(controller.__button, "hover");
     });
-    dom.bind(li, "mouseout", function() {
+    dom.bind(li, "mouseout", function () {
       dom.removeClass(controller.__button, "hover");
     });
   } else if (controller instanceof ColorController) {
     dom.addClass(li, "color");
-    controller.updateDisplay = Common.compose(
-      function(val) {
-        li.style.borderLeftColor = controller.__color.toHexString();
-        return val;
-      },
-      controller.updateDisplay
-    );
+    controller.updateDisplay = Common.compose(function (val) {
+      li.style.borderLeftColor = controller.__color.toHexString();
+      return val;
+    }, controller.updateDisplay);
     controller.updateDisplay();
   } else if (controller instanceof ArrayController) {
     dom.addClass(li, "array");
-    controller.updateDisplay = Common.compose(
-      function(val) {
-        li.style.height = (controller.__inputs.length + 1) * 26 + "px";
-      },
-      controller.updateDisplay
-    );
+    controller.updateDisplay = Common.compose(function (val) {
+      li.style.height = (controller.__inputs.length + 1) * 26 + "px";
+    }, controller.updateDisplay);
     controller.updateDisplay();
   } else if (controller instanceof GradientController) {
     li.style.borderLeft = "3px solid #2FA1D6";
@@ -4564,15 +3743,12 @@ function augmentController(gui, li, controller) {
   } else if (controller instanceof FileController) {
     dom.addClass(li, "file");
   }
-  controller.setValue = Common.compose(
-    function(val) {
-      if (gui.getRoot().__preset_select && controller.isModified()) {
-        markPresetModified(gui.getRoot(), true);
-      }
-      return val;
-    },
-    controller.setValue
-  );
+  controller.setValue = Common.compose(function (val) {
+    if (gui.getRoot().__preset_select && controller.isModified()) {
+      markPresetModified(gui.getRoot(), true);
+    }
+    return val;
+  }, controller.setValue);
 }
 function recallSavedValue(gui, controller) {
   var root = gui.getRoot();
@@ -4709,13 +3885,13 @@ function addSaveMenu(gui) {
   dom.addClass(button4, "delete");
   var select = (gui.__preset_select = document.createElement("select"));
   if (gui.load && gui.load.remembered) {
-    Common.each(gui.load.remembered, function(value, key) {
+    Common.each(gui.load.remembered, function (value, key) {
       addPresetOption(gui, key, key === gui.preset);
     });
   } else {
     addPresetOption(gui, DEFAULT_DEFAULT_PRESET_NAME, false);
   }
-  dom.bind(select, "change", function() {
+  dom.bind(select, "change", function () {
     for (var index = 0; index < gui.__preset_select.length; index++) {
       gui.__preset_select[index].innerHTML = gui.__preset_select[index].value;
     }
@@ -4736,36 +3912,36 @@ function addSaveMenu(gui) {
       localStorageCheckBox.setAttribute("checked", "checked");
     }
     showHideExplain(gui, explain);
-    dom.bind(localStorageCheckBox, "change", function() {
+    dom.bind(localStorageCheckBox, "change", function () {
       gui.useLocalStorage = !gui.useLocalStorage;
       showHideExplain(gui, explain);
     });
   }
   var newConstructorTextArea = document.getElementById("dg-new-constructor");
-  dom.bind(newConstructorTextArea, "keydown", function(e) {
+  dom.bind(newConstructorTextArea, "keydown", function (e) {
     if (e.metaKey && (e.which === 67 || e.keyCode === 67)) {
       SAVE_DIALOGUE.hide();
     }
   });
-  dom.bind(gears, "click", function() {
+  dom.bind(gears, "click", function () {
     newConstructorTextArea.innerHTML = JSON.stringify(gui.getSaveObject(), undefined, 2);
     SAVE_DIALOGUE.show();
     newConstructorTextArea.focus();
     newConstructorTextArea.select();
   });
-  dom.bind(button, "click", function() {
+  dom.bind(button, "click", function () {
     gui.save();
   });
-  dom.bind(button2, "click", function() {
+  dom.bind(button2, "click", function () {
     var presetName = prompt("Enter a new preset name.");
     if (presetName) {
       gui.saveAs(presetName);
     }
   });
-  dom.bind(button3, "click", function() {
+  dom.bind(button3, "click", function () {
     gui.revert();
   });
-  dom.bind(button4, "click", function() {
+  dom.bind(button4, "click", function () {
     if (gui.preset === DEFAULT_DEFAULT_PRESET_NAME) {
       alert("Default preset can't be deleted.");
       return;
@@ -4784,7 +3960,7 @@ function addResizeHandle(gui) {
     marginLeft: "-3px",
     height: "200px",
     cursor: "ew-resize",
-    position: "absolute"
+    position: "absolute",
   });
   function drag(e) {
     e.preventDefault();
@@ -4821,10 +3997,10 @@ function setWidth(gui, w) {
 }
 function getCurrentPreset(gui, useInitialValues) {
   var toReturn = {};
-  Common.each(gui.__rememberedObjects, function(val, index) {
+  Common.each(gui.__rememberedObjects, function (val, index) {
     var savedValues = {};
     var controllerMap = gui.__rememberedObjectIndecesToControllers[index];
-    Common.each(controllerMap, function(controller, property) {
+    Common.each(controllerMap, function (controller, property) {
       savedValues[property] = useInitialValues ? controller.initialValue : controller.getValue();
     });
     toReturn[index] = savedValues;
@@ -4840,11 +4016,11 @@ function setPresetSelectIndex(gui) {
 }
 function updateDisplays(controllerArray) {
   if (controllerArray.length !== 0) {
-    requestAnimationFrame$2.call(window, function() {
+    requestAnimationFrame$2.call(window, function () {
       updateDisplays(controllerArray);
     });
   }
-  Common.each(controllerArray, function(c) {
+  Common.each(controllerArray, function (c) {
     c.updateDisplay();
   });
 }
@@ -4852,7 +4028,7 @@ function updateDisplays(controllerArray) {
 var color = {
   Color: Color,
   math: ColorMath,
-  interpret: interpret
+  interpret: interpret,
 };
 var controllers = {
   Controller: Controller,
@@ -4869,13 +4045,13 @@ var controllers = {
   PlotterController: PlotterController,
   CustomController: CustomController,
   ImageController: ImageController,
-  ArrayController: ArrayController
+  ArrayController: ArrayController,
 };
 var dom$1 = {
-  dom: dom
+  dom: dom,
 };
 var gui = {
-  GUI: GUI
+  GUI: GUI,
 };
 var GUI$1 = GUI;
 var datGUI = {
@@ -4883,7 +4059,7 @@ var datGUI = {
   controllers: controllers,
   dom: dom$1,
   gui: gui,
-  GUI: GUI$1
+  GUI: GUI$1,
 };
 
 export default datGUI;

@@ -43,7 +43,7 @@ import GUIImport from "./gui/GUI";
 export const color = {
   Color: Color,
   math: math,
-  interpret: interpret
+  interpret: interpret,
 };
 
 /**
@@ -65,7 +65,7 @@ export const controllers = {
   PlotterController: PlotterController,
   CustomController: CustomController,
   ImageController: ImageController,
-  ArrayController: ArrayController
+  ArrayController: ArrayController,
 };
 
 /**
@@ -94,6 +94,6 @@ const datGUI = {
   controllers,
   dom,
   gui,
-  GUI
+  GUI,
 };
 export default datGUI;

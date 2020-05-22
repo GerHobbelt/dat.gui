@@ -11,7 +11,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-export default function(color, forceCSSHex) {
+export default function (color, forceCSSHex) {
   const colorFormat = color.__state.conversionName.toString();
 
   const r = Math.round(color.r);

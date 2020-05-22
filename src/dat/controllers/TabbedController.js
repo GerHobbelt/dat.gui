@@ -33,7 +33,7 @@ class TabbedController extends Controller {
     this.__button = document.createElement("div");
     this.__button.innerHTML = text === undefined ? "Fire" : text;
 
-    dom.bind(this.__button, "click", function(e) {
+    dom.bind(this.__button, "click", function (e) {
       e.preventDefault();
       _this.fire();
       return false;

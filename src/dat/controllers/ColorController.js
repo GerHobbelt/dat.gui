@@ -61,7 +61,7 @@ class ColorController extends Controller {
     dom.bind(
       this.__input,
       "keydown",
-      function(e) {
+      function (e) {
         if (e.keyCode === 13) {
           // on enter
           onBlur.call(this);
@@ -76,8 +76,8 @@ class ColorController extends Controller {
     dom.bind(
       this.__selector,
       "mousedown",
-      function(/* e */) {
-        dom.addClass(this, "drag").bind(window, "mouseup", function(/* e */) {
+      function (/* e */) {
+        dom.addClass(this, "drag").bind(window, "mouseup", function (/* e */) {
           dom.removeClass(_this.__selector, "drag");
         });
       },
@@ -88,11 +88,11 @@ class ColorController extends Controller {
     dom.bind(
       this.__selector,
       "touchstart",
-      function(/* e */) {
+      function (/* e */) {
         dom.addClass(this, "drag").bind(
           window,
           "touchend",
-          function(/* e */) {
+          function (/* e */) {
             dom.removeClass(_this.__selector, "drag");
           },
           false,
@@ -110,7 +110,7 @@ class ColorController extends Controller {
       height: "102px",
       padding: "3px",
       backgroundColor: "#222",
-      boxShadow: "0px 1px 3px rgba(0,0,0,0.3)"
+      boxShadow: "0px 1px 3px rgba(0,0,0,0.3)",
     });
 
     common.extend(this.__field_knob.style, {
@@ -120,7 +120,7 @@ class ColorController extends Controller {
       border: this.__field_knob_border + (this.__color.v < 0.5 ? "#fff" : "#000"),
       boxShadow: "0px 1px 3px rgba(0,0,0,0.5)",
       borderRadius: "12px",
-      zIndex: 1
+      zIndex: 1,
     });
 
     common.extend(this.__hue_knob.style, {
@@ -128,7 +128,7 @@ class ColorController extends Controller {
       width: "15px",
       height: "2px",
       borderRight: "4px solid #fff",
-      zIndex: 1
+      zIndex: 1,
     });
 
     common.extend(this.__saturation_field.style, {
@@ -137,13 +137,13 @@ class ColorController extends Controller {
       border: "1px solid #555",
       marginRight: "3px",
       display: "inline-block",
-      cursor: "pointer"
+      cursor: "pointer",
     });
 
     common.extend(valueField.style, {
       width: "100%",
       height: "100%",
-      background: "none"
+      background: "none",
     });
 
     linearGradient(valueField, "top", "rgba(0,0,0,0)", "#000");
@@ -155,7 +155,7 @@ class ColorController extends Controller {
       cursor: "ns-resize",
       position: "absolute",
       top: "3px",
-      right: "3px"
+      right: "3px",
     });
 
     hueGradient(this.__hue_field);
@@ -169,7 +169,7 @@ class ColorController extends Controller {
       color: "#fff",
       border: 0,
       fontWeight: "bold",
-      textShadow: this.__input_textShadow + "rgba(0,0,0,0.7)"
+      textShadow: this.__input_textShadow + "rgba(0,0,0,0.7)",
     });
 
     dom.bind(this.__saturation_field, "mousedown", fieldDown);
@@ -303,7 +303,7 @@ class ColorController extends Controller {
 
       common.each(
         Color.COMPONENTS,
-        function(component) {
+        function (component) {
           if (
             !common.isUndefined(i[component]) &&
             !common.isUndefined(this.__color.__state[component]) &&
@@ -334,7 +334,7 @@ class ColorController extends Controller {
       marginLeft: 100 * this.__color.s - 7 + "px",
       marginTop: 100 * (1 - this.__color.v) - 7 + "px",
       backgroundColor: this.__temp.toHexString(),
-      border: this.__field_knob_border + "rgb(" + flip + "," + flip + "," + flip + ")"
+      border: this.__field_knob_border + "rgb(" + flip + "," + flip + "," + flip + ")",
     });
 
     this.__hue_knob.style.marginTop = (1 - this.__color.h / 360) * 100 + "px";
@@ -349,7 +349,7 @@ class ColorController extends Controller {
     common.extend(this.__input.style, {
       backgroundColor: this.__color.toHexString(),
       color: "rgb(" + flip + "," + flip + "," + flip + ")",
-      textShadow: this.__input_textShadow + "rgba(" + _flip + "," + _flip + "," + _flip + ",.7)"
+      textShadow: this.__input_textShadow + "rgba(" + _flip + "," + _flip + "," + _flip + ",.7)",
     });
   }
 }
@@ -358,7 +358,7 @@ const vendors = ["-moz-", "-o-", "-webkit-", "-ms-", ""];
 
 function linearGradient(elem, x, a, b) {
   elem.style.background = "";
-  common.each(vendors, function(vendor) {
+  common.each(vendors, function (vendor) {
     elem.style.cssText += "background: " + vendor + "linear-gradient(" + x + ", " + a + " 0%, " + b + " 100%); ";
   });
 }

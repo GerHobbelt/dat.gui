@@ -45,7 +45,7 @@ class GradientController extends Controller {
     this.__input.type = "text";
     this.__input_textShadow = "1px 1px 2px";
 
-    dom.bind(this.__input, "keydown", function(e) {
+    dom.bind(this.__input, "keydown", function (e) {
       if (e.keyCode === 13) {
         // on enter
         onBlur.call(this);
@@ -59,8 +59,8 @@ class GradientController extends Controller {
       _this.setValue(value);
     }
 
-    dom.bind(this.__selector, "mousedown", function(/* e */) {
-      dom.addClass(this, "drag").bind(window, "mouseup", function(/* e */) {
+    dom.bind(this.__selector, "mousedown", function (/* e */) {
+      dom.addClass(this, "drag").bind(window, "mouseup", function (/* e */) {
         dom.removeClass(_this.__selector, "drag");
       });
     });
@@ -72,7 +72,7 @@ class GradientController extends Controller {
       padding: "0px",
       lineHeight: "18px",
       backgroundColor: "#222",
-      boxShadow: "0px 1px 3px rgba(0,0,0,0.3)"
+      boxShadow: "0px 1px 3px rgba(0,0,0,0.3)",
     });
 
     for (let i = 0; i < params.length; i++) {
@@ -87,7 +87,7 @@ class GradientController extends Controller {
         grd.addColorStop(key, params[i][key]);
       }
 
-      dom.bind(item, "click", function() {
+      dom.bind(item, "click", function () {
         _this.setValue(this.value);
         _this.updateDisplay();
         onFinish();
@@ -96,7 +96,7 @@ class GradientController extends Controller {
       context.fillStyle = grd;
       context.fillRect(0, 0, item.width, item.height);
       common.extend(item.style, {
-        width: "150px"
+        width: "150px",
       });
       this.__saturation_field.appendChild(item);
     }
@@ -121,10 +121,10 @@ class GradientController extends Controller {
     for (const key in value) {
       arr.push({
         percent: key,
-        color: value[key]
+        color: value[key],
       });
     }
-    arr.sort(function(a, b) {
+    arr.sort(function (a, b) {
       return a.percent - b.percent;
     });
 
@@ -140,7 +140,7 @@ class GradientController extends Controller {
       // maximum contrast shadow below and around the text, so it will work like
       // and 'outline' for the text and keep it readable on top of all gradient
       // backgrounds / colors:
-      textShadow: this.__input_textShadow + " #000"
+      textShadow: this.__input_textShadow + " #000",
     });
   }
 }

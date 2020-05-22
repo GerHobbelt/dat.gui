@@ -25,7 +25,7 @@ class CenteredDiv {
       zIndex: "1000",
       opacity: 0,
       WebkitTransition: "opacity 0.2s linear",
-      transition: "opacity 0.2s linear"
+      transition: "opacity 0.2s linear",
     });
 
     dom.makeFullscreen(this.backgroundElement);
@@ -38,14 +38,14 @@ class CenteredDiv {
       zIndex: "1001",
       opacity: 0,
       WebkitTransition: "-webkit-transform 0.2s ease-out, opacity 0.2s linear",
-      transition: "transform 0.2s ease-out, opacity 0.2s linear"
+      transition: "transform 0.2s ease-out, opacity 0.2s linear",
     });
 
     document.body.appendChild(this.backgroundElement);
     document.body.appendChild(this.domElement);
 
     const _this = this;
-    dom.bind(this.backgroundElement, "click", function() {
+    dom.bind(this.backgroundElement, "click", function () {
       _this.hide();
     });
   }
@@ -62,7 +62,7 @@ class CenteredDiv {
 
     this.layout();
 
-    common.defer(function() {
+    common.defer(function () {
       _this.backgroundElement.style.opacity = 1;
       _this.domElement.style.opacity = 1;
       _this.domElement.style.webkitTransform = "scale(1)";
@@ -75,7 +75,7 @@ class CenteredDiv {
   hide() {
     const _this = this;
 
-    const hide = function() {
+    const hide = function () {
       _this.domElement.style.display = "none";
       _this.backgroundElement.style.display = "none";
 

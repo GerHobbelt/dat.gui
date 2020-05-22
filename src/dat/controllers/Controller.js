@@ -59,9 +59,9 @@ class Controller {
      */
     this.__onFinishChange = undefined;
 
-    this.__transformInput = x => x;
+    this.__transformInput = (x) => x;
 
-    this.__transformOutput = x => x;
+    this.__transformOutput = (x) => x;
 
     /**
      * Whether to force update a display, even when input is active.
@@ -155,7 +155,7 @@ class Controller {
     return this.initialValue !== this.getValue();
   }
 
-  transform(transformInput = x => x, transformOutput = x => x) {
+  transform(transformInput = (x) => x, transformOutput = (x) => x) {
     this.__transformInput = transformInput;
     this.__transformOutput = transformOutput;
 

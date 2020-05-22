@@ -107,7 +107,7 @@ function autocomplete(settings) {
       container.removeChild(container.firstChild);
     }
     // function for rendering autocomplete suggestions
-    var render = function(item, currentValue) {
+    var render = function (item, currentValue) {
       var itemElement = doc.createElement("div");
       itemElement.textContent = item.label || "";
       return itemElement;
@@ -116,7 +116,7 @@ function autocomplete(settings) {
       render = settings.render;
     }
     // function to render autocomplete groups
-    var renderGroup = function(groupName, currentValue) {
+    var renderGroup = function (groupName, currentValue) {
       var groupDiv = doc.createElement("div");
       groupDiv.textContent = groupName;
       return groupDiv;
@@ -126,7 +126,7 @@ function autocomplete(settings) {
     }
     var fragment = doc.createDocumentFragment();
     var prevGroup = "#9?$";
-    items.forEach(function(item) {
+    items.forEach(function (item) {
       if (item.group && item.group !== prevGroup) {
         prevGroup = item.group;
         var groupDiv = renderGroup(item.group, inputValue);
@@ -137,7 +137,7 @@ function autocomplete(settings) {
       }
       var div = render(item, inputValue);
       if (div) {
-        div.addEventListener("click", function(ev) {
+        div.addEventListener("click", function (ev) {
           settings.onSelect(item, input);
           clear();
           ev.preventDefault();
@@ -199,7 +199,7 @@ function autocomplete(settings) {
       18 /* Alt */,
       20 /* CapsLock */,
       91 /* WindowsKey */,
-      9 /* Tab */
+      9 /* Tab */,
     ];
     for (var _i = 0, ignore_1 = ignore; _i < ignore_1.length; _i++) {
       var key = ignore_1[_i];
@@ -219,8 +219,8 @@ function autocomplete(settings) {
     var val = input.value;
     if (val.length >= minLen) {
       clearDebounceTimer();
-      debounceTimer = window.setTimeout(function() {
-        settings.fetch(val, function(elements) {
+      debounceTimer = window.setTimeout(function () {
+        settings.fetch(val, function (elements) {
           if (keypressCounter === savedKeypressCounter && elements) {
             items = elements;
             inputValue = val;
@@ -240,7 +240,7 @@ function autocomplete(settings) {
   function focus(ev) {
     var val = input.value;
     if (val.length === 0) {
-      settings.fetch(val, function(elements) {
+      settings.fetch(val, function (elements) {
         items = elements;
         inputValue = val;
         selected = items.length > 0 ? items[0] : undefined;
@@ -341,7 +341,7 @@ function autocomplete(settings) {
    */
   function blur() {
     // we need to delay clear, because when we click on an item, blur will be called before click and remove items from DOM
-    setTimeout(function() {
+    setTimeout(function () {
       if (doc.activeElement !== input) {
         clear();
       }
@@ -370,7 +370,7 @@ function autocomplete(settings) {
   window.addEventListener("resize", resizeEventHandler);
   doc.addEventListener("scroll", scrollEventHandler, true);
   return {
-    destroy: destroy
+    destroy: destroy,
   };
 }
 

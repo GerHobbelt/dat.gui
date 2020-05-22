@@ -39,7 +39,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
  */
-const plotter = function(fg, bg, type) {
+const plotter = function (fg, bg, type) {
   let min = Infinity;
   let max = 0;
   const { round } = Math;
@@ -72,7 +72,7 @@ const plotter = function(fg, bg, type) {
 
   return {
     dom: canvas,
-    update: function(value, maxValue) {
+    update: function (value, maxValue) {
       min = Math.min(min, value);
       max = Math.max(max, value);
 
@@ -110,7 +110,7 @@ const plotter = function(fg, bg, type) {
           round((value / maxValue) * GRAPH_HEIGHT)
         );
       }
-    }
+    },
   };
 };
 

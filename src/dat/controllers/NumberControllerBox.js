@@ -70,10 +70,10 @@ class NumberControllerBox extends NumberController {
       "position:absolute;right:0;height:10px;top:15px;background-color: #555;border: none;"
     );
 
-    dom.bind(this.__up, "mousedown", function() {
+    dom.bind(this.__up, "mousedown", function () {
       _this.setValue(_this.getValue() + _this.__impliedStep);
     });
-    dom.bind(this.__down, "mousedown", function() {
+    dom.bind(this.__down, "mousedown", function () {
       _this.setValue(_this.getValue() - _this.__impliedStep);
     });
 

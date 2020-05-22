@@ -37,7 +37,7 @@ class ArrayController extends Controller {
 
     this.__new = document.createElement("input");
     this.__new.setAttribute("type", "text");
-    dom.bind(this.__new, "keydown", function(e) {
+    dom.bind(this.__new, "keydown", function (e) {
       if (e.keyCode === 13) {
         const values = _this.getValue();
         values.push(_this.__new.value);
@@ -63,13 +63,13 @@ class ArrayController extends Controller {
 
     const _this = this;
 
-    this.__inputs.forEach(function(i) {
+    this.__inputs.forEach(function (i) {
       _this.__div.removeChild(i.parentElement);
     });
 
     this.__inputs = [];
 
-    this.getValue().forEach(function(v) {
+    this.getValue().forEach(function (v) {
       const group = document.createElement("div");
       dom.addClass(group, "array-input");
       const input = document.createElement("input");
@@ -87,7 +87,7 @@ class ArrayController extends Controller {
       dom.bind(input, "keyup", onChange);
       dom.bind(input, "change", onChange);
       dom.bind(input, "blur", onBlur);
-      dom.bind(input, "keydown", function(e) {
+      dom.bind(input, "keydown", function (e) {
         if (e.keyCode === 13) {
           this.blur();
         }
@@ -100,7 +100,7 @@ class ArrayController extends Controller {
     function onRemove(e) {
       for (let i = 0; i < _this.__inputs.length; i++) {
         if (_this.__inputs[i].parentElement === e.target.parentElement) {
-          const values = _this.getValue().filter(v => v !== _this.__inputs[i].value);
+          const values = _this.getValue().filter((v) => v !== _this.__inputs[i].value);
           _this.setValue(values);
         }
       }
@@ -113,7 +113,7 @@ class ArrayController extends Controller {
 
       _this.__changing = true;
 
-      const values = _this.__inputs.map(function(i) {
+      const values = _this.__inputs.map(function (i) {
         return i.value;
       });
 

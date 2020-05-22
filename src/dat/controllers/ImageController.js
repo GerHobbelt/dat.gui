@@ -78,7 +78,7 @@ class ImageController extends Controller {
     dom.addClass(this.__plusIcon, "new-image-icon");
     dom.addClass(this.__plus, "new-image-button");
 
-    defaultOptions.forEach(option => {
+    defaultOptions.forEach((option) => {
       this.addSwatch(option.src, option.videoSrc);
     });
 
@@ -139,16 +139,16 @@ class ImageController extends Controller {
     function onCameraClick() {
       navigator.mediaDevices
         .getUserMedia({ video: true })
-        .then(localMediaStream => {
+        .then((localMediaStream) => {
           this.killStream();
           this.videoStream = localMediaStream;
           this.setValue({
             type: "video-stream",
             value: localMediaStream,
-            domElement: this.__video
+            domElement: this.__video,
           });
         })
-        .catch(err => {
+        .catch((err) => {
           this.killStream();
         });
     }
@@ -159,7 +159,7 @@ class ImageController extends Controller {
 
   killStream() {
     if (!this.videoStream) return;
-    this.videoStream.getTracks().forEach(track => track.stop());
+    this.videoStream.getTracks().forEach((track) => track.stop());
   }
 
   destruct() {
@@ -179,20 +179,20 @@ class ImageController extends Controller {
         this.setValue({
           url: asset.url,
           type: asset.type,
-          domElement: this.__glGif.get_canvas()
+          domElement: this.__glGif.get_canvas(),
         });
       }
     } else if (asset.type === "image") {
       this.setValue({
         url: asset.url,
         type: asset.type,
-        domElement: this.__img
+        domElement: this.__img,
       });
     } else if (asset.type === "video") {
       this.setValue({
         url: asset.url,
         type: asset.type,
-        domElement: this.__video
+        domElement: this.__video,
       });
     }
   }
@@ -227,14 +227,14 @@ class ImageController extends Controller {
           this.setValue({
             url: url,
             type: "gif",
-            domElement: this.__glGif.get_canvas()
+            domElement: this.__glGif.get_canvas(),
           });
         }
       } else if (!isAnimated) {
         this.setValue({
           url: url,
           type: "image",
-          domElement: this.__img
+          domElement: this.__img,
         });
         this.setImage(url, false);
       }
@@ -242,7 +242,7 @@ class ImageController extends Controller {
       this.setValue({
         url: url,
         type: "video",
-        domElement: this.__video
+        domElement: this.__video,
       });
       this.setVideo();
     }
@@ -262,9 +262,9 @@ class ImageController extends Controller {
       if (this.__glGif.get_canvas()) {
         this.__glGif.get_canvas().style.display = "block";
       }
-      this.__glGif.load(err => {
+      this.__glGif.load((err) => {
         if (!err) {
-          this.__glGif.play().catch(e => console.log(e));
+          this.__glGif.play().catch((e) => console.log(e));
           if (this.__gifNeedsInitializing) {
             // only want to call this if the canvas hasn't been initialized yet
             // but don't want to call setImage again
@@ -275,7 +275,7 @@ class ImageController extends Controller {
             this.setValue({
               url: url,
               type: "gif",
-              domElement: this.__glGif.get_canvas()
+              domElement: this.__glGif.get_canvas(),
             });
           }
         }
@@ -303,7 +303,7 @@ class ImageController extends Controller {
     this.__isAnimated = true;
     this.__video.loop = true;
     this.__video.volume = 0;
-    this.__video.play().catch(e => {
+    this.__video.play().catch((e) => {
       console.log(e, e.message, e.name);
     });
     this.__img.src = "data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=";
@@ -325,7 +325,7 @@ class ImageController extends Controller {
         this.setValue({
           url: videoSrc,
           type: "video",
-          domElement: this.__video
+          domElement: this.__video,
         });
       } else {
         const isAnimated = src.split(".").pop() === "gif";
@@ -336,14 +336,14 @@ class ImageController extends Controller {
             this.setValue({
               url: src,
               type: "gif",
-              domElement: this.__glGif.get_canvas()
+              domElement: this.__glGif.get_canvas(),
             });
           }
         } else {
           this.setValue({
             url: src,
             type: "image",
-            domElement: this.__img
+            domElement: this.__img,
           });
         }
       }

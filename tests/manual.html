@@ -9,14 +9,14 @@
       /* eslint-disable no-console, camelcase, no-new */
 
       $.noConflict();
-      jQuery(document).ready(function($) {
+      jQuery(document).ready(function ($) {
         const gui = new dat.GUI();
         const obj = {
           text: "Some text",
           number: 1,
           slider: 5,
           checkbox: true,
-          button: function() {},
+          button: function () {},
           select: "One",
           plotter: 0,
           color0: "#ff0000",
@@ -25,8 +25,8 @@
           color3: {
             h: 350,
             s: 0.9,
-            v: 0.3
-          }
+            v: 0.3,
+          },
         };
 
         const controllers = [];
@@ -62,10 +62,10 @@
          * Listen for the change events and log the output
          */
         for (let i = 0; i < controllers.length; i++) {
-          controllers[i].onChange(function(val) {
+          controllers[i].onChange(function (val) {
             console.log(this.property, "onChange:", val);
           });
-          controllers[i].onFinishChange(function(val) {
+          controllers[i].onFinishChange(function (val) {
             console.log(this.property, "onFinishChange:", val);
           });
         }
@@ -75,7 +75,7 @@
          */
         let angle = 0;
         const max = Math.PI * 2;
-        setInterval(function() {
+        setInterval(function () {
           angle += 0.05;
           if (angle > max) {
             angle = 0;
@@ -89,18 +89,18 @@
           text: "Some text 2",
           number: 1,
           checkbox: true,
-          button: function() {},
+          button: function () {},
           color0: "#ff0000",
           color1: [0, 128, 255],
           color2: [0, 128, 255, 0.4],
           color3: {
             h: 350,
             s: 0.9,
-            v: 0.3
-          }
+            v: 0.3,
+          },
         };
         new dat.GUI({
-          object: obj2
+          object: obj2,
         });
       });
     </script>

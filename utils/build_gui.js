@@ -4,7 +4,7 @@ require("./builder.js").build({
   out: "../build/dat.gui.js",
   minify: false,
   shortcut: "dat.GUI",
-  paths: {}
+  paths: {},
 });
 
 require("./builder.js").build({
@@ -13,5 +13,5 @@ require("./builder.js").build({
   out: "../build/dat.gui.min.js",
   minify: true,
   shortcut: "dat.GUI",
-  paths: {}
+  paths: {},
 });

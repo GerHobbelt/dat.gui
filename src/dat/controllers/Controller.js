@@ -2,7 +2,7 @@
  * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011-2019 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2020 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -11,7 +11,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define(["dat/utils/common"], function(common) {
+define(["dat/utils/common"], function (common) {
   /**
    * @class An "abstract" class that represents a given property of an object.
    *
@@ -20,7 +20,7 @@ define(["dat/utils/common"], function(common) {
    *
    * @member dat.controllers
    */
-  const Controller = function(object, property) {
+  const Controller = function (object, property) {
     this.initialValue = object[property];
 
     /**
@@ -69,7 +69,7 @@ define(["dat/utils/common"], function(common) {
        * is modified via this Controller.
        * @returns {dat.controllers.Controller} this
        */
-      onChange: function(fnc) {
+      onChange: function (fnc) {
         this.__onChange = fnc;
         return this;
       },
@@ -83,7 +83,7 @@ define(["dat/utils/common"], function(common) {
        * someone "finishes" changing the value via this Controller.
        * @returns {dat.controllers.Controller} this
        */
-      onFinishChange: function(fnc) {
+      onFinishChange: function (fnc) {
         this.__onFinishChange = fnc;
         return this;
       },
@@ -93,7 +93,7 @@ define(["dat/utils/common"], function(common) {
        *
        * @param {Object} newValue The new value of <code>object[property]</code>
        */
-      setValue: function(newValue) {
+      setValue: function (newValue) {
         this.object[this.property] = newValue;
         if (this.__onChange) {
           this.__onChange.call(this, newValue);
@@ -107,7 +107,7 @@ define(["dat/utils/common"], function(common) {
        *
        * @returns {Object} The current value of <code>object[property]</code>
        */
-      getValue: function() {
+      getValue: function () {
         return this.object[this.property];
       },
 
@@ -116,16 +116,16 @@ define(["dat/utils/common"], function(common) {
        * with the object's current value.
        * @returns {dat.controllers.Controller} this
        */
-      updateDisplay: function() {
+      updateDisplay: function () {
         return this;
       },
 
       /**
        * @returns {Boolean} true if the value has deviated from initialValue
        */
-      isModified: function() {
+      isModified: function () {
         return this.initialValue !== this.getValue();
-      }
+      },
     }
   );
 

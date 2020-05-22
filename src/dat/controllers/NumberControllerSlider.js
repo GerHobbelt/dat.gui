@@ -2,7 +2,7 @@
  * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011-2019 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2020 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@ define([
   "dat/dom/dom",
   "dat/utils/css",
   "dat/utils/common",
-  "text!dat/controllers/NumberControllerSlider.css"
-], function(NumberController, dom, css, common, styleSheet) {
+  "text!dat/controllers/NumberControllerSlider.css",
+], function (NumberController, dom, css, common, styleSheet) {
   /**
    * @class Represents a given property of an object that is a number, contains
    * a minimum and maximum, and provides a slider element with which to
@@ -36,11 +36,11 @@ define([
    *
    * @member dat.controllers
    */
-  var NumberControllerSlider = function(object, property, min, max, step) {
+  var NumberControllerSlider = function (object, property, min, max, step) {
     NumberControllerSlider.superclass.call(this, object, property, {
       min: min,
       max: max,
-      step: step
+      step: step,
     });
 
     const _this = this;
@@ -90,7 +90,7 @@ define([
   /**
    * Injects default stylesheet for slider elements.
    */
-  NumberControllerSlider.useDefaultStyles = function() {
+  NumberControllerSlider.useDefaultStyles = function () {
     css.inject(styleSheet);
   };
 
@@ -99,11 +99,11 @@ define([
     NumberController.prototype,
 
     {
-      updateDisplay: function() {
+      updateDisplay: function () {
         const pct = (this.getValue() - this.__min) / (this.__max - this.__min);
         this.__foreground.style.width = pct * 100 + "%";
         return NumberControllerSlider.superclass.prototype.updateDisplay.call(this);
-      }
+      },
     }
   );
 

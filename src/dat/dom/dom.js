@@ -2,7 +2,7 @@
  * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011-2019 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2020 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -11,16 +11,16 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define(["dat/utils/common"], function(common) {
+define(["dat/utils/common"], function (common) {
   const EVENT_MAP = {
     HTMLEvents: ["change"],
     MouseEvents: ["click", "mousemove", "mousedown", "mouseup", "mouseover"],
-    KeyboardEvents: ["keydown"]
+    KeyboardEvents: ["keydown"],
   };
 
   const EVENT_MAP_INV = {};
-  common.each(EVENT_MAP, function(v, k) {
-    common.each(v, function(e) {
+  common.each(EVENT_MAP, function (v, k) {
+    common.each(v, function (e) {
       EVENT_MAP_INV[e] = k;
     });
   });
@@ -51,14 +51,14 @@ define(["dat/utils/common"], function(common) {
      * @param elem
      * @param selectable
      */
-    makeSelectable: function(elem, selectable) {
+    makeSelectable: function (elem, selectable) {
       if (elem === undefined || elem.style === undefined) return;
 
       elem.onselectstart = selectable
-        ? function() {
+        ? function () {
             return false;
           }
-        : function() {};
+        : function () {};
 
       elem.style.MozUserSelect = selectable ? "auto" : "none";
       elem.style.KhtmlUserSelect = selectable ? "auto" : "none";
@@ -71,7 +71,7 @@ define(["dat/utils/common"], function(common) {
      * @param horizontal
      * @param vertical
      */
-    makeFullscreen: function(elem, horizontal, vertical) {
+    makeFullscreen: function (elem, horizontal, vertical) {
       if (common.isUndefined(horizontal)) horizontal = true;
       if (common.isUndefined(vertical)) vertical = true;
 
@@ -93,7 +93,7 @@ define(["dat/utils/common"], function(common) {
      * @param eventType
      * @param params
      */
-    fakeEvent: function(elem, eventType, params, aux) {
+    fakeEvent: function (elem, eventType, params, aux) {
       params = params || {};
       const className = EVENT_MAP_INV[eventType];
       if (!className) {
@@ -131,7 +131,7 @@ define(["dat/utils/common"], function(common) {
             shiftKey: false,
             metaKey: false,
             keyCode: undefined,
-            charCode: undefined
+            charCode: undefined,
           });
           init(
             eventType,
@@ -161,7 +161,7 @@ define(["dat/utils/common"], function(common) {
      * @param func
      * @param bool
      */
-    bind: function(elem, event, func, bool) {
+    bind: function (elem, event, func, bool) {
       bool = bool || false;
       if (elem.addEventListener) elem.addEventListener(event, func, bool);
       else if (elem.attachEvent) elem.attachEvent("on" + event, func);
@@ -175,7 +175,7 @@ define(["dat/utils/common"], function(common) {
      * @param func
      * @param bool
      */
-    unbind: function(elem, event, func, bool) {
+    unbind: function (elem, event, func, bool) {
       bool = bool || false;
       if (elem.removeEventListener) elem.removeEventListener(event, func, bool);
       else if (elem.detachEvent) elem.detachEvent("on" + event, func);
@@ -187,17 +187,14 @@ define(["dat/utils/common"], function(common) {
      * @param elem
      * @param className
      */
-    addClass: function(elem, className) {
+    addClass: function (elem, className) {
       if (elem.className === undefined) {
         elem.className = className;
       } else if (elem.className !== className) {
         const classes = elem.className.split(/ +/);
         if (classes.indexOf(className) == -1) {
           classes.push(className);
-          elem.className = classes
-            .join(" ")
-            .replace(/^\s+/, "")
-            .replace(/\s+$/, "");
+          elem.className = classes.join(" ").replace(/^\s+/, "").replace(/\s+$/, "");
         }
       }
       return dom;
@@ -208,7 +205,7 @@ define(["dat/utils/common"], function(common) {
      * @param elem
      * @param className
      */
-    removeClass: function(elem, className) {
+    removeClass: function (elem, className) {
       if (className) {
         if (elem.className === undefined) {
           // elem.className = className;
@@ -228,7 +225,7 @@ define(["dat/utils/common"], function(common) {
       return dom;
     },
 
-    hasClass: function(elem, className) {
+    hasClass: function (elem, className) {
       return new RegExp("(?:^|\\s+)" + className + "(?:\\s+|$)").test(elem.className) || false;
     },
 
@@ -236,7 +233,7 @@ define(["dat/utils/common"], function(common) {
      *
      * @param elem
      */
-    getWidth: function(elem) {
+    getWidth: function (elem) {
       const style = getComputedStyle(elem);
 
       return (
@@ -252,7 +249,7 @@ define(["dat/utils/common"], function(common) {
      *
      * @param elem
      */
-    getHeight: function(elem) {
+    getHeight: function (elem) {
       const style = getComputedStyle(elem);
 
       return (
@@ -268,10 +265,10 @@ define(["dat/utils/common"], function(common) {
      *
      * @param elem
      */
-    getOffset: function(elem) {
+    getOffset: function (elem) {
       const offset = {
         left: 0,
-        top: 0
+        top: 0,
       };
       if (elem.offsetParent) {
         do {
@@ -287,9 +284,9 @@ define(["dat/utils/common"], function(common) {
      *
      * @param elem
      */
-    isActive: function(elem) {
+    isActive: function (elem) {
       return elem === document.activeElement && (elem.type || elem.href);
-    }
+    },
   };
 
   return dom;

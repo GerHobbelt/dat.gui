@@ -28,3 +28,4 @@ node_modules
 __forks.info__/
 __forks__.bulk_dump
 
+/build/dat.gui.min.js

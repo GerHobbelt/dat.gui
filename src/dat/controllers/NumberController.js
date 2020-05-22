@@ -2,7 +2,7 @@
  * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011-2019 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2020 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -11,7 +11,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define(["dat/controllers/Controller", "dat/utils/common"], function(Controller, common) {
+define(["dat/controllers/Controller", "dat/utils/common"], function (Controller, common) {
   /**
    * @class Represents a given property of an object that is a number.
    *
@@ -26,7 +26,7 @@ define(["dat/controllers/Controller", "dat/utils/common"], function(Controller, 
    *
    * @member dat.controllers
    */
-  var NumberController = function(object, property, params) {
+  var NumberController = function (object, property, params) {
     NumberController.superclass.call(this, object, property);
 
     params = params || {};
@@ -57,7 +57,7 @@ define(["dat/controllers/Controller", "dat/utils/common"], function(Controller, 
 
     /** @lends dat.controllers.NumberController.prototype */
     {
-      setValue: function(v) {
+      setValue: function (v) {
         if (this.__min !== undefined && v < this.__min) {
           v = this.__min;
         } else if (this.__max !== undefined && v > this.__max) {
@@ -78,7 +78,7 @@ define(["dat/controllers/Controller", "dat/utils/common"], function(Controller, 
        * <code>object[property]</code>
        * @returns {dat.controllers.NumberController} this
        */
-      min: function(v) {
+      min: function (v) {
         this.__min = v;
         return this;
       },
@@ -90,7 +90,7 @@ define(["dat/controllers/Controller", "dat/utils/common"], function(Controller, 
        * <code>object[property]</code>
        * @returns {dat.controllers.NumberController} this
        */
-      max: function(v) {
+      max: function (v) {
         this.__max = v;
         return this;
       },
@@ -105,12 +105,12 @@ define(["dat/controllers/Controller", "dat/utils/common"], function(Controller, 
        * difference otherwise stepValue is 1
        * @returns {dat.controllers.NumberController} this
        */
-      step: function(v) {
+      step: function (v) {
         this.__step = v;
         this.__impliedStep = v;
         this.__precision = numDecimals(v);
         return this;
-      }
+      },
     }
   );
 

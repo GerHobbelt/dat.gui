@@ -111,7 +111,7 @@ function build(_params) {
   if (params.minify) {
     console.log("Compiling minified source ...");
 
-    closure.compile(to_write, function(error, code) {
+    closure.compile(to_write, function (error, code) {
       if (error) {
         console.log(error);
       } else {
@@ -153,7 +153,7 @@ function define(deps, callback) {
     this.callback = callback;
   }
 
-  this.getClosure = function() {
+  this.getClosure = function () {
     if (this.shared) return this.shared;
     if (!this.deps || this.text) return this.callback;
     var arg_string = "(";
@@ -173,7 +173,7 @@ function define(deps, callback) {
     return "(" + this.callback + ")" + arg_string;
   };
 
-  this.recurseDeps = function() {
+  this.recurseDeps = function () {
     if (!this.deps) return;
 
     for (var i in this.deps) {

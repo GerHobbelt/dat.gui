@@ -2,7 +2,7 @@
  * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011-2019 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2020 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -11,7 +11,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], function(Controller, dom, common) {
+define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], function (Controller, dom, common) {
   /**
    * @class Provides a *disabled* text input indicating the value of the property
    *        is undefined. Calling reset() on the controller will remove and re-add it.
@@ -25,7 +25,7 @@ define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], functi
    *
    * @member dat.controllers
    */
-  var UndefinedController = function(object, property) {
+  var UndefinedController = function (object, property) {
     UndefinedController.superclass.call(this, object, property);
 
     const _this = this;
@@ -39,14 +39,14 @@ define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], functi
   UndefinedController.superclass = Controller;
 
   common.extend(UndefinedController.prototype, Controller.prototype, {
-    updateDisplay: function() {
+    updateDisplay: function () {
       if (this.__onFinishChange) {
         if (!common.isUndefined(this.object[this.property])) {
           this.__onFinishChange.call(this.object[this.property]);
         }
       }
       return UndefinedController.superclass.prototype.updateDisplay.call(this);
-    }
+    },
   });
 
   return UndefinedController;

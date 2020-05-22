@@ -2,7 +2,7 @@
  * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011-2019 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2020 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@ define([
   "dat/dom/dom",
   "dat/color/Color",
   "dat/color/interpret",
-  "dat/utils/common"
-], function(Controller, dom, Color, interpret, common) {
-  var ColorController = function(object, property) {
+  "dat/utils/common",
+], function (Controller, dom, Color, interpret, common) {
+  var ColorController = function (object, property) {
     ColorController.superclass.call(this, object, property);
 
     this.__color = new Color(this.getValue());
@@ -50,7 +50,7 @@ define([
     this.__input.type = "text";
     this.__input_textShadow = "0 1px 1px ";
 
-    dom.bind(this.__input, "keydown", function(e) {
+    dom.bind(this.__input, "keydown", function (e) {
       if (e.keyCode === 13) {
         // on enter
         onBlur.call(this);
@@ -59,8 +59,8 @@ define([
 
     dom.bind(this.__input, "blur", onBlur);
 
-    dom.bind(this.__selector, "mousedown", function(e) {
-      dom.addClass(this, "drag").bind(window, "mouseup", function(e) {
+    dom.bind(this.__selector, "mousedown", function (e) {
+      dom.addClass(this, "drag").bind(window, "mouseup", function (e) {
         dom.removeClass(_this.__selector, "drag");
       });
     });
@@ -72,7 +72,7 @@ define([
       height: "102px",
       padding: "3px",
       backgroundColor: "#222",
-      boxShadow: "0px 1px 3px rgba(0,0,0,0.3)"
+      boxShadow: "0px 1px 3px rgba(0,0,0,0.3)",
     });
 
     common.extend(this.__field_knob.style, {
@@ -82,7 +82,7 @@ define([
       border: this.__field_knob_border + (this.__color.v < 0.5 ? "#fff" : "#000"),
       boxShadow: "0px 1px 3px rgba(0,0,0,0.5)",
       borderRadius: "12px",
-      zIndex: 1
+      zIndex: 1,
     });
 
     common.extend(this.__hue_knob.style, {
@@ -90,7 +90,7 @@ define([
       width: "15px",
       height: "2px",
       borderRight: "4px solid #fff",
-      zIndex: 1
+      zIndex: 1,
     });
 
     common.extend(this.__saturation_field.style, {
@@ -99,13 +99,13 @@ define([
       border: "1px solid #555",
       marginRight: "3px",
       display: "inline-block",
-      cursor: "pointer"
+      cursor: "pointer",
     });
 
     common.extend(value_field.style, {
       width: "100%",
       height: "100%",
-      background: "none"
+      background: "none",
     });
 
     linearGradient(value_field, "top", "rgba(0,0,0,0)", "#000");
@@ -115,7 +115,7 @@ define([
       height: "100px",
       display: "inline-block",
       border: "1px solid #555",
-      cursor: "ns-resize"
+      cursor: "ns-resize",
     });
 
     hueGradient(this.__hue_field);
@@ -129,13 +129,13 @@ define([
       color: "#fff",
       border: 0,
       fontWeight: "bold",
-      textShadow: this.__input_textShadow + "rgba(0,0,0,0.7)"
+      textShadow: this.__input_textShadow + "rgba(0,0,0,0.7)",
     });
 
     dom.bind(this.__saturation_field, "mousedown", fieldDown);
     dom.bind(this.__field_knob, "mousedown", fieldDown);
 
-    dom.bind(this.__hue_field, "mousedown", function(e) {
+    dom.bind(this.__hue_field, "mousedown", function (e) {
       setH(e);
       dom.bind(window, "mousemove", setH);
       dom.bind(window, "mouseup", unbindH);
@@ -227,7 +227,7 @@ define([
     Controller.prototype,
 
     {
-      updateDisplay: function() {
+      updateDisplay: function () {
         const i = interpret(this.getValue());
 
         if (i !== false) {
@@ -237,7 +237,7 @@ define([
 
           common.each(
             Color.COMPONENTS,
-            function(component) {
+            function (component) {
               if (
                 !common.isUndefined(i[component]) &&
                 !common.isUndefined(this.__color.__state[component]) &&
@@ -268,7 +268,7 @@ define([
           marginLeft: 100 * this.__color.s - 7 + "px",
           marginTop: 100 * (1 - this.__color.v) - 7 + "px",
           backgroundColor: this.__temp.toString(),
-          border: this.__field_knob_border + "rgb(" + flip + "," + flip + "," + flip + ")"
+          border: this.__field_knob_border + "rgb(" + flip + "," + flip + "," + flip + ")",
         });
 
         this.__hue_knob.style.marginTop = (1 - this.__color.h / 360) * 100 + "px";
@@ -281,9 +281,9 @@ define([
         common.extend(this.__input.style, {
           backgroundColor: (this.__input.value = this.__color.toString()),
           color: "rgb(" + flip + "," + flip + "," + flip + ")",
-          textShadow: this.__input_textShadow + "rgba(" + _flip + "," + _flip + "," + _flip + ",.7)"
+          textShadow: this.__input_textShadow + "rgba(" + _flip + "," + _flip + "," + _flip + ",.7)",
         });
-      }
+      },
     }
   );
 
@@ -291,7 +291,7 @@ define([
 
   function linearGradient(elem, x, a, b) {
     elem.style.background = "";
-    common.each(vendors, function(vendor) {
+    common.each(vendors, function (vendor) {
       elem.style.cssText += "background: " + vendor + "linear-gradient(" + x + ", " + a + " 0%, " + b + " 100%); ";
     });
   }

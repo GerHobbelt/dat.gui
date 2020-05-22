@@ -2,7 +2,7 @@
  * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011-2019 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2020 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -11,7 +11,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define(["dat/controllers/NumberController", "dat/dom/dom", "dat/utils/common"], function(
+define(["dat/controllers/NumberController", "dat/dom/dom", "dat/utils/common"], function (
   NumberController,
   dom,
   common
@@ -32,7 +32,7 @@ define(["dat/controllers/NumberController", "dat/dom/dom", "dat/utils/common"], 
    *
    * @member dat.controllers
    */
-  var NumberControllerBox = function(object, property, params) {
+  var NumberControllerBox = function (object, property, params) {
     this.__truncationSuspended = false;
 
     NumberControllerBox.superclass.call(this, object, property, params);
@@ -53,7 +53,7 @@ define(["dat/controllers/NumberController", "dat/dom/dom", "dat/utils/common"], 
     dom.bind(this.__input, "change", onChange);
     dom.bind(this.__input, "blur", onBlur);
     dom.bind(this.__input, "mousedown", onMouseDown);
-    dom.bind(this.__input, "keydown", function(e) {
+    dom.bind(this.__input, "keydown", function (e) {
       // When pressing entire, you can be as precise as you want.
       if (e.keyCode === 13) {
         _this.__truncationSuspended = true;
@@ -104,7 +104,7 @@ define(["dat/controllers/NumberController", "dat/dom/dom", "dat/utils/common"], 
     NumberController.prototype,
 
     {
-      updateDisplay: function() {
+      updateDisplay: function () {
         // Use the same solution from StringController.js to enable
         // editing <input>s while "listen()"ing
         if (!dom.isActive(this.__input)) {
@@ -113,7 +113,7 @@ define(["dat/controllers/NumberController", "dat/dom/dom", "dat/utils/common"], 
             : roundToDecimal(this.getValue(), this.__precision);
         }
         return NumberControllerBox.superclass.prototype.updateDisplay.call(this);
-      }
+      },
     }
   );
 

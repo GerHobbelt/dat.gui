@@ -6,7 +6,7 @@ builder.build({
   out: "../build/dat.gui.js",
   minify: false,
   shortcut: "dat.GUI",
-  paths: {}
+  paths: {},
 });
 
 builder.build({
@@ -15,5 +15,5 @@ builder.build({
   out: "../build/dat.gui.min.js",
   minify: true,
   shortcut: "dat.GUI",
-  paths: {}
+  paths: {},
 });

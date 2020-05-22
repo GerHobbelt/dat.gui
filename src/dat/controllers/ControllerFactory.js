@@ -2,7 +2,7 @@
  * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011-2019 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2020 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@ define([
   "dat/controllers/FunctionController",
   "dat/controllers/BooleanController",
   "dat/controllers/UndefinedController",
-  "dat/utils/common"
-], function(
+  "dat/utils/common",
+], function (
   OptionController,
   NumberControllerBox,
   NumberControllerSlider,
@@ -30,7 +30,7 @@ define([
   UndefinedController,
   common
 ) {
-  return function(object, property) {
+  return function (object, property) {
     const initialValue = object[property];
 
     // Providing options?
@@ -47,7 +47,7 @@ define([
       }
       return new NumberControllerBox(object, property, {
         min: arguments[2],
-        max: arguments[3]
+        max: arguments[3],
       });
     }
 

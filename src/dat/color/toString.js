@@ -2,7 +2,7 @@
  * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011-2019 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2020 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -11,8 +11,8 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define(["dat/utils/common"], function(common) {
-  return function(color) {
+define(["dat/utils/common"], function (common) {
+  return function (color) {
     if (color.a == 1 || common.isUndefined(color.a)) {
       let s = color.hex.toString(16);
       while (s.length < 6) {

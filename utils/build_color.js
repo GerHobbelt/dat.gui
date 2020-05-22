@@ -4,5 +4,5 @@ require("./builder.js").build({
   out: "../build/dat.color.js",
   minify: false,
   shortcut: "dat.Color",
-  paths: {}
+  paths: {},
 });

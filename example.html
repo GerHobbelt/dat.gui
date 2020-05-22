@@ -1,9 +1,14 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <link rel="stylesheet" href="build/dat.gui.css" />
   </head>
   <body>
+    <center>
+      <h1>Example Page</h1>
+      <div id="example"></div>
+    </center>
     <script type="text/javascript" src="build/dat.gui.js"></script>
     <script type="text/javascript">
       /* eslint-disable no-console, camelcase */
@@ -11,17 +16,13 @@
       const obj = {
         x: undefined,
         y: undefined,
-        timer: 2.0
+        timer: 2.0,
       };
       const gui = new dat.GUI();
-      gui
-        .add(obj, "timer")
-        .min(0)
-        .max(obj.timer)
-        .listen();
+      gui.add(obj, "timer").min(0).max(obj.timer).listen();
       gui.add(obj, "x").listen();
       const y = gui.add(obj, "y");
-      var interval = setInterval(function() {
+      var interval = setInterval(function () {
         obj.timer -= 0.1;
         if (obj.timer <= 0) {
           clearInterval(interval);

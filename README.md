@@ -17,6 +17,12 @@ In your `head` tag, include the following code:
 <script type="text/javascript" src="dat.gui.min.js"></script>
 ```
 
+
+## Example code
+
+See `tests/manual.html` for an example of each type of controller.
+
+
 ## Installing from npm
 
 Install the module:
@@ -47,13 +53,12 @@ gui.add(obj, 'x').onChange(function() {
 
 ## Directory Contents
 
-```
-+-- build - Concatenated source code for browsers.
-+-- src - source code in commonjs format.
-+-- tests - [QUnit](https://github.com/jquery/qunit) test suite.
- * utils: [node.js](http://nodejs.org/) utility scripts for compiling source.
++ `build` - Concatenated source code for browsers.
++ `src` - source code in commonjs format.
++ `tests` - [QUnit](https://github.com/jquery/qunit) test suite.
++ `utils`: [node.js](http://nodejs.org/) utility scripts for compiling source.
 
-----
+
 
 ## Building your own dat.GUI
 
@@ -68,10 +73,21 @@ This will create a rolled-up build of dat.GUI at `build/dat.gui.js` and its
 minified version at `build/dat.gui.min.js`.
 
 
+
+## Running tests
+
+In the terminal, enter `npm run dev` and open http://localhost:8080/tests/
+
+* Open `qunit.html` to run automated unit tests
+* Open `manual.html` for a manual test suite - events are logged to the browser console.
+
+
 ## npm scripts
 
-- npm run build - Build development and production version of scripts.
-- npm run dev - Build development version of script and watch for changes.
+* npm run dev - Build development version of script and watch for changes.
+* npm run build - Build development and production version of scripts.
+* npm run build-docs - Automatically generate API.md from source code
+* npm run lint - Run eslint on all code
 
 
 ## Working with Content Security Policy

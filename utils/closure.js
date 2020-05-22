@@ -35,18 +35,18 @@ function compile(code, next) {
         js_code: code.toString("utf-8"),
         compilation_level: "SIMPLE_OPTIMIZATIONS",
         output_format: "json",
-        output_info: "compiled_code"
+        output_info: "compiled_code",
       }),
       client = http.createClient(80, host).on("error", next),
       req = client.request("POST", "/compile", {
         Host: host,
         "Content-Length": body.length,
-        "Content-Type": "application/x-www-form-urlencoded"
+        "Content-Type": "application/x-www-form-urlencoded",
       });
 
     req.on("error", next).end(body);
 
-    req.on("response", function(res) {
+    req.on("response", function (res) {
       if (res.statusCode != 200) next(new Error("Unexpected HTTP response: " + res.statusCode));
       else capture(res, "utf-8", parseResponse);
     });
@@ -54,7 +54,7 @@ function compile(code, next) {
     function parseResponse(err, data) {
       err
         ? next(err)
-        : loadJSON(data, function(err, obj) {
+        : loadJSON(data, function (err, obj) {
             var error;
             if (err) next(err);
             else if ((error = obj.errors || obj.serverErrors || obj.warnings))
@@ -77,11 +77,11 @@ function compile(code, next) {
 function capture(input, encoding, next) {
   var buffer = "";
 
-  input.on("data", function(chunk) {
+  input.on("data", function (chunk) {
     buffer += chunk.toString(encoding);
   });
 
-  input.on("end", function() {
+  input.on("end", function () {
     next(null, buffer);
   });
 

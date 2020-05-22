@@ -2,7 +2,7 @@
  * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011-2019 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2020 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -11,7 +11,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], function(Controller, dom, common) {
+define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], function (Controller, dom, common) {
   /**
    * @class Provides a text input to alter the string property of an object.
    *
@@ -22,7 +22,7 @@ define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], functi
    *
    * @member dat.controllers
    */
-  var StringController = function(object, property) {
+  var StringController = function (object, property) {
     StringController.superclass.call(this, object, property);
 
     const _this = this;
@@ -33,7 +33,7 @@ define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], functi
     dom.bind(this.__input, "keyup", onChange);
     dom.bind(this.__input, "change", onChange);
     dom.bind(this.__input, "blur", onBlur);
-    dom.bind(this.__input, "keydown", function(e) {
+    dom.bind(this.__input, "keydown", function (e) {
       if (e.keyCode === 13) {
         this.blur();
       }
@@ -61,14 +61,14 @@ define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], functi
     Controller.prototype,
 
     {
-      updateDisplay: function() {
+      updateDisplay: function () {
         // Stops the caret from moving on account of:
         // keyup -> setValue -> updateDisplay
         if (!dom.isActive(this.__input)) {
           this.__input.value = this.getValue();
         }
         return StringController.superclass.prototype.updateDisplay.call(this);
-      }
+      },
     }
   );
 

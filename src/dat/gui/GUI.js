@@ -21,6 +21,7 @@ import NumberControllerBox from '../controllers/NumberControllerBox';
 import NumberControllerSlider from '../controllers/NumberControllerSlider';
 import ColorController from '../controllers/ColorController';
 import ImageController from '../controllers/ImageController';
+import PlotterController from '../controllers/PlotterController';
 import requestAnimationFrame from '../utils/requestAnimationFrame';
 import CenteredDiv from '../dom/CenteredDiv';
 import dom from '../dom/dom';
@@ -126,12 +127,12 @@ const GUI = function(pars) {
    * @example
    * [
    *  {
-     *    propertyName: Controller,
-     *    anotherPropertyName: Controller
-     *  },
+   *    propertyName: Controller,
+   *    anotherPropertyName: Controller
+   *  },
    *  {
-     *    propertyName: Controller
-     *  }
+   *    propertyName: Controller
+   *  }
    * ]
    */
   this.__rememberedObjectIndecesToControllers = [];
@@ -1154,19 +1155,27 @@ function recallSavedValue(gui, controller) {
 }
 
 function add(gui, object, property, params) {
-  if (object[property] === undefined) {
-    throw new Error(`Object "${object}" has no property "${property}"`);
-  }
-
   let controller;
 
-  if (params.color) {
-    controller = new ColorController(object, property);
+  // add( new SomeCustomerController(a,b,c), params)
+  if (object instanceof Controller) {
+    controller = object;
+    params = property || { };
+  } else {
+
+    if (object[property] === undefined) {
+      throw new Error(`Object "${object}" has no property "${property}"`);
+    }
+
+    if (params.color) {
+      controller = new ColorController(object, property);
   } else if (params.image) {
     controller = new ImageController(object, property);
-  } else {
-    const factoryArgs = [object, property].concat(params.factoryArgs);
-    controller = ControllerFactory.apply(gui, factoryArgs);
+    } else {
+      const factoryArgs = [object, property].concat(params.factoryArgs);
+      controller = ControllerFactory.apply(gui, factoryArgs);
+    }
+
   }
 
   if (params.before instanceof Controller) {
@@ -1192,6 +1201,10 @@ function add(gui, object, property, params) {
     dom.addClass(li, 'color');
   } else if (controller instanceof ImageController) {
     dom.addClass(li, 'image');
+  } else if (params.liClass) {
+    dom.addClass(li, params.liClass);
+  } else if (controller.liClass) {
+    dom.addClass(li, controller.liClass);
   } else {
     dom.addClass(li, typeof controller.getValue());
   }

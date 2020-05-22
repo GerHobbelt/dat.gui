@@ -32,6 +32,8 @@
         color3: { h: 350, s: 0.9, v: 0.3 }, // Hue, saturation, value
 
         imagePath1: 'https://images.unsplash.com/photo-1516222338250-863216ce01ea?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=467&q=50'
+
+      plotter: 0
       };
 
       var gui = new dat.gui.GUI();
@@ -62,8 +64,26 @@
 
       var f3 = f2.addFolder("Nested Folder");
       f3.add(obj, "growthSpeed");
+
     var f4 = gui.addFolder('Image');
     f4.addImage(obj, 'imagePath1');
+
+    var f5 = gui.addFolder('Custom Controllers');
+    plotter = new dat.controllers.PlotterController(obj, 'plotter');
+    f5.add(plotter, { liClass: 'plotter' });
+    plotter.listen();
+
+    var angle = 0,
+      max = Math.PI * 2;
+    setInterval(function() {
+      angle += 0.05;
+      if (angle > max) {
+        angle = 0;
+      }
+
+      obj.plotter = Math.sin(angle) + 1.5;
+    }, 10);
+
     </script>
   </body>
 </html>

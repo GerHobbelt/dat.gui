@@ -1,6 +1,9 @@
+# Fork
+
+This is a fork of dat.gui where I merged some outstanding pull request to fix bugs.
 
 # dat.GUI
-A lightweight graphical user interface for changing variables in JavaScript. 
+A lightweight graphical user interface for changing variables in JavaScript.
 
 Get started with dat.GUI by reading the [tutorial](http://workshop.chromeexperiments.com/examples/gui)
 or the [API documentation](API.md).

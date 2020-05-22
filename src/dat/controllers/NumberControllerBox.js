@@ -42,6 +42,8 @@ class NumberControllerBox extends NumberController {
 
     const _this = this;
 
+    this.__suspendUpdate = false;
+
     /**
      * {Number} Previous mouse y position
      * @ignore
@@ -61,7 +63,12 @@ class NumberControllerBox extends NumberController {
       }
     }
 
+    function onFocus() {
+      this.__suspendUpdate = true;
+    }
+
     function onBlur() {
+      this.__suspendUpdate = false;
       onFinish();
     }
 
@@ -89,6 +96,7 @@ class NumberControllerBox extends NumberController {
 
     // Makes it so manually specified values are not truncated.
 
+    dom.bind(this.__input, 'focus', onFocus);
     dom.bind(this.__input, "change", onChange);
     dom.bind(this.__input, "blur", onBlur);
     dom.bind(this.__input, "mousedown", onMouseDown);
@@ -108,6 +116,7 @@ class NumberControllerBox extends NumberController {
   }
 
   updateDisplay(force) {
+    if (this.__suspendUpdate) return;
     if (!force && dom.isActive(this.__input)) return this;
     this.__input.value = this.__truncationSuspended
       ? this.getValue()
@@ -117,3 +126,4 @@ class NumberControllerBox extends NumberController {
 }
 
 export default NumberControllerBox;
+

@@ -4,8 +4,8 @@
 // old v0.4 code which needs to be integrated or otherwise thrown away
 //
 
-define(["gui", "gui.easing"], function(GUI) {
-  GUI.ScrubberPoint = function(scrubber, time, value) {
+define(["gui", "gui.easing"], function (GUI) {
+  GUI.ScrubberPoint = function (scrubber, time, value) {
     var _this = this;
 
     var g = scrubber.g;
@@ -17,22 +17,22 @@ define(["gui", "gui.easing"], function(GUI) {
 
     var val;
 
-    this.__defineSetter__("value", function(v) {
+    this.__defineSetter__("value", function (v) {
       val = v;
       scrubber.render();
     });
 
     this.value = value;
 
-    this.__defineGetter__("value", function() {
+    this.__defineGetter__("value", function () {
       return val;
     });
 
-    this.__defineGetter__("x", function() {
+    this.__defineGetter__("x", function () {
       return x;
     });
 
-    this.__defineGetter__("y", function() {
+    this.__defineGetter__("y", function () {
       return y;
     });
 
@@ -42,14 +42,14 @@ define(["gui", "gui.easing"], function(GUI) {
     var c1 = "#ffd800";
     var c2 = "#ff9000";
 
-    var positionTweenSelector = function() {
+    var positionTweenSelector = function () {
       var tweenSelectorLeft = scrubber.position.left + timer.activePoint.x - timer.tweenSelector.offsetWidth / 2;
       var tweenSelectorTop = GUI.getOffset(scrubber.canvas, timer.gui.domElement).top + timer.activePoint.y - 25;
       timer.tweenSelector.style.left = tweenSelectorLeft + "px";
       timer.tweenSelector.style.top = tweenSelectorTop + "px";
     };
 
-    this.onSelect = function() {
+    this.onSelect = function () {
       if (type == "number") {
         timer.showTweenSelector();
         positionTweenSelector();
@@ -63,13 +63,13 @@ define(["gui", "gui.easing"], function(GUI) {
       }
     };
 
-    this.onBlur = function() {
+    this.onBlur = function () {
       if (type == "number") {
         timer.hideTweenSelector();
       }
     };
 
-    this.onDrag = function(e) {
+    this.onDrag = function (e) {
       var t = GUI.map(
         e.pageX,
         scrubber.position.left,
@@ -86,7 +86,7 @@ define(["gui", "gui.easing"], function(GUI) {
       }
     };
 
-    this.getJSON = function() {
+    this.getJSON = function () {
       var obj = { value: _this.value, time: GUI.roundToDecimal(time, 4) };
 
       // TODO: save tweens
@@ -104,16 +104,16 @@ define(["gui", "gui.easing"], function(GUI) {
 
     this.tween = GUI.Easing.Linear;
 
-    this.remove = function() {
+    this.remove = function () {
       scrubber.points.splice(scrubber.points.indexOf(this), 1);
       scrubber.render();
     };
 
-    this.isHovering = function(xx) {
+    this.isHovering = function (xx) {
       return xx >= x - rectSize / 2 && xx <= x + rectSize / 2;
     };
 
-    this.__defineGetter__("next", function() {
+    this.__defineGetter__("next", function () {
       if (scrubber.points.length <= 1) {
         return null;
       }
@@ -126,7 +126,7 @@ define(["gui", "gui.easing"], function(GUI) {
       return scrubber.points[i + 1];
     });
 
-    this.__defineGetter__("prev", function() {
+    this.__defineGetter__("prev", function () {
       if (scrubber.points.length <= 1) {
         return null;
       }
@@ -139,15 +139,15 @@ define(["gui", "gui.easing"], function(GUI) {
       return scrubber.points[i - 1];
     });
 
-    this.__defineGetter__("time", function() {
+    this.__defineGetter__("time", function () {
       return time;
     });
 
-    this.__defineSetter__("time", function(s) {
+    this.__defineSetter__("time", function (s) {
       time = s;
     });
 
-    this.update = function() {
+    this.update = function () {
       x = GUI.map(time, timer.windowMin, timer.windowMin + timer.windowWidth, 0, 1);
       x = Math.round(GUI.map(x, 0, 1, 0, scrubber.width));
 
@@ -158,7 +158,7 @@ define(["gui", "gui.easing"], function(GUI) {
       }
     };
 
-    this.render = function() {
+    this.render = function () {
       if (x < 0 || x > scrubber.width) {
         return;
       }

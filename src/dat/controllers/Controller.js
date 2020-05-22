@@ -209,7 +209,7 @@ class Controller {
       isChange: changed,
       silent: silent,
       noGo: readonly,
-      eventSource: "setValue"
+      eventSource: "setValue",
     };
     if (!silent) {
       // `newValue` will end up in the second argument of the event listener, thus

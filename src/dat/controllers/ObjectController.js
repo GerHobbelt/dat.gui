@@ -11,7 +11,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], function(Controller, dom, common) {
+define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], function (Controller, dom, common) {
   /**
    * @class Provides a select input to alter the property of an object, using a
    * list of accepted values.
@@ -25,7 +25,7 @@ define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], functi
    *
    * @member dat.controllers
    */
-  var OptionController = function(object, property, params, options) {
+  var OptionController = function (object, property, params, options) {
     OptionController.superclass.call(this, object, property, "option", options);
 
     const _this = this;
@@ -41,13 +41,13 @@ define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], functi
 
     if (common.isArray(params)) {
       const map = {};
-      common.each(params, function(element) {
+      common.each(params, function (element) {
         map[element] = element;
       });
       params = map;
     }
 
-    common.each(params, function(value, key) {
+    common.each(params, function (value, key) {
       const opt = document.createElement("option");
       opt.innerHTML = value;
       opt.setAttribute("value", key);
@@ -66,7 +66,7 @@ define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], functi
     // Acknowledge original value
     this.updateDisplay();
 
-    dom.bind(this.__select, "change", function() {
+    dom.bind(this.__select, "change", function () {
       let { value } = this.options[this.selectedIndex];
       if (value === _this.CUSTOM_FLAG) {
         value = _this.__custom_controller.getValue();
@@ -75,7 +75,7 @@ define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], functi
     });
 
     if (this.__custom_controller) {
-      this.__custom_controller.onChange(function() {
+      this.__custom_controller.onChange(function () {
         const value = this.getValue();
         _this.setValue(value);
       });
@@ -90,16 +90,16 @@ define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], functi
   OptionController.superclass = Controller;
 
   common.extend(OptionController.prototype, Controller.prototype, {
-    setValue: function(v) {
+    setValue: function (v) {
       const toReturn = OptionController.superclass.prototype.setValue.call(this, v);
       return toReturn;
     },
 
-    updateDisplay: function() {
+    updateDisplay: function () {
       const value = this.getValue();
       let custom = true;
       if (value !== this.CUSTOM_FLAG) {
-        common.each(this.__select.options, function(option) {
+        common.each(this.__select.options, function (option) {
           if (value === option.value) {
             custom = false;
           }
@@ -113,7 +113,7 @@ define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], functi
       }
 
       return OptionController.superclass.prototype.updateDisplay.call(this);
-    }
+    },
   });
 
   return OptionController;

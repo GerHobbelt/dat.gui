@@ -23,8 +23,8 @@ define([
   "dat/controllers/ObjectController",
   "dat/controllers/NullController",
   "dat/controllers/UndefinedController",
-  "dat/utils/common"
-], function(
+  "dat/utils/common",
+], function (
   Controller,
   OptionController,
   NumberControllerBox,
@@ -55,7 +55,7 @@ define([
     );
   }
 
-  return function(
+  return function (
     object,
     property,
     controllerName,
@@ -116,7 +116,7 @@ define([
         step: options_3,
         minimumSaneStepSize: options_4,
         maximumSaneStepSize: options_5,
-        mode: options_6
+        mode: options_6,
       });
     }
 

@@ -1,4 +1,4 @@
-define([], function() {
+define([], function () {
   // previously: GUI.constrain
   function constrain(v, o1, o2) {
     if (v < o1) v = o1;
@@ -7,7 +7,7 @@ define([], function() {
   }
 
   function FizzyText(message, font) {
-    var that = this;
+    const that = this;
 
     // These are the variables that we manipulate with gui-dat.
     // Notice they're all defined with "this". That makes them public.
@@ -26,20 +26,20 @@ define([], function() {
     // we've defined a variable 'this.message'. This way, whenever we
     // change the message variable, we can call some more functions.
 
-    this.__defineGetter__("message", function() {
+    this.__defineGetter__("message", function () {
       return message;
     });
 
-    this.__defineSetter__("message", function(m) {
+    this.__defineSetter__("message", function (m) {
       message = m;
       createBitmap(message, font);
     });
 
-    this.__defineGetter__("font", function() {
+    this.__defineGetter__("font", function () {
       return font;
     });
 
-    this.__defineSetter__("font", function(f) {
+    this.__defineSetter__("font", function (f) {
       font = f;
       createBitmap(message, font);
     });
@@ -47,35 +47,35 @@ define([], function() {
     // We can even add functions to the DAT.GUI! As long as they have
     // 0 arguments, we can call them from the dat-gui panel.
 
-    this.explode = function() {
-      var mag = Math.random() * 30 + 30;
-      for (var i in particles) {
-        var angle = Math.random() * Math.PI * 2;
+    this.explode = function () {
+      const mag = Math.random() * 30 + 30;
+      for (const i in particles) {
+        const angle = Math.random() * Math.PI * 2;
         particles[i].vx = Math.cos(angle) * mag;
         particles[i].vy = Math.sin(angle) * mag;
       }
     };
 
-    ////////////////////////////////////////////////////////////////
+    // //////////////////////////////////////////////////////////////
 
-    var _this = this;
+    const _this = this;
 
-    var width = 550;
-    var height = 200;
-    var textAscent = 101;
-    var textOffsetLeft = 80;
-    var noiseScale = 300;
+    const width = 550;
+    const height = 200;
+    const textAscent = 101;
+    const textOffsetLeft = 80;
+    const noiseScale = 300;
 
-    var colors = ["#00aeff", "#0fa954", "#54396e", "#e61d5f"];
+    const colors = ["#00aeff", "#0fa954", "#54396e", "#e61d5f"];
 
     // This is the context we use to get a bitmap of text using
     // the getImageData function.
-    var r = document.createElement("canvas");
-    var s = r.getContext("2d");
+    const r = document.createElement("canvas");
+    const s = r.getContext("2d");
 
     // This is the context we actually use to draw.
-    var c = document.createElement("canvas");
-    var g = c.getContext("2d");
+    const c = document.createElement("canvas");
+    const g = c.getContext("2d");
 
     r.setAttribute("width", width);
     c.setAttribute("width", width);
@@ -100,7 +100,7 @@ define([], function() {
     document.getElementById("helvetica-demo").appendChild(c);
 
     // Stores bitmap image
-    var pixels = [];
+    let pixels = [];
 
     // Stores a list of particles
     var particles = [];
@@ -110,13 +110,13 @@ define([], function() {
     s.font = g.font = "800 82px " + this.allFonts[this.font];
 
     // Instantiate some particles
-    for (var i = 0; i < 1000; i++) {
+    for (let i = 0; i < 1000; i++) {
       particles.push(new Particle(Math.random() * width, Math.random() * height));
     }
 
     // This function creates a bitmap of pixels based on your message
     // It's called every time we change the message property.
-    var createBitmap = function(msg, font) {
+    var createBitmap = function (msg, font) {
       s.font = g.font = "800 82px " + that.allFonts[font];
       s.fillStyle = "#fff";
       s.fillRect(0, 0, width, height);
@@ -125,12 +125,12 @@ define([], function() {
       s.fillText(msg, textOffsetLeft, textAscent);
 
       // Pull reference
-      var imageData = s.getImageData(0, 0, width, height);
+      const imageData = s.getImageData(0, 0, width, height);
       pixels = imageData.data;
     };
 
     // Called once per frame, updates the animation.
-    var render = function() {
+    const render = function () {
       that.framesRendered++;
 
       s.font = g.font = "800 82px " + that.allFonts[that.font];
@@ -146,28 +146,28 @@ define([], function() {
 
       g.globalCompositeOperation = "darker";
 
-      for (var i = 0; i < particles.length; i++) {
+      for (let i = 0; i < particles.length; i++) {
         g.fillStyle = colors[i % colors.length];
         particles[i].render();
       }
     };
 
     // Returns x, y coordinates for a given index in the pixel array.
-    var getPosition = function(i) {
+    const getPosition = function (i) {
       return {
         x: (i - width * 4 * Math.floor(i / (width * 4))) / 4,
-        y: Math.floor(i / (width * 4))
+        y: Math.floor(i / (width * 4)),
       };
     };
 
     // Returns a color for a given pixel in the pixel array.
-    var getColor = function(x, y) {
-      var base = (Math.floor(y) * width + Math.floor(x)) * 4;
-      var c = {
+    const getColor = function (x, y) {
+      const base = (Math.floor(y) * width + Math.floor(x)) * 4;
+      const c = {
         r: pixels[base + 0],
         g: pixels[base + 1],
         b: pixels[base + 2],
-        a: pixels[base + 3]
+        a: pixels[base + 3],
       };
 
       return "rgb(" + c.r + "," + c.g + "," + c.b + ")";
@@ -177,7 +177,7 @@ define([], function() {
     // the createBitmap function.
     this.message = message;
 
-    var loop = function() {
+    var loop = function () {
       requestAnimationFrame(loop);
 
       // Don't render if we don't see it.
@@ -205,17 +205,17 @@ define([], function() {
       this.vy = 0;
 
       // Called every frame
-      this.render = function() {
+      this.render = function () {
         // What color is the pixel we're sitting on top of?
-        var c = getColor(this.x, this.y);
+        const c = getColor(this.x, this.y);
 
         // Where should we move?
-        var angle = noise(this.x / noiseScale, this.y / noiseScale) * _this.noiseStrength;
+        const angle = noise(this.x / noiseScale, this.y / noiseScale) * _this.noiseStrength;
 
         // Are we within the boundaries of the image?
-        var onScreen = this.x > 0 && this.x < width && this.y > 0 && this.y < height;
+        const onScreen = this.x > 0 && this.x < width && this.y > 0 && this.y < height;
 
-        var isBlack = c !== "rgb(255,255,255)" && onScreen;
+        const isBlack = c !== "rgb(255,255,255)" && onScreen;
 
         // If we're on top of a black pixel, grow.
         // If not, shrink.

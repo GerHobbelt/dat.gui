@@ -14,7 +14,7 @@
 let tmpComponent;
 
 const ColorMath = {
-  hsv_to_rgb: function(h, s, v) {
+  hsv_to_rgb: function (h, s, v) {
     const hi = Math.floor(h / 60) % 6;
 
     const f = h / 60 - Math.floor(h / 60);
@@ -22,16 +22,23 @@ const ColorMath = {
     const q = v * (1.0 - f * s);
     const t = v * (1.0 - (1.0 - f) * s);
 
-    const c = [[v, t, p], [q, v, p], [p, v, t], [p, q, v], [t, p, v], [v, p, q]][hi];
+    const c = [
+      [v, t, p],
+      [q, v, p],
+      [p, v, t],
+      [p, q, v],
+      [t, p, v],
+      [v, p, q],
+    ][hi];
 
     return {
       r: c[0] * 255,
       g: c[1] * 255,
-      b: c[2] * 255
+      b: c[2] * 255,
     };
   },
 
-  rgb_to_hsv: function(r, g, b) {
+  rgb_to_hsv: function (r, g, b) {
     const min = Math.min(r, g, b);
     const max = Math.max(r, g, b);
     const delta = max - min;
@@ -44,7 +51,7 @@ const ColorMath = {
       return {
         h: NaN,
         s: 0,
-        v: 0
+        v: 0,
       };
     }
 
@@ -63,25 +70,25 @@ const ColorMath = {
     return {
       h: h * 360,
       s: s,
-      v: max / 255
+      v: max / 255,
     };
   },
 
-  rgb_to_hex: function(r, g, b) {
+  rgb_to_hex: function (r, g, b) {
     let hex = this.hex_with_component(0, 2, r);
     hex = this.hex_with_component(hex, 1, g);
     hex = this.hex_with_component(hex, 0, b);
     return hex;
   },
 
-  component_from_hex: function(hex, componentIndex) {
+  component_from_hex: function (hex, componentIndex) {
     return (hex >> (componentIndex * 8)) & 0xff;
   },
 
-  hex_with_component: function(hex, componentIndex, value) {
+  hex_with_component: function (hex, componentIndex, value) {
     value = (value << (tmpComponent = componentIndex * 8)) | (hex & ~(0xff << tmpComponent));
     return value;
-  }
+  },
 };
 
 export default ColorMath;

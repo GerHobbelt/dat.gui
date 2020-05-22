@@ -26,10 +26,10 @@
     </div>
 
     <script type="text/javascript">
-      require(["domReady", "dat.GUI", "testbed"], function(domReady, dat, testbed) {
+      require(["domReady", "dat.GUI", "testbed"], function (domReady, dat, testbed) {
         "use strict";
 
-        domReady(function() {
+        domReady(function () {
           //This function is called once the DOM is ready.
           //It will be safe to query the DOM and manipulate
           //DOM nodes in this function.
@@ -39,8 +39,8 @@
               b: 10,
               c: 11,
               z: 12,
-              e: 5
-            }
+              e: 5,
+            },
           };
           var gui = new dat.gui.GUI();
           gui.add(obj, "x");

@@ -42,8 +42,8 @@ define([
 
   "dat/utils/css",
   "dat/utils/common",
-  "dat/utils/requestAnimationFrame"
-], function(
+  "dat/utils/requestAnimationFrame",
+], function (
   dat_gui_GUI,
 
   dat_controllers_Controller,
@@ -74,7 +74,7 @@ define([
     utils: {
       css: dat_utils_css,
       common: dat_utils_common,
-      requestAnimationFrame: dat_utils_requestAnimationFrame
+      requestAnimationFrame: dat_utils_requestAnimationFrame,
     },
     controller: {
       Controller: dat_controllers_Controller,
@@ -87,21 +87,21 @@ define([
       BooleanController: dat_controllers_BooleanController,
       ImageController: dat_controllers_ImageController,
       ColorController: dat_controllers_ColorController,
-      factory: dat_controllers_factory
+      factory: dat_controllers_factory,
     },
     dom: {
       dom: dat_dom_dom,
-      CenteredDiv: dat_dom_CenteredDiv
+      CenteredDiv: dat_dom_CenteredDiv,
     },
     color: {
       toString: dat_color_toString,
       interpret: dat_color_interpret,
       math: dat_color_math,
-      Color: dat_color_Color
+      Color: dat_color_Color,
     },
     gui: {
-      GUI: dat_gui_GUI
-    }
+      GUI: dat_gui_GUI,
+    },
   };
 
   return dat;

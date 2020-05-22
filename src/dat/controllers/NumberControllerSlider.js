@@ -70,7 +70,7 @@ class NumberControllerSlider extends NumberController {
 
       _this.fireFinishChange({
         eventData: e,
-        eventSource: "onTouchUp"
+        eventSource: "onTouchUp",
       });
     }
 
@@ -100,7 +100,7 @@ class NumberControllerSlider extends NumberController {
 
       _this.fireFinishChange({
         eventData: e,
-        eventSource: "onMouseUp"
+        eventSource: "onMouseUp",
       });
     }
 

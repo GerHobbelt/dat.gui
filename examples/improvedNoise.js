@@ -1,7 +1,7 @@
 // http://mrl.nyu.edu/~perlin/noise/
 
-var ImprovedNoise = function() {
-  var p = [
+const ImprovedNoise = function () {
+  const p = [
     151,
     160,
     137,
@@ -257,10 +257,10 @@ var ImprovedNoise = function() {
     215,
     61,
     156,
-    180
+    180,
   ];
 
-  for (var i = 0; i < 256; i++) {
+  for (let i = 0; i < 256; i++) {
     p[256 + i] = p[i];
   }
 
@@ -273,40 +273,40 @@ var ImprovedNoise = function() {
   }
 
   function grad(hash, x, y, z) {
-    var h = hash & 15;
-    var u = h < 8 ? x : y,
-      v = h < 4 ? y : h === 12 || h === 14 ? x : z;
+    const h = hash & 15;
+    const u = h < 8 ? x : y;
+    const v = h < 4 ? y : h === 12 || h === 14 ? x : z;
     return ((h & 1) === 0 ? u : -u) + ((h & 2) === 0 ? v : -v);
   }
 
   return {
-    noise: function(x, y, z) {
-      var floorX = Math.floor(x),
-        floorY = Math.floor(y),
-        floorZ = Math.floor(z);
+    noise: function (x, y, z) {
+      const floorX = Math.floor(x);
+      const floorY = Math.floor(y);
+      const floorZ = Math.floor(z);
 
-      var X = floorX & 255,
-        Y = floorY & 255,
-        Z = floorZ & 255;
+      const X = floorX & 255;
+      const Y = floorY & 255;
+      const Z = floorZ & 255;
 
       x -= floorX;
       y -= floorY;
       z -= floorZ;
 
-      var xMinus1 = x - 1,
-        yMinus1 = y - 1,
-        zMinus1 = z - 1;
+      const xMinus1 = x - 1;
+      const yMinus1 = y - 1;
+      const zMinus1 = z - 1;
 
-      var u = fade(x),
-        v = fade(y),
-        w = fade(z);
+      const u = fade(x);
+      const v = fade(y);
+      const w = fade(z);
 
-      var A = p[X] + Y,
-        AA = p[A] + Z,
-        AB = p[A + 1] + Z,
-        B = p[X + 1] + Y,
-        BA = p[B] + Z,
-        BB = p[B + 1] + Z;
+      const A = p[X] + Y;
+      const AA = p[A] + Z;
+      const AB = p[A + 1] + Z;
+      const B = p[X + 1] + Y;
+      const BA = p[B] + Z;
+      const BB = p[B + 1] + Z;
 
       return lerp(
         w,
@@ -321,47 +321,48 @@ var ImprovedNoise = function() {
           lerp(u, grad(p[AB + 1], x, yMinus1, zMinus1), grad(p[BB + 1], xMinus1, yMinus1, zMinus1))
         )
       );
-    }
+    },
   };
 };
 
-var currentRandom = Math.random;
+const currentRandom = Math.random;
 
 // Pseudo-random generator
 function Marsaglia(i1, i2) {
   // from http://www.math.uni-bielefeld.de/~sillke/ALGORITHMS/random/marsaglia-c
-  var z = i1 || 362436069,
-    w = i2 || 521288629;
-  var nextInt = function() {
+  let z = i1 || 362436069;
+  let w = i2 || 521288629;
+  const nextInt = function () {
     z = (36969 * (z & 65535) + (z >>> 16)) & 0xffffffff;
     w = (18000 * (w & 65535) + (w >>> 16)) & 0xffffffff;
     return (((z & 0xffff) << 16) | (w & 0xffff)) & 0xffffffff;
   };
 
-  this.nextDouble = function() {
-    var i = nextInt() / 4294967296;
+  this.nextDouble = function () {
+    const i = nextInt() / 4294967296;
     return i < 0 ? 1 + i : i;
   };
   this.nextInt = nextInt;
 }
-Marsaglia.createRandomized = function() {
-  var now = new Date();
+Marsaglia.createRandomized = function () {
+  const now = new Date();
   return new Marsaglia((now / 60000) & 0xffffffff, now & 0xffffffff);
 };
 
 // Noise functions and helpers
 function PerlinNoise(seed) {
-  var rnd = seed !== undefined ? new Marsaglia(seed) : Marsaglia.createRandomized();
-  var i, j;
+  const rnd = seed !== undefined ? new Marsaglia(seed) : Marsaglia.createRandomized();
+  let i;
+  let j;
   // http://www.noisemachine.com/talk1/17b.html
   // http://mrl.nyu.edu/~perlin/noise/
   // generate permutation
-  var p = new Array(512);
+  const p = new Array(512);
   for (i = 0; i < 256; ++i) {
     p[i] = i;
   }
   for (i = 0; i < 256; ++i) {
-    var t = p[(j = rnd.nextInt() & 0xff)];
+    const t = p[(j = rnd.nextInt() & 0xff)];
     p[j] = p[i];
     p[i] = t;
   }
@@ -371,14 +372,14 @@ function PerlinNoise(seed) {
   }
 
   function grad3d(i, x, y, z) {
-    var h = i & 15; // convert into 12 gradient directions
-    var u = h < 8 ? x : y,
-      v = h < 4 ? y : h === 12 || h === 14 ? x : z;
+    const h = i & 15; // convert into 12 gradient directions
+    const u = h < 8 ? x : y;
+    const v = h < 4 ? y : h === 12 || h === 14 ? x : z;
     return ((h & 1) === 0 ? u : -u) + ((h & 2) === 0 ? v : -v);
   }
 
   function grad2d(i, x, y) {
-    var v = (i & 1) === 0 ? x : y;
+    const v = (i & 1) === 0 ? x : y;
     return (i & 2) === 0 ? -v : v;
   }
 
@@ -390,22 +391,22 @@ function PerlinNoise(seed) {
     return a + t * (b - a);
   }
 
-  this.noise3d = function(x, y, z) {
-    var X = Math.floor(x) & 255,
-      Y = Math.floor(y) & 255,
-      Z = Math.floor(z) & 255;
+  this.noise3d = function (x, y, z) {
+    const X = Math.floor(x) & 255;
+    const Y = Math.floor(y) & 255;
+    const Z = Math.floor(z) & 255;
     x -= Math.floor(x);
     y -= Math.floor(y);
     z -= Math.floor(z);
-    var fx = (3 - 2 * x) * x * x,
-      fy = (3 - 2 * y) * y * y,
-      fz = (3 - 2 * z) * z * z;
-    var p0 = p[X] + Y,
-      p00 = p[p0] + Z,
-      p01 = p[p0 + 1] + Z,
-      p1 = p[X + 1] + Y,
-      p10 = p[p1] + Z,
-      p11 = p[p1 + 1] + Z;
+    const fx = (3 - 2 * x) * x * x;
+    const fy = (3 - 2 * y) * y * y;
+    const fz = (3 - 2 * z) * z * z;
+    const p0 = p[X] + Y;
+    const p00 = p[p0] + Z;
+    const p01 = p[p0 + 1] + Z;
+    const p1 = p[X + 1] + Y;
+    const p10 = p[p1] + Z;
+    const p11 = p[p1 + 1] + Z;
     return lerp(
       fz,
       lerp(
@@ -421,15 +422,15 @@ function PerlinNoise(seed) {
     );
   };
 
-  this.noise2d = function(x, y) {
-    var X = Math.floor(x) & 255,
-      Y = Math.floor(y) & 255;
+  this.noise2d = function (x, y) {
+    const X = Math.floor(x) & 255;
+    const Y = Math.floor(y) & 255;
     x -= Math.floor(x);
     y -= Math.floor(y);
-    var fx = (3 - 2 * x) * x * x,
-      fy = (3 - 2 * y) * y * y;
-    var p0 = p[X] + Y,
-      p1 = p[X + 1] + Y;
+    const fx = (3 - 2 * x) * x * x;
+    const fy = (3 - 2 * y) * y * y;
+    const p0 = p[X] + Y;
+    const p1 = p[X + 1] + Y;
     return lerp(
       fy,
       lerp(fx, grad2d(p[p0], x, y), grad2d(p[p1], x - 1, y)),
@@ -437,21 +438,21 @@ function PerlinNoise(seed) {
     );
   };
 
-  this.noise1d = function(x) {
-    var X = Math.floor(x) & 255;
+  this.noise1d = function (x) {
+    const X = Math.floor(x) & 255;
     x -= Math.floor(x);
-    var fx = (3 - 2 * x) * x * x;
+    const fx = (3 - 2 * x) * x * x;
     return lerp(fx, grad1d(p[X], x), grad1d(p[X + 1], x - 1));
   };
 }
 
 //  these are lifted from Processing.js
 // processing defaults
-var noiseProfile = {
+const noiseProfile = {
   generator: undefined,
   octaves: 4,
   fallout: 0.5,
-  seed: undefined
+  seed: undefined,
 };
 
 function noise(x, y, z) {
@@ -459,11 +460,11 @@ function noise(x, y, z) {
     // caching
     noiseProfile.generator = new PerlinNoise(noiseProfile.seed);
   }
-  var generator = noiseProfile.generator;
-  var effect = 1,
-    k = 1,
-    sum = 0;
-  for (var i = 0; i < noiseProfile.octaves; ++i) {
+  const { generator } = noiseProfile;
+  let effect = 1;
+  let k = 1;
+  let sum = 0;
+  for (let i = 0; i < noiseProfile.octaves; ++i) {
     effect *= noiseProfile.fallout;
     switch (arguments.length) {
       case 1:

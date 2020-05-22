@@ -4,18 +4,18 @@
 // old v0.4 code which needs to be integrated or otherwise thrown away
 //
 
-define(["gui"], function(GUI) {
-  GUI.millis = function() {
+define(["gui"], function (GUI) {
+  GUI.millis = function () {
     var d = new Date();
     return d.getTime();
   };
 
   // hack to make it compile; it crashes anyway... (old stuff)
   if (!GUI.Controller) {
-    GUI.Controller = function() {};
+    GUI.Controller = function () {};
   }
 
-  GUI.Controller.prototype.at = function(when, what, tween) {
+  GUI.Controller.prototype.at = function (when, what, tween) {
     // TODO: Disable if we're using loaded JSON. Don't want to duplicate events.
     if (!this.scrubber) {
       GUI.error("You must create a new Timer for this GUI in order to define events.");
@@ -26,7 +26,7 @@ define(["gui"], function(GUI) {
     return this;
   };
 
-  GUI.Timer = function(gui) {
+  GUI.Timer = function (gui) {
     var _this = this;
 
     this.hoverPoint = null;
@@ -54,7 +54,7 @@ define(["gui"], function(GUI) {
     }
     this.tweenSelector.addEventListener(
       "change",
-      function(e) {
+      function (e) {
         if (_this.activePoint != null) {
           _this.activePoint.tween = GUI.Easing[this.value];
         }
@@ -63,10 +63,10 @@ define(["gui"], function(GUI) {
     );
     this.gui.domElement.appendChild(this.tweenSelector);
 
-    this.showTweenSelector = function() {
+    this.showTweenSelector = function () {
       _this.tweenSelector.style.display = "block";
     };
-    this.hideTweenSelector = function() {
+    this.hideTweenSelector = function () {
       _this.tweenSelector.style.display = "none";
     };
 
@@ -92,22 +92,22 @@ define(["gui"], function(GUI) {
     var snapIncrement = 250;
     var useSnap = false;
 
-    this.__defineGetter__("useSnap", function() {
+    this.__defineGetter__("useSnap", function () {
       return useSnap;
     });
 
-    this.__defineSetter__("useSnap", function(v) {
+    this.__defineSetter__("useSnap", function (v) {
       useSnap = v;
       for (var i in _this.scrubbers) {
         _this.scrubbers[i].render();
       }
     });
 
-    this.__defineGetter__("snapIncrement", function() {
+    this.__defineGetter__("snapIncrement", function () {
       return snapIncrement;
     });
 
-    this.__defineSetter__("snapIncrement", function(v) {
+    this.__defineSetter__("snapIncrement", function (v) {
       if (snapIncrement > 0) {
         snapIncrement = v;
         for (var i in _this.scrubbers) {
@@ -116,7 +116,7 @@ define(["gui"], function(GUI) {
       }
     });
 
-    this.snap = function(t) {
+    this.snap = function (t) {
       if (!this.useSnap) {
         return t;
       }
@@ -129,7 +129,7 @@ define(["gui"], function(GUI) {
 
     window.addEventListener(
       "keyup",
-      function(e) {
+      function (e) {
         if (GUI.disableKeyListeners) return;
         switch (e.keyCode) {
           case 32:
@@ -150,7 +150,7 @@ define(["gui"], function(GUI) {
       false
     );
 
-    this.getJSON = function() {
+    this.getJSON = function () {
       var scrubberArr = [];
 
       for (var i in _this.scrubbers) {
@@ -163,28 +163,28 @@ define(["gui"], function(GUI) {
         playhead: _this.playhead,
         snapIncrement: _this.snapIncrement,
         useSnap: _this.useSnap,
-        scrubbers: scrubberArr
+        scrubbers: scrubberArr,
       };
 
       return obj;
     };
 
-    this.__defineGetter__("windowMin", function() {
+    this.__defineGetter__("windowMin", function () {
       return windowMin;
     });
 
-    this.__defineSetter__("windowMin", function(v) {
+    this.__defineSetter__("windowMin", function (v) {
       windowMin = v;
       for (var i in windowListeners) {
         windowListeners[i].call(windowListeners[i]);
       }
     });
 
-    this.__defineGetter__("windowWidth", function() {
+    this.__defineGetter__("windowWidth", function () {
       return windowWidth;
     });
 
-    this.__defineSetter__("windowWidth", function(v) {
+    this.__defineSetter__("windowWidth", function (v) {
       // TODO: Make these constants.
       windowWidth = GUI.constrain(v, 1000, 60000);
       for (var i in windowListeners) {
@@ -192,11 +192,11 @@ define(["gui"], function(GUI) {
       }
     });
 
-    this.__defineGetter__("playhead", function() {
+    this.__defineGetter__("playhead", function () {
       return playhead;
     });
 
-    this.__defineSetter__("playhead", function(t) {
+    this.__defineSetter__("playhead", function (t) {
       lastPlayhead = playhead;
       playhead = t;
       if (playing) {
@@ -207,11 +207,11 @@ define(["gui"], function(GUI) {
       }
     });
 
-    this.__defineGetter__("playing", function() {
+    this.__defineGetter__("playing", function () {
       return playing;
     });
 
-    this.play = function() {
+    this.play = function () {
       playing = true;
       lastTime = GUI.millis();
       if (playInterval == -1) {
@@ -219,19 +219,19 @@ define(["gui"], function(GUI) {
       }
     };
 
-    this.update = function() {
+    this.update = function () {
       thisTime = GUI.millis();
       _this.playhead = _this.playhead + (thisTime - lastTime);
       lastTime = thisTime;
     };
 
-    this.pause = function() {
+    this.pause = function () {
       playing = false;
       clearInterval(playInterval);
       playInterval = -1;
     };
 
-    this.playPause = function() {
+    this.playPause = function () {
       if (playing) {
         this.pause();
       } else {
@@ -239,17 +239,17 @@ define(["gui"], function(GUI) {
       }
     };
 
-    this.stop = function() {
+    this.stop = function () {
       this.pause();
       this.playhead = 0;
       this.windowMin = -windowWidth / 4;
     };
 
-    this.addPlayListener = function(fnc) {
+    this.addPlayListener = function (fnc) {
       playListeners.push(fnc);
     };
 
-    this.addWindowListener = function(fnc) {
+    this.addWindowListener = function (fnc) {
       windowListeners.push(fnc);
     };
 

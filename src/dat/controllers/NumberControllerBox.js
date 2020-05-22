@@ -83,7 +83,7 @@ class NumberControllerBox extends NumberController {
       onChange(e);
       _this.fireFinishChange({
         eventData: e,
-        eventSource: "onBlur"
+        eventSource: "onBlur",
       });
     }
 
@@ -111,7 +111,7 @@ class NumberControllerBox extends NumberController {
 
       _this.fireFinishChange({
         eventData: e,
-        eventSource: "onTouchUp"
+        eventSource: "onTouchUp",
       });
     }
 
@@ -139,7 +139,7 @@ class NumberControllerBox extends NumberController {
 
       _this.fireFinishChange({
         eventData: e,
-        eventSource: "onMouseUp"
+        eventSource: "onMouseUp",
       });
     }
 

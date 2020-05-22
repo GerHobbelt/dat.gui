@@ -33,7 +33,7 @@ import GUIImport from "./gui/GUI";
 export const color = {
   Color: Color,
   math: math,
-  interpret: interpret
+  interpret: interpret,
 };
 
 export const controllers = {
@@ -47,7 +47,7 @@ export const controllers = {
   FunctionController: FunctionController,
   TabbedController: TabbedController,
   ColorController: ColorController,
-  ImageController: ImageController
+  ImageController: ImageController,
 };
 
 export const dom = { dom: domImport };
@@ -61,5 +61,5 @@ export default {
   controllers,
   dom,
   gui,
-  GUI
+  GUI,
 };

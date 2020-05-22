@@ -11,7 +11,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-export default function(color) {
+export default function (color) {
   if (color.a === 1 || common.isUndefined(color.a)) {
     let s = color.hex.toString(16);
     while (s.length < 6) {

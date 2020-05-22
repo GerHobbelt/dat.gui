@@ -24,7 +24,7 @@
     <script type="text/javascript">
       //<![CDATA[
 
-      window.onload = function() {
+      window.onload = function () {
         //prettyPrint();
 
         //window.fizzyText = new FizzyText('dat.GUI', 0);
@@ -37,12 +37,12 @@
           allFonts: ["Times", "Courier", "Verdana"],
           noiseStrength: 0,
           displayOutline: true,
-          explode: function(state) {},
+          explode: function (state) {},
           fgcolor: "#f00",
           bgcolor: "#000" /* black */,
           regular_number: 5,
           regular_number2: -155,
-          regular_number3: 0
+          regular_number3: 0,
         };
 
         var gui = new dat.gui.GUI();
@@ -51,15 +51,8 @@
         gui.add(fizzyText, "message");
 
         // Sliders with min + max
-        gui
-          .add(fizzyText, "maxSize")
-          .min(0.5)
-          .max(7);
-        gui
-          .add(fizzyText, "growthSpeed")
-          .min(0.01)
-          .max(1)
-          .step(0.05);
+        gui.add(fizzyText, "maxSize").min(0.5).max(7);
+        gui.add(fizzyText, "growthSpeed").min(0.01).max(1).step(0.05);
         gui.add(fizzyText, "speed", 0.1, 2, 0.05); // shorthand for min/max/step
         gui.add(fizzyText, "font", fizzyText.allFonts); // Font toggle
 
@@ -79,10 +72,7 @@
         // Numbers without range
         gui.add(fizzyText, "regular_number").name("just a number...");
         gui.add(fizzyText, "regular_number2").name("a negative number...");
-        gui
-          .add(fizzyText, "regular_number3")
-          .name("exponential growth")
-          .mode("exp");
+        gui.add(fizzyText, "regular_number3").name("exponential growth").mode("exp");
 
         // Javascript for documentation
         getCollapsables();
@@ -104,7 +94,7 @@
 
       function getCollapsables() {
         if (document.getElementsByClassName == undefined) {
-          document.getElementsByClassName = function(className) {
+          document.getElementsByClassName = function (className) {
             var hasClassName = new RegExp("(?:^|\\s)" + className + "(?:$|\\s)");
             var allElements = document.getElementsByTagName("*");
             var results = [];
@@ -147,7 +137,7 @@
       <div id="notifier"></div>
 
       <h1>
-        <a href="http://twitter.com/guidat"><img src="examples/assets/profile.png" border="0" alt="dat.GUI flag"/></a>
+        <a href="http://twitter.com/guidat"><img src="examples/assets/profile.png" border="0" alt="dat.GUI flag" /></a>
       </h1>
 
       <p>

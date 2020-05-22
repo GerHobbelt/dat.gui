@@ -4,8 +4,8 @@
 // old v0.4 code which needs to be integrated or otherwise thrown away
 //
 
-define(["gui"], function(GUI) {
-  GUI.loadJSON = function(json) {
+define(["gui"], function (GUI) {
+  GUI.loadJSON = function (json) {
     if (typeof json === "string") {
       json = eval("(" + json + ")");
     }
@@ -14,7 +14,7 @@ define(["gui"], function(GUI) {
 
   GUI.loadedJSON = null;
 
-  GUI.getJSON = function() {
+  GUI.getJSON = function () {
     var guis = [];
     for (var i in GUI.allGuis) {
       guis.push(GUI.allGuis[i].getJSON());
@@ -23,11 +23,11 @@ define(["gui"], function(GUI) {
     return { guis: guis };
   };
 
-  GUI.closeSave = function() {
+  GUI.closeSave = function () {
     //
   };
 
-  GUI.save = function() {
+  GUI.save = function () {
     var jsonString = JSON.stringify(GUI.getJSON());
 
     var dialogue = document.createElement("div");
@@ -48,7 +48,7 @@ define(["gui"], function(GUI) {
     close.setAttribute("id", "guidat-save-dialogue-close");
     close.addEventListener(
       "click",
-      function() {
+      function () {
         GUI.closeSave();
       },
       false
@@ -61,7 +61,7 @@ define(["gui"], function(GUI) {
 
     textarea.addEventListener(
       "click",
-      function() {
+      function () {
         this.select();
       },
       false

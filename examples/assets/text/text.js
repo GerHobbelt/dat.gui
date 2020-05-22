@@ -3,39 +3,37 @@
  * Available via the MIT or new BSD license.
  * see: http://github.com/requirejs/text for details
  */
-/*jslint regexp: true */
-/*global require, XMLHttpRequest, ActiveXObject,
+/* jslint regexp: true */
+/* global require, XMLHttpRequest, ActiveXObject,
   define, window, process, Packages,
   java, location, Components, FileUtils */
 
-define(["module"], function(module) {
-  "use strict";
-
-  var text,
-    fs,
-    Cc,
-    Ci,
-    xpcIsWindows,
-    progIds = ["Msxml2.XMLHTTP", "Microsoft.XMLHTTP", "Msxml2.XMLHTTP.4.0"],
-    xmlRegExp = /^\s*<\?xml(\s)+version=[\'\"](\d)*.(\d)*[\'\"](\s)*\?>/im,
-    bodyRegExp = /<body[^>]*>\s*([\s\S]+)\s*<\/body>/im,
-    hasLocation = typeof location !== "undefined" && location.href,
-    defaultProtocol = hasLocation && location.protocol && location.protocol.replace(/\:/, ""),
-    defaultHostName = hasLocation && location.hostname,
-    defaultPort = hasLocation && (location.port || undefined),
-    buildMap = {},
-    masterConfig = (module.config && module.config()) || {};
+define(["module"], function (module) {
+  let text;
+  let fs;
+  let Cc;
+  let Ci;
+  let xpcIsWindows;
+  let progIds = ["Msxml2.XMLHTTP", "Microsoft.XMLHTTP", "Msxml2.XMLHTTP.4.0"];
+  const xmlRegExp = /^\s*<\?xml(\s)+version=[\'\"](\d)*.(\d)*[\'\"](\s)*\?>/im;
+  const bodyRegExp = /<body[^>]*>\s*([\s\S]+)\s*<\/body>/im;
+  const hasLocation = typeof location !== "undefined" && location.href;
+  const defaultProtocol = hasLocation && location.protocol && location.protocol.replace(/\:/, "");
+  const defaultHostName = hasLocation && location.hostname;
+  const defaultPort = hasLocation && (location.port || undefined);
+  const buildMap = {};
+  const masterConfig = (module.config && module.config()) || {};
 
   text = {
     version: "2.0.12",
 
-    strip: function(content) {
-      //Strips <?xml ...?> declarations so that external SVG and XML
-      //documents can be added to a document without worry. Also, if the string
-      //is an HTML document, only the part inside the body tag is returned.
+    strip: function (content) {
+      // Strips <?xml ...?> declarations so that external SVG and XML
+      // documents can be added to a document without worry. Also, if the string
+      // is an HTML document, only the part inside the body tag is returned.
       if (content) {
         content = content.replace(xmlRegExp, "");
-        var matches = content.match(bodyRegExp);
+        const matches = content.match(bodyRegExp);
         if (matches) {
           content = matches[1];
         }
@@ -45,7 +43,7 @@ define(["module"], function(module) {
       return content;
     },
 
-    jsEscape: function(content) {
+    jsEscape: function (content) {
       return content
         .replace(/(['\\])/g, "\\$1")
         .replace(/[\f]/g, "\\f")
@@ -59,12 +57,15 @@ define(["module"], function(module) {
 
     createXhr:
       masterConfig.createXhr ||
-      function() {
-        //Would love to dump the ActiveX crap in here. Need IE 6 to die first.
-        var xhr, i, progId;
+      function () {
+        // Would love to dump the ActiveX crap in here. Need IE 6 to die first.
+        let xhr;
+        let i;
+        let progId;
         if (typeof XMLHttpRequest !== "undefined") {
           return new XMLHttpRequest();
-        } else if (typeof ActiveXObject !== "undefined") {
+        }
+        if (typeof ActiveXObject !== "undefined") {
           for (i = 0; i < 3; i += 1) {
             progId = progIds[i];
             try {
@@ -89,13 +90,13 @@ define(["module"], function(module) {
      * @returns {Object} with properties "moduleName", "ext" and "strip"
      * where strip is a boolean.
      */
-    parseName: function(name) {
-      var modName,
-        ext,
-        temp,
-        strip = false,
-        index = name.indexOf("."),
-        isRelative = name.indexOf("./") === 0 || name.indexOf("../") === 0;
+    parseName: function (name) {
+      let modName;
+      let ext;
+      let temp;
+      let strip = false;
+      let index = name.indexOf(".");
+      const isRelative = name.indexOf("./") === 0 || name.indexOf("../") === 0;
 
       if (index !== -1 && (!isRelative || index > 1)) {
         modName = name.substring(0, index);
@@ -107,7 +108,7 @@ define(["module"], function(module) {
       temp = ext || modName;
       index = temp.indexOf("!");
       if (index !== -1) {
-        //Pull off the strip arg.
+        // Pull off the strip arg.
         strip = temp.substring(index + 1) === "strip";
         temp = temp.substring(0, index);
         if (ext) {
@@ -120,7 +121,7 @@ define(["module"], function(module) {
       return {
         moduleName: modName,
         ext: ext,
-        strip: strip
+        strip: strip,
       };
     },
 
@@ -134,11 +135,11 @@ define(["module"], function(module) {
      * @param {String} url
      * @returns Boolean
      */
-    useXhr: function(url, protocol, hostname, port) {
-      var uProtocol,
-        uHostName,
-        uPort,
-        match = text.xdRegExp.exec(url);
+    useXhr: function (url, protocol, hostname, port) {
+      let uProtocol;
+      let uHostName;
+      let uPort;
+      const match = text.xdRegExp.exec(url);
       if (!match) {
         return true;
       }
@@ -156,7 +157,7 @@ define(["module"], function(module) {
       );
     },
 
-    finishLoad: function(name, strip, content, onLoad) {
+    finishLoad: function (name, strip, content, onLoad) {
       content = strip ? text.strip(content) : content;
       if (masterConfig.isBuild) {
         buildMap[name] = content;
@@ -164,13 +165,13 @@ define(["module"], function(module) {
       onLoad(content);
     },
 
-    load: function(name, req, onLoad, config) {
-      //Name has format: some.module.filext!strip
-      //The strip part is optional.
-      //if strip is present, then that means only get the string contents
-      //inside a body tag in an HTML string. For XML/SVG content it means
-      //removing the <?xml ...?> declarations so the content can be inserted
-      //into the current doc without problems.
+    load: function (name, req, onLoad, config) {
+      // Name has format: some.module.filext!strip
+      // The strip part is optional.
+      // if strip is present, then that means only get the string contents
+      // inside a body tag in an HTML string. For XML/SVG content it means
+      // removing the <?xml ...?> declarations so the content can be inserted
+      // into the current doc without problems.
 
       // Do not bother with the work if a build and text will
       // not be inlined.
@@ -181,10 +182,10 @@ define(["module"], function(module) {
 
       masterConfig.isBuild = config && config.isBuild;
 
-      var parsed = text.parseName(name),
-        nonStripName = parsed.moduleName + (parsed.ext ? "." + parsed.ext : ""),
-        url = req.toUrl(nonStripName),
-        useXhr = masterConfig.useXhr || text.useXhr;
+      const parsed = text.parseName(name);
+      const nonStripName = parsed.moduleName + (parsed.ext ? "." + parsed.ext : "");
+      const url = req.toUrl(nonStripName);
+      const useXhr = masterConfig.useXhr || text.useXhr;
 
       // Do not load if it is an empty: url
       if (url.indexOf("empty:") === 0) {
@@ -192,59 +193,59 @@ define(["module"], function(module) {
         return;
       }
 
-      //Load the text. Use XHR if possible and in a browser.
+      // Load the text. Use XHR if possible and in a browser.
       if (!hasLocation || useXhr(url, defaultProtocol, defaultHostName, defaultPort)) {
         text.get(
           url,
-          function(content) {
+          function (content) {
             text.finishLoad(name, parsed.strip, content, onLoad);
           },
-          function(err) {
+          function (err) {
             if (onLoad.error) {
               onLoad.error(err);
             }
           }
         );
       } else {
-        //Need to fetch the resource across domains. Assume
-        //the resource has been optimized into a JS module. Fetch
-        //by the module name + extension, but do not include the
-        //!strip part to avoid file system issues.
-        req([nonStripName], function(content) {
+        // Need to fetch the resource across domains. Assume
+        // the resource has been optimized into a JS module. Fetch
+        // by the module name + extension, but do not include the
+        //! strip part to avoid file system issues.
+        req([nonStripName], function (content) {
           text.finishLoad(parsed.moduleName + "." + parsed.ext, parsed.strip, content, onLoad);
         });
       }
     },
 
-    write: function(pluginName, moduleName, write, config) {
+    write: function (pluginName, moduleName, write, config) {
       if (buildMap.hasOwnProperty(moduleName)) {
-        var content = text.jsEscape(buildMap[moduleName]);
+        const content = text.jsEscape(buildMap[moduleName]);
         write.asModule(pluginName + "!" + moduleName, "define(function () { return '" + content + "';});\n");
       }
     },
 
-    writeFile: function(pluginName, moduleName, req, write, config) {
-      var parsed = text.parseName(moduleName),
-        extPart = parsed.ext ? "." + parsed.ext : "",
-        nonStripName = parsed.moduleName + extPart,
-        //Use a '.js' file name so that it indicates it is a
-        //script that can be loaded across domains.
-        fileName = req.toUrl(parsed.moduleName + extPart) + ".js";
+    writeFile: function (pluginName, moduleName, req, write, config) {
+      const parsed = text.parseName(moduleName);
+      const extPart = parsed.ext ? "." + parsed.ext : "";
+      const nonStripName = parsed.moduleName + extPart;
+      // Use a '.js' file name so that it indicates it is a
+      // script that can be loaded across domains.
+      const fileName = req.toUrl(parsed.moduleName + extPart) + ".js";
 
-      //Leverage own load() method to load plugin value, but only
-      //write out values that do not have the strip argument,
-      //to avoid any potential issues with ! in file names.
+      // Leverage own load() method to load plugin value, but only
+      // write out values that do not have the strip argument,
+      // to avoid any potential issues with ! in file names.
       text.load(
         nonStripName,
         req,
-        function(value) {
-          //Use own write() method to construct full module value.
-          //But need to create shell that translates writeFile's
-          //write() to the right interface.
-          var textWrite = function(contents) {
+        function (value) {
+          // Use own write() method to construct full module value.
+          // But need to create shell that translates writeFile's
+          // write() to the right interface.
+          const textWrite = function (contents) {
             return write(fileName, contents);
           };
-          textWrite.asModule = function(moduleName, contents) {
+          textWrite.asModule = function (moduleName, contents) {
             return write.asModule(moduleName, fileName, contents);
           };
 
@@ -252,7 +253,7 @@ define(["module"], function(module) {
         },
         config
       );
-    }
+    },
   };
 
   if (
@@ -263,13 +264,13 @@ define(["module"], function(module) {
       !!process.versions.node &&
       !process.versions["node-webkit"])
   ) {
-    //Using special require.nodeRequire, something added by r.js.
+    // Using special require.nodeRequire, something added by r.js.
     fs = require.nodeRequire("fs");
 
-    text.get = function(url, callback, errback) {
+    text.get = function (url, callback, errback) {
       try {
-        var file = fs.readFileSync(url, "utf8");
-        //Remove BOM (Byte Mark Order) from utf8 files if it is there.
+        let file = fs.readFileSync(url, "utf8");
+        // Remove BOM (Byte Mark Order) from utf8 files if it is there.
         if (file.indexOf("\uFEFF") === 0) {
           file = file.substring(1);
         }
@@ -281,12 +282,12 @@ define(["module"], function(module) {
       }
     };
   } else if (masterConfig.env === "xhr" || (!masterConfig.env && text.createXhr())) {
-    text.get = function(url, callback, errback, headers) {
-      var xhr = text.createXhr(),
-        header;
+    text.get = function (url, callback, errback, headers) {
+      const xhr = text.createXhr();
+      let header;
       xhr.open("GET", url, true);
 
-      //Allow plugins direct access to xhr headers
+      // Allow plugins direct access to xhr headers
       if (headers) {
         for (header in headers) {
           if (headers.hasOwnProperty(header)) {
@@ -295,19 +296,20 @@ define(["module"], function(module) {
         }
       }
 
-      //Allow overrides specified in config
+      // Allow overrides specified in config
       if (masterConfig.onXhr) {
         masterConfig.onXhr(xhr, url);
       }
 
-      xhr.onreadystatechange = function(evt) {
-        var status, err;
-        //Do not explicitly handle errors, those should be
-        //visible via console output in the browser.
+      xhr.onreadystatechange = function (evt) {
+        let status;
+        let err;
+        // Do not explicitly handle errors, those should be
+        // visible via console output in the browser.
         if (xhr.readyState === 4) {
           status = xhr.status || 0;
           if (status > 399 && status < 600) {
-            //An http 4xx or 5xx error. Signal an error.
+            // An http 4xx or 5xx error. Signal an error.
             err = new Error(url + " HTTP status: " + status);
             err.xhr = xhr;
             if (errback) {
@@ -328,15 +330,17 @@ define(["module"], function(module) {
     masterConfig.env === "rhino" ||
     (!masterConfig.env && typeof Packages !== "undefined" && typeof java !== "undefined")
   ) {
-    //Why Java, why is this so awkward?
-    text.get = function(url, callback) {
-      var stringBuffer,
-        line,
-        encoding = "utf-8",
-        file = new java.io.File(url),
-        lineSeparator = java.lang.System.getProperty("line.separator"),
-        input = new java.io.BufferedReader(new java.io.InputStreamReader(new java.io.FileInputStream(file), encoding)),
-        content = "";
+    // Why Java, why is this so awkward?
+    text.get = function (url, callback) {
+      let stringBuffer;
+      let line;
+      const encoding = "utf-8";
+      const file = new java.io.File(url);
+      const lineSeparator = java.lang.System.getProperty("line.separator");
+      const input = new java.io.BufferedReader(
+        new java.io.InputStreamReader(new java.io.FileInputStream(file), encoding)
+      );
+      let content = "";
       try {
         stringBuffer = new java.lang.StringBuffer();
         line = input.readLine();
@@ -361,8 +365,8 @@ define(["module"], function(module) {
           stringBuffer.append(lineSeparator);
           stringBuffer.append(line);
         }
-        //Make sure we return a JavaScript string and not a Java string.
-        content = String(stringBuffer.toString()); //String
+        // Make sure we return a JavaScript string and not a Java string.
+        content = String(stringBuffer.toString()); // String
       } finally {
         input.close();
       }
@@ -372,17 +376,17 @@ define(["module"], function(module) {
     masterConfig.env === "xpconnect" ||
     (!masterConfig.env && typeof Components !== "undefined" && Components.classes && Components.interfaces)
   ) {
-    //Avert your gaze!
+    // Avert your gaze!
     Cc = Components.classes;
     Ci = Components.interfaces;
-    Components.utils["import"]("resource://gre/modules/FileUtils.jsm");
+    Components.utils.import("resource://gre/modules/FileUtils.jsm");
     xpcIsWindows = "@mozilla.org/windows-registry-key;1" in Cc;
 
-    text.get = function(url, callback) {
-      var inStream,
-        convertStream,
-        fileObj,
-        readData = {};
+    text.get = function (url, callback) {
+      let inStream;
+      let convertStream;
+      let fileObj;
+      const readData = {};
 
       if (xpcIsWindows) {
         url = url.replace(/\//g, "\\");
@@ -390,7 +394,7 @@ define(["module"], function(module) {
 
       fileObj = new FileUtils.File(url);
 
-      //XPCOM, you so crazy
+      // XPCOM, you so crazy
       try {
         inStream = Cc["@mozilla.org/network/file-input-stream;1"].createInstance(Ci.nsIFileInputStream);
         inStream.init(fileObj, 1, 0, false);

@@ -9,18 +9,18 @@
  * Date: Wed Jul 23 22:45:55 2014 +0200
  */
 
-(function($, undefined) {
+(function ($, undefined) {
   var rkeyEvent = /^key/,
     rmouseEvent = /^(?:mouse|contextmenu)|click/,
     currentElementUnderMouse;
 
-  $.fn.simulate = function(type, options) {
-    return this.each(function() {
+  $.fn.simulate = function (type, options) {
+    return this.each(function () {
       new $.simulate(this, type, options);
     });
   };
 
-  $.simulate = function(elem, type, options) {
+  $.simulate = function (elem, type, options) {
     var method = $.camelCase("simulate-" + type);
 
     this.target = elem;
@@ -56,23 +56,23 @@
       RIGHT: 39,
       SPACE: 32,
       TAB: 9,
-      UP: 38
+      UP: 38,
     },
 
     buttonCode: {
       LEFT: 0,
       MIDDLE: 1,
-      RIGHT: 2
-    }
+      RIGHT: 2,
+    },
   });
 
   $.extend($.simulate.prototype, {
-    simulateEvent: function(elem, type, options) {
+    simulateEvent: function (elem, type, options) {
       var event = this.createEvent(type, options);
       this.dispatchEvent(elem, type, event, options);
     },
 
-    createEvent: function(type, options) {
+    createEvent: function (type, options) {
       if (rkeyEvent.test(type)) {
         return this.keyEvent(type, options);
       }
@@ -82,7 +82,7 @@
       }
     },
 
-    mouseEvent: function(type, options) {
+    mouseEvent: function (type, options) {
       var event,
         eventDoc,
         doc,
@@ -103,7 +103,7 @@
           shiftKey: false,
           metaKey: false,
           button: 0,
-          relatedTarget: undefined
+          relatedTarget: undefined,
         },
         options
       );
@@ -144,22 +144,22 @@
           body = eventDoc.body;
 
           Object.defineProperty(event, "pageX", {
-            get: function() {
+            get: function () {
               return (
                 options.clientX +
                 ((doc && doc.scrollLeft) || (body && body.scrollLeft) || 0) -
                 ((doc && doc.clientLeft) || (body && body.clientLeft) || 0)
               );
-            }
+            },
           });
           Object.defineProperty(event, "pageY", {
-            get: function() {
+            get: function () {
               return (
                 options.clientY +
                 ((doc && doc.scrollTop) || (body && body.scrollTop) || 0) -
                 ((doc && doc.clientTop) || (body && body.clientTop) || 0)
               );
-            }
+            },
           });
         }
       } else if (document.createEventObject) {
@@ -172,14 +172,14 @@
           {
             0: 1,
             1: 4,
-            2: 2
+            2: 2,
           }[event.button] || event.button;
       }
 
       return event;
     },
 
-    keyEvent: function(type, options) {
+    keyEvent: function (type, options) {
       var event;
       options = $.extend(
         {
@@ -191,7 +191,7 @@
           shiftKey: false,
           metaKey: false,
           keyCode: 0,
-          charCode: undefined
+          charCode: undefined,
         },
         options
       );
@@ -225,7 +225,7 @@
             shiftKey: options.shiftKey,
             metaKey: options.metaKey,
             keyCode: options.keyCode,
-            charCode: options.charCode
+            charCode: options.charCode,
           });
         }
       } else if (document.createEventObject) {
@@ -244,7 +244,7 @@
       return event;
     },
 
-    dispatchEvent: function(elem, type, event) {
+    dispatchEvent: function (elem, type, event) {
       if (elem[type]) {
         elem[type]();
       } else if (elem.dispatchEvent) {
@@ -254,7 +254,7 @@
       }
     },
 
-    simulateFocus: function() {
+    simulateFocus: function () {
       var focusinEvent,
         triggered = false,
         element = $(this.target);
@@ -275,7 +275,7 @@
       element.unbind("focus", trigger);
     },
 
-    simulateBlur: function() {
+    simulateBlur: function () {
       var focusoutEvent,
         triggered = false,
         element = $(this.target);
@@ -288,7 +288,7 @@
       element[0].blur();
 
       // blur events are async in IE
-      setTimeout(function() {
+      setTimeout(function () {
         // IE won't let the blur occur if the window is inactive
         if (element[0].ownerDocument.activeElement === element[0]) {
           element[0].ownerDocument.body.focus();
@@ -306,7 +306,7 @@
       }, 1);
     },
 
-    simulateMousemove: function() {
+    simulateMousemove: function () {
       var elementUnderMouse;
 
       // What element will come to be underneath the mouse after the move?
@@ -329,7 +329,7 @@
 
       // Store the element under the mouse for the next move
       currentElementUnderMouse = elementUnderMouse;
-    }
+    },
   });
 
   /** complex events **/
@@ -342,32 +342,32 @@
 
     return {
       x: offset.left + elem.outerWidth() / 2 - document.scrollLeft(),
-      y: offset.top + elem.outerHeight() / 2 - document.scrollTop()
+      y: offset.top + elem.outerHeight() / 2 - document.scrollTop(),
     };
   }
 
   $.extend($.simulate.prototype, {
-    simulateDrag: function() {
+    simulateDrag: function () {
       var dragger = this.makeDragger();
       dragger.start(this.target, {
         clientX: this.options.clientX,
-        clientY: this.options.clientY
+        clientY: this.options.clientY,
       });
       dragger.move(this.options);
       dragger.end();
     },
-    makeDragger: function() {
+    makeDragger: function () {
       return new $.simulate.dragger(this);
-    }
+    },
   });
 
-  $.simulate.dragger = function(simulator) {
+  $.simulate.dragger = function (simulator) {
     this.started = false;
     this.ended = false;
     this.simulator = simulator;
   };
   $.extend($.simulate.dragger.prototype, {
-    start: function(target, options) {
+    start: function (target, options) {
       if (this.started || this.ended) {
         return;
       }
@@ -379,12 +379,12 @@
       var center = findCenter(target);
       this.coord = {
         clientX: options.clientX || Math.floor(center.x),
-        clientY: options.clientY || Math.floor(center.y)
+        clientY: options.clientY || Math.floor(center.y),
       };
 
       this.simulator.simulateEvent(target, "mousedown", this.coord);
     },
-    move: function(delta) {
+    move: function (delta) {
       if (!this.started || this.ended) {
         return;
       }
@@ -394,7 +394,7 @@
         dy = Math.floor(delta.dy || 0),
         final_coord = {
           clientX: this.coord.clientX + dx,
-          clientY: this.coord.clientY + dy
+          clientY: this.coord.clientY + dy,
         },
         i,
         x = this.coord.clientX,
@@ -406,7 +406,7 @@
         y += dy / moves;
         coord = {
           clientX: Math.round(x),
-          clientY: Math.round(y)
+          clientY: Math.round(y),
         };
 
         this.simulator.simulateEvent(document, "mousemove", coord);
@@ -415,7 +415,7 @@
       this.simulator.simulateEvent(document, "mousemove", final_coord);
       this.coord = final_coord;
     },
-    end: function(delta) {
+    end: function (delta) {
       if (!this.started || this.ended) {
         return;
       }
@@ -427,6 +427,6 @@
 
       this.simulator.simulateEvent(this.target, "mouseup", this.coord);
       this.simulator.simulateEvent(this.target, "click", this.coord);
-    }
+    },
   });
 })(jQuery);

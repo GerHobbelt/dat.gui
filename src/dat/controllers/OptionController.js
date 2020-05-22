@@ -48,13 +48,13 @@ class OptionController extends Controller {
 
     if (common.isArray(params)) {
       const map = {};
-      common.each(params, function(element) {
+      common.each(params, function (element) {
         map[element] = element;
       });
       params = map;
     }
 
-    common.each(params, function(value, key) {
+    common.each(params, function (value, key) {
       const opt = document.createElement("option");
       opt.innerHTML = key;
       opt.setAttribute("value", value);
@@ -73,7 +73,7 @@ class OptionController extends Controller {
     // Acknowledge original value
     this.updateDisplay();
 
-    dom.bind(this.__select, "change", function() {
+    dom.bind(this.__select, "change", function () {
       let { value } = this.options[this.selectedIndex];
       if (value === _this.CUSTOM_FLAG) {
         value = _this.__custom_controller.getValue();
@@ -82,7 +82,7 @@ class OptionController extends Controller {
     });
 
     if (this.__custom_controller) {
-      this.__custom_controller.onChange(function() {
+      this.__custom_controller.onChange(function () {
         const value = this.getValue();
         _this.setValue(value);
       });
@@ -104,7 +104,7 @@ class OptionController extends Controller {
     const value = this.getValue();
     let custom = true;
     if (value !== this.CUSTOM_FLAG) {
-      common.each(this.__select.options, function(option) {
+      common.each(this.__select.options, function (option) {
         if (value == option.value) {
           custom = false;
         }

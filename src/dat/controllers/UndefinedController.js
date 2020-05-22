@@ -11,7 +11,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], function(Controller, dom, common) {
+define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], function (Controller, dom, common) {
   /**
    * @class Provides a controller to represent an UNDEFINED-valued property of an object.
    * @extends dat.controllers.Controller
@@ -21,7 +21,7 @@ define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], functi
    *
    * @member dat.controllers
    */
-  var UndefinedController = function(object, property, options) {
+  var UndefinedController = function (object, property, options) {
     UndefinedController.superclass.call(this, object, property, "undefined", options);
 
     const _this = this;
@@ -37,10 +37,10 @@ define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], functi
   UndefinedController.superclass = Controller;
 
   common.extend(UndefinedController.prototype, Controller.prototype, {
-    updateDisplay: function() {
+    updateDisplay: function () {
       this.__elem.innerText = "<undefined>";
       return UndefinedController.superclass.prototype.updateDisplay.call(this);
-    }
+    },
   });
 
   return UndefinedController;

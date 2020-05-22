@@ -1,6 +1,4 @@
-define([], function() {
-  "use strict";
-
+define([], function () {
   // insert node at top inside parent; however, when the optional `placedBelowThisChildElement`
   // has been specified, we want the given `newElement` placed just below that element!
   function insertAtTop(newElement, parentElement, placedBelowThisChildElement) {
@@ -20,20 +18,20 @@ define([], function() {
     return newElement;
   }
 
-  var global_monitor_timer;
+  let global_monitor_timer;
 
-  var registered_objects = [];
-  var monitor_div;
-  var progress_div;
-  var inspection_divs = [];
-  var previous_displayed_values = [];
-  var monitor_time_next_trigger = 0;
-  var monitor_action_interval = 2000; // milliseconds
-  var monitor_action_interval_substeps = 20;
+  const registered_objects = [];
+  let monitor_div;
+  let progress_div;
+  const inspection_divs = [];
+  const previous_displayed_values = [];
+  let monitor_time_next_trigger = 0;
+  const monitor_action_interval = 2000; // milliseconds
+  const monitor_action_interval_substeps = 20;
 
   // time in MILLISECONDS:
   function now() {
-    var t;
+    let t;
     if (!Date.now) {
       t = new Date().getTime();
     } else {
@@ -50,7 +48,7 @@ define([], function() {
   }
 
   function gen_obj_display(obj, parentElement) {
-    var el;
+    let el;
     el = document.createElement("pre");
     el.setAttribute("class", "inspected-object");
     el.textContent = JSON.stringify(obj, null, 2);
@@ -58,11 +56,11 @@ define([], function() {
   }
 
   function perform_monitor_update() {
-    for (var i = 0, len = registered_objects.length; i < len; i++) {
-      var o = registered_objects[i];
-      var el = inspection_divs[i];
-      var oldmsg = previous_displayed_values[i];
-      var newmsg = JSON.stringify(o, null, 2);
+    for (let i = 0, len = registered_objects.length; i < len; i++) {
+      const o = registered_objects[i];
+      const el = inspection_divs[i];
+      const oldmsg = previous_displayed_values[i];
+      const newmsg = JSON.stringify(o, null, 2);
       if (newmsg !== oldmsg) {
         // only update the DOM when there's some actual change; this ensures the user can select & copy/pasta
         // or otherwise mess around in the DOM without being constantly bothered by useless updates
@@ -81,9 +79,9 @@ define([], function() {
       duration = 0;
     }
 
-    var steps = (duration * monitor_action_interval_substeps) / monitor_action_interval;
-    var s = "";
-    for (var i = 0; i < steps; i++) {
+    const steps = (duration * monitor_action_interval_substeps) / monitor_action_interval;
+    let s = "";
+    for (let i = 0; i < steps; i++) {
       s += ".";
     }
     if (s === "") {
@@ -93,7 +91,7 @@ define([], function() {
   }
 
   function do_monitor() {
-    var t = now();
+    const t = now();
 
     clearTimeout(global_monitor_timer);
     global_monitor_timer = setTimeout(
@@ -120,11 +118,11 @@ define([], function() {
   }
 
   function init(obj, document) {
-    var div = monitor_div;
+    let div = monitor_div;
     if (!div) {
       div = document.createElement("div");
       div.setAttribute("class", "monitor-container");
-      var descr = document.body.getElementsByClassName("demo-info");
+      let descr = document.body.getElementsByClassName("demo-info");
       if (descr) {
         descr = descr[0];
       }
@@ -138,7 +136,7 @@ define([], function() {
     }
 
     registered_objects.push(obj);
-    var index = registered_objects.length - 1;
+    const index = registered_objects.length - 1;
 
     div = document.createElement("div");
     div.setAttribute("class", "monitor-one-object");
@@ -153,6 +151,6 @@ define([], function() {
   }
 
   return {
-    init: init
+    init: init,
   };
 });

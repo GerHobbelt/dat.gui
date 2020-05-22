@@ -1,65 +1,65 @@
-define([], function() {
-  var GUI = function() {
+define([], function () {
+  var GUI = function () {
     GUI.allGuis.push(this);
 
-    var json;
+    let json;
     if (GUI.loadedJSON != null && GUI.loadedJSON.guis.length > 0) {
       // Consume object at index 0
       json = GUI.loadedJSON.guis.splice(0, 1)[0];
     }
 
-    this.__defineGetter__("json", function() {
+    this.__defineGetter__("json", function () {
       return json;
     });
 
-    var _this = this;
+    const _this = this;
 
     // For use with GUIScrubber
     this.timer = null;
 
-    var MIN_WIDTH = 240;
-    var MAX_WIDTH = 500;
+    const MIN_WIDTH = 240;
+    const MAX_WIDTH = 500;
 
-    var controllers = [];
-    var listening = [];
+    const controllers = [];
+    const listening = [];
 
-    var autoListen = true;
+    let autoListen = true;
 
-    var listenInterval;
+    let listenInterval;
 
     // Sum total of heights of controllers in this gui
-    var controllerHeight;
+    let controllerHeight;
 
-    var curControllerContainerHeight = 0;
+    let curControllerContainerHeight = 0;
 
-    var open = false;
+    let open = false;
 
     // Prevents checkForOverflow bug in which loaded gui appearance
     // settings are not respected by presence of scrollbar.
-    var explicitOpenHeight = false;
+    let explicitOpenHeight = false;
 
     // How big we get when we open
-    var openHeight;
+    let openHeight;
 
-    var name;
+    let name;
 
-    var resizeTo = 0;
-    var resizeTimeout;
+    let resizeTo = 0;
+    let resizeTimeout;
 
-    var width = 280;
+    let width = 280;
 
     this.domElement = document.createElement("div");
     this.domElement.setAttribute("class", "guidat");
     this.domElement.style.width = width + "px";
 
-    var controllerContainer = document.createElement("div");
+    const controllerContainer = document.createElement("div");
     controllerContainer.setAttribute("class", "guidat-controllers");
 
     // Firefox hack to prevent horizontal scrolling
     controllerContainer.addEventListener(
       "DOMMouseScroll",
-      function(e) {
-        var scrollAmount = this.scrollTop;
+      function (e) {
+        let scrollAmount = this.scrollTop;
 
         if (e.wheelDelta) {
           scrollAmount += e.wheelDelta;
@@ -79,30 +79,33 @@ define([], function() {
 
     controllerContainer.style.height = "0px";
 
-    var toggleButton = document.createElement("a");
+    const toggleButton = document.createElement("a");
     toggleButton.setAttribute("class", "guidat-toggle");
     toggleButton.setAttribute("href", "#");
     toggleButton.innerHTML = "Show Controls";
 
-    var toggleDragged = false;
-    var dragDisplacementY = 0;
-    var togglePressed = false;
+    let toggleDragged = false;
+    let dragDisplacementY = 0;
+    let togglePressed = false;
 
-    var my, pmy, mx, pmx;
+    let my;
+    let pmy;
+    let mx;
+    let pmx;
 
-    this.popout = function(e) {
-      var w = window.open("index.html", "mywindow", "location=1,status=1,scrollbars=1,width=100,height=100");
+    this.popout = function (e) {
+      const w = window.open("index.html", "mywindow", "location=1,status=1,scrollbars=1,width=100,height=100");
       w.document.title = "gui-dat";
       console.log(w.document);
     };
 
-    var resize = function(e) {
+    const resize = function (e) {
       pmy = my;
       pmx = mx;
       my = e.pageY;
       mx = e.pageX;
 
-      var dmy = _this.timer ? pmy - my : my - pmy;
+      let dmy = _this.timer ? pmy - my : my - pmy;
 
       if (!open) {
         if (dmy < 0) {
@@ -115,10 +118,10 @@ define([], function() {
       }
 
       // TODO: Flip this if you want to resize to the right.
-      var dmx = pmx - mx;
+      const dmx = pmx - mx;
 
       if (dmy > 0 && curControllerContainerHeight > controllerHeight) {
-        var d = GUI.map(curControllerContainerHeight, controllerHeight, controllerHeight + 100, 1, 0);
+        const d = GUI.map(curControllerContainerHeight, controllerHeight, controllerHeight + 100, 1, 0);
         dmy *= d;
       }
 
@@ -141,7 +144,7 @@ define([], function() {
 
     toggleButton.addEventListener(
       "mousedown",
-      function(e) {
+      function (e) {
         pmy = my = e.pageY;
         pmx = mx = e.pageX;
         togglePressed = true;
@@ -156,7 +159,7 @@ define([], function() {
 
     toggleButton.addEventListener(
       "click",
-      function(e) {
+      function (e) {
         e.preventDefault();
         return false;
       },
@@ -164,16 +167,16 @@ define([], function() {
     );
 
     // Clears lingering slider column
-    var correctWidth = function() {
+    const correctWidth = function () {
       _this.domElement.style.width = width + 1 + "px";
-      setTimeout(function() {
+      setTimeout(function () {
         _this.domElement.style.width = width + "px";
       }, 1);
     };
 
     document.addEventListener(
       "mouseup",
-      function(e) {
+      function (e) {
         if (togglePressed && !toggleDragged) {
           _this.toggle();
 
@@ -192,9 +195,10 @@ define([], function() {
             openHeight = resizeTo = controllerHeight;
             beginResize();
           } else if (controllerContainer.children.length >= 1) {
-            var singleControllerHeight = controllerContainer.children[0].offsetHeight;
+            const singleControllerHeight = controllerContainer.children[0].offsetHeight;
             clearTimeout(resizeTimeout);
-            var target = Math.round(curControllerContainerHeight / singleControllerHeight) * singleControllerHeight - 1;
+            const target =
+              Math.round(curControllerContainerHeight / singleControllerHeight) * singleControllerHeight - 1;
             resizeTo = target;
             if (resizeTo <= 0) {
               _this.hide();
@@ -231,26 +235,24 @@ define([], function() {
 
     this.autoListenIntervalTime = 1000 / 60;
 
-    var createListenInterval = function() {
-      listenInterval = setInterval(function() {
+    const createListenInterval = function () {
+      listenInterval = setInterval(function () {
         _this.listen();
       }, this.autoListenIntervalTime);
     };
 
-    this.__defineSetter__("autoListen", function(v) {
+    this.__defineSetter__("autoListen", function (v) {
       autoListen = v;
       if (!autoListen) {
         clearInterval(listenInterval);
-      } else {
-        if (listening.length > 0) createListenInterval();
-      }
+      } else if (listening.length > 0) createListenInterval();
     });
 
-    this.__defineGetter__("autoListen", function(v) {
+    this.__defineGetter__("autoListen", function (v) {
       return autoListen;
     });
 
-    this.listenTo = function(controller) {
+    this.listenTo = function (controller) {
       // TODO: check for duplicates
       if (listening.length === 0) {
         createListenInterval();
@@ -258,9 +260,9 @@ define([], function() {
       listening.push(controller);
     };
 
-    this.unlistenTo = function(controller) {
+    this.unlistenTo = function (controller) {
       // TODO: test this
-      for (var i = 0; i < listening.length; i++) {
+      for (let i = 0; i < listening.length; i++) {
         if (listening[i] == controller) listening.splice(i, 1);
       }
       if (listening.length <= 0) {
@@ -268,21 +270,21 @@ define([], function() {
       }
     };
 
-    this.listen = function(whoToListenTo) {
-      var arr = whoToListenTo || listening;
-      for (var i in arr) {
+    this.listen = function (whoToListenTo) {
+      const arr = whoToListenTo || listening;
+      for (const i in arr) {
         arr[i].updateDisplay();
       }
     };
 
-    this.listenAll = function() {
+    this.listenAll = function () {
       this.listen(controllers);
     };
 
     this.autoListen = true;
 
-    var alreadyControlled = function(object, propertyName) {
-      for (var i in controllers) {
+    const alreadyControlled = function (object, propertyName) {
+      for (const i in controllers) {
         if (controllers[i].object == object && controllers[i].propertyName == propertyName) {
           return true;
         }
@@ -290,7 +292,7 @@ define([], function() {
       return false;
     };
 
-    var construct = function(constructor, args) {
+    const construct = function (constructor, args) {
       function F() {
         return constructor.apply(this, args);
       }
@@ -299,21 +301,21 @@ define([], function() {
     };
 
     // TODO: Keep this? If so, controllerContainerHeight should be aware of these, which it is not.
-    this.divider = function() {
+    this.divider = function () {
       controllerContainer.appendChild(document.createElement("hr"));
     };
 
-    this.add = function() {
-      var object = arguments[0];
+    this.add = function () {
+      const object = arguments[0];
 
       if (arguments.length == 1) {
-        for (var i in object) {
+        for (const i in object) {
           this.add(object, i);
         }
         return;
       }
 
-      var propertyName = arguments[1];
+      const propertyName = arguments[1];
 
       // Have we already added this?
       if (alreadyControlled(object, propertyName)) {
@@ -321,7 +323,7 @@ define([], function() {
         return;
       }
 
-      var value = object[propertyName];
+      const value = object[propertyName];
 
       // Does this value exist? Is it accessible?
       if (value == undefined) {
@@ -329,8 +331,8 @@ define([], function() {
         return;
       }
 
-      var type = typeof value;
-      var handler = handlerTypes[type];
+      const type = typeof value;
+      const handler = handlerTypes[type];
 
       // Do we know how to deal with this data type?
       if (handler == undefined) {
@@ -338,12 +340,12 @@ define([], function() {
         return;
       }
 
-      var args = [this]; // Set first arg (parent) to this
-      for (var j = 0; j < arguments.length; j++) {
+      const args = [this]; // Set first arg (parent) to this
+      for (let j = 0; j < arguments.length; j++) {
         args.push(arguments[j]);
       }
 
-      var controllerObject = construct(handler, args);
+      const controllerObject = construct(handler, args);
 
       // Were we able to make the controller?
       if (!controllerObject) {
@@ -358,7 +360,7 @@ define([], function() {
 
       // Do we have a saved value for this controller?
       if (json && json.values.length > 0) {
-        var val = json.values.splice(0, 1)[0];
+        const val = json.values.splice(0, 1)[0];
         if (type !== "function") {
           controllerObject.setValue(val);
         }
@@ -380,9 +382,9 @@ define([], function() {
       return controllerObject;
     };
 
-    var checkForOverflow = function() {
+    var checkForOverflow = function () {
       controllerHeight = 0;
-      for (var i in controllers) {
+      for (const i in controllers) {
         controllerHeight += controllers[i].domElement.offsetHeight;
       }
       if (controllerHeight - 1 > openHeight) {
@@ -396,16 +398,16 @@ define([], function() {
       number: GUI.NumberController,
       string: GUI.StringController,
       boolean: GUI.BooleanController,
-      function: GUI.FunctionController
+      function: GUI.FunctionController,
     };
 
-    this.reset = function() {
+    this.reset = function () {
       // TODO
     };
 
-    this.getJSON = function() {
-      var values = [];
-      for (var i in controllers) {
+    this.getJSON = function () {
+      const values = [];
+      for (const i in controllers) {
         var val;
         switch (controllers[i].type) {
           case "function":
@@ -420,12 +422,12 @@ define([], function() {
         }
         values.push(val);
       }
-      var obj = {
+      const obj = {
         open: open,
         width: width,
         openHeight: openHeight,
         scroll: controllerContainer.scrollTop,
-        values: values
+        values: values,
       };
 
       if (this.timer) {
@@ -436,7 +438,7 @@ define([], function() {
 
     // GUI ... GUI
 
-    this.toggle = function() {
+    this.toggle = function () {
       if (open) {
         this.hide();
       } else {
@@ -444,7 +446,7 @@ define([], function() {
       }
     };
 
-    this.show = function() {
+    this.show = function () {
       toggleButton.innerHTML = name || "Hide Controls";
       resizeTo = openHeight;
       clearTimeout(resizeTimeout);
@@ -452,7 +454,7 @@ define([], function() {
       open = true;
     };
 
-    this.hide = function() {
+    this.hide = function () {
       toggleButton.innerHTML = name || "Show Controls";
       resizeTo = 0;
       clearTimeout(resizeTimeout);
@@ -460,13 +462,13 @@ define([], function() {
       open = false;
     };
 
-    this.name = function(n) {
+    this.name = function (n) {
       name = n;
       toggleButton.innerHTML = n;
     };
 
-    var beginResize = function() {
-      //console.log("Resizing from " + curControllerContainerHeight + " to " + resizeTo);
+    var beginResize = function () {
+      // console.log("Resizing from " + curControllerContainerHeight + " to " + resizeTo);
       curControllerContainerHeight += (resizeTo - curControllerContainerHeight) * 0.6;
       if (Math.abs(curControllerContainerHeight - resizeTo) < 1) {
         curControllerContainerHeight = resizeTo;
@@ -490,7 +492,7 @@ define([], function() {
         curControllerContainerHeight = openHeight;
 
         // Hack.
-        setTimeout(function() {
+        setTimeout(function () {
           controllerContainer.scrollTop = json.scroll;
         }, 0);
 
@@ -503,7 +505,7 @@ define([], function() {
     if (GUI.allGuis.length == 1) {
       window.addEventListener(
         "keyup",
-        function(e) {
+        function (e) {
           // Hide on "H"
           if (e.keyCode == 72) {
             GUI.toggleHide();
@@ -517,7 +519,7 @@ define([], function() {
   // Do not set this directly.
   GUI.hidden = false;
 
-  GUI.toggleHide = function() {
+  GUI.toggleHide = function () {
     if (GUI.hidden) {
       GUI.show();
     } else {
@@ -525,16 +527,16 @@ define([], function() {
     }
   };
 
-  GUI.show = function() {
+  GUI.show = function () {
     GUI.hidden = false;
-    for (var i in GUI.allGuis) {
+    for (const i in GUI.allGuis) {
       GUI.allGuis[i].domElement.style.display = "block";
     }
   };
 
-  GUI.hide = function() {
+  GUI.hide = function () {
     GUI.hidden = true;
-    for (var i in GUI.allGuis) {
+    for (const i in GUI.allGuis) {
       GUI.allGuis[i].domElement.style.display = "none";
     }
   };
@@ -545,8 +547,8 @@ define([], function() {
   GUI.allControllers = [];
   GUI.allGuis = [];
 
-  GUI.makeUnselectable = function(elem) {
-    elem.onselectstart = function() {
+  GUI.makeUnselectable = function (elem) {
+    elem.onselectstart = function () {
       return false;
     };
     elem.style.MozUserSelect = "none";
@@ -554,35 +556,35 @@ define([], function() {
     elem.unselectable = "on";
   };
 
-  GUI.makeSelectable = function(elem) {
-    elem.onselectstart = function() {};
+  GUI.makeSelectable = function (elem) {
+    elem.onselectstart = function () {};
     elem.style.MozUserSelect = "auto";
     elem.style.KhtmlUserSelect = "auto";
     elem.unselectable = "off";
   };
 
-  GUI.map = function(v, i1, i2, o1, o2) {
+  GUI.map = function (v, i1, i2, o1, o2) {
     v = o1 + (o2 - o1) * ((v - i1) / (i2 - i1));
     return v;
   };
 
-  GUI.constrain = function(v, o1, o2) {
+  GUI.constrain = function (v, o1, o2) {
     if (v < o1) v = o1;
     else if (v > o2) v = o2;
     return v;
   };
 
-  GUI.error = function(str) {
+  GUI.error = function (str) {
     if (typeof console.error === "function") {
       console.error("[GUI ERROR] " + str);
     }
   };
 
-  GUI.getOffset = function(obj, relativeTo) {
-    var curleft = 0;
-    var curtop = 0;
+  GUI.getOffset = function (obj, relativeTo) {
+    let curleft = 0;
+    let curtop = 0;
     if (obj.offsetParent) {
-      var c;
+      let c;
       do {
         curleft += obj.offsetLeft;
         curtop += obj.offsetTop;
@@ -594,17 +596,17 @@ define([], function() {
       } while (c);
       return {
         left: curleft,
-        top: curtop
+        top: curtop,
       };
     }
   };
 
-  GUI.roundToDecimal = function(n, decimals) {
-    var t = Math.pow(10, decimals);
+  GUI.roundToDecimal = function (n, decimals) {
+    const t = Math.pow(10, decimals);
     return Math.round(n * t) / t;
   };
 
-  GUI.extendController = function(clazz) {
+  GUI.extendController = function (clazz) {
     clazz.prototype = new GUI.Controller();
     clazz.prototype.constructor = clazz;
   };

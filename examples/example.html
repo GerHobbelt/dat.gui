@@ -22,12 +22,12 @@
         allFonts: ["Times", "Courier", "Verdana"],
         noiseStrength: 0,
         displayOutline: true,
-        explode: function(state) {},
+        explode: function (state) {},
         fgcolor: "#f00",
         bgcolor: "#000" /* black */,
         regular_number: 5,
         regular_number2: -155,
-        regular_number3: 0
+        regular_number3: 0,
       };
       for (var key in obj2) {
         if (obj[key] === undefined) {
@@ -43,15 +43,8 @@
       gui.add(obj, "message");
 
       // Sliders with min + max
-      gui
-        .add(obj, "maxSize")
-        .min(0.5)
-        .max(7);
-      gui
-        .add(obj, "growthSpeed")
-        .min(0.01)
-        .max(1)
-        .step(0.05);
+      gui.add(obj, "maxSize").min(0.5).max(7);
+      gui.add(obj, "growthSpeed").min(0.01).max(1).step(0.05);
       gui.add(obj, "speed", 0.1, 2, 0.05); // shorthand for min/max/step
       gui.add(obj, "font", obj.allFonts); // Font toggle
 
@@ -71,10 +64,7 @@
       // Numbers without range
       gui.add(obj, "regular_number").name("just a number...");
       gui.add(obj, "regular_number2").name("a negative number...");
-      gui
-        .add(obj, "regular_number3")
-        .name("exponential growth")
-        .mode("exp");
+      gui.add(obj, "regular_number3").name("exponential growth").mode("exp");
     </script>
   </body>
 </html>

@@ -4,8 +4,8 @@
 // old v0.4 code which needs to be integrated or otherwise thrown away
 //
 
-define(["gui", "gui.scrubberpoint", "gui.easing", "gui.timer"], function(GUI) {
-  GUI.Scrubber = function(controller, timer) {
+define(["gui", "gui.scrubberpoint", "gui.easing", "gui.timer"], function (GUI) {
+  GUI.Scrubber = function (controller, timer) {
     var _this = this;
 
     this.points = [];
@@ -18,7 +18,7 @@ define(["gui", "gui.scrubberpoint", "gui.easing", "gui.timer"], function(GUI) {
     var previouslyHandled;
     this.position = null;
 
-    this.getJSON = function() {
+    this.getJSON = function () {
       var pointArray = [];
       for (var i in this.points) {
         pointArray.push(this.points[i].getJSON());
@@ -28,20 +28,20 @@ define(["gui", "gui.scrubberpoint", "gui.easing", "gui.timer"], function(GUI) {
       return obj;
     };
 
-    this.sort = function() {
-      this.points.sort(function(a, b) {
+    this.sort = function () {
+      this.points.sort(function (a, b) {
         return a.time - b.time;
       });
     };
 
-    this.add = function(p) {
+    this.add = function (p) {
       this.points.push(p);
       this.sort();
     };
 
     var lastDown = 0;
 
-    this.controller.addChangeListener(function(newVal) {
+    this.controller.addChangeListener(function (newVal) {
       if (!_this.playing) {
         var v = newVal;
 
@@ -72,17 +72,17 @@ define(["gui", "gui.scrubberpoint", "gui.easing", "gui.timer"], function(GUI) {
 
     var mx, pmx;
 
-    this.__defineGetter__("width", function() {
+    this.__defineGetter__("width", function () {
       return width;
     });
 
-    this.__defineGetter__("height", function() {
+    this.__defineGetter__("height", function () {
       return height;
     });
 
     controller.domElement.insertBefore(this.domElement, controller.propertyNameElement.nextSibling);
 
-    this.render = function() {
+    this.render = function () {
       // TODO: if visible ...
 
       _this.g.clearRect(0, 0, width, height);
@@ -149,7 +149,7 @@ define(["gui", "gui.scrubberpoint", "gui.easing", "gui.timer"], function(GUI) {
 
     this.render();
 
-    var onResize = function() {
+    var onResize = function () {
       _this.canvas.width = width = _this.domElement.offsetWidth;
       _this.canvas.height = height = _this.domElement.offsetHeight;
       _this.position = GUI.getOffset(_this.canvas);
@@ -158,13 +158,13 @@ define(["gui", "gui.scrubberpoint", "gui.easing", "gui.timer"], function(GUI) {
 
     window.addEventListener(
       "resize",
-      function(e) {
+      function (e) {
         onResize();
       },
       false
     );
 
-    var scrubPan = function() {
+    var scrubPan = function () {
       var t = _this.timer.playhead;
       var tmin = _this.timer.windowMin + _this.timer.windowWidth / 5;
       var tmax = _this.timer.windowMin + _this.timer.windowWidth - _this.timer.windowWidth / 5;
@@ -185,7 +185,7 @@ define(["gui", "gui.scrubberpoint", "gui.easing", "gui.timer"], function(GUI) {
       }
     };
 
-    var scrub = function(e) {
+    var scrub = function (e) {
       var t = GUI.map(
         e.pageX,
         _this.position.left,
@@ -197,7 +197,7 @@ define(["gui", "gui.scrubberpoint", "gui.easing", "gui.timer"], function(GUI) {
       scrubPan();
     };
 
-    var pan = function(e) {
+    var pan = function (e) {
       mx = e.pageX;
       var t = GUI.map(mx - pmx, 0, width, 0, _this.timer.windowWidth);
       _this.timer.windowMin -= t;
@@ -206,7 +206,7 @@ define(["gui", "gui.scrubberpoint", "gui.easing", "gui.timer"], function(GUI) {
 
     this.canvas.addEventListener(
       "mousedown",
-      function(e) {
+      function (e) {
         // TODO: Detect right click and prevent that menu?
         if (false) {
           e.preventDefault();
@@ -267,7 +267,7 @@ define(["gui", "gui.scrubberpoint", "gui.easing", "gui.timer"], function(GUI) {
 
     this.canvas.addEventListener(
       "mousewheel",
-      function(e) {
+      function (e) {
         e.preventDefault();
 
         var dx = e.wheelDeltaX * 4;
@@ -281,7 +281,7 @@ define(["gui", "gui.scrubberpoint", "gui.easing", "gui.timer"], function(GUI) {
       false
     );
 
-    this.canvas.addEventListener("mousemove", function(e) {
+    this.canvas.addEventListener("mousemove", function (e) {
       _this.timer.hoverPoint = null;
       for (var i in _this.points) {
         var cur = _this.points[i];
@@ -299,7 +299,7 @@ define(["gui", "gui.scrubberpoint", "gui.easing", "gui.timer"], function(GUI) {
 
     document.addEventListener(
       "mouseup",
-      function() {
+      function () {
         document.body.style.cursor = "auto";
         if (_this.timer.activePoint != null) {
           document.removeEventListener("mousemove", _this.timer.activePoint.onDrag, false);
@@ -314,14 +314,14 @@ define(["gui", "gui.scrubberpoint", "gui.easing", "gui.timer"], function(GUI) {
 
     this.timer.addPlayListener(this.render);
 
-    var handlePoint = function(point) {
+    var handlePoint = function (point) {
       if (point != previouslyHandled) {
         previouslyHandled = point;
         _this.controller.setValue(point.value);
       }
     };
 
-    var onPlayChange = function(curTime, prevTime) {
+    var onPlayChange = function (curTime, prevTime) {
       if (_this.points.length == 0) return;
 
       _this.playing = true;

@@ -23,10 +23,10 @@ const ARR_SLICE = Array.prototype.slice;
 const Common = {
   BREAK: {},
 
-  extend: function(target) {
+  extend: function (target) {
     this.each(
       ARR_SLICE.call(arguments, 1),
-      function(obj) {
+      function (obj) {
         for (const key in obj) {
           if (!this.isUndefined(obj[key])) {
             target[key] = obj[key];
@@ -39,10 +39,10 @@ const Common = {
     return target;
   },
 
-  defaults: function(target) {
+  defaults: function (target) {
     this.each(
       ARR_SLICE.call(arguments, 1),
-      function(obj) {
+      function (obj) {
         for (const key in obj) {
           if (this.isUndefined(target[key])) {
             target[key] = obj[key];
@@ -55,9 +55,9 @@ const Common = {
     return target;
   },
 
-  compose: function() {
+  compose: function () {
     const toCall = ARR_SLICE.call(arguments);
-    return function() {
+    return function () {
       let args = ARR_SLICE.call(arguments);
       for (let i = toCall.length - 1; i >= 0; i--) {
         args = [toCall[i].apply(this, args)];
@@ -66,7 +66,7 @@ const Common = {
     };
   },
 
-  each: function(obj, itr, scope) {
+  each: function (obj, itr, scope) {
     if (!obj) {
       return;
     }
@@ -89,15 +89,15 @@ const Common = {
     }
   },
 
-  defer: function(fnc) {
+  defer: function (fnc) {
     setTimeout(fnc, 0);
   },
 
   // if the function is called repeatedly, wait until threshold passes until we execute the function
-  debounce: function(func, threshold, callImmediately) {
+  debounce: function (func, threshold, callImmediately) {
     let timeout;
 
-    return function() {
+    return function () {
       const obj = this;
       const args = arguments;
       function delayed() {
@@ -116,60 +116,60 @@ const Common = {
     };
   },
 
-  toArray: function(obj) {
+  toArray: function (obj) {
     if (obj.toArray) {
       return obj.toArray();
     }
     return ARR_SLICE.call(obj);
   },
 
-  isUndefined: function(obj) {
+  isUndefined: function (obj) {
     return obj === undefined;
   },
 
-  isNull: function(obj) {
+  isNull: function (obj) {
     return obj === null;
   },
 
-  isNaN: function(obj) {
+  isNaN: function (obj) {
     return obj !== obj;
   },
 
   isArray:
     Array.isArray ||
-    function(obj) {
+    function (obj) {
       return obj.constructor === Array;
     },
 
-  isObject: function(obj) {
+  isObject: function (obj) {
     return obj === Object(obj);
   },
 
-  isNumber: function(obj) {
+  isNumber: function (obj) {
     return obj === +obj;
   },
 
-  isFiniteNumber: function(obj) {
+  isFiniteNumber: function (obj) {
     return obj === +obj && isFinite(obj);
   },
 
-  isString: function(obj) {
+  isString: function (obj) {
     return typeof obj === "string";
   },
 
-  isBoolean: function(obj) {
+  isBoolean: function (obj) {
     return obj === false || obj === true;
   },
 
-  isFunction: function(obj) {
+  isFunction: function (obj) {
     return Object.prototype.toString.call(obj) === "[object Function]";
   },
 
-  isImagePath: function(obj) {
+  isImagePath: function (obj) {
     return typeof obj === "string" && obj.search(/\.(gif|jpg|jpeg|png)$/) > -1;
   },
 
-  setupDynamicProperty: function(object, property) {
+  setupDynamicProperty: function (object, property) {
     // when the property is not available directly, we may have to get at it via getter/setter functions:
     if (!(property in object)) {
       const ucProperty = property.charAt(0).toUpperCase() + property.slice(1);
@@ -178,18 +178,18 @@ const Common = {
       if (typeof getter === "function" && typeof setter === "function") {
         return {
           getter: getter,
-          setter: setter
+          setter: setter,
         };
       }
       // or it's a read-only property?
       if (typeof getter === "function") {
         return {
-          getter: getter
+          getter: getter,
         };
       }
     }
     return false;
-  }
+  },
 };
 
 export default Common;

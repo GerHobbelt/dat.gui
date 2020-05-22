@@ -63,7 +63,7 @@ class ColorController extends Controller {
 
     /* jshint unused: false */
 
-    dom.bind(this.__input, "keydown", function(e) {
+    dom.bind(this.__input, "keydown", function (e) {
       if (e.keyCode === 13) {
         // on enter
         onBlur.call(this);
@@ -72,14 +72,14 @@ class ColorController extends Controller {
 
     dom.bind(this.__input, "blur", onBlur);
 
-    dom.bind(this.__selector, "mousedown", function(e) {
-      dom.addClass(this, "drag").bind(window, "mouseup", function(e) {
+    dom.bind(this.__selector, "mousedown", function (e) {
+      dom.addClass(this, "drag").bind(window, "mouseup", function (e) {
         dom.removeClass(_this.__selector, "drag");
       });
     });
 
-    dom.bind(this.__selector, "touchstart", function(e) {
-      dom.addClass(this, "drag").bind(window, "touchend", function(e) {
+    dom.bind(this.__selector, "touchstart", function (e) {
+      dom.addClass(this, "drag").bind(window, "touchend", function (e) {
         dom.removeClass(_this.__selector, "drag");
       });
     });
@@ -93,7 +93,7 @@ class ColorController extends Controller {
       height: "102px",
       padding: "3px",
       backgroundColor: "#222",
-      boxShadow: "0px 1px 3px rgba(0,0,0,0.3)"
+      boxShadow: "0px 1px 3px rgba(0,0,0,0.3)",
     });
 
     common.extend(this.__field_knob.style, {
@@ -103,7 +103,7 @@ class ColorController extends Controller {
       border: this.__field_knob_border + (this.__color.v < 0.5 ? "#fff" : "#000"),
       boxShadow: "0px 1px 3px rgba(0,0,0,0.5)",
       borderRadius: "12px",
-      zIndex: 1
+      zIndex: 1,
     });
 
     common.extend(this.__hue_knob.style, {
@@ -111,7 +111,7 @@ class ColorController extends Controller {
       width: "15px",
       height: "2px",
       borderRight: "4px solid #fff",
-      zIndex: 1
+      zIndex: 1,
     });
 
     common.extend(this.__saturation_field.style, {
@@ -120,13 +120,13 @@ class ColorController extends Controller {
       border: "1px solid #555",
       marginRight: "3px",
       display: "inline-block",
-      cursor: "pointer"
+      cursor: "pointer",
     });
 
     common.extend(value_field.style, {
       width: "100%",
       height: "100%",
-      background: "none"
+      background: "none",
     });
 
     linearGradient(value_field, "top", "rgba(0,0,0,0)", "#000");
@@ -136,7 +136,7 @@ class ColorController extends Controller {
       height: "100px",
       display: "inline-block",
       border: "1px solid #555",
-      cursor: "ns-resize"
+      cursor: "ns-resize",
     });
 
     hueGradient(this.__hue_field);
@@ -151,10 +151,10 @@ class ColorController extends Controller {
       border: 0,
       fontWeight: "bold",
       textShadow: this.__input_textShadow
-        .map(function(d) {
+        .map(function (d) {
           return d + " rgba(0,0,0,0.7)";
         })
-        .join(", ")
+        .join(", "),
     });
 
     common.extend(this.__alpha_field.style, {
@@ -163,7 +163,7 @@ class ColorController extends Controller {
       marginLeft: "3px",
       display: "inline-block",
       border: "1px solid #555",
-      cursor: "ns-resize"
+      cursor: "ns-resize",
     });
 
     alphaGradient(this.__alpha_field, _this.__color);
@@ -173,21 +173,21 @@ class ColorController extends Controller {
       width: "15px",
       height: "2px",
       borderRight: "4px solid #fff",
-      zIndex: 1
+      zIndex: 1,
     });
 
     dom.bind(this.__saturation_field, "mousedown", fieldDown);
     dom.bind(this.__field_knob, "mousedown", fieldDown);
     dom.bind(this.__saturation_field, "touchstart", fieldDownOnTouch);
     dom.bind(this.__field_knob, "touchstart", fieldDownOnTouch);
-    dom.bind(this.__alpha_field, "mousedown", function(e) {
+    dom.bind(this.__alpha_field, "mousedown", function (e) {
       setA(e);
       dom.bind(window, "mousemove", setA);
       dom.bind(window, "mouseup", unbindA);
       dom.bind(window, "touchmove", setAonTouch);
       dom.bind(window, "touchend", unbindA);
     });
-    dom.bind(this.__alpha_field, "touchstart", function(e) {
+    dom.bind(this.__alpha_field, "touchstart", function (e) {
       setAonTouch(e);
       dom.bind(window, "mousemove", setA);
       dom.bind(window, "mouseup", unbindA);
@@ -208,13 +208,13 @@ class ColorController extends Controller {
     };
     */
 
-    dom.bind(this.__hue_field, "mousedown", function(e) {
+    dom.bind(this.__hue_field, "mousedown", function (e) {
       setH(e);
       dom.bind(window, "mousemove", setH);
       dom.bind(window, "mouseup", unbindH);
     });
 
-    dom.bind(this.__hue_field, "touchstart", function(e) {
+    dom.bind(this.__hue_field, "touchstart", function (e) {
       setHonTouch(e);
       dom.bind(window, "touchmove", setHonTouch);
       dom.bind(window, "touchend", unbindH);
@@ -371,7 +371,7 @@ class ColorController extends Controller {
     function getScroll(el) {
       const scroll = {
         top: el.scrollTop || 0,
-        left: el.scrollLeft || 0
+        left: el.scrollLeft || 0,
       };
       while ((el = el.parentNode)) {
         scroll.top += el.scrollTop || 0;
@@ -395,7 +395,7 @@ class ColorController extends Controller {
 
       common.each(
         Color.COMPONENTS,
-        function(component) {
+        function (component) {
           if (
             !common.isUndefined(i[component]) &&
             !common.isUndefined(this.__color.__state[component]) &&
@@ -426,7 +426,7 @@ class ColorController extends Controller {
       marginLeft: 100 * this.__color.s - 7 + "px",
       marginTop: 100 * (1 - this.__color.v) - 7 + "px",
       backgroundColor: this.__temp.toString(),
-      border: this.__field_knob_border + "rgb(" + flip + "," + flip + "," + flip + ")"
+      border: this.__field_knob_border + "rgb(" + flip + "," + flip + "," + flip + ")",
     });
 
     this.__alpha_knob.style.marginTop = (1 - this.__color.a) * 100 + "px";
@@ -441,10 +441,10 @@ class ColorController extends Controller {
       backgroundColor: (this.__input.value = this.__color.toString()),
       color: "rgb(" + flip + "," + flip + "," + flip + ")",
       textShadow: this.__input_textShadow
-        .map(function(d) {
+        .map(function (d) {
           return d + " rgba(" + _flip + "," + _flip + "," + _flip + ",0.7)";
         })
-        .join(", ")
+        .join(", "),
     });
 
     this.__input.disabled = this.getReadonly();
@@ -455,7 +455,7 @@ const vendors = ["-moz-", "-o-", "-webkit-", "-ms-", ""];
 
 function linearGradient(elem, x, a, b) {
   elem.style.background = "";
-  common.each(vendors, function(vendor) {
+  common.each(vendors, function (vendor) {
     elem.style.cssText += "background: " + vendor + "linear-gradient(" + x + ", " + a + " 0%, " + b + " 100%); ";
   });
 }
@@ -484,7 +484,7 @@ function alphaGradient(elem, color) {
   const rgbaStart = "rgba(" + r + "," + g + "," + b + ",1)";
   const rgbaEnd = "rgba(" + r + "," + g + "," + b + ",0)";
 
-  common.each(vendors, function(vendor) {
+  common.each(vendors, function (vendor) {
     elem.style.cssText += "background: " + vendor + "linear-gradient(top, " + rgbaStart + " , " + rgbaEnd + "); ";
   });
 }

@@ -9,11 +9,11 @@
   color: rgb(214, 214, 245);
   text-decoration: underline;
   display: block;
-  background-color: #3C3C3C;
+  background-color: #3c3c3c;
   width: 100%;
   cursor: pointer;
 }
 
 .GUI-label-image:hover {
-  background: #3C3C3C;
+  background: #3c3c3c;
 }

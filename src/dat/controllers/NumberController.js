@@ -176,7 +176,7 @@ class NumberController extends Controller {
       mode: this.__mode,
 
       impliedStep: this.__impliedStep,
-      precision: this.__precision
+      precision: this.__precision,
     };
   }
 }

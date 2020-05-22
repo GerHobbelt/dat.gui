@@ -42,7 +42,7 @@ class Color {
 
 function defineRGBComponent(target, component, componentHexIndex) {
   Object.defineProperty(target, component, {
-    get: function() {
+    get: function () {
       if (this.__state.space === "RGB") {
         return this.__state[component];
       }
@@ -52,20 +52,20 @@ function defineRGBComponent(target, component, componentHexIndex) {
       return this.__state[component];
     },
 
-    set: function(v) {
+    set: function (v) {
       if (this.__state.space !== "RGB") {
         Color.recalculateRGB(this, component, componentHexIndex);
         this.__state.space = "RGB";
       }
 
       this.__state[component] = v;
-    }
+    },
   });
 }
 
 function defineHSVComponent(target, component) {
   Object.defineProperty(target, component, {
-    get: function() {
+    get: function () {
       if (this.__state.space === "HSV") {
         return this.__state[component];
       }
@@ -75,18 +75,18 @@ function defineHSVComponent(target, component) {
       return this.__state[component];
     },
 
-    set: function(v) {
+    set: function (v) {
       if (this.__state.space !== "HSV") {
         Color.recalculateHSV(this);
         this.__state.space = "HSV";
       }
 
       this.__state[component] = v;
-    }
+    },
   });
 }
 
-Color.recalculateRGB = function(color, component, componentHexIndex) {
+Color.recalculateRGB = function (color, component, componentHexIndex) {
   if (color.__state.space === "HEX") {
     color.__state[component] = math.component_from_hex(color.__state.hex, componentHexIndex);
   } else if (color.__state.space === "HSV") {
@@ -96,12 +96,12 @@ Color.recalculateRGB = function(color, component, componentHexIndex) {
   }
 };
 
-Color.recalculateHSV = function(color) {
+Color.recalculateHSV = function (color) {
   const result = math.rgb_to_hsv(color.r, color.g, color.b);
 
   common.extend(color.__state, {
     s: result.s,
-    v: result.v
+    v: result.v,
   });
 
   if (!common.isNaN(result.h)) {
@@ -122,17 +122,17 @@ defineHSVComponent(Color.prototype, "s");
 defineHSVComponent(Color.prototype, "v");
 
 Object.defineProperty(Color.prototype, "a", {
-  get: function() {
+  get: function () {
     return this.__state.a;
   },
 
-  set: function(v) {
+  set: function (v) {
     this.__state.a = v;
-  }
+  },
 });
 
 Object.defineProperty(Color.prototype, "hex", {
-  get: function() {
+  get: function () {
     if (!this.__state.space !== "HEX") {
       this.__state.hex = math.rgb_to_hex(this.r, this.g, this.b);
     }
@@ -140,10 +140,10 @@ Object.defineProperty(Color.prototype, "hex", {
     return this.__state.hex;
   },
 
-  set: function(v) {
+  set: function (v) {
     this.__state.space = "HEX";
     this.__state.hex = v;
-  }
+  },
 });
 
 export default Color;

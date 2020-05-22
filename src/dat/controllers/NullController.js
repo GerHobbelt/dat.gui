@@ -11,7 +11,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], function(Controller, dom, common) {
+define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], function (Controller, dom, common) {
   /**
    * @class Provides a NULL controller to represent a NULL property of an object.
    * @extends dat.controllers.Controller
@@ -21,7 +21,7 @@ define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], functi
    *
    * @member dat.controllers
    */
-  var NullController = function(object, property, options) {
+  var NullController = function (object, property, options) {
     NullController.superclass.call(this, object, property, "null", options);
 
     const _this = this;
@@ -37,10 +37,10 @@ define(["dat/controllers/Controller", "dat/dom/dom", "dat/utils/common"], functi
   NullController.superclass = Controller;
 
   common.extend(NullController.prototype, Controller.prototype, {
-    updateDisplay: function() {
+    updateDisplay: function () {
       this.__elem.innerText = "<null>";
       return NullController.superclass.prototype.updateDisplay.call(this);
-    }
+    },
   });
 
   return NullController;

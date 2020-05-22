@@ -108,17 +108,22 @@ class NumberControllerBox extends NumberController {
       if (1) {
         const step = _this.__step || 1;
         switch (e.keyCode) {
+          // When pressing ENTER key, you can be as precise as you want.
           case 13:
             _this.__truncationSuspended = true;
             this.blur();
             _this.__truncationSuspended = false;
             onFinish();
             break;
+
+          // arrow up
           case 38:
             var newVal = _this.getValue() + step;
             _this.setValue(newVal);
             break;
-          case 40: // down
+
+          // arrow down
+          case 40:
             var newVal = _this.getValue() - step;
             _this.setValue(newVal);
             break;

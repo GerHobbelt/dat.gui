@@ -55,7 +55,9 @@ const dom = {
    * @param selectable
    */
   makeSelectable: function (elem, selectable) {
-    if (elem === undefined || elem.style === undefined) return;
+    if (elem === undefined || elem.style === undefined) {
+      return;
+    }
 
     elem.onselectstart = selectable
       ? function () {

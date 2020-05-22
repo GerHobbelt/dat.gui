@@ -42,7 +42,7 @@ THE SOFTWARE.
 const plotter = function (fg, bg, type) {
   let min = Infinity;
   let max = 0;
-  const round = Math.round;
+  const { round } = Math;
   const PR = round(window.devicePixelRatio || 1);
 
   const WIDTH = 160 * PR;

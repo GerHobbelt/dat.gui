@@ -181,6 +181,7 @@ const Common = {
       const opts = Object.defineProperty({}, "passive", {
         get: function () {
           supportsPassive = true;
+          return false; // make lint happy: return a value
         },
       });
       window.addEventListener("testPassive", null, opts);

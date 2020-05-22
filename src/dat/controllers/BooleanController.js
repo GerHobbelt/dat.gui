@@ -33,7 +33,9 @@ class BooleanController extends Controller {
     this.__checkbox.setAttribute("type", "checkbox");
 
     function onChange() {
-      if (!_this._readonly) _this.setValue(!_this.__prev);
+      if (!_this._readonly) {
+        _this.setValue(!_this.__prev);
+      }
     }
 
     dom.bind(this.__checkbox, "change", onChange, false, true);

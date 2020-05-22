@@ -110,9 +110,9 @@ define(["gui"], function (GUI) {
   };
 
   GUI.Easing.ElasticEaseIn = function (k) {
-    var s,
-      a = 0.1,
-      p = 0.4;
+    var s;
+    var a = 0.1;
+    var p = 0.4;
     if (k == 0) return 0;
     if (k == 1) return 1;
     if (!p) p = 0.3;
@@ -124,9 +124,9 @@ define(["gui"], function (GUI) {
   };
 
   GUI.Easing.ElasticEaseOut = function (k) {
-    var s,
-      a = 0.1,
-      p = 0.4;
+    var s;
+    var a = 0.1;
+    var p = 0.4;
     if (k == 0) return 0;
     if (k == 1) return 1;
     if (!p) p = 0.3;
@@ -138,9 +138,9 @@ define(["gui"], function (GUI) {
   };
 
   GUI.Easing.ElasticEaseInOut = function (k) {
-    var s,
-      a = 0.1,
-      p = 0.4;
+    var s;
+    var a = 0.1;
+    var p = 0.4;
     if (k == 0) return 0;
     if (k == 1) return 1;
     if (!p) p = 0.3;

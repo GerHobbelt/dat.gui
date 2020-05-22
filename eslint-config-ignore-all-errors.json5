@@ -39,4 +39,8 @@ rules: {
 	class-methods-use-this: 1,
 	no-redeclare: 1,
 	indent: 1,
+	getter-return: 1,
+	prefer-spread: 1,
+	no-unused-expressions: 1,
+	no-sequences: 1,
 }}

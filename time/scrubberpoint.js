@@ -260,9 +260,9 @@ define(["gui", "gui.easing"], function (GUI) {
         default:
           g.save();
           g.translate(x - barSize / 2, 0);
-          //g.fillStyle = c1;
+          // g.fillStyle = c1;
           g.fillRect(0, 0, barSize / 2, scrubber.height - 1);
-          //g.fillStyle = c2;
+          // g.fillStyle = c2;
           g.fillRect(barSize / 2, 0, barSize / 2, scrubber.height - 1);
           g.restore();
       }

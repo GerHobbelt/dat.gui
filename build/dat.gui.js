@@ -1294,7 +1294,7 @@
  * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011-2019 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2020 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1892,121 +1892,118 @@
   var saveDialogueContents =
     '<div id="dg-save" class="dg dialogue">\n  Here\'s the new load parameter for your <code>GUI</code>\'s constructor:\n\n  <textarea id="dg-new-constructor"></textarea>\n\n  <div id="dg-save-locally">\n    <input id="dg-local-storage" type="checkbox">\n    Automatically save values to <code>localStorage</code> on exit.\n\n    <div id="dg-local-explain">\n      The values saved to <code>localStorage</code> will override those passed to <code>dat.GUI</code>\'s constructor.\n      This makes it easier to work incrementally, but <code>localStorage</code> is fragile, and your friends may not see\n      the same values you do.\n    </div>\n  </div>\n</div>\n';
 
-  define([
-    "dat/controllers/Controller",
-    "dat/controllers/OptionController",
-    "dat/controllers/NumberControllerBox",
-    "dat/controllers/NumberControllerSlider",
-    "dat/controllers/StringController",
-    "dat/controllers/FunctionController",
-    "dat/controllers/BooleanController",
-    "dat/controllers/ImageController",
-    "dat/controllers/ObjectController",
-    "dat/controllers/NullController",
-    "dat/controllers/UndefinedController",
-    "dat/utils/common",
-  ], function (Controller, OptionController, NumberControllerBox, NumberControllerSlider, StringController, FunctionController, BooleanController, ImageController, ObjectController, NullController, UndefinedController, common) {
-    var firstTimeImageController = true;
-    var ARR_SLICE = Array.prototype.slice;
-    function isControllerTemplate(f) {
-      return (
-        typeof f === "function" &&
-        f.prototype &&
-        typeof f.prototype.onBeforeChange === "function" &&
-        typeof f.prototype.onChange === "function" &&
-        typeof f.prototype.onFinishChange === "function" &&
-        typeof f.prototype.setValue === "function" &&
-        typeof f.prototype.getValue === "function" &&
-        typeof f.prototype.updateDisplay === "function"
-      );
-    }
-    return function (
-      object,
-      property,
-      controllerName,
-      controllers,
-      options_1,
-      options_2,
-      options_3,
-      options_4,
-      options_5,
-      options_6
-    ) {
-      var ControllerConstructor = controllers[controllerName];
-      if (!ControllerConstructor && isControllerTemplate(controllerName)) {
-        ControllerConstructor = controllerName;
+  var OptionController$2 = (function (_Controller) {
+    _inheritsLoose(OptionController, _Controller);
+    function OptionController(object, property, params, options) {
+      var _this2;
+      _this2 = _Controller.call(this, object, property, "option", options) || this;
+      var _this = _assertThisInitialized(_this2);
+      _this2.CUSTOM_FLAG = "";
+      params = params || {};
+      _this2.__select = document.createElement("select");
+      if (common.isArray(params)) {
+        var map = {};
+        common.each(params, function (element) {
+          map[element] = element;
+        });
+        params = map;
       }
-      if (ControllerConstructor) {
-        return new ControllerConstructor(
-          object,
-          property,
-          options_1,
-          options_2,
-          options_3,
-          options_4,
-          options_5,
-          options_6
-        );
+      common.each(params, function (value, key) {
+        var opt = document.createElement("option");
+        opt.innerHTML = value;
+        opt.setAttribute("value", key);
+        _this.__select.appendChild(opt);
+      });
+      if (params.custom) {
+        var opt = document.createElement("option");
+        opt.innerHTML = params.custom.display || "Custom";
+        opt.setAttribute("value", _this.CUSTOM_FLAG);
+        _this.__select.appendChild(opt);
+        _this2.__custom_controller = params.custom.controller;
       }
-      var dyninfo = common.setupDynamicProperty(object, property);
-      var initialValue = !dyninfo ? object[property] : dyninfo.getter.call(object);
-      if (common.isArray(options_1) || common.isObject(options_1)) {
-        return new OptionController(object, property, options_1);
-      }
-      if (common.isNumber(initialValue)) {
-        if (common.isNumber(options_1) && common.isNumber(options_2)) {
-          return new NumberControllerSlider(
-            object,
-            property,
-            options_1,
-            options_2,
-            options_3,
-            options_4,
-            options_5,
-            options_6
-          );
+      _this2.updateDisplay();
+      dom.bind(_this2.__select, "change", function () {
+        var value = this.options[this.selectedIndex].value;
+        if (value === _this.CUSTOM_FLAG) {
+          value = _this.__custom_controller.getValue();
         }
-        return new NumberControllerBox(object, property, {
-          min: options_1,
-          max: options_2,
-          step: options_3,
-          minimumSaneStepSize: options_4,
-          maximumSaneStepSize: options_5,
-          mode: options_6,
+        _this.setValue(value);
+      });
+      if (_this2.__custom_controller) {
+        _this2.__custom_controller.onChange(function () {
+          var value = this.getValue();
+          _this.setValue(value);
         });
       }
-      if (common.isImagePath(initialValue)) {
-        if (firstTimeImageController) {
-          ImageController.useDefaultStyles();
-          firstTimeImageController = false;
-        }
-        return new ImageController(object, property);
+      _this2.domElement.appendChild(_this2.__select);
+      if (_this2.__custom_controller) {
+        _this2.domElement.appendChild(_this2.__custom_controller.el);
       }
-      if (common.isString(initialValue)) {
-        return new StringController(object, property);
-      }
-      if (common.isFunction(initialValue)) {
-        var opts = ARR_SLICE.call(arguments, 5);
-        if (opts.length === 0) {
-          opts = undefined;
-        }
-        return new FunctionController(object, property, options_1, opts);
-      }
-      if (common.isBoolean(initialValue)) {
-        return new BooleanController(object, property);
-      }
-      if (common.isArray(initialValue) || common.isObject(initialValue)) {
-        return new ObjectController(object, property);
-      }
-      if (initialValue === null) {
-        return new NullController(object, property);
-      }
-      if (initialValue === undefined && property in object) {
-        return new UndefinedController(object, property);
-      }
-      return false;
+      return _this2;
+    }
+    var _proto = OptionController.prototype;
+    _proto.setValue = function setValue(v) {
+      var toReturn = _Controller.prototype.setValue.call(this, v);
+      return toReturn;
     };
-  });
+    _proto.updateDisplay = function updateDisplay() {
+      var value = this.getValue();
+      var custom = true;
+      if (value !== this.CUSTOM_FLAG) {
+        common.each(this.__select.options, function (option) {
+          if (value === option.value) {
+            custom = false;
+          }
+        });
+      }
+      this.__select.value = custom ? this.CUSTOM_FLAG : value;
+      if (this.__custom_controller) {
+        this.__custom_controller.el.style.display = custom ? "block" : "none";
+      }
+      return _Controller.prototype.updateDisplay.call(this);
+    };
+    return OptionController;
+  })(Controller);
+
+  var NullController = (function (_Controller) {
+    _inheritsLoose(NullController, _Controller);
+    function NullController(object, property, options) {
+      var _this2;
+      _this2 = _Controller.call(this, object, property, "null", options) || this;
+      var _this = _assertThisInitialized(_this2);
+      _this2.__prev = _this2.getValue();
+      _this2.__elem = document.createElement("em");
+      _this2.domElement.appendChild(_this2.__elem);
+      _this2.updateDisplay();
+      return _this2;
+    }
+    var _proto = NullController.prototype;
+    _proto.updateDisplay = function updateDisplay() {
+      this.__elem.innerText = "<null>";
+      return _Controller.prototype.updateDisplay.call(this);
+    };
+    return NullController;
+  })(Controller);
+
+  var UndefinedController = (function (_Controller) {
+    _inheritsLoose(UndefinedController, _Controller);
+    function UndefinedController(object, property, options) {
+      var _this2;
+      _this2 = _Controller.call(this, object, property, "undefined", options) || this;
+      var _this = _assertThisInitialized(_this2);
+      _this2.__prev = _this2.getValue();
+      _this2.__elem = document.createElement("em");
+      _this2.domElement.appendChild(_this2.__elem);
+      _this2.updateDisplay();
+      return _this2;
+    }
+    var _proto = UndefinedController.prototype;
+    _proto.updateDisplay = function updateDisplay() {
+      this.__elem.innerText = "<undefined>";
+      return _Controller.prototype.updateDisplay.call(this);
+    };
+    return UndefinedController;
+  })(Controller);
 
   function pos2vec(pos, min, max) {
     return [pos[0] * (max[0] - min[0]) + min[0], pos[1] * (max[1] - min[1]) + min[1]];

@@ -41,7 +41,7 @@ define(["gui"], function (GUI) {
     span2.innerHTML = "&hellip; or paste this into the beginning of your source:";
 
     var textarea = document.createElement("textarea");
-    //textarea.setAttribute('disabled', 'true');
+    // textarea.setAttribute('disabled', 'true');
     textarea.innerHTML += "GUI.loadJSON(" + jsonString + ");";
 
     var close = document.createElement("div");

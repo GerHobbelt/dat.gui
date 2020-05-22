@@ -10,9 +10,9 @@
  */
 
 (function ($, undefined) {
-  var rkeyEvent = /^key/,
-    rmouseEvent = /^(?:mouse|contextmenu)|click/,
-    currentElementUnderMouse;
+  var rkeyEvent = /^key/;
+  var rmouseEvent = /^(?:mouse|contextmenu)|click/;
+  var currentElementUnderMouse;
 
   $.fn.simulate = function (type, options) {
     return this.each(function () {
@@ -83,11 +83,11 @@
     },
 
     mouseEvent: function (type, options) {
-      var event,
-        eventDoc,
-        doc,
-        body,
-        configurable = false;
+      var event;
+      var eventDoc;
+      var doc;
+      var body;
+      var configurable = false;
       options = $.extend(
         {
           bubbles: true,
@@ -255,9 +255,9 @@
     },
 
     simulateFocus: function () {
-      var focusinEvent,
-        triggered = false,
-        element = $(this.target);
+      var focusinEvent;
+      var triggered = false;
+      var element = $(this.target);
 
       function trigger() {
         triggered = true;
@@ -276,9 +276,9 @@
     },
 
     simulateBlur: function () {
-      var focusoutEvent,
-        triggered = false,
-        element = $(this.target);
+      var focusoutEvent;
+      var triggered = false;
+      var element = $(this.target);
 
       function trigger() {
         triggered = true;
@@ -335,8 +335,8 @@
   /** complex events **/
 
   function findCenter(elem) {
-    var offset,
-      document = $(elem.ownerDocument);
+    var offset;
+    var document = $(elem.ownerDocument);
     elem = $(elem);
     offset = elem.offset();
 
@@ -389,17 +389,17 @@
         return;
       }
 
-      var moves = delta.steps || 3,
-        dx = Math.floor(delta.dx || 0),
-        dy = Math.floor(delta.dy || 0),
-        final_coord = {
-          clientX: this.coord.clientX + dx,
-          clientY: this.coord.clientY + dy,
-        },
-        i,
-        x = this.coord.clientX,
-        y = this.coord.clientY,
-        coord;
+      var moves = delta.steps || 3;
+      var dx = Math.floor(delta.dx || 0);
+      var dy = Math.floor(delta.dy || 0);
+      var final_coord = {
+        clientX: this.coord.clientX + dx,
+        clientY: this.coord.clientY + dy,
+      };
+      var i;
+      var x = this.coord.clientX;
+      var y = this.coord.clientY;
+      var coord;
 
       for (i = 0; i < moves - 1; i++) {
         x += dx / moves;

@@ -337,8 +337,8 @@ define(["gui", "gui.scrubberpoint", "gui.easing", "gui.timer"], function (GUI) {
           }
         }
       } else {
-        var prev = undefined,
-          next = undefined;
+        var prev = undefined;
+        var next = undefined;
 
         // Find 'surrounding' points.
 

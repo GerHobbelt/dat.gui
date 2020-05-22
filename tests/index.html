@@ -1152,11 +1152,11 @@
           let gui = new GUI();
           gui.remember(object);
 
-          for (var i in object) {
+          for (const i in object) {
             controllers[i] = gui.add(object, i);
           }
 
-          for (i in controllers) {
+          for (const i in controllers) {
             controllers[i].setValue(changed[i]);
           }
 
@@ -1170,7 +1170,7 @@
 
           gui.remember(object);
 
-          for (i in object) {
+          for (const i in object) {
             controllers[i] = gui.add(object, i);
             equal(object[i], changed[i]);
           }

@@ -11,45 +11,70 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import fs from 'fs';
-import path from 'path';
-import resolve from 'rollup-plugin-node-resolve';
-import cleanup from 'rollup-plugin-cleanup';
-import babel from 'rollup-plugin-babel';
-import sass from 'rollup-plugin-sass';
+import fs from "fs";
+import path from "path";
+import resolve from "rollup-plugin-node-resolve";
+import cleanup from "rollup-plugin-cleanup";
+import babel from "rollup-plugin-babel";
+import sass from "rollup-plugin-sass";
+import postcss from "rollup-plugin-postcss";
+import html from "rollup-plugin-html";
+import commonjs from "rollup-plugin-commonjs";
 
-const banner = fs.readFileSync(path.join(__dirname, 'licenseBanner.txt'));
+const banner = fs.readFileSync(path.join(__dirname, "licenseBanner.txt"));
 
 export default {
-  input: 'src/dat/index.js',
-  output: [{
-    // TODO: Remove default exports, and this line, in v0.8.0.
-    exports: 'named',
-    file: './build/dat.gui.js',
-    format: 'umd',
-    name: 'dat',
-    sourcemap: true,
-    banner: banner
-  }, {
-    file: './build/dat.gui.module.js',
-    format: 'es',
-    sourcemap: true,
-    banner: banner
-  }],
+  input: "src/dat/index.js",
+  output: [
+    {
+      // TODO: Remove default exports, and this line, in v0.8.0.
+      exports: "named",
+      file: "./build/dat.gui.js",
+      format: "umd",
+      name: "dat",
+      sourcemap: false,
+      banner: banner,
+    },
+    {
+      file: "./build/dat.gui.module.js",
+      format: "es",
+      sourcemap: false,
+      banner: banner,
+    },
+  ],
   watch: {
-    include: 'src/**'
+    include: "src/**",
   },
   plugins: [
     resolve(),
+    html({
+      include: "**/*.html",
+    }),
+    postcss({
+      plugins: [],
+    }),
     sass({
-      insert: true,
-      output: 'build/dat.gui.css',
-      options: {outputStyle: 'compressed'}
+      // insert: true makes dat.gui automatically append the styles when just the JS is included,
+      // with insert: false both the JS and CSS need to explicitly be included
+      insert: false,
+      output: "build/dat.gui.css",
+      options: { outputStyle: "expanded" },
     }),
     babel({
-      plugins: ['external-helpers'],
-      exclude: 'node_modules/**'
+      babelrc: false,
+      comments: true,
+      sourceMap: false,
+      presets: [
+        [
+          "@babel/preset-env",
+          {
+            modules: false,
+            loose: true,
+          },
+        ],
+      ],
+      exclude: "node_modules/**",
     }),
-    cleanup()
-  ]
+    cleanup(),
+  ],
 };

@@ -1,8 +1,8 @@
 /**
- * dat-gui JavaScript Controller Library
+ * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2020 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -11,15 +11,15 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import OptionController from './OptionController';
-import NumberControllerBox from './NumberControllerBox';
-import NumberControllerSlider from './NumberControllerSlider';
-import StringController from './StringController';
-import FunctionController from './FunctionController';
-import BooleanController from './BooleanController';
-import common from '../utils/common';
+import OptionController from "./OptionController";
+import NumberControllerBox from "./NumberControllerBox";
+import NumberControllerSlider from "./NumberControllerSlider";
+import StringController from "./StringController";
+import FunctionController from "./FunctionController";
+import BooleanController from "./BooleanController";
+import common from "../utils/common";
 
-const ControllerFactory = function(object, property) {
+const ControllerFactory = function (object, property) {
   const initialValue = object[property];
 
   // Providing options?
@@ -33,17 +33,16 @@ const ControllerFactory = function(object, property) {
     if (common.isNumber(arguments[2]) && common.isNumber(arguments[3])) {
       // has step?
       if (common.isNumber(arguments[4])) {
-        return new NumberControllerSlider(object, property,
-                        arguments[2], arguments[3], arguments[4]);
+        return new NumberControllerSlider(object, property, arguments[2], arguments[3], arguments[4]);
       }
 
       return new NumberControllerSlider(object, property, arguments[2], arguments[3]);
     }
 
     // number box
-    if (common.isNumber(arguments[4])) { // has step
-      return new NumberControllerBox(object, property,
-                        { min: arguments[2], max: arguments[3], step: arguments[4] });
+    if (common.isNumber(arguments[4])) {
+      // has step
+      return new NumberControllerBox(object, property, { min: arguments[2], max: arguments[3], step: arguments[4] });
     }
     return new NumberControllerBox(object, property, { min: arguments[2], max: arguments[3] });
   }
@@ -53,7 +52,7 @@ const ControllerFactory = function(object, property) {
   }
 
   if (common.isFunction(initialValue)) {
-    return new FunctionController(object, property, '');
+    return new FunctionController(object, property, "");
   }
 
   if (common.isBoolean(initialValue)) {

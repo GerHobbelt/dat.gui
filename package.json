@@ -1,62 +1,101 @@
 {
-  "name": "dat.gui",
-  "version": "0.7.6",
-  "description": "A lightweight graphical user interface for changing variables in JavaScript.",
+  "name": "@gerhobbelt/dat.GUI",
+  "version": "0.7.6-3",
+  "description": "A lightweight graphical user interface for changing variables in JavaScript (fork with extra features).",
   "main": "build/dat.gui.js",
   "module": "build/dat.gui.module.js",
   "directories": {
+    "doc": "docs",
+    "example": "examples",
     "test": "tests"
   },
   "scripts": {
-    "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"serve --port 8080\"",
-    "build": "rollup -c && rollup -c rollup.config.min.js",
+    "test": "tests/index.html",
+    "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"serve --listen 8080\"",
+    "build": "rollup -c && prettier --print-width 120 --write build/**/*.js && rollup -c rollup.config.min.js && npm run update-banner",
+    "watch": "rollup --watch -c && rollup --watch -c rollup.config.js",
     "build-docs": "jsdoc2md -f src/dat/gui/GUI.js src/dat/controllers/Controller.js src/dat/controllers/NumberController.js | replace-between --target API.md --token API",
-    "lint": "eslint src",
+    "build-all": "npm run prettier && npm run fix && npm run stylefix && npm run update-banner && npm run build && npm run build-docs && npm run prettier && npm run fix && npm run stylefix",
+    "lint": "eslint --report-unused-disable-directives src tests/*.html example.html",
+    "stylelint": "stylelint src tests",
+    "fix": "eslint --fix -c eslint-config-ignore-all-errors.json5 src tests/*.html example.html && npm run prettier",
+    "stylefix": "prettier --write **/*.scss **/*.css && stylelint --fix **/*.css **/*.scss",
+    "update-banner": "node util/__patch_licenseBanner_in_js.js",
     "preversion": "npm run lint",
     "version": "npm run build && git add -A build",
-    "postversion": "git push && git push --tags && npm publish"
+    "postversion": "git push && git push --tags && npm publish",
+    "semistandard": "npx semistandard --fix *.js **/*.js",
+    "prettier": "prettier --print-width 120 --write *.js **/*.?s **/*.css **/*.scss **/*.html",
+    "pub": "npm publish --access public"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dataarts/dat.gui.git"
+    "url": "git@github.com:dataarts/dat.gui.git"
   },
+  "keywords": [
+    "data",
+    "binding",
+    "control",
+    "panel",
+    "data",
+    "GUI"
+  ],
   "author": "Data Arts Team, Google",
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/dataarts/dat.gui/issues"
   },
-  "homepage": "https://github.com/dataarts/dat.gui#readme",
+  "homepage": "https://github.com/dataarts/dat.gui",
   "devDependencies": {
-    "babel-core": "^6.26.3",
-    "babel-plugin-external-helpers": "^6.22.0",
-    "babel-preset-env": "^1.7.0",
-    "concurrently": "^3.5.1",
-    "eslint": "^3.5.0",
-    "eslint-config-airbnb-base": "^7.1.0",
-    "eslint-loader": "^1.5.0",
-    "eslint-plugin-import": "^1.15.0",
-    "extend": "^3.0.0",
-    "jsdoc-to-markdown": "^4.0.1",
+    "@babel/core": "7.9.6",
+    "@babel/preset-env": "7.9.6",
+    "concurrently": "5.2.0",
+    "eslint": "7.0.0",
+    "eslint-config-airbnb-base": "14.1.0",
+    "eslint-plugin-html": "6.0.2",
+    "eslint-plugin-import": "2.20.2",
+    "extend": "3.0.2",
+    "globby": "11.0.0",
+    "jsdoc-to-markdown": "5.0.3",
+    "node-sass": "4.14.1",
+    "prettier": "2.0.5",
+    "qunit": "2.10.0",
     "replace-between": "0.0.8",
-    "rollup": "^0.54.1",
-    "rollup-plugin-babel": "^3.0.4",
-    "rollup-plugin-cleanup": "^2.0.1",
-    "rollup-plugin-node-resolve": "^3.3.0",
-    "rollup-plugin-sass": "^0.6.1",
-    "rollup-plugin-uglify": "^2.0.1",
-    "serve": "^6.5.8"
+    "rollup": "2.10.7",
+    "rollup-plugin-babel": "4.4.0",
+    "rollup-plugin-cleanup": "3.1.1",
+    "rollup-plugin-commonjs": "10.1.0",
+    "rollup-plugin-html": "0.2.1",
+    "rollup-plugin-node-resolve": "5.2.0",
+    "rollup-plugin-postcss": "^3.1.1",
+    "rollup-plugin-sass": "1.2.2",
+    "rollup-plugin-uglify": "6.0.4",
+    "semistandard": "^14.2.0",
+    "serve": "11.3.1",
+    "stylelint": "^13.5.0",
+    "stylelint-config-recommended-scss": "^4.2.0",
+    "stylelint-config-standard": "^20.0.0",
+    "stylelint-scss": "^3.17.2",
+    "uglify-js": "3.9.3"
   },
   "eslintConfig": {
     "extends": "airbnb-base",
+    "plugins": [
+      "html"
+    ],
     "rules": {
       "comma-dangle": 0,
       "func-names": 0,
       "no-alert": 0,
       "no-console": 1,
+      "no-unused-vars": 0,
+      "no-multi-assign": 0,
       "no-use-before-define": 0,
       "prefer-rest-params": 0,
       "prefer-template": 0,
+      "prefer-destructuring": "warn",
       "no-mixed-operators": 0,
+      "no-nested-ternary": "warn",
       "no-undef": 0,
       "no-underscore-dangle": 0,
       "prefer-arrow-callback": 0,
@@ -67,8 +106,43 @@
       "no-param-reassign": 0,
       "consistent-return": 0,
       "no-restricted-syntax": 0,
+      "no-restricted-globals": 0,
       "no-bitwise": 0,
-      "no-plusplus": 0
+      "no-plusplus": 0,
+      "operator-linebreak": 0,
+      "no-else-return": 0,
+      "prefer-destructuring": 0,
+      "no-multi-assign": 0,
+      "no-restricted-properties": 0,
+      "no-return-assign": 0,
+      "no-restricted-globals": 0,
+      "quotes": [
+        "error",
+        "double",
+        {
+          "avoidEscape": true
+        }
+      ],
+      "eqeqeq": [
+        "error",
+        "always",
+        {
+          "null": "ignore"
+        }
+      ],
+      "guard-for-in": "warn"
+    }
+  },
+  "stylelint": {
+    "extends": [
+      "stylelint-config-standard",
+      "stylelint-config-recommended-scss"
+    ],
+    "defaultSeverity": "warning",
+    "rules": {
+      "block-no-empty": null,
+      "color-hex-case": "upper",
+      "color-hex-length": "long"
     }
   }
 }

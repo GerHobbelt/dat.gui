@@ -17,6 +17,7 @@ import resolve from "rollup-plugin-node-resolve";
 import cleanup from "rollup-plugin-cleanup";
 import babel from "rollup-plugin-babel";
 import sass from "rollup-plugin-sass";
+import postcss from "rollup-plugin-postcss";
 import html from "rollup-plugin-html";
 import commonjs from "rollup-plugin-commonjs";
 
@@ -32,29 +33,32 @@ export default {
       format: "umd",
       name: "dat",
       sourcemap: false,
-      banner: banner
+      banner: banner,
     },
     {
       file: "./build/dat.gui.module.js",
       format: "es",
       sourcemap: false,
-      banner: banner
-    }
+      banner: banner,
+    },
   ],
   watch: {
-    include: "src/**"
+    include: "src/**",
   },
   plugins: [
     resolve(),
     html({
-      include: "**/*.html"
+      include: "**/*.html",
+    }),
+    postcss({
+      plugins: [],
     }),
     sass({
       // insert: true makes dat.gui automatically append the styles when just the JS is included,
       // with insert: false both the JS and CSS need to explicitly be included
       insert: false,
       output: "build/dat.gui.css",
-      options: { outputStyle: "expanded" }
+      options: { outputStyle: "expanded" },
     }),
     babel({
       babelrc: false,
@@ -65,15 +69,15 @@ export default {
           "@babel/preset-env",
           {
             modules: false,
-            loose: true
-          }
-        ]
+            loose: true,
+          },
+        ],
       ],
-      exclude: "node_modules/**"
+      exclude: "node_modules/**",
     }),
     commonjs({
-      "node_modules/wsgif/sibgif.js": ["SuperGif"]
+      "node_modules/wsgif/sibgif.js": ["SuperGif"],
     }),
-    cleanup()
-  ]
+    cleanup(),
+  ],
 };

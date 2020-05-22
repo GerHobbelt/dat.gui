@@ -2,7 +2,7 @@
  * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011-2019 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2020 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ class NumberControllerSlider extends NumberController {
       for (k in hash) {
         arr.push({ key: k, value: hash[k] });
       }
-      arr = arr.sort(function(a, b) {
+      arr = arr.sort(function (a, b) {
         const result = true ? a.value < b.value : a.value > b.value;
         return result ? 1 : -1;
       });

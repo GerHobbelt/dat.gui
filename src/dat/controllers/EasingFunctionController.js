@@ -2,7 +2,7 @@
  * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011-2019 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2020 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ class EasingFunctionController extends Controller {
       top: 1,
       left: 3,
       width: width - 2,
-      height: height - 16
+      height: height - 16,
     };
     const rV = rectView;
 
@@ -49,7 +49,7 @@ class EasingFunctionController extends Controller {
     this.__ctx = this.__thumbnail.getContext("2d");
     this.__ctx.scale(2, 2);
 
-    dom.bind(this.__thumbnail, "contextmenu", function(e) {
+    dom.bind(this.__thumbnail, "contextmenu", function (e) {
       e.preventDefault();
     });
     dom.bind(this.__thumbnail, "mouseover", onMouseOver);
@@ -204,7 +204,7 @@ class EasingFunctionController extends Controller {
     common.extend(this.__thumbnail.style, {
       width: width + "px",
       height: height + "px",
-      cursor: "crosshair"
+      cursor: "crosshair",
       // cursor: 'ew-resize'
       // cursor: 'move'
     });
@@ -266,7 +266,7 @@ class EasingFunctionController extends Controller {
     ctx.lineWidth = 1;
 
     beginPath();
-    easing_func.getSegments().forEach(function(s, i) {
+    easing_func.getSegments().forEach(function (s, i) {
       moveTo.apply(null, s.slice(0, 2));
       curveTo.apply(null, s.slice(2));
     });
@@ -280,7 +280,7 @@ class EasingFunctionController extends Controller {
     ctx.fillStyle = "#fff";
     ctx.strokeStyle = "#f90";
     ctx.lineWidth = 2;
-    easing_func.points.forEach(function(p, i) {
+    easing_func.points.forEach(function (p, i) {
       if (_this.__mouseo_over && i === _this.__point_over) {
         return;
       }
@@ -316,7 +316,7 @@ class EasingFunctionController extends Controller {
       stroke();
 
       // knobs
-      ["l", "r"].forEach(function(dir) {
+      ["l", "r"].forEach(function (dir) {
         beginPath();
         circle(p.x + p[dir], p.y, 2);
         fill();

@@ -2,7 +2,7 @@
  * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011-2019 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2020 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ class FunctionController extends Controller {
     this.__button = settings.DOCUMENT.createElement("div");
     this.__button.innerHTML = text === undefined ? "Fire" : text;
 
-    dom.bind(this.__button, "click", function(e) {
+    dom.bind(this.__button, "click", function (e) {
       e.preventDefault();
       _this.fire();
       return false;

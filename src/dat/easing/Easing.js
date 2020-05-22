@@ -2,7 +2,7 @@
  * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011-2019 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2020 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
  */
 
 function clipFunc(min, max) {
-  return function(v) {
+  return function (v) {
     if (v < min) {
       return min;
     }
@@ -26,7 +26,7 @@ const clip01 = clipFunc(0.0, 1.0);
 
 // See http://pomax.github.io/bezierinfo/#explanation
 function cubicFunc(a, b, c, d) {
-  return function(t) {
+  return function (t) {
     const t2 = t * t;
     const t3 = t2 * t;
     const mt = 1 - t;
@@ -36,7 +36,7 @@ function cubicFunc(a, b, c, d) {
   };
 }
 function cubicFuncDeriv(a, b, c, d) {
-  return function(t) {
+  return function (t) {
     const t2 = t * t;
     const mt = 1 - t;
     const mt2 = mt * mt;
@@ -57,15 +57,15 @@ const EPSILON = 0.0001;
  * 2. {x:..., y:..., l:..., r:...}
  *
  */
-const EasingFunctionPoint = function(coord) {
+const EasingFunctionPoint = function (coord) {
   const _this = this;
 
   if (Array.isArray(coord) && coord.length == 4) {
-    ["x", "y", "l", "r"].forEach(function(d, i) {
+    ["x", "y", "l", "r"].forEach(function (d, i) {
       _this[d] = coord[i];
     });
   } else if (typeof coord === "object") {
-    ["x", "y", "l", "r"].forEach(function(d) {
+    ["x", "y", "l", "r"].forEach(function (d) {
       _this[d] = coord[d];
     });
   } else {
@@ -78,23 +78,23 @@ const EasingFunctionPoint = function(coord) {
  *
  * The constructor argument is array of EasingFunctionPoint or undefined.
  */
-const EasingFunction = function(_points) {
+const EasingFunction = function (_points) {
   const rawPoints = _points || [
     {
       x: 0,
       y: 0,
       l: 0,
-      r: 0.5
+      r: 0.5,
     },
     {
       x: 1,
       y: 1,
       l: 0.5,
-      r: 0
-    }
+      r: 0,
+    },
   ];
   const points = [];
-  rawPoints.forEach(function(p) {
+  rawPoints.forEach(function (p) {
     points.push(new EasingFunctionPoint(p));
   });
   this.points = points;
@@ -103,11 +103,11 @@ const EasingFunction = function(_points) {
 EasingFunction.Point = EasingFunctionPoint;
 
 EasingFunction.prototype = {
-  toString: function() {
+  toString: function () {
     return "something";
   },
 
-  movePoint: function(index, type, x, y) {
+  movePoint: function (index, type, x, y) {
     const p = this.points[index];
 
     if (type == "LEFT") {
@@ -122,12 +122,12 @@ EasingFunction.prototype = {
 
     this.constrainPoints();
   },
-  constrainPoints: function() {
+  constrainPoints: function () {
     let pl;
     let p;
     let pr;
     const _this = this;
-    const last = function(i) {
+    const last = function (i) {
       return i == _this.points.length - 1;
     };
 
@@ -166,7 +166,7 @@ EasingFunction.prototype = {
       }
     }
   },
-  findPoint: function(x, y, r) {
+  findPoint: function (x, y, r) {
     r = r || 0.035; // [FIXME] magic number
     let dx;
     let dy;
@@ -175,7 +175,7 @@ EasingFunction.prototype = {
     let minIndex;
     let type;
 
-    this.points.forEach(function(p, i) {
+    this.points.forEach(function (p, i) {
       (dx = x - p.x), (dy = y - p.y);
       h = dx * dx + dy * dy;
       if (h < r * r && minD > h) {
@@ -185,10 +185,10 @@ EasingFunction.prototype = {
     });
     return {
       index: minIndex,
-      type: Number.isInteger(minIndex) ? "ANCHOR" : undefined
+      type: Number.isInteger(minIndex) ? "ANCHOR" : undefined,
     };
   },
-  findPointWithHandle: function(x, y, r) {
+  findPointWithHandle: function (x, y, r) {
     r = r || 0.035; // [FIXME] magic number
     let dx;
     let dy;
@@ -201,16 +201,26 @@ EasingFunction.prototype = {
     let type;
     const _this = this;
 
-    this.points.forEach(function(p, i) {
+    this.points.forEach(function (p, i) {
       if (i == 0) {
-        candidates = [[p.r, "RIGHT"], [0.0, "ANCHOR"]];
+        candidates = [
+          [p.r, "RIGHT"],
+          [0.0, "ANCHOR"],
+        ];
       } else if (i == _this.points.length - 1) {
-        candidates = [[p.l, "LEFT"], [0.0, "ANCHOR"]];
+        candidates = [
+          [p.l, "LEFT"],
+          [0.0, "ANCHOR"],
+        ];
       } else {
-        candidates = [[p.r, "RIGHT"], [p.l, "LEFT"], [0.0, "ANCHOR"]];
+        candidates = [
+          [p.r, "RIGHT"],
+          [p.l, "LEFT"],
+          [0.0, "ANCHOR"],
+        ];
       }
 
-      candidates.forEach(function(cand) {
+      candidates.forEach(function (cand) {
         (d = cand[0]), (type = cand[1]);
 
         (dx = x - p.x - d), (dy = y - p.y);
@@ -225,7 +235,7 @@ EasingFunction.prototype = {
 
     return { index: minIndex, type: minType };
   },
-  addPoint: function(x, y) {
+  addPoint: function (x, y) {
     for (var i = 1; i < this.points.length - 1; i++) {
       if (x <= this.points[i].x) {
         break;
@@ -235,13 +245,13 @@ EasingFunction.prototype = {
       x: x,
       y: y,
       l: 0.0,
-      r: 0.0
+      r: 0.0,
     });
     this.points.splice(i, 0, point);
     this.constrainPoints();
     return point;
   },
-  deletePoint: function(i) {
+  deletePoint: function (i) {
     if (i == 0 || i == this.points.length - 1) {
       return false;
     }
@@ -249,7 +259,7 @@ EasingFunction.prototype = {
     return true;
   },
 
-  getSegments: function() {
+  getSegments: function () {
     const segments = [];
     let p1;
     let p2;
@@ -265,12 +275,12 @@ EasingFunction.prototype = {
         p2.x + p2.l,
         p2.y, // control point 2
         p2.x,
-        p2.y // anchor point 2
+        p2.y, // anchor point 2
       ]);
     }
     return segments;
   },
-  getSegmentByX: function(x) {
+  getSegmentByX: function (x) {
     let p1;
     let p2;
     for (var i = 1; i < this.points.length - 1; i++) {
@@ -283,7 +293,7 @@ EasingFunction.prototype = {
     return [p1.x, p1.y, p1.x + p1.r, p1.y, p2.x + p2.l, p2.y, p2.x, p2.y];
   },
 
-  calculateY: function(x) {
+  calculateY: function (x) {
     x = clip01(x);
     if (x < EPSILON) {
       x = EPSILON;
@@ -308,7 +318,7 @@ EasingFunction.prototype = {
     }
 
     // Newton's method failed. Then we use bisection method instead
-    const funcXd = function(t) {
+    const funcXd = function (t) {
       return funcX(t) - x;
     };
     let t1 = 0.0;
@@ -333,7 +343,7 @@ EasingFunction.prototype = {
       }
     }
     return funcY(t);
-  }
+  },
 };
 
 export default EasingFunction;

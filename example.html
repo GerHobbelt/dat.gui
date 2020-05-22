@@ -13,17 +13,17 @@
 
       let myFizzyText;
 
-      const FizzyText = function() {
+      const FizzyText = function () {
         this.message = "dat.gui";
         this.speed = 0.8;
         this.displayOutline = false;
-        this["Trace object!"] = function() {
+        this["Trace object!"] = function () {
           console.log(myFizzyText);
         };
-        this["Trace folder find!"] = function() {
+        this["Trace folder find!"] = function () {
           console.log("folder find test", gui.getFolderByName("folder"));
         };
-        this["Trace cont find!"] = function() {
+        this["Trace cont find!"] = function () {
           console.log("controller find test", gui.getControllerByName("testbool4", true));
         };
 
@@ -41,7 +41,7 @@
 
       let gui;
 
-      window.onload = function() {
+      window.onload = function () {
         function displayOutput(value) {
           $("#output").html(value);
         }
@@ -50,7 +50,7 @@
         gui = new dat.GUI();
         let g;
         gui.add(text, "message").onChange(displayOutput);
-        gui.addTextArea(text, "description").onChange(function(value) {
+        gui.addTextArea(text, "description").onChange(function (value) {
           value = value.replace(/\r?\n/g, "<br />");
           $("#output").html(value);
         });
@@ -62,7 +62,7 @@
             Medium: 2,
             High: 3,
             "Very High": 6,
-            Extreme: 8
+            Extreme: 8,
           })
           .onChange(displayOutput);
         gui.add(text, "displayOutline").onChange(displayOutput);
@@ -73,15 +73,8 @@
         gui.add(text, "testbool2").onChange(displayOutput);
 
         gui.add(text, "number1").onChange(displayOutput);
-        gui
-          .add(text, "number2")
-          .step(0.5)
-          .onChange(displayOutput);
-        gui
-          .add(text, "number3")
-          .min(0)
-          .step(0.01)
-          .onChange(displayOutput);
+        gui.add(text, "number2").step(0.5).onChange(displayOutput);
+        gui.add(text, "number3").min(0).step(0.01).onChange(displayOutput);
 
         g = gui.addFolder("folder");
         $(g.domElement).addClass("testClass");
@@ -99,7 +92,7 @@
 
         for (p in allGUIs) {
           g = allGUIs[p];
-          g.onClosedChange(function(val) {
+          g.onClosedChange(function (val) {
             displayOutput("" + this.name + " is closed? " + val);
           });
         }
@@ -110,7 +103,7 @@
       Output:
     </h1>
     <div id="output"></div>
-    <div id="info" style="width:65%">
+    <div id="info" style="width: 65%;">
       <h1>Changelog:</h1>
       <ul>
         <li>Misc improvements for CSS and controllers</li>

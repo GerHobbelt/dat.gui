@@ -2,7 +2,7 @@
  * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011-2019 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2020 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ class Vec3Controller extends NumberController {
     const vec3 = {
       x: 0,
       y: 0,
-      z: 0
+      z: 0,
     };
 
     this.xInput = document.createElement("input");
@@ -64,7 +64,7 @@ class Vec3Controller extends NumberController {
     dom.bind(this.xInput, "change", onChange(xInput));
     dom.bind(this.xInput, "blur", onBlur(xInput));
     dom.bind(this.xInput, "mousedown", onMouseDown);
-    dom.bind(this.xInput, "keydown", function(e) {
+    dom.bind(this.xInput, "keydown", function (e) {
       // When pressing entire, you can be as precise as you want.
       if (e.keyCode === 13) {
         _this.__truncationSuspended = true;
@@ -76,7 +76,7 @@ class Vec3Controller extends NumberController {
     dom.bind(this.yInput, "change", onChange(yInput));
     dom.bind(this.yInput, "blur", onBlur(yInput));
     dom.bind(this.yInput, "mousedown", onMouseDown);
-    dom.bind(this.yInput, "keydown", function(e) {
+    dom.bind(this.yInput, "keydown", function (e) {
       // When pressing entire, you can be as precise as you want.
       if (e.keyCode === 13) {
         _this.__truncationSuspended = true;
@@ -88,7 +88,7 @@ class Vec3Controller extends NumberController {
     dom.bind(this.zInput, "change", onChange(zInput));
     dom.bind(this.zInput, "blur", onBlur(zInput));
     dom.bind(this.zInput, "mousedown", onMouseDown);
-    dom.bind(this.zInput, "keydown", function(e) {
+    dom.bind(this.zInput, "keydown", function (e) {
       // When pressing entire, you can be as precise as you want.
       if (e.keyCode === 13) {
         _this.__truncationSuspended = true;

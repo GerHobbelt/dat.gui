@@ -2,7 +2,7 @@
  * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011-2019 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2020 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,33 +47,34 @@ defineHSVComponent(Color.prototype, "s");
 defineHSVComponent(Color.prototype, "v");
 
 Object.defineProperty(Color.prototype, "a", {
-  get: function() {
+  get: function () {
     return this.__state.a;
   },
 
-  set: function(v) {
+  set: function (v) {
     this.__state.a = v;
-  }
+  },
 });
 
 Object.defineProperty(Color.prototype, "hex", {
-  get: function() {
-    if (!this.__state.space !== "HEX") {
+  get: function () {
+    if (this.__state.space !== "HEX") {
       this.__state.hex = math.rgb_to_hex(this.r, this.g, this.b);
+      this.__state.space = "HEX";
     }
 
     return this.__state.hex;
   },
 
-  set: function(v) {
+  set: function (v) {
     this.__state.space = "HEX";
     this.__state.hex = v;
-  }
+  },
 });
 
 function defineRGBComponent(target, component, componentHexIndex) {
   Object.defineProperty(target, component, {
-    get: function() {
+    get: function () {
       if (this.__state.space === "RGB") {
         return this.__state[component];
       }
@@ -83,20 +84,20 @@ function defineRGBComponent(target, component, componentHexIndex) {
       return this.__state[component];
     },
 
-    set: function(v) {
+    set: function (v) {
       if (this.__state.space !== "RGB") {
         recalculateRGB(this, component, componentHexIndex);
         this.__state.space = "RGB";
       }
 
       this.__state[component] = v;
-    }
+    },
   });
 }
 
 function defineHSVComponent(target, component) {
   Object.defineProperty(target, component, {
-    get: function() {
+    get: function () {
       if (this.__state.space === "HSV") {
         return this.__state[component];
       }
@@ -106,14 +107,14 @@ function defineHSVComponent(target, component) {
       return this.__state[component];
     },
 
-    set: function(v) {
+    set: function (v) {
       if (this.__state.space !== "HSV") {
         recalculateHSV(this);
         this.__state.space = "HSV";
       }
 
       this.__state[component] = v;
-    }
+    },
   });
 }
 
@@ -132,7 +133,7 @@ function recalculateHSV(color) {
 
   common.extend(color.__state, {
     s: result.s,
-    v: result.v
+    v: result.v,
   });
 
   if (!common.isNaN(result.h)) {

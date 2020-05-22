@@ -2,7 +2,7 @@
  * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011-2019 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2020 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,13 +42,13 @@ class OptionController extends Controller {
 
     if (common.isArray(options)) {
       const map = {};
-      common.each(options, function(element) {
+      common.each(options, function (element) {
         map[element] = element;
       });
       options = map;
     }
 
-    common.each(options, function(value, key) {
+    common.each(options, function (value, key) {
       const opt = settings.DOCUMENT.createElement("option");
       opt.innerHTML = key;
       opt.setAttribute("value", value);
@@ -58,7 +58,7 @@ class OptionController extends Controller {
     // Acknowledge original value
     this.updateDisplay();
 
-    dom.bind(this.__select, "change", function() {
+    dom.bind(this.__select, "change", function () {
       const desiredValue = this.options[this.selectedIndex].value;
       _this.setValue(desiredValue);
     });

@@ -11,7 +11,7 @@
     <script type="text/javascript">
       /* eslint-disable no-console, camelcase */
 
-      var TestEasing = function() {
+      var TestEasing = function () {
         this.status = "playing";
         this.duration = 1.0;
         this.keyframe = [
@@ -19,13 +19,13 @@
           { x: 0.4, y: 0, l: -0.1, r: 0.2 },
           { x: 0.6, y: 1.0, l: -0.1, r: 0.1 },
           { x: 0.75, y: 0, l: -0.1, r: 0.1 },
-          { x: 1.0, y: 0, l: -0.25, r: 0 }
+          { x: 1.0, y: 0, l: -0.25, r: 0 },
         ];
         this.color = "#999dd9";
         this.flag = true;
 
         this.playing = true;
-        this.onoff = function() {
+        this.onoff = function () {
           this.playing = !this.playing;
           this.status = this.playing ? "playing" : "stop";
           update();
@@ -46,7 +46,7 @@
       gui.add(obj, "onoff");
       gui.add(obj, "status");
 
-      durationController.onChange(function(v) {
+      durationController.onChange(function (v) {
         start = null; // reset
       });
 

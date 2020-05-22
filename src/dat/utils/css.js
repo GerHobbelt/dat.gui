@@ -2,7 +2,7 @@
  * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011-2019 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2020 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
  */
 
 const css = {
-  load: function(url, doc) {
+  load: function (url, doc) {
     doc = doc || settings.DOCUMENT;
     const link = doc.createElement("link");
     link.type = "text/css";
@@ -20,13 +20,13 @@ const css = {
     link.href = url;
     doc.getElementsByTagName("head")[0].appendChild(link);
   },
-  inject: function(css, doc) {
+  inject: function (css, doc) {
     doc = doc || settings.DOCUMENT;
     const injected = settings.DOCUMENT.createElement("style");
     injected.type = "text/css";
     injected.innerHTML = css;
     doc.getElementsByTagName("head")[0].appendChild(injected);
-  }
+  },
 };
 
 export default css;

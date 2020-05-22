@@ -26,12 +26,12 @@ licenseBanner = licenseBanner.replace(/^(\s*version )([0-9.-]+[0-9.a-z-]*)/gm, f
 var count;
 
 globby(["src/**/*.js", "build/**/*.js"])
-  .then(paths => {
+  .then((paths) => {
     count = 0;
 
     // console.log(paths);
 
-    paths.forEach(path => {
+    paths.forEach((path) => {
       var updated = false;
 
       // console.log('path: ', path);
@@ -57,7 +57,7 @@ globby(["src/**/*.js", "build/**/*.js"])
         console.log("updated: ", path);
         fs.writeFileSync(path, src, {
           encoding: "utf8",
-          flags: "w"
+          flags: "w",
         });
       }
     });

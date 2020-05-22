@@ -20,6 +20,7 @@ import FunctionController from '../controllers/FunctionController';
 import NumberControllerBox from '../controllers/NumberControllerBox';
 import NumberControllerSlider from '../controllers/NumberControllerSlider';
 import ColorController from '../controllers/ColorController';
+import ImageController from '../controllers/ImageController';
 import requestAnimationFrame from '../utils/requestAnimationFrame';
 import CenteredDiv from '../dom/CenteredDiv';
 import dom from '../dom/dom';
@@ -550,6 +551,29 @@ common.extend(
         property,
         {
           color: true
+        }
+      );
+    },
+
+    /**
+     * Adds an image controller to the GUI.
+     *
+     * @param object
+     * @param property
+     * @returns {Controller} The controller that was added to the GUI.
+     * @instance
+     *
+     * @example
+     * var images = { path1: 'myImage.png'};
+     * gui.addImage(images, 'path1');
+     */
+    addImage: function(object, property) {
+      return add(
+        this,
+        object,
+        property,
+        {
+          image: true
         }
       );
     },
@@ -1138,6 +1162,8 @@ function add(gui, object, property, params) {
 
   if (params.color) {
     controller = new ColorController(object, property);
+  } else if (params.image) {
+    controller = new ImageController(object, property);
   } else {
     const factoryArgs = [object, property].concat(params.factoryArgs);
     controller = ControllerFactory.apply(gui, factoryArgs);
@@ -1164,6 +1190,8 @@ function add(gui, object, property, params) {
   dom.addClass(li, GUI.CLASS_CONTROLLER_ROW);
   if (controller instanceof ColorController) {
     dom.addClass(li, 'color');
+  } else if (controller instanceof ImageController) {
+    dom.addClass(li, 'image');
   } else {
     dom.addClass(li, typeof controller.getValue());
   }

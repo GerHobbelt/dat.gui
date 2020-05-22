@@ -4878,7 +4878,7 @@ var gui = {
   GUI: GUI
 };
 var GUI$1 = GUI;
-var index = {
+var datGUI = {
   color: color,
   controllers: controllers,
   dom: dom$1,
@@ -4886,5 +4886,5 @@ var index = {
   GUI: GUI$1
 };
 
-export default index;
+export default datGUI;
 export { GUI$1 as GUI, color, controllers, dom$1 as dom, gui };

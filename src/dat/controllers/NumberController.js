@@ -82,7 +82,7 @@ class NumberController extends Controller {
    *
    * @param {Number} minValue The minimum value for
    * <code>object[property]</code>
-   * 
+   *
    * @returns {NumberController} this
    */
   min(minValue) {
@@ -95,7 +95,7 @@ class NumberController extends Controller {
    *
    * @param {Number} maxValue The maximum value for
    * <code>object[property]</code>
-   * 
+   *
    * @returns {NumberController} this
    */
   max(maxValue) {
@@ -108,10 +108,10 @@ class NumberController extends Controller {
    * increments by.
    *
    * @param {Number} stepValue The step value for {NumberController}
-   * 
+   *
    * @default if minimum and maximum specified increment is 1% of the
    * difference otherwise stepValue is 1
-   * 
+   *
    * @returns {NumberController} this
    */
   step(stepValue) {

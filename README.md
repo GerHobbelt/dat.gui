@@ -1,13 +1,27 @@
-# dat.GUI
+# UI Controller (dat.gui ported to commonjs)
 
-@MacroMan's fork with extra features - v1.2.0+dataarts-0.7.6
+## dynamic_properties branch
+
+This branch add the possibility for controllers to handle "dynamic properties".
+
+It means that the property supplied to the controller may not exist as such on the supplied object but in the form of a couple of standard getter/setter functions that match the property's name.
+
+Ie: the property `"position"` match the `getPosition()`/`setPosition()` functions.
+
+---
+Original dat.GUI readme below:
+
+---
+
+# dat.GUI
 
 A lightweight graphical user interface for changing variables in JavaScript.
 
 Get started with dat.GUI by reading the [tutorial](http://workshop.chromeexperiments.com/examples/gui)
 or the [API documentation](API.md).
 
-This fork of dat.gui was specifically created to be used with the new ISF website. It can be used exactly the same way; however, it just needs to be built with the JS and CSS separately. This can be turned on and off by changing one line in `rollup.config.js`:
+The dat.GUI library needs to be built with the JS and CSS separately. 
+This can be turned on and off by changing one line in `rollup.config.js`:
 ```js
 plugins: [
     ...
@@ -20,11 +34,14 @@ plugins: [
 ]
 ```
 
-This is because, when `insert` is set to `true`, the built dat.gui file appends the CSS file to the HTML, which means you can't control the order that it is included. Because the ISF website (or any website) needs to override the default styles, the default styles need to be included before the overrides. This is all set up on the ISF website to insert the files from `node_modules`, you just need to make sure you're pointing to the right dat.gui that is built in the right way.
+This is because, when `insert` is set to `true`, the built dat.GUI file 
+appends the CSS file to the HTML, which means you can't control the order 
+that it is included. Because any website needs to be able to override 
+the default styles, the default styles need to be included before the overrides. 
 
 
 
-## MacroMan's extra features
+## This fork's extra features
 
 * Added hide/show methods to all Controllers ([#93](https://github.com/dataarts/dat.gui/issues/93)).
 * Delete button added to preset menu ([#215](https://github.com/dataarts/dat.gui/issues/215)).
@@ -41,7 +58,7 @@ See [API.md](API.md) for usage
 
 ## Packaged Builds
 
-The easiest way to use dat.GUI in your code is by using the built source at [`build/dat.gui.min.js`](build/dat.gui.min.js). This built JavaScript file bundles all the necessary dependencies to run dat.GUI.
+The easiest way to use dat.GUI in your code is by using the built source at [`build/dat.gui.js`](build/dat.gui.js). This built JavaScript file bundles all the necessary dependencies to run dat.GUI.
 
 In your `head` tag, include the following code:
 
@@ -88,7 +105,8 @@ gui.add(obj, 'x').onChange(function() {
 ```
 ├── build - Concatenated source code for browsers.
 ├── src - source code in commonjs format.
-└── tests - [QUnit](https://github.com/jquery/qunit) test suite.
+├── tests - [QUnit](https://github.com/jquery/qunit) test suite.
+└── util - [node.js](http://nodejs.org/) utility scripts for compiling source.
 ```
 
 

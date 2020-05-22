@@ -80,8 +80,8 @@ const hideableGuis = [];
  *
  * @param {Object} [params]
  * @param {String} [params.name] The name of this GUI.
- * @param {Object} [params.load] JSON object representing the saved state of
- * this GUI.
+ * @param {Object} [params.load] JSON object representing the saved state of this GUI.
+ * @param {Object} [params.object] Providing your object will create a controller for each property automatically
  * @param {dat.gui.GUI} [params.parent] The GUI I'm nested in.
  * @param {Boolean} [params.autoPlace=true]
  * @param {Boolean} [params.hideable=true] If true, GUI is shown/hidden by <kbd>h</kbd> keypress.
@@ -466,6 +466,12 @@ const GUI = function(pars) {
   if (!params.parent) {
     resetWidth();
   }
+
+  if (common.isObject(params.object)) {
+    common.each(params.object, function(property, propertyName) {
+      _this.add(params.object, propertyName);
+    });
+  }
 };
 
 GUI.toggleHide = function() {
@@ -531,8 +537,7 @@ common.extend(
       return add(
         this,
         object,
-        property,
-        {
+        property, {
           factoryArgs: Array.prototype.slice.call(arguments, 2)
         }
       );
@@ -562,9 +567,43 @@ common.extend(
       return add(
         this,
         object,
-        property,
-        {
+        property, {
           color: true
+        }
+      );
+    },
+
+    /**
+     * Adds a new plotter controller to the GUI.
+     *
+     * @param object
+     * @param property
+     * @param max The maximum value that the plotter will display (default 10)
+     * @param period The update interval in ms or use 0 to only update on value change (default 500)
+     * @param type Type of graph to render - line or bar (default line)
+     * @param fgColor Foreground color of the graph in hex (default #fff)
+     * @param bgColor Background color of the graph in hex (default #000)
+     * @returns {Controller} The controller that was added to the GUI.
+     * @instance
+     *
+     * @example
+     * var obj = {
+     *   value: 5
+     * };
+     * gui.addPlotter(obj, 'value', 10, 100);
+     * gui.addPlotter(obj, 'value', 10, 0);
+     */
+    addPlotter: function(object, property, max, period, type, fgColor, bgColor) {
+      return add(
+        this,
+        object,
+        property, {
+          plotter: true,
+          max: max || 10,
+          period: (typeof period === 'number') ? period : 500,
+          type: type || 'line',
+          fgColor: fgColor || '#fff',
+          bgColor: bgColor || '#000'
         }
       );
     },
@@ -721,15 +760,15 @@ common.extend(
     },
 
     /**
-    * Hides the GUI.
-    */
+     * Hides the GUI.
+     */
     hide: function() {
       this.domElement.style.display = 'none';
     },
 
     /**
-    * Shows the GUI.
-    */
+     * Shows the GUI.
+     */
     show: function() {
       this.domElement.style.display = '';
     },
@@ -802,7 +841,8 @@ common.extend(
       });
 
       if (this.autoPlace) {
-        // Set save row width
+        // Set save row width and increase to accomodate buttons
+        this.width += 40;
         setWidth(this, this.width);
       }
     },
@@ -894,6 +934,17 @@ common.extend(
       }
     },
 
+    deleteSave: function() {
+      // Not allowed to remove Default preset
+      if (this.preset === DEFAULT_DEFAULT_PRESET_NAME || !confirm(`Delete preset "${this.preset}". Are you sure?`)) {
+        return;
+      }
+
+      delete this.load.remembered[this.preset];
+      this.preset = removeCurrentPresetOption(this);
+      this.saveToLocalStorageIfPossible();
+    },
+
     listen: function(controller) {
       const init = this.__listening.length === 0;
       this.__listening.push(controller);
@@ -972,8 +1023,7 @@ function augmentController(gui, li, controller) {
         return add(
           gui,
           controller.object,
-          controller.property,
-          {
+          controller.property, {
             before: nextSibling,
             factoryArgs: [common.toArray(arguments)]
           }
@@ -987,8 +1037,7 @@ function augmentController(gui, li, controller) {
         return add(
           gui,
           controller.object,
-          controller.property,
-          {
+          controller.property, {
             before: nextSibling,
             factoryArgs: [options]
           }
@@ -1008,9 +1057,11 @@ function augmentController(gui, li, controller) {
 
     /**
      * Sets controller to listen for changes on its underlying object.
+     * @param {boolean} forceUpdateDisplay Whether to force update a display, even when input is active (default: false).
      * @return {Controller}
      */
-    listen: function() {
+    listen: function(forceUpdateDisplay) {
+      controller.forceUpdateDisplay = !!forceUpdateDisplay;
       controller.__gui.listen(controller);
       return controller;
     },
@@ -1056,8 +1107,7 @@ function augmentController(gui, li, controller) {
         const newController = add(
           gui,
           controller.object,
-          controller.property,
-          {
+          controller.property, {
             before: controller.__li.nextElementSibling,
             factoryArgs: [controller.__min, controller.__max, controller.__step]
           }
@@ -1184,6 +1234,9 @@ function add(gui, object, property, params) {
       controller = new ColorController(object, property);
   } else if (params.image) {
     controller = new ImageController(object, property);
+  } else if (params.plotter) {
+    controller = new PlotterController(object, property, params);
+    gui.listen(controller);
     } else {
       const factoryArgs = [object, property].concat(params.factoryArgs);
       controller = ControllerFactory.apply(gui, factoryArgs);
@@ -1219,6 +1272,8 @@ function add(gui, object, property, params) {
     dom.addClass(li, 'color');
   } else if (controller instanceof ImageController) {
     dom.addClass(li, 'image');
+  } else if (controller instanceof PlotterController) {
+    dom.addClass(li, 'plotter');
   } else if (params.liClass) {
     dom.addClass(li, params.liClass);
   } else if (controller.liClass) {
@@ -1247,6 +1302,11 @@ function addPresetOption(gui, name, setSelected) {
   if (setSelected) {
     gui.__preset_select.selectedIndex = gui.__preset_select.length - 1;
   }
+}
+
+function removeCurrentPresetOption(gui) {
+  gui.__preset_select.removeChild(gui.__preset_select.options[gui.__preset_select.selectedIndex]);
+  return gui.__preset_select.options[gui.__preset_select.selectedIndex].value;
 }
 
 function showHideExplain(gui, explain) {
@@ -1282,6 +1342,11 @@ function addSaveMenu(gui) {
   dom.addClass(button3, 'button');
   dom.addClass(button3, 'revert');
 
+  const button4 = document.createElement('span');
+  button4.innerHTML = 'Delete';
+  dom.addClass(button4, 'button');
+  dom.addClass(button4, 'delete');
+
   const select = gui.__preset_select = document.createElement('select');
 
   if (gui.load && gui.load.remembered) {
@@ -1305,6 +1370,7 @@ function addSaveMenu(gui) {
   div.appendChild(button);
   div.appendChild(button2);
   div.appendChild(button3);
+  div.appendChild(button4);
 
   if (SUPPORTS_LOCAL_STORAGE) {
     const explain = document.getElementById('dg-local-explain');
@@ -1354,6 +1420,10 @@ function addSaveMenu(gui) {
 
   dom.bind(button3, 'click', function() {
     gui.revert();
+  });
+
+  dom.bind(button4, 'click', function() {
+    gui.deleteSave();
   });
 
   // div.appendChild(button2);

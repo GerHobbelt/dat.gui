@@ -154,8 +154,23 @@ const Common = {
 
   isAsyncFunction: function(obj) {
     return Object.prototype.toString.call(obj) === '[object AsyncFunction]';
-  }
+  },
 
+  supportsPassive: function() {
+    let supportsPassive = false;
+    try {
+      const opts = Object.defineProperty({}, 'passive', {
+        get: function() {
+          supportsPassive = true;
+        }
+      });
+      window.addEventListener('testPassive', null, opts);
+      window.removeEventListener('testPassive', null, opts);
+    } catch (e) {
+      // Do nothing
+    }
+    return supportsPassive;
+  }
 };
 
 export default Common;

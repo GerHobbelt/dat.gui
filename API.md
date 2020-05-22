@@ -44,6 +44,7 @@ manipulate variables and fire functions on the fly.
     * [.add(object, property, values)](#GUI+add2) ⇒ [<code>Controller</code>](#Controller)
     * [.addColor(object, property)](#GUI+addColor) ⇒ [<code>Controller</code>](#Controller)
     * [.addImage(object, property)](#GUI+addImage) ⇒ [<code>Controller</code>](#Controller)
+    * [.addPlotter(object, property, max, period, type, fgColor, bgColor)](#GUI+addPlotter) ⇒ [<code>Controller</code>](#Controller)
     * [.remove(controller)](#GUI+remove)
     * [.destroy()](#GUI+destroy)
     * [.addFolder(name)](#GUI+addFolder) ⇒ <code>dat.gui.GUI</code>
@@ -239,6 +240,32 @@ Adds an image controller to the GUI.
 var images = { path1: 'myImage.png'};
 gui.addImage(images, 'path1');
 ```
+<a name="GUI+addPlotter"></a>
+
+### gui.addPlotter(object, property, max, period, type, fgColor, bgColor) ⇒ [<code>Controller</code>](#Controller)
+Adds a new plotter controller to the GUI.
+
+**Kind**: instance method of [<code>GUI</code>](#GUI)  
+**Returns**: [<code>Controller</code>](#Controller) - The controller that was added to the GUI.  
+
+| Param | Description |
+| --- | --- |
+| object |  |
+| property |  |
+| max | The maximum value that the plotter will display (default 10) |
+| period | The update interval in ms or use 0 to only update on value change (default 500) |
+| type | Type of graph to render - line or bar (default line) |
+| fgColor | Foreground color of the graph in hex (default #fff) |
+| bgColor | Background color of the graph in hex (default #000) |
+
+**Example**  
+```js
+var obj = {
+  value: 5
+};
+gui.addPlotter(obj, 'value', 10, 100);
+gui.addPlotter(obj, 'value', 10, 0);
+```
 <a name="GUI+remove"></a>
 
 ### gui.remove(controller)
@@ -332,10 +359,13 @@ An "abstract" class that represents a given property of an object.
     * [.domElement](#Controller+domElement) : <code>DOMElement</code>
     * [.object](#Controller+object) : <code>Object</code>
     * [.property](#Controller+property) : <code>String</code>
+    * [.forceUpdateDisplay](#Controller+forceUpdateDisplay) : <code>boolean</code>
     * [.options(options)](#Controller+options) ⇒ [<code>Controller</code>](#Controller)
     * [.name(name)](#Controller+name) ⇒ [<code>Controller</code>](#Controller)
-    * [.listen()](#Controller+listen) ⇒ [<code>Controller</code>](#Controller)
+    * [.listen(forceUpdateDisplay)](#Controller+listen) ⇒ [<code>Controller</code>](#Controller)
     * [.remove()](#Controller+remove) ⇒ [<code>Controller</code>](#Controller)
+    * [.hide()](#Controller+hide)
+    * [.show()](#Controller+show)
     * [.onChange(fnc)](#Controller+onChange) ⇒ [<code>Controller</code>](#Controller)
     * [.onFinishChange(fnc)](#Controller+onFinishChange) ⇒ [<code>Controller</code>](#Controller)
     * [.setValue(newValue)](#Controller+setValue)
@@ -370,6 +400,12 @@ The object to manipulate
 The name of the property to manipulate
 
 **Kind**: instance property of [<code>Controller</code>](#Controller)  
+<a name="Controller+forceUpdateDisplay"></a>
+
+### controller.forceUpdateDisplay : <code>boolean</code>
+Whether to force update a display, even when input is active.
+
+**Kind**: instance property of [<code>Controller</code>](#Controller)  
 <a name="Controller+options"></a>
 
 ### controller.options(options) ⇒ [<code>Controller</code>](#Controller)
@@ -392,14 +428,31 @@ Sets the name of the controller.
 
 <a name="Controller+listen"></a>
 
-### controller.listen() ⇒ [<code>Controller</code>](#Controller)
+### controller.listen(forceUpdateDisplay) ⇒ [<code>Controller</code>](#Controller)
 Sets controller to listen for changes on its underlying object.
 
 **Kind**: instance method of [<code>Controller</code>](#Controller)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| forceUpdateDisplay | <code>boolean</code> | Whether to force update a display, even when input is active (default: false). |
+
 <a name="Controller+remove"></a>
 
 ### controller.remove() ⇒ [<code>Controller</code>](#Controller)
 Removes the controller from its parent GUI.
+
+**Kind**: instance method of [<code>Controller</code>](#Controller)  
+<a name="Controller+hide"></a>
+
+### controller.hide()
+Hides the controller on it's parent GUI.
+
+**Kind**: instance method of [<code>Controller</code>](#Controller)  
+<a name="Controller+show"></a>
+
+### controller.show()
+Shows the controller on it's parent GUI.
 
 **Kind**: instance method of [<code>Controller</code>](#Controller)  
 <a name="Controller+onChange"></a>

@@ -59,6 +59,28 @@ class Controller {
      * @ignore
      */
     this.__onFinishChange = undefined;
+
+    /**
+    * Whether to force update a display, even when input is active.
+    * @type boolean
+    */
+    this.forceUpdateDisplay = false;
+  }
+
+  /**
+  * Hides the controller on it's parent GUI.
+  */
+  hide() {
+    this.domElement.parentNode.parentNode.style.display = 'none';
+    return this;
+  }
+
+  /**
+  * Shows the controller on it's parent GUI.
+  */
+  show() {
+    this.domElement.parentNode.parentNode.style.display = '';
+    return this;
   }
 
   /**

@@ -48,7 +48,7 @@ class PlotterController extends Controller {
     this.domElement.appendChild(this.__panel.dom);
   }
 
-  updateDisplay () {
+  updateDisplay() {
     const value = this.getValue();
     if (this.period < 1 && value !== this.prevValue) {
       /* Update only on value change when auto-refresh is off */

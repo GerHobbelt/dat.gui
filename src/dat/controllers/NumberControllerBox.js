@@ -50,6 +50,18 @@ class NumberControllerBox extends NumberController {
      */
     let prevY;
 
+    this.__input = document.createElement("input");
+    this.__input.setAttribute("type", "number");
+
+    // Makes it so manually specified values are not truncated.
+
+    dom.bind(this.__input, 'focus', onFocus, false, true);
+    dom.bind(this.__input, 'change', onChange, false, true);
+    dom.bind(this.__input, 'blur', onBlur, false, true);
+    dom.bind(this.__input, 'mousedown', onMouseDown, false, true);
+    dom.bind(this.__input, 'wheel', onWheel);
+    dom.bind(this.__input, 'keydown', onKeyDown, false, true);
+
     function onChange() {
       const attempted = parseFloat(_this.__input.value);
       if (!common.isNaN(attempted) && !_this._readonly) {
@@ -86,22 +98,14 @@ class NumberControllerBox extends NumberController {
     }
 
     function onMouseDown(e) {
-      dom.bind(window, "mousemove", onMouseDrag);
-      dom.bind(window, "mouseup", onMouseUp);
+      dom.bind(window, 'mousemove', onMouseDrag, false, true);
+      dom.bind(window, 'mouseup', onMouseUp, false, true);
       prevY = e.clientY;
     }
 
-    this.__input = document.createElement("input");
-    this.__input.setAttribute("type", "text");
-
-    // Makes it so manually specified values are not truncated.
-
-    dom.bind(this.__input, 'focus', onFocus);
-    dom.bind(this.__input, "change", onChange);
-    dom.bind(this.__input, "blur", onBlur);
-    dom.bind(this.__input, "mousedown", onMouseDown);
-    dom.bind(this.__input, "keydown", function (e) {
-      // When pressing enter, you can be as precise as you want.
+    function onKeyDown(e) {
+      // TODO: pick one of the two keyboard switch-case handlers below:
+      if (1) {
       const step = _this.__step || 1;
       switch (e.keyCode) {
         case 13:
@@ -119,7 +123,43 @@ class NumberControllerBox extends NumberController {
           _this.setValue(newVal);
           break;
       }
-    });
+      
+      } else {
+      
+      switch (e.key) {
+        case 'Enter':
+          {
+            // When pressing enter, you can be as precise as you want.
+            _this.__truncationSuspended = true;
+            this.blur();
+            _this.__truncationSuspended = false;
+            onFinish();
+            break;
+          }
+        case 'ArrowUp':
+          {
+            _this.setValue(_this.getValue() + _this.__impliedStep);
+            break;
+          }
+        case 'ArrowDown':
+          {
+            _this.setValue(_this.getValue() - _this.__impliedStep);
+            break;
+          }
+        default:
+          {
+            break;
+          }
+      }
+      
+      }
+    }
+
+    function onWheel(e) {
+      e.preventDefault();
+      const direction = (-e.deltaY >> 10) || 1;
+      _this.setValue(_this.getValue() + direction * _this.__impliedStep);
+    }
 
     this.updateDisplay();
 

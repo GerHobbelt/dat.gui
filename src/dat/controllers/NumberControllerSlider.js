@@ -44,7 +44,8 @@ class NumberControllerSlider extends NumberController {
     this.__foreground = document.createElement('div');
 
     dom.bind(this.__background, 'mousedown', onMouseDown);
-    dom.bind(this.__background, 'touchstart', onTouchStart);
+    dom.bind(this.__background, 'touchstart', onTouchStart, false, true);
+    dom.bind(this.__background, 'wheel', onWheel);
 
     dom.addClass(this.__background, 'slider');
     dom.addClass(this.__foreground, 'slider-fg');
@@ -53,7 +54,7 @@ class NumberControllerSlider extends NumberController {
       document.activeElement.blur();
 
       dom.bind(window, 'mousemove', onMouseDrag);
-      dom.bind(window, 'mouseup', onMouseUp);
+      dom.bind(window, 'mouseup', onMouseUp, false, true);
 
       onMouseDrag(e);
     }
@@ -81,8 +82,8 @@ class NumberControllerSlider extends NumberController {
 
     function onTouchStart(e) {
       if (e.touches.length !== 1) { return; }
-      dom.bind(window, 'touchmove', onTouchMove);
-      dom.bind(window, 'touchend', onTouchEnd);
+      dom.bind(window, 'touchmove', onTouchMove, false, true);
+      dom.bind(window, 'touchend', onTouchEnd, false, true);
       onTouchMove(e);
     }
 
@@ -102,6 +103,12 @@ class NumberControllerSlider extends NumberController {
       if (_this.__onFinishChange) {
         _this.__onFinishChange.call(_this, _this.getValue());
       }
+    }
+
+    function onWheel(e) {
+      e.preventDefault();
+      const direction = (-e.deltaY >> 10) || 1;
+      _this.setValue(_this.getValue() + direction * _this.__impliedStep);
     }
 
     this.updateDisplay();

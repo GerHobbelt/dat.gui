@@ -79,6 +79,7 @@ class NumberController extends Controller {
    *
    * @param {Number} minValue The minimum value for
    * <code>object[property]</code>
+   *
    * @returns {dat.controllers.NumberController} this
    */
   min(minValue) {

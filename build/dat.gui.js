@@ -20,15 +20,50 @@
 })(this, function (exports) {
   "use strict";
 
-  function toString$1(color) {
-    if (color.a === 1 || common.isUndefined(color.a)) {
+  function colorToString(color, forceCSSHex) {
+    var colorFormat = color.__state.conversionName.toString();
+    var r = Math.round(color.r);
+    var g = Math.round(color.g);
+    var b = Math.round(color.b);
+    var a = color.a >= 1 || color.a == null ? 1 : color.a;
+    var h = Math.round(color.h);
+    var s = color.s.toFixed(1);
+    var v = color.v.toFixed(1);
+    if (forceCSSHex || colorFormat === "THREE_CHAR_HEX" || colorFormat === "SIX_CHAR_HEX") {
       var str = color.hex.toString(16);
       while (str.length < 6) {
         str = "0" + str;
       }
       return "#" + str;
     }
-    return "rgba(" + Math.round(color.r) + "," + Math.round(color.g) + "," + Math.round(color.b) + "," + color.a + ")";
+    if (colorFormat === "CSS_RGB") {
+      return "rgb(" + r + "," + g + "," + b + ")";
+    }
+    if (colorFormat === "CSS_RGBA") {
+      return "rgba(" + r + "," + g + "," + b + "," + a + ")";
+    }
+    if (colorFormat === "HEX") {
+      return "0x" + color.hex.toString(16);
+    }
+    if (colorFormat === "RGB_ARRAY") {
+      return "[" + r + "," + g + "," + b + "]";
+    }
+    if (colorFormat === "RGBA_ARRAY") {
+      return "[" + r + "," + g + "," + b + "," + a + "]";
+    }
+    if (colorFormat === "RGB_OBJ") {
+      return "{r:" + r + ",g:" + g + ",b:" + b + "}";
+    }
+    if (colorFormat === "RGBA_OBJ") {
+      return "{r:" + r + ",g:" + g + ",b:" + b + ",a:" + a + "}";
+    }
+    if (colorFormat === "HSV_OBJ") {
+      return "{h:" + h + ",s:" + s + ",v:" + v + "}";
+    }
+    if (colorFormat === "HSVA_OBJ") {
+      return "{h:" + h + ",s:" + s + ",v:" + v + ",a:" + a + "}";
+    }
+    return "unknown format";
   }
 
   var ARR_SLICE = Array.prototype.slice;
@@ -110,11 +145,9 @@
     isNaN: function isNaN(obj) {
       return obj !== obj;
     },
-    isArray:
-      Array.isArray ||
-      function (obj) {
-        return obj.constructor === Array;
-      },
+    isArray: function isArray(obj) {
+      return obj != null && obj.length >= 0 && typeof obj === "object";
+    },
     isObject: function isObject(obj) {
       return obj === Object(obj);
     },
@@ -169,7 +202,7 @@
               ),
             };
           },
-          write: toString$1,
+          write: colorToString,
         },
         SIX_CHAR_HEX: {
           read: function read(original) {
@@ -182,7 +215,7 @@
               hex: parseInt("0x" + test[1].toString(), 16),
             };
           },
-          write: toString$1,
+          write: colorToString,
         },
         CSS_RGB: {
           read: function read(original) {
@@ -197,7 +230,7 @@
               b: parseFloat(test[3]),
             };
           },
-          write: toString$1,
+          write: colorToString,
         },
         CSS_RGBA: {
           read: function read(original) {
@@ -213,7 +246,7 @@
               a: parseFloat(test[4]),
             };
           },
-          write: toString$1,
+          write: colorToString,
         },
       },
     },
@@ -470,17 +503,12 @@
       this.__state.a = this.__state.a || 1;
     }
     var _proto = Color.prototype;
-    _proto.toString = (function (_toString) {
-      function toString() {
-        return _toString.apply(this, arguments);
-      }
-      toString.toString = function () {
-        return _toString.toString();
-      };
-      return toString;
-    })(function () {
-      return toString(this);
-    });
+    _proto.toString = function toString() {
+      return colorToString(this);
+    };
+    _proto.toHexString = function toHexString() {
+      return colorToString(this, true);
+    };
     _proto.toOriginal = function toOriginal() {
       return this.__state.conversion.write(this);
     };
@@ -626,7 +654,7 @@
 
   var EVENT_MAP = {
     HTMLEvents: ["change"],
-    MouseEvents: ["click", "mousemove", "mousedown", "mouseup", "mouseover"],
+    MouseEvents: ["click", "mousemove", "mousedown", "mouseup", "mouseover", "wheel"],
     KeyboardEvents: ["keydown"],
   };
   var EVENT_MAP_INV = {};
@@ -839,15 +867,15 @@
       _this2.__prev = _this2.getValue();
       _this2.__checkbox = document.createElement("input");
       _this2.__checkbox.setAttribute("type", "checkbox");
+      function onChange() {
+        _this.setValue(!_this.__prev);
+      }
       dom.bind(_this2.__checkbox, "change", onChange, false);
       _this2.domElement.appendChild(_this2.__checkbox);
       _this2.updateDisplay();
       return _this2;
     }
     var _proto = BooleanController.prototype;
-    _proto.onChange = function onChange() {
-      _this.setValue(!_this.__prev);
-    };
     _proto.setValue = function setValue(v) {
       var toReturn = _Controller.prototype.setValue.call(this, v);
       if (this.__onFinishChange) {
@@ -917,17 +945,17 @@
       var _this2;
       _this2 = _Controller.call(this, object, property) || this;
       var _this = _assertThisInitialized(_this2);
+      function onKeyDown(e) {
+        if (e.keyCode === 13) {
+          this.blur();
+        }
+      }
       _this2.__input = document.createElement("input");
       _this2.__input.setAttribute("type", "text");
       dom.bind(_this2.__input, "keyup", onChange);
       dom.bind(_this2.__input, "change", onChange);
       dom.bind(_this2.__input, "blur", onBlur);
       dom.bind(_this2.__input, "keydown", onKeyDown);
-      function onKeyDown(e) {
-        if (e.keyCode === 13) {
-          this.blur();
-        }
-      }
       function onChange() {
         _this.setValue(_this.__input.value);
       }
@@ -1181,7 +1209,7 @@
       _this2.__hue_field.className = "hue-field";
       _this2.__input = document.createElement("input");
       _this2.__input.type = "text";
-      _this2.__input_textShadow = "0 1px 1px ";
+      _this2.__input_textShadow = ["1px 0px 0px ", "-1px 0px 0px ", "0px 1px 0px ", "0px -1px 0px "];
       dom.bind(_this2.__input, "keydown", function (e) {
         if (e.keyCode === 13) {
           onBlur.call(this);
@@ -1245,7 +1273,11 @@
         color: "#fff",
         border: 0,
         fontWeight: "bold",
-        textShadow: _this2.__input_textShadow + "rgba(0,0,0,0.7)",
+        textShadow: _this2.__input_textShadow
+          .map(function (d) {
+            return d + " rgba(0,0,0,0.7)";
+          })
+          .join(", "),
       });
       dom.bind(_this2.__saturation_field, "mousedown", fieldDown);
       dom.bind(_this2.__field_knob, "mousedown", fieldDown);
@@ -1363,7 +1395,11 @@
       Common.extend(this.__input.style, {
         backgroundColor: this.__color.toString(),
         color: "rgb(" + flip + "," + flip + "," + flip + ")",
-        textShadow: this.__input_textShadow + "rgba(" + _flip + "," + _flip + "," + _flip + ",.7)",
+        textShadow: this.__input_textShadow
+          .map(function (d) {
+            return d + " rgba(" + _flip + "," + _flip + "," + _flip + ",0.7)";
+          })
+          .join(", "),
       });
     };
     return ColorController;

@@ -11,14 +11,13 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import UndefinedController from "./UndefinedController";
 import OptionController from "./OptionController";
 import NumberControllerBox from "./NumberControllerBox";
 import NumberControllerSlider from "./NumberControllerSlider";
 import StringController from "./StringController";
 import FunctionController from "./FunctionController";
 import BooleanController from "./BooleanController";
-
+import UndefinedController from "./UndefinedController";
 import common from "../utils/common";
 
 const ARR_SLICE = Array.prototype.slice;

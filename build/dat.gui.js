@@ -20,15 +20,50 @@
 })(this, function (exports) {
   "use strict";
 
-  function toString$1(color) {
-    if (color.a === 1 || common.isUndefined(color.a)) {
+  function colorToString(color, forceCSSHex) {
+    var colorFormat = color.__state.conversionName.toString();
+    var r = Math.round(color.r);
+    var g = Math.round(color.g);
+    var b = Math.round(color.b);
+    var a = color.a >= 1 || color.a == null ? 1 : color.a;
+    var h = Math.round(color.h);
+    var s = color.s.toFixed(1);
+    var v = color.v.toFixed(1);
+    if (forceCSSHex || colorFormat === "THREE_CHAR_HEX" || colorFormat === "SIX_CHAR_HEX") {
       var str = color.hex.toString(16);
       while (str.length < 6) {
         str = "0" + str;
       }
       return "#" + str;
     }
-    return "rgba(" + Math.round(color.r) + "," + Math.round(color.g) + "," + Math.round(color.b) + "," + color.a + ")";
+    if (colorFormat === "CSS_RGB") {
+      return "rgb(" + r + "," + g + "," + b + ")";
+    }
+    if (colorFormat === "CSS_RGBA") {
+      return "rgba(" + r + "," + g + "," + b + "," + a + ")";
+    }
+    if (colorFormat === "HEX") {
+      return "0x" + color.hex.toString(16);
+    }
+    if (colorFormat === "RGB_ARRAY") {
+      return "[" + r + "," + g + "," + b + "]";
+    }
+    if (colorFormat === "RGBA_ARRAY") {
+      return "[" + r + "," + g + "," + b + "," + a + "]";
+    }
+    if (colorFormat === "RGB_OBJ") {
+      return "{r:" + r + ",g:" + g + ",b:" + b + "}";
+    }
+    if (colorFormat === "RGBA_OBJ") {
+      return "{r:" + r + ",g:" + g + ",b:" + b + ",a:" + a + "}";
+    }
+    if (colorFormat === "HSV_OBJ") {
+      return "{h:" + h + ",s:" + s + ",v:" + v + "}";
+    }
+    if (colorFormat === "HSVA_OBJ") {
+      return "{h:" + h + ",s:" + s + ",v:" + v + ",a:" + a + "}";
+    }
+    return "unknown format";
   }
 
   var ARR_SLICE = Array.prototype.slice;
@@ -110,11 +145,9 @@
     isNaN: function isNaN(obj) {
       return Number.isNaN(obj);
     },
-    isArray:
-      Array.isArray ||
-      function (obj) {
-        return obj.constructor === Array;
-      },
+    isArray: function isArray(obj) {
+      return obj != null && obj.length >= 0 && typeof obj === "object";
+    },
     isObject: function isObject(obj) {
       return obj === Object(obj);
     },
@@ -159,7 +192,7 @@
               ),
             };
           },
-          write: toString$1,
+          write: colorToString,
         },
         SIX_CHAR_HEX: {
           read: function read(original) {
@@ -172,7 +205,7 @@
               hex: parseInt("0x" + test[1].toString(), 16),
             };
           },
-          write: toString$1,
+          write: colorToString,
         },
         CSS_RGB: {
           read: function read(original) {
@@ -187,7 +220,7 @@
               b: parseFloat(test[3]),
             };
           },
-          write: toString$1,
+          write: colorToString,
         },
         CSS_RGBA: {
           read: function read(original) {
@@ -203,7 +236,7 @@
               a: parseFloat(test[4]),
             };
           },
-          write: toString$1,
+          write: colorToString,
         },
       },
     },
@@ -460,17 +493,12 @@
       this.__state.a = this.__state.a || 1;
     }
     var _proto = Color.prototype;
-    _proto.toString = (function (_toString) {
-      function toString() {
-        return _toString.apply(this, arguments);
-      }
-      toString.toString = function () {
-        return _toString.toString();
-      };
-      return toString;
-    })(function () {
-      return toString(this);
-    });
+    _proto.toString = function toString() {
+      return colorToString(this);
+    };
+    _proto.toHexString = function toHexString() {
+      return colorToString(this, true);
+    };
     _proto.toOriginal = function toOriginal() {
       return this.__state.conversion.write(this);
     };
@@ -628,7 +656,7 @@
 
   var EVENT_MAP = {
     HTMLEvents: ["change"],
-    MouseEvents: ["click", "mousemove", "mousedown", "mouseup", "mouseover"],
+    MouseEvents: ["click", "mousemove", "mousedown", "mouseup", "mouseover", "wheel"],
     KeyboardEvents: ["keydown"],
   };
   var EVENT_MAP_INV = {};
@@ -742,8 +770,8 @@
       Common.defaults(evt, aux);
       elem.dispatchEvent(evt);
     },
-    bind: function bind(elem, event, func, newBool) {
-      var bool = newBool || false;
+    bind: function bind(elem, event, func, bool) {
+      bool = bool || false;
       if (elem.addEventListener) {
         elem.addEventListener(event, func, bool);
       } else if (elem.attachEvent) {
@@ -751,8 +779,8 @@
       }
       return dom;
     },
-    unbind: function unbind(elem, event, func, newBool) {
-      var bool = newBool || false;
+    unbind: function unbind(elem, event, func, bool) {
+      bool = bool || false;
       if (elem.removeEventListener) {
         elem.removeEventListener(event, func, bool);
       } else if (elem.detachEvent) {
@@ -841,15 +869,15 @@
       _this2.__prev = _this2.getValue();
       _this2.__checkbox = settings.DOCUMENT.createElement("input");
       _this2.__checkbox.setAttribute("type", "checkbox");
+      function onChange() {
+        _this.setValue(!_this.__prev);
+      }
       dom.bind(_this2.__checkbox, "change", onChange, false);
       _this2.domElement.appendChild(_this2.__checkbox);
       _this2.updateDisplay();
       return _this2;
     }
     var _proto = BooleanController.prototype;
-    _proto.onChange = function onChange() {
-      _this.setValue(!_this.__prev);
-    };
     _proto.setValue = function setValue(v) {
       var toReturn = _Controller.prototype.setValue.call(this, v);
       if (this.__onFinishChange) {
@@ -907,6 +935,9 @@
       return toReturn;
     };
     _proto.updateDisplay = function updateDisplay() {
+      if (dom.isActive(this.__select)) {
+        return this;
+      }
       this.__select.value = this.getValue();
       return _Controller.prototype.updateDisplay.call(this);
     };
@@ -919,17 +950,6 @@
       var _this2;
       _this2 = _Controller.call(this, object, property) || this;
       var _this = _assertThisInitialized(_this2);
-      _this2.__input = settings.DOCUMENT.createElement("input");
-      _this2.__input.setAttribute("type", "text");
-      dom.bind(_this2.__input, "keyup", onChange);
-      dom.bind(_this2.__input, "change", onChange);
-      dom.bind(_this2.__input, "blur", onBlur);
-      dom.bind(_this2.__input, "keydown", onKeyDown);
-      function onKeyDown(e) {
-        if (e.keyCode === 13) {
-          this.blur();
-        }
-      }
       function onChange() {
         _this.setValue(_this.__input.value);
       }
@@ -938,15 +958,27 @@
           _this.__onFinishChange.call(_this, _this.getValue());
         }
       }
+      function onKeyDown(e) {
+        if (e.keyCode === 13) {
+          this.blur();
+        }
+      }
+      _this2.__input = settings.DOCUMENT.createElement("input");
+      _this2.__input.setAttribute("type", "text");
+      dom.bind(_this2.__input, "keyup", onChange);
+      dom.bind(_this2.__input, "change", onChange);
+      dom.bind(_this2.__input, "blur", onBlur);
+      dom.bind(_this2.__input, "keydown", onKeyDown);
       _this2.updateDisplay();
       _this2.domElement.appendChild(_this2.__input);
       return _this2;
     }
     var _proto = StringController.prototype;
     _proto.updateDisplay = function updateDisplay() {
-      if (!dom.isActive(this.__input)) {
-        this.__input.value = this.getValue();
+      if (dom.isActive(this.__input)) {
+        return this;
       }
+      this.__input.value = this.getValue();
       return _Controller.prototype.updateDisplay.call(this);
     };
     return StringController;
@@ -1026,16 +1058,7 @@
       _this2.__truncationSuspended = false;
       _this2.__mouseIsDown = false;
       var _this = _assertThisInitialized(_this2);
-      _this2.__input = settings.DOCUMENT.createElement("input");
-      if (_this2.__step != null) {
-        _this2.__input.setAttribute("step", _this2.__step);
-        _this2.__input.setAttribute("type", "number");
-      } else _this2.__input.setAttribute("type", "text");
-      dom.bind(_this2.__input, "input", onInput);
-      dom.bind(_this2.__input, "change", onChange);
-      dom.bind(_this2.__input, "blur", onBlur);
-      dom.bind(_this2.__input, "mousedown", onMouseDownDetect);
-      dom.bind(_this2.__input, "keydown", function (e) {
+      function onKeyDown(e) {
         if (e.keyCode === 13) {
           _this.__truncationSuspended = true;
           this.blur();
@@ -1043,7 +1066,7 @@
         } else if ((e.keyCode === 38 || e.keyCode === 40) && _this.__step) {
           onChange();
         }
-      });
+      }
       function onMouseDownDetect() {
         _this.__mouseIsDown = true;
         dom.bind(window, "mouseup", onMouseUpDetect);
@@ -1052,7 +1075,7 @@
         _this.__mouseIsDown = false;
         dom.unbind(window, "mouseup", onMouseUpDetect);
       }
-      function onChange() {
+      function onChange(e) {
         var attempted = parseFloat(_this.__input.value);
         if (!Common.isNaN(attempted)) {
           _this.setValue(attempted);
@@ -1073,19 +1096,34 @@
           _this.__onFinishChange.call(_this, _this.getValue());
         }
       }
+      _this2.__input = settings.DOCUMENT.createElement("input");
+      if (_this2.__step != null) {
+        _this2.__input.setAttribute("step", _this2.__step);
+        _this2.__input.setAttribute("type", "number");
+      } else _this2.__input.setAttribute("type", "text");
+      dom.bind(_this2.__input, "input", onInput);
+      dom.bind(_this2.__input, "change", onChange);
+      dom.bind(_this2.__input, "blur", onBlur);
+      dom.bind(_this2.__input, "mousedown", onMouseDownDetect);
+      dom.bind(_this2.__input, "keydown", onKeyDown);
       _this2.updateDisplay();
       _this2.domElement.appendChild(_this2.__input);
       return _this2;
     }
     var _proto = NumberControllerBox.prototype;
     _proto.updateDisplay = function updateDisplay() {
+      if (dom.isActive(this.__input)) {
+        return this;
+      }
       this.__input.value = this.__truncationSuspended
         ? this.getValue()
         : roundToDecimal(this.getValue(), this.__precision);
       return _NumberController.prototype.updateDisplay.call(this);
     };
     _proto.step = function step(v) {
-      if (this.__input.getAttribute("type") !== "number") this.__input.setAttribute("type", "number");
+      if (this.__input.getAttribute("type") !== "number") {
+        this.__input.setAttribute("type", "number");
+      }
       this.__input.setAttribute("step", v);
       return _NumberController.prototype.step.apply(this, arguments);
     };
@@ -1144,7 +1182,7 @@
         _this.setValue(map(e.clientX, offset.left, offset.left + width, _this.__min, _this.__max));
         return false;
       }
-      function onMouseUp() {
+      function onMouseUp(e) {
         dom.unbind(settings.WINDOW, "mousemove", onMouseDrag);
         dom.unbind(settings.WINDOW, "mouseup", onMouseUp);
         if (_this.__onFinishChange) {
@@ -1158,9 +1196,6 @@
       return _this2;
     }
     var _proto = NumberControllerSlider.prototype;
-    _proto.useDefaultStyles = function useDefaultStyles() {
-      css.inject(styleSheet);
-    };
     _proto.updateDisplay = function updateDisplay() {
       var value = this.getValue();
       var pct = (value - this.__min) / (this.__max - this.__min);
@@ -1239,7 +1274,7 @@
       _this2.__hue_field.className = "hue-field";
       _this2.__input = settings.DOCUMENT.createElement("input");
       _this2.__input.type = "text";
-      _this2.__input_textShadow = "0 1px 1px ";
+      _this2.__input_textShadow = ["1px 0px 0px ", "-1px 0px 0px ", "0px 1px 0px ", "0px -1px 0px "];
       dom.bind(_this2.__input, "keydown", function (e) {
         if (e.keyCode === 13) {
           onBlur.call(this);
@@ -1303,7 +1338,11 @@
         color: "#fff",
         border: 0,
         fontWeight: "bold",
-        textShadow: _this2.__input_textShadow + "rgba(0,0,0,0.7)",
+        textShadow: _this2.__input_textShadow
+          .map(function (d) {
+            return d + " rgba(0,0,0,0.7)";
+          })
+          .join(", "),
       });
       dom.bind(_this2.__saturation_field, "mousedown", fieldDown);
       dom.bind(_this2.__field_knob, "mousedown", fieldDown);
@@ -1421,7 +1460,11 @@
       Common.extend(this.__input.style, {
         backgroundColor: this.__color.toString(),
         color: "rgb(" + flip + "," + flip + "," + flip + ")",
-        textShadow: this.__input_textShadow + "rgba(" + _flip + "," + _flip + "," + _flip + ",.7)",
+        textShadow: this.__input_textShadow
+          .map(function (d) {
+            return d + " rgba(" + _flip + "," + _flip + "," + _flip + ",0.7)";
+          })
+          .join(", "),
       });
     };
     return ColorController;
@@ -1488,9 +1531,10 @@
     }
     var _proto = ArrayController.prototype;
     _proto.updateDisplay = function updateDisplay() {
-      if (!dom.isActive(this.__input)) {
-        this.__input.value = this.getValue();
+      if (dom.isActive(this.__input)) {
+        return this;
       }
+      this.__input.value = this.getValue();
       return _Controller.prototype.updateDisplay.call(this);
     };
     return ArrayController;
@@ -1523,9 +1567,10 @@
     }
     var _proto = TextAreaController.prototype;
     _proto.updateDisplay = function updateDisplay() {
-      if (!dom.isActive(this.__input)) {
-        this.__input.value = this.getValue();
+      if (dom.isActive(this.__input)) {
+        return this;
       }
+      this.__input.value = this.getValue();
       return _Controller.prototype.updateDisplay.call(this);
     };
     return TextAreaController;
@@ -1535,9 +1580,9 @@
     _inheritsLoose(Vec3Controller, _NumberController);
     function Vec3Controller(object, property, params) {
       var _this2;
-      _this2.__truncationSuspended = false;
       _this2 = _NumberController.call(this, object, property, params) || this;
       var _this = _assertThisInitialized(_this2);
+      _this2.__truncationSuspended = false;
       var prev_y;
       _this2.xInput = document.createElement("input");
       _this2.xInput.setAttribute("type", "number");
@@ -1620,6 +1665,26 @@
     var tenTo = Math.pow(10, decimals);
     return Math.round(value * tenTo) / tenTo;
   }
+
+  var UndefinedController = (function (_Controller) {
+    _inheritsLoose(UndefinedController, _Controller);
+    function UndefinedController(object, property, options) {
+      var _this2;
+      _this2 = _Controller.call(this, object, property, "undefined", options) || this;
+      var _this = _assertThisInitialized(_this2);
+      _this2.__prev = _this2.getValue();
+      _this2.__elem = document.createElement("em");
+      _this2.domElement.appendChild(_this2.__elem);
+      _this2.updateDisplay();
+      return _this2;
+    }
+    var _proto = UndefinedController.prototype;
+    _proto.updateDisplay = function updateDisplay() {
+      this.__elem.innerText = "<undefined>";
+      return _Controller.prototype.updateDisplay.call(this);
+    };
+    return UndefinedController;
+  })(Controller);
 
   function clipFunc(min, max) {
     return function (v) {
@@ -2413,7 +2478,9 @@
         this.domElement.appendChild(this.__closeButton);
         dom.bind(this.__closeButton, "click", function () {
           _this.closed = !_this.closed;
-          if (_this.__onClosedChange) _this.__onClosedChange.call(_this, _this.closed);
+          if (_this.__onClosedChange) {
+            _this.__onClosedChange.call(_this, _this.closed);
+          }
         });
       } else {
         if (params.closed === undefined) {
@@ -2425,7 +2492,9 @@
         var on_click_title = function on_click_title(e) {
           e.preventDefault();
           _this.closed = !_this.closed;
-          if (_this.__onClosedChange) _this.__onClosedChange.call(_this, _this.closed);
+          if (_this.__onClosedChange) {
+            _this.__onClosedChange.call(_this, _this.closed);
+          }
           return false;
         };
         dom.addClass(this.__ul, GUI.CLASS_CLOSED);
@@ -2451,13 +2520,13 @@
           setWidth(_this, params.width);
         }
       }
-      this.__resizeHandler = function () {
+      function __resizeHandler() {
         _this.onResize();
-      };
-      dom.bind(settings.WINDOW, "resize", this.__resizeHandler);
-      dom.bind(this.__ul, "webkitTransitionEnd", this.__resizeHandler);
-      dom.bind(this.__ul, "transitionend", this.__resizeHandler);
-      dom.bind(this.__ul, "oTransitionEnd", this.__resizeHandler);
+      }
+      dom.bind(settings.WINDOW, "resize", __resizeHandler);
+      dom.bind(this.__ul, "webkitTransitionEnd", __resizeHandler);
+      dom.bind(this.__ul, "transitionend", __resizeHandler);
+      dom.bind(this.__ul, "oTransitionEnd", __resizeHandler);
       this.onResize();
       if (params.resizable) {
         addResizeHandle(this);

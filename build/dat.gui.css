@@ -1,3 +1,4 @@
+@charset "UTF-8";
 /**
  * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
@@ -75,7 +76,6 @@
   opacity: 1;
 }
 .dg.main .close-button {
-  /* opacity: 0; */
   -webkit-transition: opacity 0.1s linear;
   -o-transition: opacity 0.1s linear;
   -moz-transition: opacity 0.1s linear;
@@ -150,6 +150,8 @@
   width: 40%;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-overflow: "…" "…";
+  white-space: nowrap;
 }
 .dg .c {
   float: left;
@@ -182,7 +184,6 @@
 .dg .has-slider input[type=text],
 .dg .has-slider input[type=number] {
   width: 30%;
-  /* display: none; */
   margin-left: 0;
 }
 .dg .slider {

@@ -75,6 +75,11 @@ class OptionController extends Controller {
   }
 
   updateDisplay() {
+    // Use the same solution from StringController.js to enable
+    // editing <input>s while "listen()"ing
+    if (dom.isActive(this.__select)) {
+      return this;
+    }
     this.__select.value = this.getValue();
     return super.updateDisplay();
   }

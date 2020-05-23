@@ -14,10 +14,6 @@
 import dom from "./dom";
 import common from "../utils/common";
 
-function lockScroll(e) {
-  console.log(e);
-}
-
 class CenteredDiv {
   constructor() {
     this.backgroundElement = settings.DOCUMENT.createElement("div");

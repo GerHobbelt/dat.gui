@@ -30,22 +30,6 @@ class StringController extends Controller {
 
     const _this = this;
 
-    this.__input = settings.DOCUMENT.createElement("input");
-    this.__input.setAttribute("type", "text");
-
-    dom.bind(this.__input, "keyup", onChange);
-    dom.bind(this.__input, "change", onChange);
-    dom.bind(this.__input, "blur", onBlur);
-    dom.bind(this.__input, "keydown", onKeyDown);
-
-    function onKeyDown(e) {
-      if (e.keyCode === 13) {
-        /* jshint validthis: true */
-        this.blur();
-        /* jshint validthis: false */
-      }
-    }
-
     function onChange() {
       _this.setValue(_this.__input.value);
     }
@@ -56,6 +40,22 @@ class StringController extends Controller {
       }
     }
 
+    function onKeyDown(e) {
+      if (e.keyCode === 13) {
+        /* jshint validthis: true */
+        this.blur();
+        /* jshint validthis: false */
+      }
+    }
+
+    this.__input = settings.DOCUMENT.createElement("input");
+    this.__input.setAttribute("type", "text");
+
+    dom.bind(this.__input, "keyup", onChange);
+    dom.bind(this.__input, "change", onChange);
+    dom.bind(this.__input, "blur", onBlur);
+    dom.bind(this.__input, "keydown", onKeyDown);
+
     this.updateDisplay();
 
     this.domElement.appendChild(this.__input);
@@ -64,9 +64,12 @@ class StringController extends Controller {
   updateDisplay() {
     // Stops the caret from moving on account of:
     // keyup -> setValue -> updateDisplay
-    if (!dom.isActive(this.__input)) {
-      this.__input.value = this.getValue();
+    //
+    // This enables editing <input>s while "listen()"ing
+    if (dom.isActive(this.__input)) {
+      return this;
     }
+    this.__input.value = this.getValue();
     return super.updateDisplay();
   }
 }

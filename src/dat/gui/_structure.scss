@@ -11,6 +11,12 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
+// ▐▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▌
+// ▐ Triggering UTF8 file save hack ▌
+// ▐▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▌
+//
+// --------------------------------------------------------------
+
 $nest-margin: 4px;
 $row-height: 27px;
 
@@ -80,7 +86,7 @@ $button-height: 20px;
     }
 
     .close-button {
-      /* opacity: 0; */
+      // opacity: 0;
       @include transition(opacity, 0.1s, linear);
 
       border: 0;
@@ -174,6 +180,8 @@ $button-height: 20px;
     width: 40%;
     overflow: hidden;
     text-overflow: ellipsis;
+    text-overflow: "…" "…"; // https://developer.mozilla.org/en-US/docs/Web/CSS/text-overflow
+    white-space: nowrap; // otherwise the text will simply wrap and the text-overflow ellipsis will not be applied, but instead the text simply disappears (if only partially)
   }
 
   /** Controller-half (right) */
@@ -217,7 +225,7 @@ $button-height: 20px;
   .has-slider input[type="number"] {
     width: 30%;
 
-    /* display: none; */
+    // display: none;
     margin-left: 0;
   }
 
@@ -260,7 +268,7 @@ $button-height: 20px;
 
   /** Ensure the entire boolean and function row shows a hand */
   .cr.function,
-  .cr.function .property-name, /* Don't know why I need to be this explicit */
+  .cr.function .property-name,  // Don't know why I need to be this explicit 
   .cr.function *,
   .cr.boolean,
   .cr.boolean * {

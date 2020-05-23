@@ -93,7 +93,7 @@ class NumberControllerSlider extends NumberController {
       return false;
     }
 
-    function onMouseUp() {
+    function onMouseUp(e) {
       dom.unbind(settings.WINDOW, "mousemove", onMouseDrag);
       dom.unbind(settings.WINDOW, "mouseup", onMouseUp);
       if (_this.__onFinishChange) {
@@ -106,13 +106,6 @@ class NumberControllerSlider extends NumberController {
     this.__background.appendChild(this.__foreground);
     this.__background.appendChild(this.__label);
     this.domElement.appendChild(this.__background);
-  }
-
-  /**
-   * Injects default stylesheet for slider elements.
-   */
-  useDefaultStyles() {
-    css.inject(styleSheet);
   }
 
   updateDisplay() {

@@ -31,17 +31,11 @@ class QuatController extends Controller {
 
     const _this = this;
 
-    this.__input = document.createElement("input");
-    this.__input.setAttribute("type", "text");
-
-    dom.bind(this.__input, "keyup", onChange);
-    dom.bind(this.__input, "change", onChange);
-    dom.bind(this.__input, "blur", onBlur);
-    dom.bind(this.__input, "keydown", function (e) {
+    function onKeyDown(e) {
       if (e.keyCode === 13) {
         this.blur();
       }
-    });
+    }
 
     function onChange() {
       _this.setValue(_this.__input.value);
@@ -53,17 +47,26 @@ class QuatController extends Controller {
       }
     }
 
+    this.__input = document.createElement("input");
+    this.__input.setAttribute("type", "text");
+
+    dom.bind(this.__input, "keyup", onChange);
+    dom.bind(this.__input, "change", onChange);
+    dom.bind(this.__input, "blur", onBlur);
+    dom.bind(this.__input, "keydown", onKeyDown);
+
     this.updateDisplay();
 
     this.domElement.appendChild(this.__input);
   }
 
   updateDisplay() {
-    // Stops the caret from moving on account of:
-    // keyup -> setValue -> updateDisplay
-    if (!dom.isActive(this.__input)) {
-      this.__input.value = this.getValue();
+    // Use the same solution from StringController.js to enable
+    // editing <input>s while "listen()"ing
+    if (dom.isActive(this.__input)) {
+      return this;
     }
+    this.__input.value = this.getValue();
     return super.updateDisplay();
   }
 }

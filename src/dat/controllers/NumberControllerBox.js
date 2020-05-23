@@ -51,30 +51,18 @@ class NumberControllerBox extends NumberController {
      */
     let prevY;
 
-    this.__input = settings.DOCUMENT.createElement("input");
-
-    if (this.__step != null) {
-      this.__input.setAttribute("step", this.__step);
-      this.__input.setAttribute("type", "number");
-    } else this.__input.setAttribute("type", "text");
-
-    // Makes it so manually specified values are not truncated.
-
-    dom.bind(this.__input, "input", onInput);
-    dom.bind(this.__input, "change", onChange);
-    dom.bind(this.__input, "blur", onBlur);
-    dom.bind(this.__input, "mousedown", onMouseDownDetect);
-    // dom.bind(this.__input, 'mousedown', onMouseDown);
-    dom.bind(this.__input, "keydown", function (e) {
+    function onKeyDown(e) {
       // When pressing ENTER key, you can be as precise as you want.
       if (e.keyCode === 13) {
         _this.__truncationSuspended = true;
+        /* jshint validthis: true */
         this.blur();
+        /* jshint validthis: false */
         _this.__truncationSuspended = false;
       } else if ((e.keyCode === 38 || e.keyCode === 40) && _this.__step) {
         onChange();
       }
-    });
+    }
 
     function onMouseDownDetect() {
       _this.__mouseIsDown = true;
@@ -86,7 +74,7 @@ class NumberControllerBox extends NumberController {
       dom.unbind(window, "mouseup", onMouseUpDetect);
     }
 
-    function onChange() {
+    function onChange(e) {
       const attempted = parseFloat(_this.__input.value);
       if (!common.isNaN(attempted)) {
         _this.setValue(attempted);
@@ -124,10 +112,26 @@ class NumberControllerBox extends NumberController {
       prevY = e.clientY;
     }
 
-    function onMouseUp() {
+    function onMouseUp(e) {
       dom.unbind(settings.WINDOW, "mousemove", onMouseDrag);
       dom.unbind(settings.WINDOW, "mouseup", onMouseUp);
     }
+
+    this.__input = settings.DOCUMENT.createElement("input");
+
+    if (this.__step != null) {
+      this.__input.setAttribute("step", this.__step);
+      this.__input.setAttribute("type", "number");
+    } else this.__input.setAttribute("type", "text");
+
+    // Makes it so manually specified values are not truncated.
+
+    dom.bind(this.__input, "input", onInput);
+    dom.bind(this.__input, "change", onChange);
+    dom.bind(this.__input, "blur", onBlur);
+    dom.bind(this.__input, "mousedown", onMouseDownDetect);
+    // dom.bind(this.__input, 'mousedown', onMouseDown);
+    dom.bind(this.__input, "keydown", onKeyDown);
 
     this.updateDisplay();
 
@@ -135,6 +139,11 @@ class NumberControllerBox extends NumberController {
   }
 
   updateDisplay() {
+    // Use the same solution from StringController.js to enable
+    // editing <input>s while "listen()"ing
+    if (dom.isActive(this.__input)) {
+      return this;
+    }
     this.__input.value = this.__truncationSuspended
       ? this.getValue()
       : roundToDecimal(this.getValue(), this.__precision);
@@ -142,7 +151,9 @@ class NumberControllerBox extends NumberController {
   }
 
   step(v) {
-    if (this.__input.getAttribute("type") !== "number") this.__input.setAttribute("type", "number");
+    if (this.__input.getAttribute("type") !== "number") {
+      this.__input.setAttribute("type", "number");
+    }
     this.__input.setAttribute("step", v);
     return super.step(...arguments);
   }

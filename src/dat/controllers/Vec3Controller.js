@@ -32,11 +32,11 @@ import dom from "../dom/dom";
  */
 class Vec3Controller extends NumberController {
   constructor(object, property, params) {
-    this.__truncationSuspended = false;
-
     super(object, property, params);
 
     const _this = this;
+
+    this.__truncationSuspended = false;
 
     /**
      * {Number} Previous mouse y position
@@ -145,7 +145,7 @@ class Vec3Controller extends NumberController {
 }
 
 function roundToDecimal(value, decimals) {
-  const tenTo = Math.pow(10, decimals);
+  const tenTo = 10 ** decimals;
   return Math.round(value * tenTo) / tenTo;
 }
 

@@ -28,7 +28,11 @@ class Color {
   }
 
   toString() {
-    return toString(this);
+    return colorToString(this);
+  }
+
+  toHexString() {
+    return colorToString(this, true);
   }
 
   toOriginal() {

@@ -23,6 +23,7 @@ import ColorController from "../controllers/ColorController";
 import OptionController from "../controllers/OptionController";
 import EasingFunctionController from "../controllers/EasingFunctionController";
 import TextAreaController from "../controllers/TextAreaController";
+import UndefinedController from "../controllers/UndefinedController";
 import requestAnimationFrame from "../utils/requestAnimationFrame";
 import CenteredDiv from "../dom/CenteredDiv";
 import dom from "../dom/dom";
@@ -151,7 +152,9 @@ class GUI {
         params.load.preset = params.preset;
       }
     } else {
-      params.load = { preset: DEFAULT_DEFAULT_PRESET_NAME };
+      params.load = {
+        preset: DEFAULT_DEFAULT_PRESET_NAME,
+      };
     }
 
     if (common.isUndefined(params.parent) && params.hideable) {
@@ -351,7 +354,9 @@ class GUI {
 
       dom.bind(this.__closeButton, "click", function () {
         _this.closed = !_this.closed;
-        if (_this.__onClosedChange) _this.__onClosedChange.call(_this, _this.closed);
+        if (_this.__onClosedChange) {
+          _this.__onClosedChange.call(_this, _this.closed);
+        }
       });
     } else {
       // Oh, you're a nested GUI!
@@ -368,7 +373,9 @@ class GUI {
       const on_click_title = function (e) {
         e.preventDefault();
         _this.closed = !_this.closed;
-        if (_this.__onClosedChange) _this.__onClosedChange.call(_this, _this.closed);
+        if (_this.__onClosedChange) {
+          _this.__onClosedChange.call(_this, _this.closed);
+        }
         return false;
       };
 
@@ -405,14 +412,14 @@ class GUI {
       }
     }
 
-    this.__resizeHandler = function () {
+    function __resizeHandler() {
       _this.onResize();
-    };
+    }
 
-    dom.bind(settings.WINDOW, "resize", this.__resizeHandler);
-    dom.bind(this.__ul, "webkitTransitionEnd", this.__resizeHandler);
-    dom.bind(this.__ul, "transitionend", this.__resizeHandler);
-    dom.bind(this.__ul, "oTransitionEnd", this.__resizeHandler);
+    dom.bind(settings.WINDOW, "resize", __resizeHandler);
+    dom.bind(this.__ul, "webkitTransitionEnd", __resizeHandler);
+    dom.bind(this.__ul, "transitionend", __resizeHandler);
+    dom.bind(this.__ul, "oTransitionEnd", __resizeHandler);
     this.onResize();
 
     if (params.resizable) {
@@ -429,6 +436,7 @@ class GUI {
     this.saveToLocalStorageIfPossible = saveToLocalStorage;
 
     const root = _this.getRoot();
+
     function resetWidth() {
       const root = _this.getRoot();
       root.width += 1;
@@ -530,15 +538,6 @@ class GUI {
       GUI.toggleHide();
     }
   }
-
-  /*
-  dom.bind(
-    settings.WINDOW,
-    "keydown",
-    _keydownHandler,
-    false
-  );
-*/
 
   /**
    * @param object
@@ -664,7 +663,10 @@ class GUI {
       throw new Error(`You already have a folder in this GUI by the name "${name}"`);
     }
 
-    const new_gui_params = { name: name, parent: this };
+    const new_gui_params = {
+      name: name,
+      parent: this,
+    };
 
     // We need to pass down the autoPlace trait so that we can
     // attach event listeners to open/close folder actions to

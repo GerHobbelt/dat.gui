@@ -20,6 +20,7 @@ import ArrayController from "./ArrayController";
 import FunctionController from "./FunctionController";
 import BooleanController from "./BooleanController";
 import Vec3Controller from "./Vec3Controller";
+import UndefinedController from "./UndefinedController";
 import common from "../utils/common";
 
 const ARR_SLICE = Array.prototype.slice;
@@ -40,7 +41,11 @@ const ControllerFactory = function (object, property) {
       return new NumberControllerSlider(object, property, arguments[2], arguments[3], arguments[4], arguments[5]);
     }
     // number box
-    return new NumberControllerBox(object, property, { min: arguments[2], max: arguments[3], step: arguments[4] });
+    return new NumberControllerBox(object, property, {
+      min: arguments[2],
+      max: arguments[3],
+      step: arguments[4],
+    });
   }
 
   if (common.isString(initialValue)) {
@@ -61,6 +66,10 @@ const ControllerFactory = function (object, property) {
 
   if (common.isArray(initialValue)) {
     return new ArrayController(object, property);
+  }
+
+  if (common.isUndefined(initialValue)) {
+    return new UndefinedController(object, property);
   }
 
   // otherwise: we cannot 'sniff' the type of controller you want, since the

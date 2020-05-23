@@ -60,11 +60,12 @@ class TextAreaController extends Controller {
   }
 
   updateDisplay() {
-    // Stops the caret from moving on account of:
-    // keyup -> setValue -> updateDisplay
-    if (!dom.isActive(this.__input)) {
-      this.__input.value = this.getValue();
+    // Use the same solution from StringController.js to enable
+    // editing <input>s while "listen()"ing
+    if (dom.isActive(this.__input)) {
+      return this;
     }
+    this.__input.value = this.getValue();
     return super.updateDisplay();
   }
 }

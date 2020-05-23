@@ -77,9 +77,10 @@ class ArrayController extends Controller {
   updateDisplay() {
     // Stops the caret from moving on account of:
     // keyup -> setValue -> updateDisplay
-    if (!dom.isActive(this.__input)) {
-      this.__input.value = this.getValue();
+    if (dom.isActive(this.__input)) {
+      return this;
     }
+    this.__input.value = this.getValue();
     return super.updateDisplay();
   }
 }

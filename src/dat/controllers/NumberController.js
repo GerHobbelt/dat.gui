@@ -35,8 +35,6 @@ function numDecimals(x) {
  * @param {Number} [params.step] Increment by which to change value
  *
  * @member dat.controllers
- *
- * @lends dat.controllers.NumberController.prototype
  */
 class NumberController extends Controller {
   constructor(object, property, params) {
@@ -83,8 +81,8 @@ class NumberController extends Controller {
    * <code>object[property]</code>
    * @returns {dat.controllers.NumberController} this
    */
-  min(v) {
-    this.__min = v;
+  min(minValue) {
+    this.__min = minValue;
     return this;
   }
 
@@ -93,27 +91,29 @@ class NumberController extends Controller {
    *
    * @param {Number} maxValue The maximum value for
    * <code>object[property]</code>
-   * @returns {dat.controllers.NumberController} this
+   *
+   * @returns {NumberController} this
    */
-  max(v) {
-    this.__max = v;
+  max(maxValue) {
+    this.__max = maxValue;
     return this;
   }
 
   /**
-   * Specify a step value that dat.controllers.NumberController
+   * Specify a step value that {NumberController}
    * increments by.
    *
-   * @param {Number} stepValue The step value for
-   * dat.controllers.NumberController
+   * @param {Number} stepValue The step value for {NumberController}
+   *
    * @default if minimum and maximum specified increment is 1% of the
    * difference otherwise stepValue is 1
-   * @returns {dat.controllers.NumberController} this
+   *
+   * @returns {NumberController} this
    */
-  step(v) {
-    this.__step = v;
-    this.__impliedStep = v;
-    this.__precision = numDecimals(v);
+  step(stepValue) {
+    this.__step = stepValue;
+    this.__impliedStep = stepValue;
+    this.__precision = numDecimals(stepValue);
     return this;
   }
 }

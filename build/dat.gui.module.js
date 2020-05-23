@@ -1013,18 +1013,18 @@ var NumberController = (function (_Controller) {
     }
     return _Controller.prototype.setValue.call(this, v);
   };
-  _proto.min = function min(v) {
-    this.__min = v;
+  _proto.min = function min(minValue) {
+    this.__min = minValue;
     return this;
   };
-  _proto.max = function max(v) {
-    this.__max = v;
+  _proto.max = function max(maxValue) {
+    this.__max = maxValue;
     return this;
   };
-  _proto.step = function step(v) {
-    this.__step = v;
-    this.__impliedStep = v;
-    this.__precision = numDecimals(v);
+  _proto.step = function step(stepValue) {
+    this.__step = stepValue;
+    this.__impliedStep = stepValue;
+    this.__precision = numDecimals(stepValue);
     return this;
   };
   return NumberController;
@@ -1039,6 +1039,7 @@ var NumberControllerBox = (function (_NumberController) {
   function NumberControllerBox(object, property, params) {
     var _this2;
     _this2 = _NumberController.call(this, object, property, params) || this;
+    params = params || {};
     _this2.__truncationSuspended = false;
     var _this = _assertThisInitialized(_this2);
     var prev_y;
@@ -1623,7 +1624,7 @@ var CLOSE_BUTTON_HEIGHT = 20;
 var DEFAULT_DEFAULT_PRESET_NAME = "Default";
 var SUPPORTS_LOCAL_STORAGE = (function () {
   try {
-    return "localStorage" in window && window.localStorage != null;
+    return "localStorage" in window && !!window.localStorage;
   } catch (e) {
     return false;
   }

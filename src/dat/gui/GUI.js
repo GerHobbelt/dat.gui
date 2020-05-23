@@ -46,7 +46,7 @@ const DEFAULT_DEFAULT_PRESET_NAME = "Default";
 
 const SUPPORTS_LOCAL_STORAGE = (function () {
   try {
-    return "localStorage" in window && window.localStorage != null;
+    return "localStorage" in window && !!window.localStorage;
   } catch (e) {
     return false;
   }

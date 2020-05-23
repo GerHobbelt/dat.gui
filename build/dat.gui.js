@@ -1006,9 +1006,10 @@
     }
     var _proto = StringController.prototype;
     _proto.updateDisplay = function updateDisplay() {
-      if (!dom.isActive(this.__input)) {
-        this.__input.value = this.getValue();
+      if (dom.isActive(this.__input)) {
+        return this;
       }
+      this.__input.value = this.getValue();
       return _Controller.prototype.updateDisplay.call(this);
     };
     return StringController;
@@ -1084,6 +1085,14 @@
       _this2.__truncationSuspended = false;
       var _this = _assertThisInitialized(_this2);
       var prevY;
+      function onKeyDown(e) {
+        if (e.keyCode === 13) {
+          _this.__truncationSuspended = true;
+          this.blur();
+          _this.__truncationSuspended = false;
+          onFinish();
+        }
+      }
       function onChange() {
         var attempted = parseFloat(_this.__input.value);
         if (!Common.isNaN(attempted)) {
@@ -1118,20 +1127,16 @@
       dom.bind(_this2.__input, "change", onChange);
       dom.bind(_this2.__input, "blur", onBlur);
       dom.bind(_this2.__input, "mousedown", onMouseDown);
-      dom.bind(_this2.__input, "keydown", function (e) {
-        if (e.keyCode === 13) {
-          _this.__truncationSuspended = true;
-          this.blur();
-          _this.__truncationSuspended = false;
-          onFinish();
-        }
-      });
+      dom.bind(_this2.__input, "keydown", onKeyDown);
       _this2.updateDisplay();
       _this2.domElement.appendChild(_this2.__input);
       return _this2;
     }
     var _proto = NumberControllerBox.prototype;
     _proto.updateDisplay = function updateDisplay() {
+      if (dom.isActive(this.__input)) {
+        return this;
+      }
       this.__input.value = this.__truncationSuspended
         ? this.getValue()
         : roundToDecimal(this.getValue(), this.__precision);
@@ -1266,20 +1271,20 @@
       _this2.__hue_field.className = "hue-field";
       _this2.__input = document.createElement("input");
       _this2.__input.type = "text";
-      _this2.__input_textShadow = "0 1px 1px ";
+      _this2.__input_textShadow = ["1px 0px 0px ", "-1px 0px 0px ", "0px 1px 0px ", "0px -1px 0px "];
       dom.bind(_this2.__input, "keydown", function (e) {
         if (e.keyCode === 13) {
           onBlur.call(this);
         }
       });
       dom.bind(_this2.__input, "blur", onBlur);
-      dom.bind(_this2.__selector, "mousedown", function () {
-        dom.addClass(this, "drag").bind(window, "mouseup", function () {
+      dom.bind(_this2.__selector, "mousedown", function (e) {
+        dom.addClass(this, "drag").bind(window, "mouseup", function (e) {
           dom.removeClass(_this.__selector, "drag");
         });
       });
-      dom.bind(_this2.__selector, "touchstart", function () {
-        dom.addClass(this, "drag").bind(window, "touchend", function () {
+      dom.bind(_this2.__selector, "touchstart", function (e) {
+        dom.addClass(this, "drag").bind(window, "touchend", function (e) {
           dom.removeClass(_this.__selector, "drag");
         });
       });
@@ -1337,7 +1342,11 @@
         color: "#fff",
         border: 0,
         fontWeight: "bold",
-        textShadow: _this2.__input_textShadow + "rgba(0,0,0,0.7)",
+        textShadow: _this2.__input_textShadow
+          .map(function (d) {
+            return d + " rgba(0,0,0,0.7)";
+          })
+          .join(", "),
       });
       dom.bind(_this2.__saturation_field, "mousedown", fieldDown);
       dom.bind(_this2.__saturation_field, "touchstart", fieldDown);
@@ -1480,7 +1489,11 @@
       Common.extend(this.__input.style, {
         backgroundColor: this.__color.toHexString(),
         color: "rgb(" + flip + "," + flip + "," + flip + ")",
-        textShadow: this.__input_textShadow + "rgba(" + _flip + "," + _flip + "," + _flip + ",.7)",
+        textShadow: this.__input_textShadow
+          .map(function (d) {
+            return d + " rgba(" + _flip + "," + _flip + "," + _flip + ",0.7)";
+          })
+          .join(", "),
       });
     };
     return ColorController;
@@ -1536,6 +1549,26 @@
   var saveDialogueContents =
     '<div id="dg-save" class="dg dialogue">\n  Here\'s the new load parameter for your <code>GUI</code>\'s constructor:\n\n  <textarea id="dg-new-constructor"></textarea>\n\n  <div id="dg-save-locally">\n    <input id="dg-local-storage" type="checkbox">\n    Automatically save values to <code>localStorage</code> on exit.\n\n    <div id="dg-local-explain">\n      The values saved to <code>localStorage</code> will override those passed to <code>dat.GUI</code>\'s constructor.\n      This makes it easier to work incrementally, but <code>localStorage</code> is fragile, and your friends may not see\n      the same values you do.\n    </div>\n  </div>\n</div>\n';
 
+  var UndefinedController = (function (_Controller) {
+    _inheritsLoose(UndefinedController, _Controller);
+    function UndefinedController(object, property, options) {
+      var _this2;
+      _this2 = _Controller.call(this, object, property, "undefined", options) || this;
+      var _this = _assertThisInitialized(_this2);
+      _this2.__prev = _this2.getValue();
+      _this2.__elem = document.createElement("em");
+      _this2.domElement.appendChild(_this2.__elem);
+      _this2.updateDisplay();
+      return _this2;
+    }
+    var _proto = UndefinedController.prototype;
+    _proto.updateDisplay = function updateDisplay() {
+      this.__elem.innerText = "<undefined>";
+      return _Controller.prototype.updateDisplay.call(this);
+    };
+    return UndefinedController;
+  })(Controller);
+
   var ARR_SLICE$1 = Array.prototype.slice;
   var ControllerFactory = function ControllerFactory(object, property) {
     var initialValue = object[property];
@@ -1573,6 +1606,9 @@
     }
     if (Common.isBoolean(initialValue)) {
       return new BooleanController(object, property);
+    }
+    if (Common.isUndefined(initialValue)) {
+      return new UndefinedController(object, property);
     }
     return null;
   };

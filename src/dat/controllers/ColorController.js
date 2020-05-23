@@ -56,7 +56,10 @@ class ColorController extends Controller {
 
     this.__input = document.createElement("input");
     this.__input.type = "text";
-    this.__input_textShadow = "0 1px 1px ";
+
+    this.__input_textShadow = ["1px 0px 0px ", "-1px 0px 0px ", "0px 1px 0px ", "0px -1px 0px "];
+
+    /* jshint unused: false */
 
     dom.bind(this.__input, "keydown", function (e) {
       if (e.keyCode === 13) {
@@ -67,17 +70,19 @@ class ColorController extends Controller {
 
     dom.bind(this.__input, "blur", onBlur);
 
-    dom.bind(this.__selector, "mousedown", function (/* e */) {
-      dom.addClass(this, "drag").bind(window, "mouseup", function (/* e */) {
+    dom.bind(this.__selector, "mousedown", function (e) {
+      dom.addClass(this, "drag").bind(window, "mouseup", function (e) {
         dom.removeClass(_this.__selector, "drag");
       });
     });
 
-    dom.bind(this.__selector, "touchstart", function (/* e */) {
-      dom.addClass(this, "drag").bind(window, "touchend", function (/* e */) {
+    dom.bind(this.__selector, "touchstart", function (e) {
+      dom.addClass(this, "drag").bind(window, "touchend", function (e) {
         dom.removeClass(_this.__selector, "drag");
       });
     });
+
+    /* jshint unused: true */
 
     const valueField = document.createElement("div");
 
@@ -145,7 +150,11 @@ class ColorController extends Controller {
       color: "#fff",
       border: 0,
       fontWeight: "bold",
-      textShadow: this.__input_textShadow + "rgba(0,0,0,0.7)",
+      textShadow: this.__input_textShadow
+        .map(function (d) {
+          return d + " rgba(0,0,0,0.7)";
+        })
+        .join(", "),
     });
 
     dom.bind(this.__saturation_field, "mousedown", fieldDown);
@@ -190,6 +199,7 @@ class ColorController extends Controller {
     }
 
     function onBlur() {
+      /* jshint validthis: true */
       const i = interpret(this.value);
       if (i !== false) {
         _this.__color.__state = i;
@@ -197,6 +207,7 @@ class ColorController extends Controller {
       } else {
         this.value = _this.__color.toString();
       }
+      /* jshint validthis: false */
     }
 
     function onFinish() {
@@ -325,7 +336,11 @@ class ColorController extends Controller {
     common.extend(this.__input.style, {
       backgroundColor: this.__color.toHexString(),
       color: "rgb(" + flip + "," + flip + "," + flip + ")",
-      textShadow: this.__input_textShadow + "rgba(" + _flip + "," + _flip + "," + _flip + ",.7)",
+      textShadow: this.__input_textShadow
+        .map(function (d) {
+          return d + " rgba(" + _flip + "," + _flip + "," + _flip + ",0.7)";
+        })
+        .join(", "),
     });
   }
 }

@@ -52,6 +52,16 @@ class NumberControllerBox extends NumberController {
      */
     let prevY;
 
+    function onKeyDown(e) {
+      // When pressing ENTER key, you can be as precise as you want.
+      if (e.keyCode === 13) {
+        _this.__truncationSuspended = true;
+        this.blur();
+        _this.__truncationSuspended = false;
+        onFinish();
+      }
+    }
+
     function onChange() {
       const attempted = parseFloat(_this.__input.value);
       if (!common.isNaN(attempted)) {
@@ -96,15 +106,7 @@ class NumberControllerBox extends NumberController {
     dom.bind(this.__input, "change", onChange);
     dom.bind(this.__input, "blur", onBlur);
     dom.bind(this.__input, "mousedown", onMouseDown);
-    dom.bind(this.__input, "keydown", function (e) {
-      // When pressing ENTER key, you can be as precise as you want.
-      if (e.keyCode === 13) {
-        _this.__truncationSuspended = true;
-        this.blur();
-        _this.__truncationSuspended = false;
-        onFinish();
-      }
-    });
+    dom.bind(this.__input, "keydown", onKeyDown);
 
     this.updateDisplay();
 
@@ -112,6 +114,12 @@ class NumberControllerBox extends NumberController {
   }
 
   updateDisplay() {
+    // Use the same solution from StringController.js to enable
+    // editing <input>s while "listen()"ing
+    if (dom.isActive(this.__input)) {
+      return this;
+    }
+
     this.__input.value = this.__truncationSuspended
       ? this.getValue()
       : roundToDecimal(this.getValue(), this.__precision);

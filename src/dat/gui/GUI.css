@@ -8,13 +8,13 @@
 }
 
 .guidat {
-  color: #ffffff;
+  color: #FFFFFF;
   opacity: 0.97;
   text-align: left;
   float: right;
   margin-right: 20px;
   margin-bottom: 20px;
-  background-color: #ffffff;
+  background-color: #FFFFFF;
 }
 
 .guidat,
@@ -34,7 +34,7 @@ a.guidat-toggle:visited,
 a.guidat-toggle:active {
   text-decoration: none;
   cursor: pointer;
-  color: #ffffff;
+  color: #FFFFFF;
   background-color: #222222;
   text-align: center;
   display: block;
@@ -88,30 +88,30 @@ a.guidat-toggle:hover {
 .guidat-controller input:focus,
 .guidat-controller.active input {
   background-color: #555555;
-  color: #ffffff;
+  color: #FFFFFF;
 }
 
 .guidat-controller.number {
-  border-left: 5px solid #00aeff;
+  border-left: 5px solid #00AEFF;
 }
 
 .guidat-controller.string {
-  border-left: 5px solid #1ed36f;
+  border-left: 5px solid #1ED36F;
 }
 
 .guidat-controller.string input {
   border: 0;
-  color: #1ed36f;
+  color: #1ED36F;
   margin-right: 2px;
   width: 148px;
 }
 
 .guidat-controller.boolean {
-  border-left: 5px solid #54396e;
+  border-left: 5px solid #54396E;
 }
 
 .guidat-controller.function {
-  border-left: 5px solid #e61d5f;
+  border-left: 5px solid #E61D5F;
 }
 
 .guidat-controller.function button {
@@ -123,14 +123,14 @@ a.guidat-toggle:hover {
 }
 
 .guidat-controller.object {
-  border-left: 5px solid #ffff00;
+  border-left: 5px solid #FFFF00;
 }
 
 .guidat-controller.number input[type="text"] {
   width: 35px;
   margin-left: 5px;
   margin-right: 2px;
-  color: #00aeff;
+  color: #00AEFF;
 }
 
 .guidat .guidat-controller.boolean input {
@@ -160,7 +160,7 @@ a.guidat-toggle:hover {
 
 .guidat-controller .guidat-slider-bg .guidat-slider-fg:hover,
 .guidat-controller.active .guidat-slider-bg .guidat-slider-fg {
-  background-color: #52c8ff;
+  background-color: #52C8FF;
 }
 
 .guidat-slider-bg {
@@ -174,6 +174,6 @@ a.guidat-toggle:hover {
 
 .guidat-slider-fg {
   cursor: ew-resize;
-  background-color: #00aeff;
+  background-color: #00AEFF;
   height: 21px;
 }

@@ -73,7 +73,7 @@ class ImageController extends Controller {
 
   updateDisplay() {
     this.__previewImage.src = this.getValue();
-    return ImageController.superclass.prototype.updateDisplay.call(this);
+    return super.updateDisplay();
   }
 }
 

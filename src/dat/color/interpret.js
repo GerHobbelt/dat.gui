@@ -18,6 +18,7 @@ const INTERPRETATIONS = [
   // Strings
   {
     litmus: common.isString,
+
     conversions: {
       THREE_CHAR_HEX: {
         read: function (original) {
@@ -123,6 +124,7 @@ const INTERPRETATIONS = [
   // Arrays
   {
     litmus: common.isArray,
+
     conversions: {
       RGB_ARRAY: {
         read: function (original) {
@@ -165,6 +167,7 @@ const INTERPRETATIONS = [
   // Objects
   {
     litmus: common.isObject,
+
     conversions: {
       RGBA_OBJ: {
         read: function (original) {
@@ -278,6 +281,7 @@ const interpret = function () {
   toReturn = false;
 
   const original = arguments.length > 1 ? common.toArray(arguments) : arguments[0];
+
   common.each(INTERPRETATIONS, function (family) {
     if (family.litmus(original)) {
       common.each(family.conversions, function (conversion, conversionName) {

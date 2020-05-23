@@ -1,14 +1,14 @@
-$background-color: #1a1a1a;
+$background-color: #1A1A1A;
 
 $hover-lighten: 5%;
 $border-lighten: 7%;
 $active-lighten: 10%;
 
-$number-color: #2fa1d6;
+$number-color: #2FA1D6;
 $boolean-color: #806787;
-$string-color: #1ed36f;
-$function-color: #e61d5f;
-$save-row-color: #dad5cb;
+$string-color: #1ED36F;
+$function-color: #E61D5F;
+$save-row-color: #DAD5CB;
 $button-color: darken($save-row-color, 10%);
 $border-color: lighten($background-color, $border-lighten);
 $input-color: lighten($background-color, 8.5%);
@@ -34,14 +34,15 @@ $input-color: lighten($background-color, 8.5%);
   line-height: 7px;
   padding: 4px 4px 5px 4px;
   background: $button-color;
-  color: #ffffff;
+  color: #FFFFFF;
   text-shadow: 0 1px 0 darken($button-color, 10%);
   box-shadow: 0 -1px 0 darken($button-color, 10%);
   cursor: pointer;
 }
 
 @mixin gears() {
-  background: $button-color
+  background:
+    $button-color
     url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAANCAYAAAB/9ZQ7AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAQJJREFUeNpiYKAU/P//PwGIC/ApCABiBSAW+I8AClAcgKxQ4T9hoMAEUrxx2QSGN6+egDX+/vWT4e7N82AMYoPAx/evwWoYoSYbACX2s7KxCxzcsezDh3evFoDEBYTEEqycggWAzA9AuUSQQgeYPa9fPv6/YWm/Acx5IPb7ty/fw+QZblw67vDs8R0YHyQhgObx+yAJkBqmG5dPPDh1aPOGR/eugW0G4vlIoTIfyFcA+QekhhHJhPdQxbiAIguMBTQZrPD7108M6roWYDFQiIAAv6Aow/1bFwXgis+f2LUAynwoIaNcz8XNx3Dl7MEJUDGQpx9gtQ8YCueB+D26OECAAQDadt7e46D42QAAAABJRU5ErkJggg==)
     2px 1px no-repeat;
   height: 7px;
@@ -52,7 +53,7 @@ $input-color: lighten($background-color, 8.5%);
 
 /** Main type */
 .dg {
-  color: #eeeeee;
+  color: #EEEEEE;
   font: 11px "Lucida Grande", sans-serif;
   text-shadow: 0 -1px 0 #111111;
 
@@ -111,9 +112,10 @@ $input-color: lighten($background-color, 8.5%);
 
     &.title {
       padding-left: 16px;
-      background: #000000
-        url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlI+hKgFxoCgAOw==) 6px 10px
-        no-repeat;
+      background:
+        #000000
+        url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlI+hKgFxoCgAOw==)
+        6px 10px no-repeat;
       cursor: pointer;
       border-bottom: 1px solid rgba(255, 255, 255, 0.2);
     }
@@ -171,7 +173,7 @@ $input-color: lighten($background-color, 8.5%);
 
       &:focus {
         background: lighten($input-color, $active-lighten);
-        color: #ffffff;
+        color: #FFFFFF;
       }
     }
 

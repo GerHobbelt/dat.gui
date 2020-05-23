@@ -409,7 +409,6 @@
     return toReturn;
   };
 
-  var tmpComponent;
   var ColorMath = {
     hsv_to_rgb: function hsv_to_rgb(h, s, v) {
       var hi = Math.floor(h / 60) % 6;
@@ -473,7 +472,8 @@
       return (hex >> (componentIndex * 8)) & 0xff;
     },
     hex_with_component: function hex_with_component(hex, componentIndex, value) {
-      value = (value << (tmpComponent = componentIndex * 8)) | (hex & ~(0xff << tmpComponent));
+      var tmpComponent = componentIndex * 8;
+      value = (value << tmpComponent) | (hex & ~(0xff << tmpComponent));
       return value;
     },
   };
@@ -921,12 +921,12 @@
       dom.bind(_this2.__checkbox, "change", onChange, false);
       _this2.domElement.appendChild(_this2.__checkbox);
       _this2.updateDisplay();
-      function onChange() {
-        _this.setValue(!_this.__prev);
-      }
       return _this2;
     }
     var _proto = BooleanController.prototype;
+    _proto.onChange = function onChange() {
+      _this.setValue(!_this.__prev);
+    };
     _proto.setValue = function setValue(v) {
       var toReturn = _Controller.prototype.setValue.call(this, v);
       this.__prev = this.getValue();
@@ -1303,7 +1303,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-\n\n.slider {\n  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15);\n  height: 1em;\n  border-radius: 1em;\n  background-color: #eeeeee;\n  padding: 0 0.5em;\n  overflow: hidden;\n}\n\n.slider-fg {\n  padding: 1px 0 2px 0;\n  background-color: #aaaaaa;\n  height: 1em;\n  margin-left: -0.5em;\n  padding-right: 0.5em;\n  border-radius: 1em 0 0 1em;\n}\n\n.slider-fg::after {\n  display: inline-block;\n  border-radius: 1em;\n  background-color: #ffffff;\n  border: 1px solid #aaaaaa;\n  content: "";\n  float: right;\n  margin-right: -1em;\n  margin-top: -1px;\n  height: 0.9em;\n  width: 0.9em;\n}\n';
+\n\n.slider {\n  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15);\n  height: 1em;\n  border-radius: 1em;\n  background-color: #EEEEEE;\n  padding: 0 0.5em;\n  overflow: hidden;\n}\n\n.slider-fg {\n  padding: 1px 0 2px 0;\n  background-color: #AAAAAA;\n  height: 1em;\n  margin-left: -0.5em;\n  padding-right: 0.5em;\n  border-radius: 1em 0 0 1em;\n}\n\n.slider-fg::after {\n  display: inline-block;\n  border-radius: 1em;\n  background-color: #FFFFFF;\n  border: 1px solid #AAAAAA;\n  content: "";\n  float: right;\n  margin-right: -1em;\n  margin-top: -1px;\n  height: 0.9em;\n  width: 0.9em;\n}\n';
   styleInject(css_248z);
 
   function map(v, i1, i2, o1, o2) {
@@ -1827,7 +1827,7 @@
   }
 
   var css_248z$1 =
-    ".GUI-preview-image {\n  float: left;\n  padding: 0.4em;\n  max-width: 2em;\n  max-height: 2em;\n}\n\n.GUI-label-image {\n  color: rgb(214, 214, 245);\n  text-decoration: underline;\n  display: block;\n  background-color: #3c3c3c;\n  width: 100%;\n  cursor: pointer;\n}\n\n.GUI-label-image:hover {\n  background: #3c3c3c;\n}\n";
+    ".GUI-preview-image {\n  float: left;\n  padding: 0.4em;\n  max-width: 2em;\n  max-height: 2em;\n}\n\n.GUI-label-image {\n  color: rgb(214, 214, 245);\n  text-decoration: underline;\n  display: block;\n  background-color: #3C3C3C;\n  width: 100%;\n  cursor: pointer;\n}\n\n.GUI-label-image:hover {\n  background: #3C3C3C;\n}\n";
   styleInject(css_248z$1);
 
   var ImageController = (function (_Controller) {
@@ -1863,7 +1863,7 @@
     };
     _proto.updateDisplay = function updateDisplay() {
       this.__previewImage.src = this.getValue();
-      return ImageController.superclass.prototype.updateDisplay.call(this);
+      return _Controller.prototype.updateDisplay.call(this);
     };
     return ImageController;
   })(Controller);

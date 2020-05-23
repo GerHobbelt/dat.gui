@@ -16,6 +16,7 @@ import dom from "../dom/dom";
 
 /**
  * @class Provides a checkbox input to alter the boolean property of an object.
+ *
  * @extends dat.controllers.Controller
  *
  * @param {Object} object The object to be manipulated
@@ -39,10 +40,10 @@ class BooleanController extends Controller {
 
     // Match original value
     this.updateDisplay();
+  }
 
-    function onChange() {
-      _this.setValue(!_this.__prev);
-    }
+  onChange() {
+    _this.setValue(!_this.__prev);
   }
 
   setValue(v) {

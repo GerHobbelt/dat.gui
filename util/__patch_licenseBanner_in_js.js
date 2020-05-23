@@ -26,7 +26,16 @@ licenseBanner = licenseBanner.replace(/^(\s*version )([0-9.-]+[0-9.a-z-]*)/gm, f
 
 var count;
 
-globby(["src/**/*.js", "src/**/*.*css", "build/**/*.js", "build/**/*.css"])
+globby([
+  "src/**/*.js",
+  "src/**/*.*css",
+  "build/**/*.js",
+  "build/**/*.css",
+  "examples/**/*.js",
+  "examples/**/*.css",
+  "tests/**/*.js",
+  "tests/**/*.css",
+])
   .then((paths) => {
     count = 0;
 

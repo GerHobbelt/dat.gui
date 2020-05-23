@@ -28,6 +28,22 @@ class StringController extends Controller {
 
     const _this = this;
 
+    this.__input = document.createElement("input");
+    this.__input.setAttribute("type", "text");
+
+    dom.bind(this.__input, "keyup", onChange);
+    dom.bind(this.__input, "change", onChange);
+    dom.bind(this.__input, "blur", onBlur);
+    dom.bind(this.__input, "keydown", onKeyDown);
+
+    function onKeyDown(e) {
+      if (e.keyCode === 13) {
+        /* jshint validthis: true */
+        this.blur();
+        /* jshint validthis: false */
+      }
+    }
+
     function onChange() {
       _this.setValue(_this.__input.value);
     }
@@ -37,18 +53,6 @@ class StringController extends Controller {
         _this.__onFinishChange.call(_this, _this.getValue());
       }
     }
-
-    this.__input = document.createElement("input");
-    this.__input.setAttribute("type", "text");
-
-    dom.bind(this.__input, "keyup", onChange);
-    dom.bind(this.__input, "change", onChange);
-    dom.bind(this.__input, "blur", onBlur);
-    dom.bind(this.__input, "keydown", function (e) {
-      if (e.keyCode === 13) {
-        this.blur();
-      }
-    });
 
     this.updateDisplay();
 

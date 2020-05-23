@@ -86,7 +86,7 @@ class NumberControllerSlider extends NumberController {
     }
 
     function onTouchMove(e) {
-      const clientX = e.touches[0].clientX;
+      const { clientX } = e.touches[0];
       const bgRect = _this.__background.getBoundingClientRect();
 
       _this.setValue(map(clientX, bgRect.left, bgRect.right, _this.__min, _this.__max));

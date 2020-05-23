@@ -290,9 +290,9 @@ const GUI = function (pars) {
             dom.removeClass(_this.__ul, GUI.CLASS_CLOSED);
           }
           // For browsers that aren't going to respect the CSS transition,
-          // Lets just check our height against the window height right off
+          // Let's just check our height against the window height right off
           // the bat.
-          this.onResize();
+          _this.onResize();
 
           if (_this.__closeButton) {
             _this.__closeButton.innerHTML = v ? GUI.TEXT_OPEN : GUI.TEXT_CLOSED;
@@ -695,7 +695,7 @@ common.extend(
       // we debounce this function to prevent performance issues when rotating on tablet/mobile
       const root = this.getRoot();
       if (root.scrollable) {
-        const top = dom.getOffset(root.__ul).top;
+        const { top } = dom.getOffset(root.__ul);
         let h = 0;
 
         common.each(root.__ul.childNodes, function (node) {
@@ -738,7 +738,7 @@ common.extend(
      * @instance
      * @ignore
      */
-    remember: function () {
+    remember: function (/* ...args */) {
       if (common.isUndefined(SAVE_DIALOGUE)) {
         SAVE_DIALOGUE = new CenteredDiv();
         SAVE_DIALOGUE.domElement.innerHTML = saveDialogueContents;
@@ -763,6 +763,7 @@ common.extend(
         // Set save row width
         setWidth(this, this.width);
       }
+      return this;
     },
 
     /**
@@ -784,6 +785,7 @@ common.extend(
      */
     getSaveObject: function () {
       const toReturn = this.load;
+
       toReturn.closed = this.closed;
 
       // Am I remembering any values?
@@ -813,6 +815,7 @@ common.extend(
       this.load.remembered[this.preset] = getCurrentPreset(this);
       markPresetModified(this, false);
       this.saveToLocalStorageIfPossible();
+      return this;
     },
 
     saveAs: function (presetName) {
@@ -826,6 +829,7 @@ common.extend(
       this.preset = presetName;
       addPresetOption(this, presetName, true);
       this.saveToLocalStorageIfPossible();
+      return this;
     },
 
     revert: function (gui) {
@@ -854,6 +858,7 @@ common.extend(
       if (!gui) {
         markPresetModified(this.getRoot(), false);
       }
+      return this;
     },
 
     listen: function (controller) {
@@ -862,6 +867,7 @@ common.extend(
       if (init) {
         updateDisplays(this.__listening);
       }
+      return this;
     },
 
     updateDisplay: function () {
@@ -871,6 +877,7 @@ common.extend(
       common.each(this.__folders, function (folder) {
         folder.updateDisplay();
       });
+      return this;
     },
   }
 );
@@ -1106,7 +1113,7 @@ function recallSavedValue(gui, controller) {
         return;
       }
 
-      // Did the loaded object remember thcommon.isObject? &&  Did we remember this particular property?
+      // Did the loaded object remember this object?  &&  Did we remember this particular property?
       if (preset[matchedIndex] && preset[matchedIndex][controller.property] !== undefined) {
         // We did remember something for this guy ...
         const value = preset[matchedIndex][controller.property];
@@ -1373,7 +1380,7 @@ function getCurrentPreset(gui, useInitialValues) {
   common.each(gui.__rememberedObjects, function (val, index) {
     const savedValues = {};
 
-    // The controllers I've made for thcommon.isObject by property
+    // The controllers I've made for this object by property
     const controllerMap = gui.__rememberedObjectIndecesToControllers[index];
 
     // Remember each value for each property

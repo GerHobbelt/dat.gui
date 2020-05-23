@@ -26,23 +26,32 @@ function colorToString(color, forceCSSHex) {
       str = "0" + str;
     }
     return "#" + str;
-  } else if (colorFormat === "CSS_RGB") {
+  }
+  if (colorFormat === "CSS_RGB") {
     return "rgb(" + r + "," + g + "," + b + ")";
-  } else if (colorFormat === "CSS_RGBA") {
+  }
+  if (colorFormat === "CSS_RGBA") {
     return "rgba(" + r + "," + g + "," + b + "," + a + ")";
-  } else if (colorFormat === "HEX") {
+  }
+  if (colorFormat === "HEX") {
     return "0x" + color.hex.toString(16);
-  } else if (colorFormat === "RGB_ARRAY") {
+  }
+  if (colorFormat === "RGB_ARRAY") {
     return "[" + r + "," + g + "," + b + "]";
-  } else if (colorFormat === "RGBA_ARRAY") {
+  }
+  if (colorFormat === "RGBA_ARRAY") {
     return "[" + r + "," + g + "," + b + "," + a + "]";
-  } else if (colorFormat === "RGB_OBJ") {
+  }
+  if (colorFormat === "RGB_OBJ") {
     return "{r:" + r + ",g:" + g + ",b:" + b + "}";
-  } else if (colorFormat === "RGBA_OBJ") {
+  }
+  if (colorFormat === "RGBA_OBJ") {
     return "{r:" + r + ",g:" + g + ",b:" + b + ",a:" + a + "}";
-  } else if (colorFormat === "HSV_OBJ") {
+  }
+  if (colorFormat === "HSV_OBJ") {
     return "{h:" + h + ",s:" + s + ",v:" + v + "}";
-  } else if (colorFormat === "HSVA_OBJ") {
+  }
+  if (colorFormat === "HSVA_OBJ") {
     return "{h:" + h + ",s:" + s + ",v:" + v + ",a:" + a + "}";
   }
   return "unknown format";
@@ -427,7 +436,6 @@ var interpret = function interpret() {
   return toReturn;
 };
 
-var tmpComponent;
 var ColorMath = {
   hsv_to_rgb: function hsv_to_rgb(h, s, v) {
     var hi = Math.floor(h / 60) % 6;
@@ -491,7 +499,8 @@ var ColorMath = {
     return (hex >> (componentIndex * 8)) & 0xff;
   },
   hex_with_component: function hex_with_component(hex, componentIndex, value) {
-    value = (value << (tmpComponent = componentIndex * 8)) | (hex & ~(0xff << tmpComponent));
+    var tmpComponent = componentIndex * 8;
+    value = (value << tmpComponent) | (hex & ~(0xff << tmpComponent));
     return value;
   },
 };
@@ -706,9 +715,7 @@ var dom = {
     elem.style.KhtmlUserSelect = selectable ? "auto" : "none";
     elem.unselectable = selectable ? "on" : "off";
   },
-  makeFullscreen: function makeFullscreen(elem, hor, vert) {
-    var vertical = vert;
-    var horizontal = hor;
+  makeFullscreen: function makeFullscreen(elem, horizontal, vertical) {
     if (Common.isUndefined(horizontal)) {
       horizontal = true;
     }
@@ -725,8 +732,8 @@ var dom = {
       elem.style.bottom = 0;
     }
   },
-  fakeEvent: function fakeEvent(elem, eventType, pars, aux) {
-    var params = pars || {};
+  fakeEvent: function fakeEvent(elem, eventType, params, aux) {
+    params = params || {};
     var className = EVENT_MAP_INV[eventType];
     if (!className) {
       throw new Error("Event type " + eventType + " not supported.");
@@ -820,7 +827,8 @@ var dom = {
   },
   removeClass: function removeClass(elem, className) {
     if (className) {
-      if (elem.className === className) {
+      if (elem.className === undefined);
+      else if (elem.className === className) {
         elem.removeAttribute("class");
       } else {
         var classes = elem.className.split(/ +/);
@@ -887,15 +895,15 @@ var BooleanController = (function (_Controller) {
     _this2.__prev = _this2.getValue();
     _this2.__checkbox = document.createElement("input");
     _this2.__checkbox.setAttribute("type", "checkbox");
-    function onChange() {
-      _this.setValue(!_this.__prev);
-    }
     dom.bind(_this2.__checkbox, "change", onChange, false);
     _this2.domElement.appendChild(_this2.__checkbox);
     _this2.updateDisplay();
     return _this2;
   }
   var _proto = BooleanController.prototype;
+  _proto.onChange = function onChange() {
+    _this.setValue(!_this.__prev);
+  };
   _proto.setValue = function setValue(v) {
     var toReturn = _Controller.prototype.setValue.call(this, v);
     if (this.__onFinishChange) {
@@ -969,6 +977,17 @@ var StringController = (function (_Controller) {
     var _this2;
     _this2 = _Controller.call(this, object, property) || this;
     var _this = _assertThisInitialized(_this2);
+    _this2.__input = document.createElement("input");
+    _this2.__input.setAttribute("type", "text");
+    dom.bind(_this2.__input, "keyup", onChange);
+    dom.bind(_this2.__input, "change", onChange);
+    dom.bind(_this2.__input, "blur", onBlur);
+    dom.bind(_this2.__input, "keydown", onKeyDown);
+    function onKeyDown(e) {
+      if (e.keyCode === 13) {
+        this.blur();
+      }
+    }
     function onChange() {
       _this.setValue(_this.__input.value);
     }
@@ -977,16 +996,6 @@ var StringController = (function (_Controller) {
         _this.__onFinishChange.call(_this, _this.getValue());
       }
     }
-    _this2.__input = document.createElement("input");
-    _this2.__input.setAttribute("type", "text");
-    dom.bind(_this2.__input, "keyup", onChange);
-    dom.bind(_this2.__input, "change", onChange);
-    dom.bind(_this2.__input, "blur", onBlur);
-    dom.bind(_this2.__input, "keydown", function (e) {
-      if (e.keyCode === 13) {
-        this.blur();
-      }
-    });
     _this2.updateDisplay();
     _this2.domElement.appendChild(_this2.__input);
     return _this2;
@@ -1578,7 +1587,7 @@ var css = {
 };
 
 var saveDialogueContents =
-  '<div id="dg-save" class="dg dialogue">\n  Here\'s the new load parameter for your <code>GUI</code>\'s constructor:\n\n  <textarea id="dg-new-constructor"></textarea>\n\n  <div id="dg-save-locally">\n    <input id="dg-local-storage" type="checkbox"> Automatically save values to <code>localStorage</code> on exit.\n\n    <div id="dg-local-explain">\n      The values saved to <code>localStorage</code> will override those passed to <code>dat.GUI</code>\'s constructor.\n      This makes it easier to work incrementally, but <code>localStorage</code> is fragile, and your friends may not see\n      the same values you do.\n    </div>\n  </div>\n</div>\n';
+  '<div id="dg-save" class="dg dialogue">\n  Here\'s the new load parameter for your <code>GUI</code>\'s constructor:\n\n  <textarea id="dg-new-constructor"></textarea>\n\n  <div id="dg-save-locally">\n    <input id="dg-local-storage" type="checkbox">\n    Automatically save values to <code>localStorage</code> on exit.\n\n    <div id="dg-local-explain">\n      The values saved to <code>localStorage</code> will override those passed to <code>dat.GUI</code>\'s constructor.\n      This makes it easier to work incrementally, but <code>localStorage</code> is fragile, and your friends may not see\n      the same values you do.\n    </div>\n  </div>\n</div>\n';
 
 function requestAnimationFrame(callback, element) {
   setTimeout(callback, 1000 / 60);
@@ -1787,7 +1796,7 @@ var GUI = function GUI(pars) {
         } else {
           dom.removeClass(_this.__ul, GUI.CLASS_CLOSED);
         }
-        this.onResize();
+        _this.onResize();
         if (_this.__closeButton) {
           _this.__closeButton.innerHTML = v ? GUI.TEXT_OPEN : GUI.TEXT_CLOSED;
         }
@@ -2014,7 +2023,8 @@ Common.extend(GUI.prototype, {
   onResize: function onResize() {
     var root = this.getRoot();
     if (root.scrollable) {
-      var top = dom.getOffset(root.__ul).top;
+      var _dom$getOffset = dom.getOffset(root.__ul),
+        top = _dom$getOffset.top;
       var h = 0;
       Common.each(root.__ul.childNodes, function (node) {
         if (!(root.autoPlace && node === root.__save_row)) {
@@ -2061,6 +2071,7 @@ Common.extend(GUI.prototype, {
     if (this.autoPlace) {
       setWidth(this, this.width);
     }
+    return this;
   },
   getRoot: function getRoot() {
     var gui = this;
@@ -2092,6 +2103,7 @@ Common.extend(GUI.prototype, {
     this.load.remembered[this.preset] = getCurrentPreset(this);
     markPresetModified(this, false);
     this.saveToLocalStorageIfPossible();
+    return this;
   },
   saveAs: function saveAs(presetName) {
     if (!this.load.remembered) {
@@ -2102,6 +2114,7 @@ Common.extend(GUI.prototype, {
     this.preset = presetName;
     addPresetOption(this, presetName, true);
     this.saveToLocalStorageIfPossible();
+    return this;
   },
   revert: function revert(gui) {
     Common.each(
@@ -2124,6 +2137,7 @@ Common.extend(GUI.prototype, {
     if (!gui) {
       markPresetModified(this.getRoot(), false);
     }
+    return this;
   },
   listen: function listen(controller) {
     var init = this.__listening.length === 0;
@@ -2131,6 +2145,7 @@ Common.extend(GUI.prototype, {
     if (init) {
       updateDisplays(this.__listening);
     }
+    return this;
   },
   updateDisplay: function updateDisplay() {
     Common.each(this.__controllers, function (controller) {
@@ -2139,6 +2154,7 @@ Common.extend(GUI.prototype, {
     Common.each(this.__folders, function (folder) {
       folder.updateDisplay();
     });
+    return this;
   },
 });
 function addRow(gui, newDom, liBefore) {

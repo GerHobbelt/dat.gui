@@ -363,7 +363,7 @@ Removes the controller from its parent GUI.
 <a name="Controller+onChange"></a>
 
 ### controller.onChange(fnc) ⇒ [<code>Controller</code>](#Controller)
-Specify that a function fire every time someone changes the value with
+Specify a function which fires every time someone has changed the value with
 this Controller.
 
 **Kind**: instance method of [<code>Controller</code>](#Controller)  
@@ -371,13 +371,13 @@ this Controller.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| fnc | <code>function</code> | This function will be called whenever the value is modified via this Controller. |
+| fnc | <code>function</code> | This function will be called whenever the value has been modified via this Controller. |
 
 <a name="Controller+onFinishChange"></a>
 
 ### controller.onFinishChange(fnc) ⇒ [<code>Controller</code>](#Controller)
-Specify that a function fire every time someone "finishes" changing
-the value wih this Controller. Useful for values that change
+Specify a function which fires every time someone "finishes" changing
+the value with this Controller. Useful for values that change
 incrementally like numbers or strings.
 
 **Kind**: instance method of [<code>Controller</code>](#Controller)  

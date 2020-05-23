@@ -74,16 +74,12 @@ const dom = {
    *
    * @param elem
    * @param horizontal
-   * @param vert
+   * @param vertical
    */
-  makeFullscreen: function (elem, hor, vert) {
-    let vertical = vert;
-    let horizontal = hor;
-
+  makeFullscreen: function (elem, horizontal, vertical) {
     if (common.isUndefined(horizontal)) {
       horizontal = true;
     }
-
     if (common.isUndefined(vertical)) {
       vertical = true;
     }
@@ -106,8 +102,8 @@ const dom = {
    * @param eventType
    * @param params
    */
-  fakeEvent: function (elem, eventType, pars, aux) {
-    const params = pars || {};
+  fakeEvent: function (elem, eventType, params, aux) {
+    params = params || {};
     const className = EVENT_MAP_INV[eventType];
     if (!className) {
       throw new Error("Event type " + eventType + " not supported.");
@@ -229,7 +225,10 @@ const dom = {
    */
   removeClass: function (elem, className) {
     if (className) {
-      if (elem.className === className) {
+      /* jshint -W035 */ // jshint: ignore empty block
+      if (elem.className === undefined) {
+        // elem.className = undefined;
+      } else if (elem.className === className) {
         elem.removeAttribute("class");
       } else {
         const classes = elem.className.split(/ +/);
@@ -239,6 +238,7 @@ const dom = {
           elem.className = classes.join(" ");
         }
       }
+      /* jshint +W035 */
     } else {
       elem.className = undefined;
     }

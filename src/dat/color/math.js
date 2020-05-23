@@ -11,8 +11,6 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-let tmpComponent;
-
 const ColorMath = {
   hsv_to_rgb: function (h, s, v) {
     const hi = Math.floor(h / 60) % 6;
@@ -86,7 +84,8 @@ const ColorMath = {
   },
 
   hex_with_component: function (hex, componentIndex, value) {
-    value = (value << (tmpComponent = componentIndex * 8)) | (hex & ~(0xff << tmpComponent));
+    const tmpComponent = componentIndex * 8;
+    value = (value << tmpComponent) | (hex & ~(0xff << tmpComponent));
     return value;
   },
 };

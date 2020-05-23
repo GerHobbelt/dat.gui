@@ -80,7 +80,6 @@ const dom = {
     if (common.isUndefined(horizontal)) {
       horizontal = true;
     }
-
     if (common.isUndefined(vertical)) {
       vertical = true;
     }
@@ -111,9 +110,9 @@ const dom = {
     }
     const evt = document.createEvent(className);
     switch (className) {
-      case "MouseEvents":
-        var clientX = params.x || params.clientX || 0;
-        var clientY = params.y || params.clientY || 0;
+      case "MouseEvents": {
+        const clientX = params.x || params.clientX || 0;
+        const clientY = params.y || params.clientY || 0;
         evt.initMouseEvent(
           eventType,
           params.bubbles || false,
@@ -132,8 +131,9 @@ const dom = {
           null
         );
         break;
-      case "KeyboardEvents":
-        var init = evt.initKeyboardEvent || evt.initKeyEvent; // webkit || moz
+      }
+      case "KeyboardEvents": {
+        const init = evt.initKeyboardEvent || evt.initKeyEvent; // webkit || moz
         common.defaults(params, {
           cancelable: true,
           ctrlKey: false,
@@ -156,9 +156,11 @@ const dom = {
           params.charCode
         );
         break;
-      default:
+      }
+      default: {
         evt.initEvent(eventType, params.bubbles || false, params.cancelable || true);
         break;
+      }
     }
     common.defaults(evt, aux);
     elem.dispatchEvent(evt);
@@ -223,18 +225,20 @@ const dom = {
    */
   removeClass: function (elem, className) {
     if (className) {
+      /* jshint -W035 */ // jshint: ignore empty block
       if (elem.className === undefined) {
-        // elem.className = className;
+        // elem.className = undefined;
       } else if (elem.className === className) {
         elem.removeAttribute("class");
       } else {
         const classes = elem.className.split(/ +/);
         const index = classes.indexOf(className);
-        if (index != -1) {
+        if (index !== -1) {
           classes.splice(index, 1);
           elem.className = classes.join(" ");
         }
       }
+      /* jshint +W035 */
     } else {
       elem.className = undefined;
     }
@@ -290,7 +294,8 @@ const dom = {
       do {
         offset.left += elem.offsetLeft;
         offset.top += elem.offsetTop;
-      } while ((elem = elem.offsetParent));
+        elem = elem.offsetParent;
+      } while (elem);
     }
     return offset;
   },

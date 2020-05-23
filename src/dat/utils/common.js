@@ -27,7 +27,11 @@ const Common = {
     this.each(
       ARR_SLICE.call(arguments, 1),
       function (obj) {
-        for (const key in obj) if (!this.isUndefined(obj[key])) target[key] = obj[key];
+        for (const key in obj) {
+          if (!this.isUndefined(obj[key])) {
+            target[key] = obj[key];
+          }
+        }
       },
       this
     );
@@ -39,7 +43,11 @@ const Common = {
     this.each(
       ARR_SLICE.call(arguments, 1),
       function (obj) {
-        for (const key in obj) if (this.isUndefined(target[key])) target[key] = obj[key];
+        for (const key in obj) {
+          if (this.isUndefined(target[key])) {
+            target[key] = obj[key];
+          }
+        }
       },
       this
     );
@@ -68,11 +76,17 @@ const Common = {
       obj.forEach(itr, scope);
     } else if (obj.length === obj.length + 0) {
       // Is number but not NaN
-
-      for (var key = 0, l = obj.length; key < l; key++)
-        if (key in obj && itr.call(scope, obj[key], key) === this.BREAK) return;
+      for (let key = 0, l = obj.length; key < l; key++) {
+        if (key in obj && itr.call(scope, obj[key], key) === this.BREAK) {
+          return;
+        }
+      }
     } else {
-      for (var key in obj) if (itr.call(scope, obj[key], key) === this.BREAK) return;
+      for (const objkey in obj) {
+        if (itr.call(scope, obj[objkey], objkey) === this.BREAK) {
+          return;
+        }
+      }
     }
   },
 
@@ -81,7 +95,9 @@ const Common = {
   },
 
   toArray: function (obj) {
-    if (obj.toArray) return obj.toArray();
+    if (obj.toArray) {
+      return obj.toArray();
+    }
     return ARR_SLICE.call(obj);
   },
 
@@ -111,6 +127,10 @@ const Common = {
     return obj === obj + 0;
   },
 
+  isFiniteNumber: function (obj) {
+    return obj === +obj && isFinite(obj);
+  },
+
   isString: function (obj) {
     return obj === obj + "";
   },
@@ -120,11 +140,12 @@ const Common = {
   },
 
   isFunction: function (obj) {
-    return Object.prototype.toString.call(obj) === "[object Function]";
+    return obj instanceof Function;
   },
 
   hasOwnProperty: function (obj, prop) {
-    const proto = obj.__proto__ || obj.constructor.prototype;
+    // TODO: fix this one up
+    const proto = obj.constructor.prototype;
     let proto_prop;
     try {
       proto_prop = proto[prop];

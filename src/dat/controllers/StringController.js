@@ -36,11 +36,15 @@ class StringController extends Controller {
     dom.bind(this.__input, "keyup", onChange);
     dom.bind(this.__input, "change", onChange);
     dom.bind(this.__input, "blur", onBlur);
-    dom.bind(this.__input, "keydown", function (e) {
+    dom.bind(this.__input, "keydown", onKeyDown);
+
+    function onKeyDown(e) {
       if (e.keyCode === 13) {
+        /* jshint validthis: true */
         this.blur();
+        /* jshint validthis: false */
       }
-    });
+    }
 
     function onChange() {
       _this.setValue(_this.__input.value);

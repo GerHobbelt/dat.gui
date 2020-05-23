@@ -11,6 +11,8 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
+// (ArrayController is based on StringController and was created by Ulysses Popple)
+
 import Controller from "./Controller";
 import dom from "../dom/dom";
 import common from "../utils/common";

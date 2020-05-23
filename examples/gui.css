@@ -1,32 +1,76 @@
-/**
- * dat.GUI JavaScript Controller Library
- * http://code.google.com/p/dat-gui
- *
- * Copyright 2011-2020 Data Arts Team, Google Creative Lab
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- */
-
 #guidat {
   position: fixed;
+  width: 100%;
+  height: 100%;
+  left: 0;
   top: 0;
-  right: 0;
-  width: auto;
   z-index: 1001;
-  text-align: right;
+}
+
+.guidat-tween-selector {
+  z-index: 1001;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.guidat {
+  float: right;
+  padding: 0;
+  margin: 0 20px 0 0;
+}
+
+.guidat-scrubber {
+  width: 75%;
+  float: right;
+  margin-top: -3px;
+  margin-right: -2px;
+  margin-left: 3px;
+  background-color: #333333;
+  border-bottom: 1px solid #444444;
+  height: 31px;
+}
+
+#guidat-save-dialogue {
+  z-index: 1001;
+  -webkit-box-shadow: rgba(0, 0, 0, 0.6) 0 0 10px;
+  box-shadow: rgba(0, 0, 0, 0.6) 0 0 10px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  background-color: #111111;
+  color: #CCCCCC;
+  width: 400px;
+  height: 228px;
+  margin-top: -114px;
+  margin-left: -200px;
+  text-align: center;
+  padding: 10px;
+}
+
+#guidat-save-dialogue textarea {
+  margin-top: 9px;
+  width: 390px;
+  height: 160px;
+  font-size: 9px;
+  border: 0;
+  font-family: Monaco, monospace;
+  padding: 5px;
+}
+
+#guidat-save-dialogue a {
+  display: block;
+  text-decoration: none;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px outset #444444;
+  margin-bottom: 9px;
+  padding: 5px;
 }
 
 .guidat {
   color: #FFFFFF;
   opacity: 0.97;
   text-align: left;
-  float: right;
-  margin-right: 20px;
-  margin-bottom: 20px;
   background-color: #FFFFFF;
 }
 
@@ -42,9 +86,12 @@
   background-color: rgba(0, 0, 0, 0.1);
 }
 
-a.guidat-toggle:link,
-a.guidat-toggle:visited,
-a.guidat-toggle:active {
+.guidat-controllers hr {
+  height: 0;
+  border-top: 1px solid #000000;
+}
+
+a.guidat-toggle {
   text-decoration: none;
   cursor: pointer;
   color: #FFFFFF;
@@ -89,19 +136,12 @@ a.guidat-toggle:hover {
   background-color: #222222;
 }
 
-.guidat-controller select {
-  margin-top: 4px;
-  float: right;
-}
-
 .guidat-controller input:hover {
   background-color: #444444;
 }
 
-.guidat-controller input:focus,
-.guidat-controller.active input {
+.guidat-controller input:focus {
   background-color: #555555;
-  color: #FFFFFF;
 }
 
 .guidat-controller.number {
@@ -114,9 +154,9 @@ a.guidat-toggle:hover {
 
 .guidat-controller.string input {
   border: 0;
+  width: 125px;
   color: #1ED36F;
   margin-right: 2px;
-  width: 148px;
 }
 
 .guidat-controller.boolean {
@@ -128,10 +168,10 @@ a.guidat-toggle:hover {
 }
 
 .guidat-controller.number input[type="text"] {
-  width: 35px;
   margin-left: 5px;
   margin-right: 2px;
   color: #00AEFF;
+  width: 35px;
 }
 
 .guidat .guidat-controller.boolean input {
@@ -154,27 +194,47 @@ a.guidat-toggle:hover {
   display: inline-block;
 }
 
-.guidat-controller .guidat-slider-bg:hover,
-.guidat-controller.active .guidat-slider-bg {
+.guidat-slider-bg:hover,
+.guidat-slider-bg.active {
   background-color: #444444;
 }
 
-.guidat-controller .guidat-slider-bg .guidat-slider-fg:hover,
-.guidat-controller.active .guidat-slider-bg .guidat-slider-fg {
+.guidat-slider-bg:hover .guidat-slider-fg,
+.guidat-slider-bg.active .guidat-slider-fg {
   background-color: #52C8FF;
 }
 
 .guidat-slider-bg {
   background-color: #222222;
   cursor: ew-resize;
-  width: 40%;
+  width: 85px;
   margin-top: 2px;
   float: right;
   height: 21px;
 }
 
 .guidat-slider-fg {
-  cursor: ew-resize;
   background-color: #00AEFF;
-  height: 21px;
+  height: 20px;
+}
+
+/* Styles for timed GUI */
+
+.guidat.time {
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+  left: 0;
+}
+
+.time .guidat-slider-bg {
+  width: 7%;
+}
+
+.time .guidat-controller.string input {
+  width: 10.6%;
+}
+
+.time .guidat-controller.number input[type="text"] {
+  width: 3%;
 }

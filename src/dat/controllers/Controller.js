@@ -18,8 +18,6 @@
  * @param {string} property The name of the property to be manipulated
  *
  * @member dat.controllers
- *
- * @lends dat.controllers.Controller.prototype
  */
 class Controller {
   constructor(object, property) {
@@ -46,25 +44,25 @@ class Controller {
     /**
      * The function to be called on change.
      * @type {Function}
-     * @ignore
+     * @private
      */
     this.__onChange = undefined;
 
     /**
      * The function to be called on finishing change.
      * @type {Function}
-     * @ignore
+     * @private
      */
     this.__onFinishChange = undefined;
   }
 
   /**
-   * Specify that a function fire every time someone changes the value with
+   * Specify a function which fires every time someone has changed the value with
    * this Controller.
    *
    * @param {Function} fnc This function will be called whenever the value
-   * is modified via this Controller.
-   * @returns {dat.controllers.Controller} this
+   * has been modified via this Controller.
+   * @returns {Controller} this
    */
   onChange(fnc) {
     this.__onChange = fnc;
@@ -72,13 +70,13 @@ class Controller {
   }
 
   /**
-   * Specify that a function fire every time someone "finishes" changing
-   * the value wih this Controller. Useful for values that change
+   * Specify a function which fires every time someone "finishes" changing
+   * the value with this Controller. Useful for values that change
    * incrementally like numbers or strings.
    *
    * @param {Function} fnc This function will be called whenever
    * someone "finishes" changing the value via this Controller.
-   * @returns {dat.controllers.Controller} this
+   * @returns {Controller} this
    */
   onFinishChange(fnc) {
     this.__onFinishChange = fnc;
@@ -111,14 +109,14 @@ class Controller {
   /**
    * Refreshes the visual display of a Controller in order to keep sync
    * with the object's current value.
-   * @returns {dat.controllers.Controller} this
+   * @returns {Controller} this
    */
   updateDisplay() {
     return this;
   }
 
   /**
-   * @returns {Boolean} true if the value has deviated from initialValue
+   * @returns {boolean} true if the value has deviated from initialValue
    */
   isModified() {
     return this.initialValue !== this.getValue();

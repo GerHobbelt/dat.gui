@@ -14,6 +14,14 @@
 import Controller from "./Controller";
 import common from "../utils/common";
 
+function numDecimals(x) {
+  const _x = x.toString();
+  if (_x.indexOf(".") > -1) {
+    return _x.length - _x.indexOf(".") - 1;
+  }
+  return 0;
+}
+
 /**
  * @class Represents a given property of an object that is a number.
  *
@@ -45,7 +53,7 @@ class NumberController extends Controller {
         this.__impliedStep = 1; // What are we, psychics?
       } else {
         // Hey Doug, check this out.
-        this.__impliedStep = Math.pow(10, Math.floor(Math.log(Math.abs(this.initialValue)) / Math.LN10)) / 10;
+        this.__impliedStep = 10 ** Math.floor(Math.log(Math.abs(this.initialValue)) / Math.LN10) / 10;
       }
     } else {
       this.__impliedStep = this.__step;
@@ -55,13 +63,13 @@ class NumberController extends Controller {
   }
 
   setValue(v) {
-    if (this.__min !== undefined && v < this.__min) {
+    if (this.__min != null && v < this.__min) {
       v = this.__min;
-    } else if (this.__max !== undefined && v > this.__max) {
+    } else if (this.__max != null && v > this.__max) {
       v = this.__max;
     }
 
-    if (this.__step !== undefined && v % this.__step != 0) {
+    if (this.__step != null && v % this.__step !== 0) {
       v = Math.round(v / this.__step) * this.__step;
     }
 
@@ -108,14 +116,6 @@ class NumberController extends Controller {
     this.__precision = numDecimals(v);
     return this;
   }
-}
-
-function numDecimals(x) {
-  x = x.toString();
-  if (x.indexOf(".") > -1) {
-    return x.length - x.indexOf(".") - 1;
-  }
-  return 0;
 }
 
 export default NumberController;

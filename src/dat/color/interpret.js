@@ -281,6 +281,7 @@ const interpret = function () {
   toReturn = false;
 
   const original = arguments.length > 1 ? common.toArray(arguments) : arguments[0];
+
   common.each(INTERPRETATIONS, function (family) {
     if (family.litmus(original)) {
       common.each(family.conversions, function (conversion, conversionName) {

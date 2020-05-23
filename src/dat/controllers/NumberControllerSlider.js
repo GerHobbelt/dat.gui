@@ -14,7 +14,11 @@
 import NumberController from "./NumberController";
 import dom from "../dom/dom";
 
-//  "text!dat/controllers/NumberControllerSlider.css"
+// import "./NumberControllerSlider.css";
+
+function map(v, i1, i2, o1, o2) {
+  return o1 + (o2 - o1) * ((v - i1) / (i2 - i1));
+}
 
 /**
  * @class Represents a given property of an object that is a number, contains
@@ -88,14 +92,12 @@ class NumberControllerSlider extends NumberController {
   }
 
   updateDisplay() {
-    const pct = (this.getValue() - this.__min) / (this.__max - this.__min);
+    const value = this.getValue();
+    const pct = (value - this.__min) / (this.__max - this.__min);
     this.__foreground.style.width = pct * 100 + "%";
+
     return super.updateDisplay();
   }
-}
-
-function map(v, i1, i2, o1, o2) {
-  return o1 + (o2 - o1) * ((v - i1) / (i2 - i1));
 }
 
 export default NumberControllerSlider;

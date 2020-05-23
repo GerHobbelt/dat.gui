@@ -13,25 +13,20 @@
 
 (function (global, factory) {
   typeof exports === "object" && typeof module !== "undefined"
-    ? factory(exports, require("dat/controllers/UndefinedController"))
+    ? factory(exports)
     : typeof define === "function" && define.amd
-    ? define(["exports", "dat/controllers/UndefinedController"], factory)
-    : ((global = global || self), factory((global.dat = {}), global.UndefinedController$1));
-})(this, function (exports, UndefinedController$1) {
+    ? define(["exports"], factory)
+    : ((global = global || self), factory((global.dat = {})));
+})(this, function (exports) {
   "use strict";
 
-  UndefinedController$1 =
-    UndefinedController$1 && Object.prototype.hasOwnProperty.call(UndefinedController$1, "default")
-      ? UndefinedController$1["default"]
-      : UndefinedController$1;
-
   function toString$1(color) {
-    if (color.a == 1 || common.isUndefined(color.a)) {
-      var s = color.hex.toString(16);
-      while (s.length < 6) {
-        s = "0" + s;
+    if (color.a === 1 || common.isUndefined(color.a)) {
+      var str = color.hex.toString(16);
+      while (str.length < 6) {
+        str = "0" + str;
       }
-      return "#" + s;
+      return "#" + str;
     }
     return "rgba(" + Math.round(color.r) + "," + Math.round(color.g) + "," + Math.round(color.b) + "," + color.a + ")";
   }
@@ -44,7 +39,9 @@
         ARR_SLICE.call(arguments, 1),
         function (obj) {
           for (var key in obj) {
-            if (!this.isUndefined(obj[key])) target[key] = obj[key];
+            if (!this.isUndefined(obj[key])) {
+              target[key] = obj[key];
+            }
           }
         },
         this
@@ -56,7 +53,9 @@
         ARR_SLICE.call(arguments, 1),
         function (obj) {
           for (var key in obj) {
-            if (this.isUndefined(target[key])) target[key] = obj[key];
+            if (this.isUndefined(target[key])) {
+              target[key] = obj[key];
+            }
           }
         },
         this
@@ -81,11 +80,15 @@
         obj.forEach(itr, scope);
       } else if (obj.length === obj.length + 0) {
         for (var key = 0, l = obj.length; key < l; key++) {
-          if (key in obj && itr.call(scope, obj[key], key) === this.BREAK) return;
+          if (key in obj && itr.call(scope, obj[key], key) === this.BREAK) {
+            return;
+          }
         }
       } else {
-        for (var key in obj) {
-          if (itr.call(scope, obj[key], key) === this.BREAK) return;
+        for (var objkey in obj) {
+          if (itr.call(scope, obj[objkey], objkey) === this.BREAK) {
+            return;
+          }
         }
       }
     },
@@ -93,7 +96,9 @@
       setTimeout(fnc, 0);
     },
     toArray: function toArray(obj) {
-      if (obj.toArray) return obj.toArray();
+      if (obj.toArray) {
+        return obj.toArray();
+      }
       return ARR_SLICE.call(obj);
     },
     isUndefined: function isUndefined(obj) {
@@ -116,6 +121,9 @@
     isNumber: function isNumber(obj) {
       return obj === obj + 0;
     },
+    isFiniteNumber: function isFiniteNumber(obj) {
+      return obj === +obj && isFinite(obj);
+    },
     isString: function isString(obj) {
       return obj === obj + "";
     },
@@ -123,10 +131,10 @@
       return obj === false || obj === true;
     },
     isFunction: function isFunction(obj) {
-      return Object.prototype.toString.call(obj) === "[object Function]";
+      return obj instanceof Function;
     },
     hasOwnProperty: function hasOwnProperty(obj, prop) {
-      var proto = obj.__proto__ || obj.constructor.prototype;
+      var proto = obj.constructor.prototype;
       var proto_prop;
       try {
         proto_prop = proto[prop];
@@ -478,6 +486,63 @@
     };
     return Color;
   })();
+  function defineRGBComponent(target, component, componentHexIndex) {
+    Object.defineProperty(target, component, {
+      get: function get() {
+        if (this.__state.space === "RGB") {
+          return this.__state[component];
+        }
+        Color.recalculateRGB(this, component, componentHexIndex);
+        return this.__state[component];
+      },
+      set: function set(v) {
+        if (this.__state.space !== "RGB") {
+          Color.recalculateRGB(this, component, componentHexIndex);
+          this.__state.space = "RGB";
+        }
+        this.__state[component] = v;
+      },
+    });
+  }
+  function defineHSVComponent(target, component) {
+    Object.defineProperty(target, component, {
+      get: function get() {
+        if (this.__state.space === "HSV") {
+          return this.__state[component];
+        }
+        Color.recalculateHSV(this);
+        return this.__state[component];
+      },
+      set: function set(v) {
+        if (this.__state.space !== "HSV") {
+          Color.recalculateHSV(this);
+          this.__state.space = "HSV";
+        }
+        this.__state[component] = v;
+      },
+    });
+  }
+  Color.recalculateRGB = function (color, component, componentHexIndex) {
+    if (color.__state.space === "HEX") {
+      color.__state[component] = ColorMath.component_from_hex(color.__state.hex, componentHexIndex);
+    } else if (color.__state.space === "HSV") {
+      Common.extend(color.__state, ColorMath.hsv_to_rgb(color.__state.h, color.__state.s, color.__state.v));
+    } else {
+      throw new Error("Corrupted color state");
+    }
+  };
+  Color.recalculateHSV = function (color) {
+    var result = ColorMath.rgb_to_hsv(color.r, color.g, color.b);
+    Common.extend(color.__state, {
+      s: result.s,
+      v: result.v,
+    });
+    if (!Common.isNaN(result.h)) {
+      color.__state.h = result.h;
+    } else if (Common.isUndefined(color.__state.h)) {
+      color.__state.h = 0;
+    }
+  };
   Color.COMPONENTS = ["r", "g", "b", "h", "s", "v", "hex", "a"];
   defineRGBComponent(Color.prototype, "r", 2);
   defineRGBComponent(Color.prototype, "g", 1);
@@ -506,61 +571,6 @@
       this.__state.hex = v;
     },
   });
-  function defineRGBComponent(target, component, componentHexIndex) {
-    Object.defineProperty(target, component, {
-      get: function get() {
-        if (this.__state.space === "RGB") {
-          return this.__state[component];
-        }
-        recalculateRGB(this, component, componentHexIndex);
-        return this.__state[component];
-      },
-      set: function set(v) {
-        if (this.__state.space !== "RGB") {
-          recalculateRGB(this, component, componentHexIndex);
-          this.__state.space = "RGB";
-        }
-        this.__state[component] = v;
-      },
-    });
-  }
-  function defineHSVComponent(target, component) {
-    Object.defineProperty(target, component, {
-      get: function get() {
-        if (this.__state.space === "HSV") return this.__state[component];
-        recalculateHSV(this);
-        return this.__state[component];
-      },
-      set: function set(v) {
-        if (this.__state.space !== "HSV") {
-          recalculateHSV(this);
-          this.__state.space = "HSV";
-        }
-        this.__state[component] = v;
-      },
-    });
-  }
-  function recalculateRGB(color, component, componentHexIndex) {
-    if (color.__state.space === "HEX") {
-      color.__state[component] = ColorMath.component_from_hex(color.__state.hex, componentHexIndex);
-    } else if (color.__state.space === "HSV") {
-      Common.extend(color.__state, ColorMath.hsv_to_rgb(color.__state.h, color.__state.s, color.__state.v));
-    } else {
-      throw "Corrupted color state";
-    }
-  }
-  function recalculateHSV(color) {
-    var result = ColorMath.rgb_to_hsv(color.r, color.g, color.b);
-    Common.extend(color.__state, {
-      s: result.s,
-      v: result.v,
-    });
-    if (!Common.isNaN(result.h)) {
-      color.__state.h = result.h;
-    } else if (Common.isUndefined(color.__state.h)) {
-      color.__state.h = 0;
-    }
-  }
 
   var Controller = (function () {
     function Controller(object, property) {
@@ -675,7 +685,7 @@
       }
       var evt = document.createEvent(className);
       switch (className) {
-        case "MouseEvents":
+        case "MouseEvents": {
           var clientX = params.x || params.clientX || 0;
           var clientY = params.y || params.clientY || 0;
           evt.initMouseEvent(
@@ -696,7 +706,8 @@
             null
           );
           break;
-        case "KeyboardEvents":
+        }
+        case "KeyboardEvents": {
           var init = evt.initKeyboardEvent || evt.initKeyEvent;
           Common.defaults(params, {
             cancelable: true,
@@ -720,9 +731,11 @@
             params.charCode
           );
           break;
-        default:
+        }
+        default: {
           evt.initEvent(eventType, params.bubbles || false, params.cancelable || true);
           break;
+        }
       }
       Common.defaults(evt, aux);
       elem.dispatchEvent(evt);
@@ -765,7 +778,7 @@
         } else {
           var classes = elem.className.split(/ +/);
           var index = classes.indexOf(className);
-          if (index != -1) {
+          if (index !== -1) {
             classes.splice(index, 1);
             elem.className = classes.join(" ");
           }
@@ -807,7 +820,8 @@
         do {
           offset.left += elem.offsetLeft;
           offset.top += elem.offsetTop;
-        } while ((elem = elem.offsetParent));
+          elem = elem.offsetParent;
+        } while (elem);
       }
       return offset;
     },
@@ -908,11 +922,12 @@
       dom.bind(_this2.__input, "keyup", onChange);
       dom.bind(_this2.__input, "change", onChange);
       dom.bind(_this2.__input, "blur", onBlur);
-      dom.bind(_this2.__input, "keydown", function (e) {
+      dom.bind(_this2.__input, "keydown", onKeyDown);
+      function onKeyDown(e) {
         if (e.keyCode === 13) {
           this.blur();
         }
-      });
+      }
       function onChange() {
         _this.setValue(_this.__input.value);
       }
@@ -935,6 +950,13 @@
     return StringController;
   })(Controller);
 
+  function numDecimals(x) {
+    var _x = x.toString();
+    if (_x.indexOf(".") > -1) {
+      return _x.length - _x.indexOf(".") - 1;
+    }
+    return 0;
+  }
   var NumberController = (function (_Controller) {
     _inheritsLoose(NumberController, _Controller);
     function NumberController(object, property, params) {
@@ -958,12 +980,12 @@
     }
     var _proto = NumberController.prototype;
     _proto.setValue = function setValue(v) {
-      if (this.__min !== undefined && v < this.__min) {
+      if (this.__min != null && v < this.__min) {
         v = this.__min;
-      } else if (this.__max !== undefined && v > this.__max) {
+      } else if (this.__max != null && v > this.__max) {
         v = this.__max;
       }
-      if (this.__step !== undefined && v % this.__step != 0) {
+      if (this.__step != null && v % this.__step !== 0) {
         v = Math.round(v / this.__step) * this.__step;
       }
       return _Controller.prototype.setValue.call(this, v);
@@ -984,20 +1006,17 @@
     };
     return NumberController;
   })(Controller);
-  function numDecimals(x) {
-    x = x.toString();
-    if (x.indexOf(".") > -1) {
-      return x.length - x.indexOf(".") - 1;
-    }
-    return 0;
-  }
 
+  function roundToDecimal(value, decimals) {
+    var tenTo = Math.pow(10, decimals);
+    return Math.round(value * tenTo) / tenTo;
+  }
   var NumberControllerBox = (function (_NumberController) {
     _inheritsLoose(NumberControllerBox, _NumberController);
     function NumberControllerBox(object, property, params) {
       var _this2;
-      _this2.__truncationSuspended = false;
       _this2 = _NumberController.call(this, object, property, params) || this;
+      _this2.__truncationSuspended = false;
       var _this = _assertThisInitialized(_this2);
       var prev_y;
       _this2.__input = document.createElement("input");
@@ -1053,11 +1072,10 @@
     };
     return NumberControllerBox;
   })(NumberController);
-  function roundToDecimal(value, decimals) {
-    var tenTo = Math.pow(10, decimals);
-    return Math.round(value * tenTo) / tenTo;
-  }
 
+  function map(v, i1, i2, o1, o2) {
+    return o1 + (o2 - o1) * ((v - i1) / (i2 - i1));
+  }
   var NumberControllerSlider = (function (_NumberController) {
     _inheritsLoose(NumberControllerSlider, _NumberController);
     function NumberControllerSlider(object, property, min, max, step) {
@@ -1103,15 +1121,13 @@
       css.inject(styleSheet);
     };
     _proto.updateDisplay = function updateDisplay() {
-      var pct = (this.getValue() - this.__min) / (this.__max - this.__min);
+      var value = this.getValue();
+      var pct = (value - this.__min) / (this.__max - this.__min);
       this.__foreground.style.width = pct * 100 + "%";
       return _NumberController.prototype.updateDisplay.call(this);
     };
     return NumberControllerSlider;
   })(NumberController);
-  function map(v, i1, i2, o1, o2) {
-    return o1 + (o2 - o1) * ((v - i1) / (i2 - i1));
-  }
 
   var FunctionController = (function (_Controller) {
     _inheritsLoose(FunctionController, _Controller);
@@ -1151,7 +1167,6 @@
       _this2.__color = new Color(_this2.getValue());
       _this2.__temp = new Color(0);
       var _this = _assertThisInitialized(_this2);
-      _this2.domElement = document.createElement("div");
       dom.makeSelectable(_this2.domElement, false);
       _this2.__selector = document.createElement("div");
       _this2.__selector.className = "selector";
@@ -1272,13 +1287,20 @@
       function setSV(e) {
         e.preventDefault();
         var w = dom.getWidth(_this.__saturation_field);
+        var h = dom.getHeight(_this.__saturation_field);
         var o = dom.getOffset(_this.__saturation_field);
         var s = (e.clientX - o.left + document.body.scrollLeft) / w;
-        var v = 1 - (e.clientY - o.top + document.body.scrollTop) / w;
-        if (v > 1) v = 1;
-        else if (v < 0) v = 0;
-        if (s > 1) s = 1;
-        else if (s < 0) s = 0;
+        var v = 1 - (e.clientY - o.top + document.body.scrollTop) / h;
+        if (v > 1) {
+          v = 1;
+        } else if (v < 0) {
+          v = 0;
+        }
+        if (s > 1) {
+          s = 1;
+        } else if (s < 0) {
+          s = 0;
+        }
         _this.__color.v = v;
         _this.__color.s = s;
         _this.setValue(_this.__color.toOriginal());
@@ -1289,8 +1311,11 @@
         var s = dom.getHeight(_this.__hue_field);
         var o = dom.getOffset(_this.__hue_field);
         var h = 1 - (e.clientY - o.top + document.body.scrollTop) / s;
-        if (h > 1) h = 1;
-        else if (h < 0) h = 0;
+        if (h > 1) {
+          h = 1;
+        } else if (h < 0) {
+          h = 0;
+        }
         _this.__color.h = h * 360;
         _this.setValue(_this.__color.toOriginal());
         return false;
@@ -1311,7 +1336,7 @@
               i[component] !== this.__color.__state[component]
             ) {
               mismatch = true;
-              return {};
+              return Common.BREAK;
             }
           },
           this
@@ -1334,8 +1359,9 @@
       this.__temp.s = 1;
       this.__temp.v = 1;
       linearGradient(this.__saturation_field, "left", "#fff", this.__temp.toString());
+      this.__input.value = this.__color.toString();
       Common.extend(this.__input.style, {
-        backgroundColor: (this.__input.value = this.__color.toString()),
+        backgroundColor: this.__color.toString(),
         color: "rgb(" + flip + "," + flip + "," + flip + ")",
         textShadow: this.__input_textShadow + "rgba(" + _flip + "," + _flip + "," + _flip + ",.7)",
       });
@@ -1454,29 +1480,8 @@
     return ArrayController;
   })(Controller);
 
-  var css$1 = {
-    load: function load(url, indoc) {
-      var doc = indoc || document;
-      var link = doc.createElement("link");
-      link.type = "text/css";
-      link.rel = "stylesheet";
-      link.href = url;
-      doc.getElementsByTagName("head")[0].appendChild(link);
-    },
-    inject: function inject(cssContent, indoc) {
-      var doc = indoc || document;
-      var injected = document.createElement("style");
-      injected.type = "text/css";
-      injected.innerHTML = cssContent;
-      var head = doc.getElementsByTagName("head")[0];
-      try {
-        head.appendChild(injected);
-      } catch (e) {}
-    },
-  };
-
   var saveDialogueContents =
-    '<div id="dg-save" class="dg dialogue">\n  Here\'s the new load parameter for your <code>GUI</code>\'s constructor:\n\n  <textarea id="dg-new-constructor"></textarea>\n\n  <div id="dg-save-locally">\n    <input id="dg-local-storage" type="checkbox"> Automatically save values to <code>localStorage</code> on exit.\n\n    <div id="dg-local-explain">\n      The values saved to <code>localStorage</code> will override those passed to <code>dat.GUI</code>\'s constructor.\n      This makes it easier to work incrementally, but <code>localStorage</code> is fragile, and your friends may not see\n      the same values you do.\n    </div>\n  </div>\n</div>\n';
+    '<div id="dg-save" class="dg dialogue">\n  Here\'s the new load parameter for your <code>GUI</code>\'s constructor:\n\n  <textarea id="dg-new-constructor"></textarea>\n\n  <div id="dg-save-locally">\n    <input id="dg-local-storage" type="checkbox">\n    Automatically save values to <code>localStorage</code> on exit.\n\n    <div id="dg-local-explain">\n      The values saved to <code>localStorage</code> will override those passed to <code>dat.GUI</code>\'s constructor.\n      This makes it easier to work incrementally, but <code>localStorage</code> is fragile, and your friends may not see\n      the same values you do.\n    </div>\n  </div>\n</div>\n';
 
   var UndefinedController = (function (_Controller) {
     _inheritsLoose(UndefinedController, _Controller);
@@ -1497,7 +1502,7 @@
           this.__onFinishChange.call(this.object[this.property]);
         }
       }
-      return UndefinedController.superclass.prototype.updateDisplay.call(this);
+      return _Controller.prototype.updateDisplay.call(this);
     };
     return UndefinedController;
   })(Controller);
@@ -1581,9 +1586,7 @@
     return CenteredDiv;
   })();
 
-  var styleSheet$1 = "";
-
-  css$1.inject(styleSheet$1);
+  var ARR_SLICE$1 = Array.prototype.slice;
   var CSS_NAMESPACE = "dg";
   var HIDE_KEY_CODE = 72;
   var CLOSE_BUTTON_HEIGHT = 20;
@@ -1600,262 +1603,249 @@
   var auto_place_container;
   var hide = false;
   var hideable_guis = [];
-  var GUI = function GUI(params) {
-    var _this = this;
-    this.domElement = document.createElement("div");
-    this.__ul = document.createElement("ul");
-    this.domElement.appendChild(this.__ul);
-    dom.addClass(this.domElement, CSS_NAMESPACE);
-    this.__folders = {};
-    this.__controllers = [];
-    this.__rememberedObjects = [];
-    this.__rememberedObjectIndecesToControllers = [];
-    this.__listening = [];
-    params = params || {};
-    params = Common.defaults(params, {
-      autoPlace: true,
-      width: GUI.DEFAULT_WIDTH,
-    });
-    params = Common.defaults(params, {
-      resizable: params.autoPlace,
-      hideable: params.autoPlace,
-    });
-    if (!Common.isUndefined(params.load)) {
-      if (params.preset) params.load.preset = params.preset;
-    } else {
-      params.load = {
-        preset: DEFAULT_DEFAULT_PRESET_NAME,
-      };
-    }
-    if (Common.isUndefined(params.parent) && params.hideable) {
-      hideable_guis.push(this);
-    }
-    params.resizable = Common.isUndefined(params.parent) && params.resizable;
-    if (params.autoPlace && Common.isUndefined(params.scrollable)) {
-      params.scrollable = true;
-    }
-    var use_local_storage =
-      SUPPORTS_LOCAL_STORAGE && localStorage.getItem(getLocalStorageHash(this, "isLocal")) === "true";
-    var saveToLocalStorage;
-    Object.defineProperties(this, {
-      parent: {
-        get: function get() {
-          return params.parent;
+  var GUI = (function () {
+    function GUI(params) {
+      var _this = this;
+      this.domElement = document.createElement("div");
+      this.__ul = document.createElement("ul");
+      this.domElement.appendChild(this.__ul);
+      dom.addClass(this.domElement, CSS_NAMESPACE);
+      this.__folders = {};
+      this.__controllers = [];
+      this.__rememberedObjects = [];
+      this.__rememberedObjectIndecesToControllers = [];
+      this.__listening = [];
+      params = params || {};
+      params = Common.defaults(params, {
+        autoPlace: true,
+        width: GUI.DEFAULT_WIDTH,
+      });
+      params = Common.defaults(params, {
+        resizable: params.autoPlace,
+        hideable: params.autoPlace,
+      });
+      if (!Common.isUndefined(params.load)) {
+        if (params.preset) {
+          params.load.preset = params.preset;
+        }
+      } else {
+        params.load = {
+          preset: DEFAULT_DEFAULT_PRESET_NAME,
+        };
+      }
+      if (Common.isUndefined(params.parent) && params.hideable) {
+        hideable_guis.push(this);
+      }
+      params.resizable = Common.isUndefined(params.parent) && params.resizable;
+      if (params.autoPlace && Common.isUndefined(params.scrollable)) {
+        params.scrollable = true;
+      }
+      var use_local_storage =
+        SUPPORTS_LOCAL_STORAGE && localStorage.getItem(getLocalStorageHash(this, "isLocal")) === "true";
+      var saveToLocalStorage;
+      Object.defineProperties(this, {
+        parent: {
+          get: function get() {
+            return params.parent;
+          },
         },
-      },
-      scrollable: {
-        get: function get() {
-          return params.scrollable;
+        scrollable: {
+          get: function get() {
+            return params.scrollable;
+          },
         },
-      },
-      autoPlace: {
-        get: function get() {
-          return params.autoPlace;
+        autoPlace: {
+          get: function get() {
+            return params.autoPlace;
+          },
         },
-      },
-      preset: {
-        get: function get() {
-          if (_this.parent) {
-            return _this.getRoot().preset;
-          }
-          return params.load.preset;
-        },
-        set: function set(v) {
-          if (_this.parent) {
-            _this.getRoot().preset = v;
-          } else {
-            params.load.preset = v;
-          }
-          setPresetSelectIndex(this);
-          _this.revert();
-        },
-      },
-      width: {
-        get: function get() {
-          return params.width;
-        },
-        set: function set(v) {
-          params.width = v;
-          setWidth(_this, v);
-        },
-      },
-      name: {
-        get: function get() {
-          return params.name;
-        },
-        set: function set(v) {
-          params.name = v;
-          if (title_row_name) {
-            title_row_name.innerHTML = params.name;
-          }
-        },
-      },
-      closed: {
-        get: function get() {
-          return params.closed;
-        },
-        set: function set(v) {
-          params.closed = v;
-          if (params.closed) {
-            dom.addClass(_this.__ul, GUI.CLASS_CLOSED);
-          } else {
-            dom.removeClass(_this.__ul, GUI.CLASS_CLOSED);
-          }
-          this.onResize();
-          if (_this.__closeButton) {
-            _this.__closeButton.innerHTML = v ? GUI.TEXT_OPEN : GUI.TEXT_CLOSED;
-          }
-        },
-      },
-      load: {
-        get: function get() {
-          return params.load;
-        },
-      },
-      useLocalStorage: {
-        get: function get() {
-          return use_local_storage;
-        },
-        set: function set(bool) {
-          if (SUPPORTS_LOCAL_STORAGE) {
-            use_local_storage = bool;
-            if (bool) {
-              dom.bind(window, "unload", saveToLocalStorage);
-            } else {
-              dom.unbind(window, "unload", saveToLocalStorage);
+        preset: {
+          get: function get() {
+            if (_this.parent) {
+              return _this.getRoot().preset;
             }
-            localStorage.setItem(getLocalStorageHash(_this, "isLocal"), bool);
-          }
+            return params.load.preset;
+          },
+          set: function set(v) {
+            if (_this.parent) {
+              _this.getRoot().preset = v;
+            } else {
+              params.load.preset = v;
+            }
+            setPresetSelectIndex(this);
+            _this.revert();
+          },
         },
-      },
-    });
-    if (Common.isUndefined(params.parent)) {
-      params.closed = false;
-      dom.addClass(this.domElement, GUI.CLASS_MAIN);
-      dom.makeSelectable(this.domElement, false);
-      if (SUPPORTS_LOCAL_STORAGE) {
-        if (use_local_storage) {
-          _this.useLocalStorage = true;
-          var saved_gui = localStorage.getItem(getLocalStorageHash(this, "gui"));
-          if (saved_gui) {
-            params.load = JSON.parse(saved_gui);
+        width: {
+          get: function get() {
+            return params.width;
+          },
+          set: function set(v) {
+            params.width = v;
+            setWidth(_this, v);
+          },
+        },
+        name: {
+          get: function get() {
+            return params.name;
+          },
+          set: function set(v) {
+            if (v !== params.name && _this.__folders[v] !== undefined) {
+              throw new Error("name collision: another sibling GUI folder has the same name");
+            }
+            params.name = v;
+            if (title_row_name) {
+              title_row_name.innerHTML = params.name;
+            }
+          },
+        },
+        closed: {
+          get: function get() {
+            return params.closed;
+          },
+          set: function set(v) {
+            params.closed = v;
+            if (params.closed) {
+              dom.addClass(_this.__ul, GUI.CLASS_CLOSED);
+            } else {
+              dom.removeClass(_this.__ul, GUI.CLASS_CLOSED);
+            }
+            _this.onResize();
+            if (_this.__closeButton) {
+              _this.__closeButton.innerHTML = v ? GUI.TEXT_OPEN : GUI.TEXT_CLOSED;
+            }
+          },
+        },
+        load: {
+          get: function get() {
+            return params.load;
+          },
+        },
+        useLocalStorage: {
+          get: function get() {
+            return use_local_storage;
+          },
+          set: function set(bool) {
+            if (SUPPORTS_LOCAL_STORAGE) {
+              use_local_storage = bool;
+              if (bool) {
+                dom.bind(window, "unload", saveToLocalStorage);
+              } else {
+                dom.unbind(window, "unload", saveToLocalStorage);
+              }
+              localStorage.setItem(getLocalStorageHash(_this, "isLocal"), bool);
+            }
+          },
+        },
+      });
+      if (Common.isUndefined(params.parent)) {
+        params.closed = false;
+        dom.addClass(this.domElement, GUI.CLASS_MAIN);
+        dom.makeSelectable(this.domElement, false);
+        if (SUPPORTS_LOCAL_STORAGE) {
+          if (use_local_storage) {
+            _this.useLocalStorage = true;
+            var saved_gui = localStorage.getItem(getLocalStorageHash(this, "gui"));
+            if (saved_gui) {
+              params.load = JSON.parse(saved_gui);
+            }
           }
         }
-      }
-      this.__closeButton = document.createElement("div");
-      this.__closeButton.innerHTML = GUI.TEXT_CLOSED;
-      dom.addClass(this.__closeButton, GUI.CLASS_CLOSE_BUTTON);
-      this.domElement.appendChild(this.__closeButton);
-      dom.bind(this.__closeButton, "click", function () {
-        _this.closed = !_this.closed;
-      });
-    } else {
-      if (params.closed === undefined) {
-        params.closed = true;
-      }
-      var title_row_name = document.createTextNode(params.name);
-      dom.addClass(title_row_name, "controller-name");
-      var title_row = addRow(_this, title_row_name);
-      var on_click_title = function on_click_title(e) {
-        e.preventDefault();
-        _this.closed = !_this.closed;
-        return false;
-      };
-      dom.addClass(this.__ul, GUI.CLASS_CLOSED);
-      dom.addClass(title_row, "title");
-      dom.bind(title_row, "click", on_click_title);
-      if (!params.closed) {
-        this.closed = false;
-      }
-    }
-    if (params.autoPlace) {
-      if (Common.isUndefined(params.parent)) {
-        if (auto_place_virgin) {
-          auto_place_container = document.createElement("div");
-          dom.addClass(auto_place_container, CSS_NAMESPACE);
-          dom.addClass(auto_place_container, GUI.CLASS_AUTO_PLACE_CONTAINER);
-          document.body.appendChild(auto_place_container);
-          auto_place_virgin = false;
+        this.__closeButton = document.createElement("div");
+        this.__closeButton.innerHTML = GUI.TEXT_CLOSED;
+        dom.addClass(this.__closeButton, GUI.CLASS_CLOSE_BUTTON);
+        this.domElement.appendChild(this.__closeButton);
+        dom.bind(this.__closeButton, "click", function () {
+          _this.closed = !_this.closed;
+        });
+      } else {
+        if (params.closed === undefined) {
+          params.closed = true;
         }
-        auto_place_container.appendChild(this.domElement);
-        dom.addClass(this.domElement, GUI.CLASS_AUTO_PLACE);
+        var title_row_name = document.createTextNode(params.name);
+        dom.addClass(title_row_name, "controller-name");
+        var title_row = addRow(_this, title_row_name);
+        var on_click_title = function on_click_title(e) {
+          e.preventDefault();
+          _this.closed = !_this.closed;
+          return false;
+        };
+        dom.addClass(this.__ul, GUI.CLASS_CLOSED);
+        dom.addClass(title_row, "title");
+        dom.bind(title_row, "click", on_click_title);
+        if (!params.closed) {
+          this.closed = false;
+        }
       }
-      if (!this.parent) setWidth(_this, params.width);
-    }
-    dom.bind(window, "resize", function () {
-      _this.onResize();
-    });
-    dom.bind(this.__ul, "webkitTransitionEnd", function () {
-      _this.onResize();
-    });
-    dom.bind(this.__ul, "transitionend", function () {
-      _this.onResize();
-    });
-    dom.bind(this.__ul, "oTransitionEnd", function () {
-      _this.onResize();
-    });
-    this.onResize();
-    if (params.resizable) {
-      addResizeHandle(this);
-    }
-    saveToLocalStorage = function saveToLocalStorage() {
-      if (SUPPORTS_LOCAL_STORAGE && localStorage.getItem(getLocalStorageHash(_this, "isLocal")) === "true") {
-        localStorage.setItem(getLocalStorageHash(_this, "gui"), JSON.stringify(_this.getSaveObject()));
+      if (params.autoPlace) {
+        if (Common.isUndefined(params.parent)) {
+          if (auto_place_virgin) {
+            auto_place_container = document.createElement("div");
+            dom.addClass(auto_place_container, CSS_NAMESPACE);
+            dom.addClass(auto_place_container, GUI.CLASS_AUTO_PLACE_CONTAINER);
+            document.body.appendChild(auto_place_container);
+            auto_place_virgin = false;
+          }
+          auto_place_container.appendChild(this.domElement);
+          dom.addClass(this.domElement, GUI.CLASS_AUTO_PLACE);
+        }
+        if (!this.parent) {
+          setWidth(_this, params.width);
+        }
       }
-    };
-    this.saveToLocalStorageIfPossible = saveToLocalStorage;
-    var root = _this.getRoot();
-    function resetWidth() {
+      function __resizeHandler() {
+        _this.onResize();
+      }
+      dom.bind(settings.WINDOW, "resize", __resizeHandler);
+      dom.bind(this.__ul, "webkitTransitionEnd", __resizeHandler);
+      dom.bind(this.__ul, "transitionend", __resizeHandler);
+      dom.bind(this.__ul, "oTransitionEnd", __resizeHandler);
+      this.onResize();
+      if (params.resizable) {
+        addResizeHandle(this);
+      }
+      saveToLocalStorage = function saveToLocalStorage() {
+        if (SUPPORTS_LOCAL_STORAGE && localStorage.getItem(getLocalStorageHash(_this, "isLocal")) === "true") {
+          localStorage.setItem(getLocalStorageHash(_this, "gui"), JSON.stringify(_this.getSaveObject()));
+        }
+      };
+      this.saveToLocalStorageIfPossible = saveToLocalStorage;
       var root = _this.getRoot();
-      root.width += 1;
-      Common.defer(function () {
-        root.width -= 1;
+      function resetWidth() {
+        var root = _this.getRoot();
+        root.width += 1;
+        Common.defer(function () {
+          root.width -= 1;
+        });
+      }
+      if (!params.parent) {
+        resetWidth();
+      }
+    }
+    var _proto = GUI.prototype;
+    _proto.toggleHide = function toggleHide() {
+      hide = !hide;
+      Common.each(hideable_guis, function (gui) {
+        gui.domElement.style.zIndex = hide ? -999 : 999;
+        gui.domElement.style.opacity = hide ? 0 : 1;
       });
-    }
-    if (!params.parent) {
-      resetWidth();
-    }
-  };
-  GUI.toggleHide = function () {
-    hide = !hide;
-    Common.each(hideable_guis, function (gui) {
-      gui.domElement.style.zIndex = hide ? -999 : 999;
-      gui.domElement.style.opacity = hide ? 0 : 1;
-    });
-  };
-  GUI.CLASS_AUTO_PLACE = "a";
-  GUI.CLASS_AUTO_PLACE_CONTAINER = "ac";
-  GUI.CLASS_MAIN = "main";
-  GUI.CLASS_CONTROLLER_ROW = "cr";
-  GUI.CLASS_TOO_TALL = "taller-than-window";
-  GUI.CLASS_CLOSED = "closed";
-  GUI.CLASS_CLOSE_BUTTON = "close-button";
-  GUI.CLASS_DRAG = "drag";
-  GUI.DEFAULT_WIDTH = 245;
-  GUI.TEXT_CLOSED = "Close Controls";
-  GUI.TEXT_OPEN = "Open Controls";
-  dom.bind(
-    window,
-    "keydown",
-    function (e) {
+    };
+    _proto._keydownHandler = function _keydownHandler(e) {
       if (document.activeElement.type !== "text" && (e.which === HIDE_KEY_CODE || e.keyCode == HIDE_KEY_CODE)) {
         GUI.toggleHide();
       }
-    },
-    false
-  );
-  Common.extend(GUI.prototype, {
-    add: function add(object, property) {
+    };
+    _proto.add = function add(object, property) {
       return _add(this, object, property, {
         factoryArgs: Array.prototype.slice.call(arguments, 2),
       });
-    },
-    addColor: function addColor(object, property) {
+    };
+    _proto.addColor = function addColor(object, property) {
       return _add(this, object, property, {
         color: true,
       });
-    },
-    remove: function remove(controller) {
+    };
+    _proto.remove = function remove(controller) {
       this.__ul.removeChild(controller.__li);
       var ixl = this.__listening.indexOf(controller);
       if (ixl > 0) this.__listening.pop(ixl);
@@ -1864,13 +1854,13 @@
       Common.defer(function () {
         _this.onResize();
       });
-    },
-    destroy: function destroy() {
+    };
+    _proto.destroy = function destroy() {
       if (this.autoPlace) {
         auto_place_container.removeChild(this.domElement);
       }
-    },
-    addFolder: function addFolder(name) {
+    };
+    _proto.addFolder = function addFolder(name) {
       if (this.__folders[name] !== undefined) {
         throw new Error('You already have a folder in this GUI by the name "' + name + '"');
       }
@@ -1888,14 +1878,14 @@
       var li = addRow(this, gui.domElement);
       dom.addClass(li, "folder");
       return gui;
-    },
-    open: function open() {
+    };
+    _proto.open = function open() {
       this.closed = false;
-    },
-    close: function close() {
+    };
+    _proto.close = function close() {
       this.closed = true;
-    },
-    onResize: function onResize() {
+    };
+    _proto.onResize = function onResize() {
       var root = this.getRoot();
       if (root.scrollable) {
         var _dom$getOffset = dom.getOffset(root.__ul),
@@ -1922,8 +1912,8 @@
       if (root.__closeButton) {
         root.__closeButton.style.width = root.width + "px";
       }
-    },
-    remember: function remember() {
+    };
+    _proto.remember = function remember() {
       if (Common.isUndefined(SAVE_DIALOGUE)) {
         SAVE_DIALOGUE = new CenteredDiv();
         SAVE_DIALOGUE.domElement.innerHTML = saveDialogueContents;
@@ -1932,26 +1922,26 @@
         throw new Error("You can only call remember on a top level GUI.");
       }
       var _this = this;
-      Common.each(Array.prototype.slice.call(arguments), function (object) {
-        if (_this.__rememberedObjects.length == 0) {
+      Common.each(ARR_SLICE$1.call(arguments), function (object) {
+        if (_this.__rememberedObjects.length === 0) {
           addSaveMenu(_this);
         }
-        if (_this.__rememberedObjects.indexOf(object) == -1) {
+        if (_this.__rememberedObjects.indexOf(object) === -1) {
           _this.__rememberedObjects.push(object);
         }
       });
       if (this.autoPlace) {
         setWidth(this, this.width);
       }
-    },
-    getRoot: function getRoot() {
+    };
+    _proto.getRoot = function getRoot() {
       var gui = this;
       while (gui.parent) {
         gui = gui.parent;
       }
       return gui;
-    },
-    getSaveObject: function getSaveObject() {
+    };
+    _proto.getSaveObject = function getSaveObject() {
       var toReturn = this.load;
       toReturn.closed = this.closed;
       if (this.__rememberedObjects.length > 0) {
@@ -1966,16 +1956,16 @@
         toReturn.folders[key] = element.getSaveObject();
       });
       return toReturn;
-    },
-    save: function save() {
+    };
+    _proto.save = function save() {
       if (!this.load.remembered) {
         this.load.remembered = {};
       }
       this.load.remembered[this.preset] = getCurrentPreset(this);
       markPresetModified(this, false);
       this.saveToLocalStorageIfPossible();
-    },
-    saveAs: function saveAs(presetName) {
+    };
+    _proto.saveAs = function saveAs(presetName) {
       if (!this.load.remembered) {
         this.load.remembered = {};
         this.load.remembered[DEFAULT_DEFAULT_PRESET_NAME] = getCurrentPreset(this, true);
@@ -1984,8 +1974,8 @@
       this.preset = presetName;
       addPresetOption(this, presetName, true);
       this.saveToLocalStorageIfPossible();
-    },
-    revert: function revert(gui) {
+    };
+    _proto.revert = function revert(gui) {
       Common.each(
         this.__controllers,
         function (controller) {
@@ -2003,23 +1993,37 @@
       if (!gui) {
         markPresetModified(this.getRoot(), false);
       }
-    },
-    listen: function listen(controller) {
+    };
+    _proto.listen = function listen(controller) {
       var init = this.__listening.length == 0;
       this.__listening.push(controller);
-      if (init) updateDisplays(this.__listening);
-    },
-    updateDisplay: function updateDisplay() {
+      if (init) {
+        updateDisplays(this.__listening);
+      }
+    };
+    _proto.updateDisplay = function updateDisplay() {
       for (var c in this.__controllers) {
         this.__controllers[c].updateDisplay();
       }
       for (var f in this.__folders) {
         this.__folders[f].updateDisplay();
       }
-    },
-  });
+    };
+    return GUI;
+  })();
+  GUI.CLASS_AUTO_PLACE = "a";
+  GUI.CLASS_AUTO_PLACE_CONTAINER = "ac";
+  GUI.CLASS_MAIN = "main";
+  GUI.CLASS_CONTROLLER_ROW = "cr";
+  GUI.CLASS_TOO_TALL = "taller-than-window";
+  GUI.CLASS_CLOSED = "closed";
+  GUI.CLASS_CLOSE_BUTTON = "close-button";
+  GUI.CLASS_DRAG = "drag";
+  GUI.DEFAULT_WIDTH = 245;
+  GUI.TEXT_CLOSED = "Close Controls";
+  GUI.TEXT_OPEN = "Open Controls";
   function _add(gui, object, property, params) {
-    if (!Common.hasOwnProperty(object, property)) {
+    if (!(property in object)) {
       throw new Error("Object " + object + ' has no property "' + property + '"');
     }
     var controller;
@@ -2028,6 +2032,15 @@
     } else {
       var factoryArgs = [object, property].concat(params.factoryArgs);
       controller = controllerFactory.apply(gui, factoryArgs);
+    }
+    if (!controller) {
+      throw new Error(
+        "Object " +
+          object +
+          ' has a (probably null-ed) property "' +
+          property +
+          '" for which you did not explicitly specify a suitable controller'
+      );
     }
     if (params.before instanceof Controller) {
       params.before = params.before.__li;
@@ -2080,8 +2093,8 @@
           });
         }
       },
-      name: function name(v) {
-        controller.__li.firstElementChild.firstElementChild.innerHTML = v;
+      name: function name(_name) {
+        controller.__li.firstElementChild.firstElementChild.innerHTML = _name;
         return controller;
       },
       listen: function listen() {
@@ -2103,7 +2116,7 @@
         var pc = controller[method];
         var pb = box[method];
         controller[method] = box[method] = function () {
-          var args = Array.prototype.slice.call(arguments);
+          var args = ARR_SLICE$1.call(arguments);
           pc.apply(controller, args);
           return pb.apply(box, args);
         };
@@ -2114,10 +2127,11 @@
       var r = function r(returned) {
         if (Common.isNumber(controller.__min) && Common.isNumber(controller.__max)) {
           controller.remove();
-          return _add(gui, controller.object, controller.property, {
+          var newController = _add(gui, controller.object, controller.property, {
             before: controller.__li.nextElementSibling,
             factoryArgs: [controller.__min, controller.__max, controller.__step],
           });
+          return newController;
         }
         return returned;
       };
@@ -2232,12 +2246,12 @@
     div.appendChild(button);
     div.appendChild(button2);
     div.appendChild(button3);
+    function showHideExplain() {
+      explain.style.display = gui.useLocalStorage ? "block" : "none";
+    }
     if (SUPPORTS_LOCAL_STORAGE) {
-      var showHideExplain = function showHideExplain() {
-        explain.style.display = gui.useLocalStorage ? "block" : "none";
-      };
       var saveLocally = document.getElementById("dg-save-locally");
-      var explain = document.getElementById("dg-local-explain");
+      var _explain = document.getElementById("dg-local-explain");
       saveLocally.style.display = "block";
       var localStorageCheckBox = document.getElementById("dg-local-storage");
       if (localStorage.getItem(getLocalStorageHash(gui, "isLocal")) === "true") {

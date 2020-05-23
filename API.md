@@ -17,9 +17,6 @@ hands-on examples, see the dat.GUI [tutorial](http://workshop.chromeexperiments.
 <dt><a href="#hide">hide</a></dt>
 <dd><p>Are we hiding the GUI&#39;s ?</p>
 </dd>
-<dt><a href="#domElement">domElement</a> : <code>DOMElement</code></dt>
-<dd><p>Outermost DOM Element</p>
-</dd>
 </dl>
 
 ## Constants
@@ -60,12 +57,6 @@ Fixed position div that auto place GUI's go inside
 
 ## hide
 Are we hiding the GUI's ?
-
-**Kind**: global variable  
-<a name="domElement"></a>
-
-## domElement : <code>DOMElement</code>
-Outermost DOM Element
 
 **Kind**: global variable  
 <a name="CSS_NAMESPACE"></a>

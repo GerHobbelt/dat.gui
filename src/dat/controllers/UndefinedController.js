@@ -45,7 +45,7 @@ class UndefinedController extends Controller {
         this.__onFinishChange.call(this.object[this.property]);
       }
     }
-    return UndefinedController.superclass.prototype.updateDisplay.call(this);
+    return super.updateDisplay();
   }
 }
 

@@ -15,6 +15,11 @@ import NumberController from "./NumberController";
 import dom from "../dom/dom";
 import common from "../utils/common";
 
+function roundToDecimal(value, decimals) {
+  const tenTo = 10 ** decimals;
+  return Math.round(value * tenTo) / tenTo;
+}
+
 /**
  * @class Represents a given property of an object that is a number and
  * provides an input element with which to manipulate it.
@@ -33,9 +38,9 @@ import common from "../utils/common";
  */
 class NumberControllerBox extends NumberController {
   constructor(object, property, params) {
-    this.__truncationSuspended = false;
-
     super(object, property, params);
+
+    this.__truncationSuspended = false;
 
     const _this = this;
 
@@ -54,7 +59,7 @@ class NumberControllerBox extends NumberController {
     dom.bind(this.__input, "blur", onBlur);
     dom.bind(this.__input, "mousedown", onMouseDown);
     dom.bind(this.__input, "keydown", function (e) {
-      // When pressing entire, you can be as precise as you want.
+      // When pressing ENTER key, you can be as precise as you want.
       if (e.keyCode === 13) {
         _this.__truncationSuspended = true;
         this.blur();
@@ -109,11 +114,6 @@ class NumberControllerBox extends NumberController {
     }
     return super.updateDisplay();
   }
-}
-
-function roundToDecimal(value, decimals) {
-  const tenTo = Math.pow(10, decimals);
-  return Math.round(value * tenTo) / tenTo;
 }
 
 export default NumberControllerBox;

@@ -21,7 +21,10 @@ import TabbedController from "./TabbedController";
 import BooleanController from "./BooleanController";
 import ColorController from "./ColorController";
 import ArrayController from "./ArrayController";
+import UndefinedController from "./UndefinedController";
 import common from "../utils/common";
+
+const ARR_SLICE = Array.prototype.slice;
 
 const ControllerFactory = function (object, property) {
   const initialValue = object[property];
@@ -83,7 +86,11 @@ const ControllerFactory = function (object, property) {
   }
 
   if (common.isFunction(initialValue)) {
-    return new FunctionController(object, property, "");
+    let opts = ARR_SLICE.call(arguments, 3);
+    if (opts.length === 0) {
+      opts = undefined;
+    }
+    return new FunctionController(object, property, options_1, opts);
   }
 
   if (common.isBoolean(initialValue)) {
@@ -93,6 +100,13 @@ const ControllerFactory = function (object, property) {
   if (common.isArray(initialValue)) {
     return new ArrayController(object, property);
   }
+
+  if (common.isUndefined(initialValue)) {
+    return new UndefinedController(object, property);
+  }
+
+  // otherwise: we cannot 'sniff' the type of controller you want, since the
+  // `initialValue` is null or undefined.
 
   return null;
 };

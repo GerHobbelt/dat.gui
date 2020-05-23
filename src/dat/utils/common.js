@@ -27,14 +27,11 @@ const Common = {
     this.each(
       ARR_SLICE.call(arguments, 1),
       function (obj) {
-        const keys = this.isObject(obj) ? Object.keys(obj) : [];
-        keys.forEach(
-          function (key) {
-            if (!this.isUndefined(obj[key])) {
-              target[key] = obj[key];
-            }
-          }.bind(this)
-        );
+        for (const key in obj) {
+          if (!this.isUndefined(obj[key])) {
+            target[key] = obj[key];
+          }
+        }
       },
       this
     );
@@ -46,14 +43,11 @@ const Common = {
     this.each(
       ARR_SLICE.call(arguments, 1),
       function (obj) {
-        const keys = this.isObject(obj) ? Object.keys(obj) : [];
-        keys.forEach(
-          function (key) {
-            if (this.isUndefined(target[key])) {
-              target[key] = obj[key];
-            }
-          }.bind(this)
-        );
+        for (const key in obj) {
+          if (this.isUndefined(target[key])) {
+            target[key] = obj[key];
+          }
+        }
       },
       this
     );
@@ -82,16 +76,14 @@ const Common = {
       obj.forEach(itr, scope);
     } else if (obj.length === obj.length + 0) {
       // Is number but not NaN
-      let key;
-      let l;
-      for (key = 0, l = obj.length; key < l; key++) {
+      for (let key = 0, l = obj.length; key < l; key++) {
         if (key in obj && itr.call(scope, obj[key], key) === this.BREAK) {
           return;
         }
       }
     } else {
-      for (const key in obj) {
-        if (itr.call(scope, obj[key], key) === this.BREAK) {
+      for (const objkey in obj) {
+        if (itr.call(scope, obj[objkey], objkey) === this.BREAK) {
           return;
         }
       }
@@ -129,7 +121,9 @@ const Common = {
   },
 
   toArray: function (obj) {
-    if (obj.toArray) return obj.toArray();
+    if (obj.toArray) {
+      return obj.toArray();
+    }
     return ARR_SLICE.call(obj);
   },
 
@@ -159,6 +153,10 @@ const Common = {
     return obj === obj + 0;
   },
 
+  isFiniteNumber: function (obj) {
+    return obj === +obj && isFinite(obj);
+  },
+
   isString: function (obj) {
     return obj === obj + "";
   },
@@ -168,7 +166,7 @@ const Common = {
   },
 
   isFunction: function (obj) {
-    return Object.prototype.toString.call(obj) === "[object Function]";
+    return obj instanceof Function;
   },
 
   supportsPassive: function () {

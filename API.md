@@ -12,9 +12,6 @@ hands-on examples, see the dat.GUI [tutorial](http://workshop.chromeexperiments.
 <dd><p>A lightweight controller library for JavaScript. It allows you to easily
 manipulate variables and fire functions on the fly.</p>
 </dd>
-<dt><a href="#Controller">Controller</a></dt>
-<dd><p>An &quot;abstract&quot; class that represents a given property of an object.</p>
-</dd>
 </dl>
 
 ## Members
@@ -73,11 +70,11 @@ manipulate variables and fire functions on the fly.
     * [.closed](#GUI+closed) : <code>Boolean</code>
     * [.load](#GUI+load) : <code>Object</code>
     * [.useLocalStorage](#GUI+useLocalStorage) : <code>Boolean</code>
-    * [.add(object, property, label, [min], [max], [step])](#GUI+add) ⇒ [<code>Controller</code>](#Controller)
-    * [.addColor(object, property)](#GUI+addColor) ⇒ [<code>Controller</code>](#Controller)
-    * [.addPlotter(object, property, max, period, type, fgColor, bgColor)](#GUI+addPlotter) ⇒ [<code>Controller</code>](#Controller)
-    * [.addFile(object, property)](#GUI+addFile) ⇒ [<code>Controller</code>](#Controller)
-    * [.addCustomController(object, property)](#GUI+addCustomController) ⇒ [<code>Controller</code>](#Controller)
+    * [.add(object, property, label, [min], [max], [step])](#GUI+add) ⇒ <code>Controller</code>
+    * [.addColor(object, property)](#GUI+addColor) ⇒ <code>Controller</code>
+    * [.addPlotter(object, property, max, period, type, fgColor, bgColor)](#GUI+addPlotter) ⇒ <code>Controller</code>
+    * [.addFile(object, property)](#GUI+addFile) ⇒ <code>Controller</code>
+    * [.addCustomController(object, property)](#GUI+addCustomController) ⇒ <code>Controller</code>
     * [.addGradient(object, property)](#GUI+addGradient) ⇒ <code>dat.controllers.ColorController</code>
     * [.addImage(object, property)](#GUI+addImage) ⇒ <code>dat.controllers.ImageController</code>
     * [.remove(controller)](#GUI+remove)
@@ -202,14 +199,14 @@ Determines whether or not to use <a href="https://developer.mozilla.org/en/DOM/S
 **Kind**: instance property of [<code>GUI</code>](#GUI)  
 <a name="GUI+add"></a>
 
-### gui.add(object, property, label, [min], [max], [step]) ⇒ [<code>Controller</code>](#Controller)
-Adds a new [Controller](#Controller) to the GUI. The type of controller created
+### gui.add(object, property, label, [min], [max], [step]) ⇒ <code>Controller</code>
+Adds a new [Controller](Controller) to the GUI. The type of controller created
 is inferred from the initial value of <code>object[property]</code>.
 For color properties, see [addColor](addColor).
 For file properties, see [addFile](addFile).
 
 **Kind**: instance method of [<code>GUI</code>](#GUI)  
-**Returns**: [<code>Controller</code>](#Controller) - The controller that was added to the GUI.  
+**Returns**: <code>Controller</code> - The controller that was added to the GUI.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -234,11 +231,11 @@ gui.add(person, 'age', 0, 100);
 ```
 <a name="GUI+addColor"></a>
 
-### gui.addColor(object, property) ⇒ [<code>Controller</code>](#Controller)
+### gui.addColor(object, property) ⇒ <code>Controller</code>
 Adds a new color controller to the GUI.
 
 **Kind**: instance method of [<code>GUI</code>](#GUI)  
-**Returns**: [<code>Controller</code>](#Controller) - The controller that was added to the GUI.  
+**Returns**: <code>Controller</code> - The controller that was added to the GUI.  
 
 | Param |
 | --- |
@@ -260,11 +257,11 @@ gui.addColor(palette, 'color4');
 ```
 <a name="GUI+addPlotter"></a>
 
-### gui.addPlotter(object, property, max, period, type, fgColor, bgColor) ⇒ [<code>Controller</code>](#Controller)
+### gui.addPlotter(object, property, max, period, type, fgColor, bgColor) ⇒ <code>Controller</code>
 Adds a new plotter controller to the GUI.
 
 **Kind**: instance method of [<code>GUI</code>](#GUI)  
-**Returns**: [<code>Controller</code>](#Controller) - The controller that was added to the GUI.  
+**Returns**: <code>Controller</code> - The controller that was added to the GUI.  
 
 | Param | Description |
 | --- | --- |
@@ -286,11 +283,11 @@ gui.addPlotter(obj, 'value', 10, 0);
 ```
 <a name="GUI+addFile"></a>
 
-### gui.addFile(object, property) ⇒ [<code>Controller</code>](#Controller)
+### gui.addFile(object, property) ⇒ <code>Controller</code>
 Adds a new file controller to the GUI.
 
 **Kind**: instance method of [<code>GUI</code>](#GUI)  
-**Returns**: [<code>Controller</code>](#Controller) - The controller that was added to the GUI.  
+**Returns**: <code>Controller</code> - The controller that was added to the GUI.  
 
 | Param |
 | --- |
@@ -308,11 +305,11 @@ gui.addFile(instance, 'onLoad');
 ```
 <a name="GUI+addCustomController"></a>
 
-### gui.addCustomController(object, property) ⇒ [<code>Controller</code>](#Controller)
+### gui.addCustomController(object, property) ⇒ <code>Controller</code>
 Adds a new custom controller to the GUI.
 
 **Kind**: instance method of [<code>GUI</code>](#GUI)  
-**Returns**: [<code>Controller</code>](#Controller) - The controller that was added to the GUI.  
+**Returns**: <code>Controller</code> - The controller that was added to the GUI.  
 
 | Param |
 | --- |
@@ -350,7 +347,7 @@ Removes the given controller from the GUI.
 
 | Param | Type |
 | --- | --- |
-| controller | [<code>Controller</code>](#Controller) | 
+| controller | <code>Controller</code> | 
 
 <a name="GUI+destroy"></a>
 
@@ -440,193 +437,6 @@ of the list.
 **Kind**: instance method of [<code>GUI</code>](#GUI)  
 **Returns**: <code>Object</code> - a JSON object representing the current state of
 this GUI as well as its remembered properties.  
-<a name="Controller"></a>
-
-## Controller
-An "abstract" class that represents a given property of an object.
-
-**Kind**: global class  
-
-* [Controller](#Controller)
-    * [new Controller(object, property)](#new_Controller_new)
-    * [.domElement](#Controller+domElement) : <code>DOMElement</code>
-    * [.object](#Controller+object) : <code>Object</code>
-    * [.property](#Controller+property) : <code>String</code>
-    * [._readonly](#Controller+_readonly) : <code>Object</code>
-    * [.forceUpdateDisplay](#Controller+forceUpdateDisplay) : <code>boolean</code>
-    * [.options(options)](#Controller+options) ⇒ [<code>Controller</code>](#Controller)
-    * [.name(name)](#Controller+name) ⇒ [<code>Controller</code>](#Controller)
-    * [.listen(forceUpdateDisplay)](#Controller+listen) ⇒ [<code>Controller</code>](#Controller)
-    * [.remove()](#Controller+remove) ⇒ [<code>Controller</code>](#Controller)
-    * [.hide()](#Controller+hide)
-    * [.show()](#Controller+show)
-    * [.onChange(fnc)](#Controller+onChange) ⇒ [<code>Controller</code>](#Controller)
-    * [.onFinishChange(fnc)](#Controller+onFinishChange) ⇒ [<code>Controller</code>](#Controller)
-    * [.setValue(newValue)](#Controller+setValue)
-    * [.getValue()](#Controller+getValue) ⇒ <code>Object</code>
-    * [.updateDisplay()](#Controller+updateDisplay) ⇒ [<code>Controller</code>](#Controller)
-    * [.isModified()](#Controller+isModified) ⇒ <code>Boolean</code>
-    * [.readonly(ro)](#Controller+readonly) ⇒ <code>StringController</code>
-
-<a name="new_Controller_new"></a>
-
-### new Controller(object, property)
-
-| Param | Type | Description |
-| --- | --- | --- |
-| object | <code>Object</code> | The object to be manipulated |
-| property | <code>string</code> | The name of the property to be manipulated |
-
-<a name="Controller+domElement"></a>
-
-### controller.domElement : <code>DOMElement</code>
-Those who extend this class will put their DOM elements in here.
-
-**Kind**: instance property of [<code>Controller</code>](#Controller)  
-<a name="Controller+object"></a>
-
-### controller.object : <code>Object</code>
-The object to manipulate
-
-**Kind**: instance property of [<code>Controller</code>](#Controller)  
-<a name="Controller+property"></a>
-
-### controller.property : <code>String</code>
-The name of the property to manipulate
-
-**Kind**: instance property of [<code>Controller</code>](#Controller)  
-<a name="Controller+_readonly"></a>
-
-### controller.\_readonly : <code>Object</code>
-Readonly field
-
-**Kind**: instance property of [<code>Controller</code>](#Controller)  
-<a name="Controller+forceUpdateDisplay"></a>
-
-### controller.forceUpdateDisplay : <code>boolean</code>
-Whether to force update a display, even when input is active.
-
-**Kind**: instance property of [<code>Controller</code>](#Controller)  
-<a name="Controller+options"></a>
-
-### controller.options(options) ⇒ [<code>Controller</code>](#Controller)
-**Kind**: instance method of [<code>Controller</code>](#Controller)  
-
-| Param | Type |
-| --- | --- |
-| options | <code>Array</code> \| <code>Object</code> | 
-
-<a name="Controller+name"></a>
-
-### controller.name(name) ⇒ [<code>Controller</code>](#Controller)
-Sets the name of the controller.
-
-**Kind**: instance method of [<code>Controller</code>](#Controller)  
-
-| Param | Type |
-| --- | --- |
-| name | <code>string</code> | 
-
-<a name="Controller+listen"></a>
-
-### controller.listen(forceUpdateDisplay) ⇒ [<code>Controller</code>](#Controller)
-Sets controller to listen for changes on its underlying object.
-
-**Kind**: instance method of [<code>Controller</code>](#Controller)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| forceUpdateDisplay | <code>boolean</code> | Whether to force update a display, even when input is active (default: false). |
-
-<a name="Controller+remove"></a>
-
-### controller.remove() ⇒ [<code>Controller</code>](#Controller)
-Removes the controller from its parent GUI.
-
-**Kind**: instance method of [<code>Controller</code>](#Controller)  
-<a name="Controller+hide"></a>
-
-### controller.hide()
-Hides the controller on it's parent GUI.
-
-**Kind**: instance method of [<code>Controller</code>](#Controller)  
-<a name="Controller+show"></a>
-
-### controller.show()
-Shows the controller on it's parent GUI.
-
-**Kind**: instance method of [<code>Controller</code>](#Controller)  
-<a name="Controller+onChange"></a>
-
-### controller.onChange(fnc) ⇒ [<code>Controller</code>](#Controller)
-Specify that a function fire every time someone changes the value with
-this Controller.
-
-**Kind**: instance method of [<code>Controller</code>](#Controller)  
-**Returns**: [<code>Controller</code>](#Controller) - this  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| fnc | <code>function</code> | This function will be called whenever the value is modified via this Controller. |
-
-<a name="Controller+onFinishChange"></a>
-
-### controller.onFinishChange(fnc) ⇒ [<code>Controller</code>](#Controller)
-Specify that a function fire every time someone "finishes" changing
-the value wih this Controller. Useful for values that change
-incrementally like numbers or strings.
-
-**Kind**: instance method of [<code>Controller</code>](#Controller)  
-**Returns**: [<code>Controller</code>](#Controller) - this  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| fnc | <code>function</code> | This function will be called whenever someone "finishes" changing the value via this Controller. |
-
-<a name="Controller+setValue"></a>
-
-### controller.setValue(newValue)
-Change the value of <code>object[property]</code>
-
-**Kind**: instance method of [<code>Controller</code>](#Controller)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| newValue | <code>Object</code> | The new value of <code>object[property]</code> |
-
-<a name="Controller+getValue"></a>
-
-### controller.getValue() ⇒ <code>Object</code>
-Gets the value of <code>object[property]</code>
-
-**Kind**: instance method of [<code>Controller</code>](#Controller)  
-**Returns**: <code>Object</code> - The current value of <code>object[property]</code>  
-<a name="Controller+updateDisplay"></a>
-
-### controller.updateDisplay() ⇒ [<code>Controller</code>](#Controller)
-Refreshes the visual display of a Controller in order to keep sync
-with the object's current value.
-
-**Kind**: instance method of [<code>Controller</code>](#Controller)  
-**Returns**: [<code>Controller</code>](#Controller) - this  
-<a name="Controller+isModified"></a>
-
-### controller.isModified() ⇒ <code>Boolean</code>
-**Kind**: instance method of [<code>Controller</code>](#Controller)  
-**Returns**: <code>Boolean</code> - true if the value has deviated from initialValue  
-<a name="Controller+readonly"></a>
-
-### controller.readonly(ro) ⇒ <code>StringController</code>
-Set readonly mode
-
-**Kind**: instance method of [<code>Controller</code>](#Controller)  
-**Default**: <code>false</code>  
-**Returns**: <code>StringController</code> - this  
-
-| Param | Type |
-| --- | --- |
-| ro | <code>Number</code> | 
-
 <a name="autoPlaceVirgin"></a>
 
 ## autoPlaceVirgin

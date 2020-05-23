@@ -30,16 +30,19 @@ import CustomController from "../controllers/CustomController";
 import GradientController from "../controllers/GradientController";
 import ArrayController from "../controllers/ArrayController";
 import ImageController from "../controllers/ImageController";
+import UndefinedController from "../controllers/UndefinedController";
 import requestAnimationFrame from "../utils/requestAnimationFrame";
 import CenteredDiv from "../dom/CenteredDiv";
 import dom from "../dom/dom";
 import common from "../utils/common";
 import autocomplete from "../dom/autocomplete";
 
-import styleSheet from "./style.scss"; // CSS to embed in build
+// import styleSheet from "./style.scss"; // CSS to embed in build
+
+// var ARR_EACH = Array.prototype.forEach;
+const ARR_SLICE = Array.prototype.slice;
 
 // css.inject(styleSheet);
-// var scope = this;
 
 /** Outer-most className for GUI's */
 const CSS_NAMESPACE = "dg";
@@ -53,7 +56,7 @@ const DEFAULT_DEFAULT_PRESET_NAME = "Default";
 
 const SUPPORTS_LOCAL_STORAGE = (function () {
   try {
-    return !!window.localStorage;
+    return "localStorage" in window && !!window.localStorage;
   } catch (e) {
     return false;
   }
@@ -102,10 +105,10 @@ const hideableGuis = [];
  * @param {Boolean} [params.closed=false] If true, starts closed
  * @param {Boolean} [params.closeOnTop=false] If true, close/open button shows on top of the GUI
  */
-const GUI = function (pars) {
+const GUI = function (params) {
   const _this = this;
 
-  let params = pars || {};
+  params = params || {};
 
   /**
    * Outermost DOM Element
@@ -171,7 +174,9 @@ const GUI = function (pars) {
       params.load.preset = params.preset;
     }
   } else {
-    params.load = { preset: DEFAULT_DEFAULT_PRESET_NAME };
+    params.load = {
+      preset: DEFAULT_DEFAULT_PRESET_NAME,
+    };
   }
 
   if (common.isUndefined(params.parent) && params.hideable) {
@@ -366,7 +371,7 @@ const GUI = function (pars) {
           // For browsers that aren't going to respect the CSS transition,
           // Lets just check our height against the window height right off
           // the bat.
-          this.onResize();
+          _this.onResize();
 
           if (_this.__closeButton) {
             _this.__closeButton.innerHTML = v ? GUI.TEXT_OPEN : GUI.TEXT_CLOSED;
@@ -449,8 +454,9 @@ const GUI = function (pars) {
     dom.bind(this.__closeButton, "click", function () {
       _this.closed = !_this.closed;
     });
-    // Oh, you're a nested GUI!
   } else {
+    // Oh, you're a nested GUI!
+
     if (params.closed === undefined) {
       params.closed = true;
     }
@@ -503,14 +509,14 @@ const GUI = function (pars) {
     }
   }
 
-  this.__resizeHandler = function () {
+  function __resizeHandler() {
     _this.onResizeDebounced();
-  };
+  }
 
-  dom.bind(window, "resize", this.__resizeHandler);
-  dom.bind(this.__ul, "webkitTransitionEnd", this.__resizeHandler);
-  dom.bind(this.__ul, "transitionend", this.__resizeHandler);
-  dom.bind(this.__ul, "oTransitionEnd", this.__resizeHandler);
+  dom.bind(window, "resize", __resizeHandler);
+  dom.bind(this.__ul, "webkitTransitionEnd", __resizeHandler);
+  dom.bind(this.__ul, "transitionend", __resizeHandler);
+  dom.bind(this.__ul, "oTransitionEnd", __resizeHandler);
   this.onResize();
 
   if (params.resizable) {
@@ -825,10 +831,14 @@ common.extend(
       // We have to prevent collisions on names in order to have a key
       // by which to remember saved values
       if (this.__folders[name] !== undefined) {
-        throw new Error('You already have a folder in this GUI by the name "' + name + '"');
+        throw new Error(`You already have a folder in this GUI by the name "${name}"`);
       }
 
-      const newGuiParams = { name: name, parent: this, title: title };
+      const newGuiParams = {
+        name: name,
+        parent: this,
+        title: title,
+      };
 
       // We need to pass down the autoPlace trait so that we can
       // attach event listeners to open/close folder actions to
@@ -991,7 +1001,7 @@ common.extend(
 
       const _this = this;
 
-      common.each(Array.prototype.slice.call(arguments), function (object) {
+      common.each(ARR_SLICE.call(arguments), function (object) {
         if (_this.__rememberedObjects.length === 0) {
           addSaveMenu(_this);
         }
@@ -1264,9 +1274,9 @@ function augmentController(gui, li, controller) {
       const pc = controller[method];
       const pb = box[method];
       controller[method] = box[method] = function () {
-        const args = Array.prototype.slice.call(arguments);
-        pb.apply(box, args);
-        return pc.apply(controller, args);
+        const args = ARR_SLICE.call(arguments);
+        pc.apply(controller, args);
+        return pb.apply(box, args);
       };
     });
 
@@ -1295,9 +1305,9 @@ function augmentController(gui, li, controller) {
     const r = function (returned) {
       // Have we defined both boundaries?
       if (common.isNumber(controller.__min) && common.isNumber(controller.__max)) {
-        // Well, then lets just replace this with a slider.
+        // Well, then let's just replace this with a slider.
 
-        // lets remember if the old controller had a specific name or was listening
+        // Let's remember if the old controller had a specific name or was listening
         const oldName = controller.__li.firstElementChild.firstElementChild.innerHTML;
         const wasListening = controller.__gui.__listening.indexOf(controller) > -1;
 
@@ -1381,11 +1391,11 @@ function recallSavedValue(gui, controller) {
 
   // Why yes, it does!
   if (matchedIndex !== -1) {
-    // Let me fetch a map of controllers for thcommon.isObject.
+    // Let me fetch a map of controllers for this object.
     let controllerMap = root.__rememberedObjectIndecesToControllers[matchedIndex];
 
-    // Ohp, I believe this is the first controller we've created for this
-    // object. Lets make the map fresh.
+    // I believe this is the first controller we've created for this
+    // object. Let's make a fresh map.
     if (controllerMap === undefined) {
       controllerMap = {};
       root.__rememberedObjectIndecesToControllers[matchedIndex] = controllerMap;
@@ -1411,8 +1421,12 @@ function recallSavedValue(gui, controller) {
         return;
       }
 
-      // Did the loaded object remember thcommon.isObject? &&  Did we remember this particular property?
-      if (preset[matchedIndex] && preset[matchedIndex][controller.property] !== undefined) {
+      // Did the loaded object remember this object?
+      if (
+        preset[matchedIndex] &&
+        // Did we remember this particular property?
+        preset[matchedIndex][controller.property] !== undefined
+      ) {
         // We did remember something for this guy ...
         const value = preset[matchedIndex][controller.property];
 
@@ -1740,7 +1754,7 @@ function setPresetSelectIndex(gui) {
 
 function updateDisplays(controllerArray) {
   if (controllerArray.length !== 0) {
-    requestAnimationFrame.call(window, function () {
+    requestAnimationFrame(function () {
       updateDisplays(controllerArray);
     });
   }

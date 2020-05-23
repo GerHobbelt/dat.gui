@@ -17,7 +17,7 @@ export default function (color, forceCSSHex) {
   const r = Math.round(color.r);
   const g = Math.round(color.g);
   const b = Math.round(color.b);
-  const { a } = color;
+  const a = color.a >= 1 || color.a == null ? 1 : color.a;
   const h = Math.round(color.h);
   const s = color.s.toFixed(1);
   const v = color.v.toFixed(1);

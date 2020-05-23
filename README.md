@@ -51,6 +51,9 @@ the default styles, the default styles need to be included before the overrides.
 * Added value plotter controller ([#191](https://github.com/dataarts/dat.gui/issues/191))
 * Implemented number box changes on keyboard arrow up/down, mouse wheel scroll and converted inputs to number. ([#195](https://github.com/dataarts/dat.gui/issues/195))
 
+This is a fork of dat.gui where I merged some outstanding pull request to fix bugs.
+Also includes @MacroMan's fork and others' with extra features.
+
 ![dat.gui preview of all inputs](dat_panel.gif)
 
 See [API.md](API.md) for usage
@@ -102,12 +105,11 @@ gui.add(obj, 'x').onChange(function() {
 
 ## Directory Contents
 
-```
-├── build - Concatenated source code for browsers.
-├── src - source code in commonjs format.
-├── tests - [QUnit](https://github.com/jquery/qunit) test suite.
-└── util - [node.js](http://nodejs.org/) utility scripts for compiling source.
-```
++ `build` - Concatenated source code for browsers.
++ `src` - source code in commonjs format.
++ `tests` - [QUnit](https://github.com/jquery/qunit) test suite.
++ `util` - [node.js](http://nodejs.org/) utility scripts for compiling source.
+
 
 
 ## Building your own dat.GUI

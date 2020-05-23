@@ -27,7 +27,7 @@
     var r = Math.round(color.r);
     var g = Math.round(color.g);
     var b = Math.round(color.b);
-    var a = color.a;
+    var a = color.a >= 1 || color.a == null ? 1 : color.a;
     var h = Math.round(color.h);
     var s = color.s.toFixed(1);
     var v = color.v.toFixed(1);
@@ -75,14 +75,11 @@
       this.each(
         ARR_SLICE.call(arguments, 1),
         function (obj) {
-          var keys = this.isObject(obj) ? Object.keys(obj) : [];
-          keys.forEach(
-            function (key) {
-              if (!this.isUndefined(obj[key])) {
-                target[key] = obj[key];
-              }
-            }.bind(this)
-          );
+          for (var key in obj) {
+            if (!this.isUndefined(obj[key])) {
+              target[key] = obj[key];
+            }
+          }
         },
         this
       );
@@ -92,14 +89,11 @@
       this.each(
         ARR_SLICE.call(arguments, 1),
         function (obj) {
-          var keys = this.isObject(obj) ? Object.keys(obj) : [];
-          keys.forEach(
-            function (key) {
-              if (this.isUndefined(target[key])) {
-                target[key] = obj[key];
-              }
-            }.bind(this)
-          );
+          for (var key in obj) {
+            if (this.isUndefined(target[key])) {
+              target[key] = obj[key];
+            }
+          }
         },
         this
       );
@@ -122,16 +116,14 @@
       if (obj.forEach) {
         obj.forEach(itr, scope);
       } else if (obj.length === obj.length + 0) {
-        var key;
-        var l;
-        for (key = 0, l = obj.length; key < l; key++) {
+        for (var key = 0, l = obj.length; key < l; key++) {
           if (key in obj && itr.call(scope, obj[key], key) === this.BREAK) {
             return;
           }
         }
       } else {
-        for (var _key in obj) {
-          if (itr.call(scope, obj[_key], _key) === this.BREAK) {
+        for (var objkey in obj) {
+          if (itr.call(scope, obj[objkey], objkey) === this.BREAK) {
             return;
           }
         }
@@ -158,7 +150,9 @@
       };
     },
     toArray: function toArray(obj) {
-      if (obj.toArray) return obj.toArray();
+      if (obj.toArray) {
+        return obj.toArray();
+      }
       return ARR_SLICE.call(obj);
     },
     isUndefined: function isUndefined(obj) {
@@ -187,6 +181,9 @@
     isNumber: function isNumber(obj) {
       return obj === obj + 0;
     },
+    isFiniteNumber: function isFiniteNumber(obj) {
+      return obj === +obj && isFinite(obj);
+    },
     isString: function isString(obj) {
       return obj === obj + "";
     },
@@ -194,7 +191,7 @@
       return obj === false || obj === true;
     },
     isFunction: function isFunction(obj) {
-      return Object.prototype.toString.call(obj) === "[object Function]";
+      return obj instanceof Function;
     },
     supportsPassive: function supportsPassive() {
       var supportsPassive = false;
@@ -459,7 +456,6 @@
     return toReturn;
   };
 
-  var tmpComponent;
   var ColorMath = {
     hsv_to_rgb: function hsv_to_rgb(h, s, v) {
       var hi = Math.floor(h / 60) % 6;
@@ -523,7 +519,8 @@
       return (hex >> (componentIndex * 8)) & 0xff;
     },
     hex_with_component: function hex_with_component(hex, componentIndex, value) {
-      value = (value << (tmpComponent = componentIndex * 8)) | (hex & ~(0xff << tmpComponent));
+      var tmpComponent = componentIndex * 8;
+      value = (value << tmpComponent) | (hex & ~(0xff << tmpComponent));
       return value;
     },
   };
@@ -771,9 +768,7 @@
       elem.style.KhtmlUserSelect = selectable ? "auto" : "none";
       elem.unselectable = selectable ? "on" : "off";
     },
-    makeFullscreen: function makeFullscreen(elem, hor, vert) {
-      var vertical = vert;
-      var horizontal = hor;
+    makeFullscreen: function makeFullscreen(elem, horizontal, vertical) {
       if (Common.isUndefined(horizontal)) {
         horizontal = true;
       }
@@ -790,8 +785,8 @@
         elem.style.bottom = 0;
       }
     },
-    fakeEvent: function fakeEvent(elem, eventType, pars, aux) {
-      var params = pars || {};
+    fakeEvent: function fakeEvent(elem, eventType, params, aux) {
+      params = params || {};
       var className = EVENT_MAP_INV[eventType];
       if (!className) {
         throw new Error("Event type " + eventType + " not supported.");
@@ -853,9 +848,9 @@
       Common.defaults(evt, aux);
       elem.dispatchEvent(evt);
     },
-    bind: function bind(elem, event, func, newBool, newPassive) {
-      var bool = newBool || false;
-      var passive = newPassive || false;
+    bind: function bind(elem, event, func, bool, passive) {
+      bool = bool || false;
+      passive = passive || false;
       if (elem.addEventListener) {
         var listenerArg = Common.supportsPassive()
           ? {
@@ -869,8 +864,8 @@
       }
       return dom;
     },
-    unbind: function unbind(elem, event, func, newBool) {
-      var bool = newBool || false;
+    unbind: function unbind(elem, event, func, bool) {
+      bool = bool || false;
       if (elem.removeEventListener) {
         elem.removeEventListener(event, func, bool);
       } else if (elem.detachEvent) {
@@ -892,7 +887,8 @@
     },
     removeClass: function removeClass(elem, className) {
       if (className) {
-        if (elem.className === className) {
+        if (elem.className === undefined);
+        else if (elem.className === className) {
           elem.removeAttribute("class");
         } else {
           var classes = elem.className.split(/ +/);
@@ -930,8 +926,7 @@
         cssValueToPixels(style.height)
       );
     },
-    getOffset: function getOffset(el) {
-      var elem = el;
+    getOffset: function getOffset(elem) {
       var offset = {
         left: 0,
         top: 0,
@@ -997,10 +992,9 @@
 
   var OptionController = (function (_Controller) {
     _inheritsLoose(OptionController, _Controller);
-    function OptionController(object, property, opts) {
+    function OptionController(object, property, options) {
       var _this2;
       _this2 = _Controller.call(this, object, property) || this;
-      var options = opts;
       var _this = _assertThisInitialized(_this2);
       _this2.__select = document.createElement("select");
       if (Common.isArray(options)) {
@@ -1035,7 +1029,9 @@
       if (disableOnChange === void 0) {
         disableOnChange = false;
       }
-      if (this._readonly) return this.getValue();
+      if (this._readonly) {
+        return this.getValue();
+      }
       var toReturn = _Controller.prototype.setValue.call(this, v, disableOnChange);
       if (this.__onFinishChange && !disableOnChange) {
         this.__onFinishChange.call(this, this.getValue());
@@ -1043,7 +1039,9 @@
       return toReturn;
     };
     _proto.updateDisplay = function updateDisplay() {
-      if (dom.isActive(this.__select) && !this.forceUpdateDisplay) return this;
+      if (dom.isActive(this.__select) && !this.forceUpdateDisplay) {
+        return this;
+      }
       this.__select.value = this.getValue();
       return _Controller.prototype.updateDisplay.call(this);
     };
@@ -1066,26 +1064,27 @@
           _this.__onFinishChange.call(_this, _this.getValue());
         }
       }
+      function onKeyDown(e) {
+        if (e.keyCode === 13) {
+          this.blur();
+        }
+      }
       _this2.__input = document.createElement("input");
       _this2.__input.setAttribute("type", "text");
       dom.bind(_this2.__input, "keyup", onChange, false, true);
       dom.bind(_this2.__input, "change", onChange, false, true);
       dom.bind(_this2.__input, "blur", onBlur, false, true);
       dom.bind(_this2.__input, "keydown", onKeyDown, false, true);
-      function onKeyDown(e) {
-        if (e.keyCode === 13) {
-          this.blur();
-        }
-      }
       _this2.updateDisplay();
       _this2.domElement.appendChild(_this2.__input);
       return _this2;
     }
     var _proto = StringController.prototype;
     _proto.updateDisplay = function updateDisplay() {
-      if (!dom.isActive(this.__input)) {
-        this.__input.value = this.getValue();
+      if (dom.isActive(this.__input)) {
+        return this;
       }
+      this.__input.value = this.getValue();
       return _Controller.prototype.updateDisplay.call(this);
     };
     return StringController;
@@ -1103,10 +1102,10 @@
     function NumberController(object, property, params) {
       var _this;
       _this = _Controller.call(this, object, property) || this;
-      var _params = params || {};
-      _this.__min = _params.min;
-      _this.__max = _params.max;
-      _this.__step = _params.step;
+      params = params || {};
+      _this.__min = params.min;
+      _this.__max = params.max;
+      _this.__step = params.step;
       if (Common.isUndefined(_this.__step)) {
         if (_this.initialValue === 0) {
           _this.__impliedStep = 1;
@@ -1124,16 +1123,15 @@
       if (disableOnChange === void 0) {
         disableOnChange = false;
       }
-      var _v = v;
-      if (this.__min !== undefined && _v < this.__min) {
-        _v = this.__min;
-      } else if (this.__max !== undefined && _v > this.__max) {
-        _v = this.__max;
+      if (this.__min != null && v < this.__min) {
+        v = this.__min;
+      } else if (this.__max != null && v > this.__max) {
+        v = this.__max;
       }
-      if (this.__step !== undefined && _v % this.__step !== 0) {
-        _v = Math.round(_v / this.__step) * this.__step;
+      if (this.__step != null && v % this.__step !== 0) {
+        v = Math.round(v / this.__step) * this.__step;
       }
-      return _Controller.prototype.setValue.call(this, _v, disableOnChange);
+      return _Controller.prototype.setValue.call(this, v, disableOnChange);
     };
     _proto.min = function min(minValue) {
       this.__min = minValue;
@@ -1147,7 +1145,9 @@
       this.__step = stepValue;
       this.__impliedStep = stepValue;
       this.__precision = numDecimals(stepValue);
-      if (this.__input) this.__input.setAttribute("step", stepValue);
+      if (this.__input) {
+        this.__input.setAttribute("step", stepValue);
+      }
       return this;
     };
     return NumberController;
@@ -1162,34 +1162,27 @@
     function NumberControllerBox(object, property, params) {
       var _this2;
       _this2 = _NumberController.call(this, object, property, params) || this;
-      var _params = params || {};
-      _this2.__suffix = _params.suffix ? _params.suffix : "";
+      params = params || {};
+      _this2.__suffix = params.suffix || "";
       _this2.__truncationSuspended = false;
       var _this = _assertThisInitialized(_this2);
       var prevY;
-      _this2.__input = document.createElement("input");
-      _this2.__input.setAttribute("type", "text");
-      _this2.__up = document.createElement("button");
-      _this2.__up.setAttribute(
-        "style",
-        "position:absolute;right:0;height:10px;top:4px;background-color: #555;border: none;"
-      );
-      _this2.__down = document.createElement("button");
-      _this2.__down.setAttribute(
-        "style",
-        "position:absolute;right:0;height:10px;top:15px;background-color: #555;border: none;"
-      );
-      dom.bind(_this2.__up, "mousedown", function () {
-        _this.setValue(_this.getValue() + _this.__impliedStep);
-      });
-      dom.bind(_this2.__down, "mousedown", function () {
-        _this.setValue(_this.getValue() - _this.__impliedStep);
-      });
-      dom.bind(_this2.__input, "change", onChange, false, true);
-      dom.bind(_this2.__input, "blur", onBlur, false, true);
-      dom.bind(_this2.__input, "mousedown", onMouseDown, false, true);
-      dom.bind(_this2.__input, "wheel", onWheel);
-      dom.bind(_this2.__input, "keydown", onKeyDown, false, true);
+      function onKeyDown(e) {
+        switch (e.keyCode) {
+          case 13:
+            _this.__truncationSuspended = true;
+            this.blur();
+            _this.__truncationSuspended = false;
+            onFinish();
+            break;
+          case 38:
+            _this.setValue(_this.getValue() + _this.__impliedStep);
+            break;
+          case 40:
+            _this.setValue(_this.getValue() - _this.__impliedStep);
+            break;
+        }
+      }
       function onChange() {
         var value = _this.__input.value;
         if (params && _this.__suffix) {
@@ -1223,27 +1216,34 @@
         dom.bind(window, "mouseup", onMouseUp, false, true);
         prevY = e.clientY;
       }
-      function onKeyDown(e) {
-        switch (e.keyCode) {
-          case 13:
-            _this.__truncationSuspended = true;
-            this.blur();
-            _this.__truncationSuspended = false;
-            onFinish();
-            break;
-          case 38:
-            _this.setValue(_this.getValue() + _this.__impliedStep);
-            break;
-          case 40:
-            _this.setValue(_this.getValue() - _this.__impliedStep);
-            break;
-        }
-      }
       function onWheel(e) {
         e.preventDefault();
         var direction = -e.deltaY >> 10 || 1;
         _this.setValue(_this.getValue() + direction * _this.__impliedStep);
       }
+      _this2.__input = document.createElement("input");
+      _this2.__input.setAttribute("type", "text");
+      _this2.__up = document.createElement("button");
+      _this2.__up.setAttribute(
+        "style",
+        "position:absolute;right:0;height:10px;top:4px;background-color: #555;border: none;"
+      );
+      _this2.__down = document.createElement("button");
+      _this2.__down.setAttribute(
+        "style",
+        "position:absolute;right:0;height:10px;top:15px;background-color: #555;border: none;"
+      );
+      dom.bind(_this2.__up, "mousedown", function () {
+        _this.setValue(_this.getValue() + _this.__impliedStep);
+      });
+      dom.bind(_this2.__down, "mousedown", function () {
+        _this.setValue(_this.getValue() - _this.__impliedStep);
+      });
+      dom.bind(_this2.__input, "change", onChange, false, true);
+      dom.bind(_this2.__input, "blur", onBlur, false, true);
+      dom.bind(_this2.__input, "mousedown", onMouseDown, false, true);
+      dom.bind(_this2.__input, "wheel", onWheel);
+      dom.bind(_this2.__input, "keydown", onKeyDown, false, true);
       _this2.updateDisplay();
       _this2.domElement.appendChild(_this2.__input);
       _this2.domElement.appendChild(_this2.__up);
@@ -1252,8 +1252,8 @@
     }
     var _proto = NumberControllerBox.prototype;
     _proto.updateDisplay = function updateDisplay() {
-      if (this.__input === document.activeElement) {
-        return;
+      if (dom.isActive(this.__input)) {
+        return this;
       }
       this.__input.value = this.__truncationSuspended
         ? this.getValue()
@@ -1346,9 +1346,10 @@
     var _proto = NumberControllerSlider.prototype;
     _proto.updateDisplay = function updateDisplay() {
       if (this.__input === document.activeElement) {
-        return;
+        return this;
       }
-      var pct = (this.getValue() - this.__min) / (this.__max - this.__min);
+      var value = this.getValue();
+      var pct = (value - this.__min) / (this.__max - this.__min);
       this.__foreground.style.width = pct * 100 + "%";
       return _NumberController.prototype.updateDisplay.call(this);
     };
@@ -1430,7 +1431,6 @@
       _this2.__color = new Color(_this2.getValue());
       _this2.__temp = new Color(0);
       var _this = _assertThisInitialized(_this2);
-      _this2.domElement = document.createElement("div");
       dom.makeSelectable(_this2.domElement, false);
       _this2.__selector = document.createElement("div");
       _this2.__selector.className = "selector";
@@ -1445,7 +1445,7 @@
       _this2.__hue_field.className = "hue-field";
       _this2.__input = document.createElement("input");
       _this2.__input.type = "text";
-      _this2.__input_textShadow = "0 1px 1px ";
+      _this2.__input_textShadow = ["1px 0px 0px ", "-1px 0px 0px ", "0px 1px 0px ", "0px -1px 0px "];
       dom.bind(
         _this2.__input,
         "keydown",
@@ -1461,8 +1461,8 @@
       dom.bind(
         _this2.__selector,
         "mousedown",
-        function () {
-          dom.addClass(this, "drag").bind(window, "mouseup", function () {
+        function (e) {
+          dom.addClass(this, "drag").bind(window, "mouseup", function (e) {
             dom.removeClass(_this.__selector, "drag");
           });
         },
@@ -1540,7 +1540,11 @@
         color: "#fff",
         border: 0,
         fontWeight: "bold",
-        textShadow: _this2.__input_textShadow + "rgba(0,0,0,0.7)",
+        textShadow: _this2.__input_textShadow
+          .map(function (d) {
+            return d + " rgba(0,0,0,0.7)";
+          })
+          .join(", "),
       });
       dom.bind(_this2.__saturation_field, "mousedown", fieldDown);
       dom.bind(_this2.__saturation_field, "touchstart", fieldDown);
@@ -1656,7 +1660,7 @@
               i[component] !== this.__color.__state[component]
             ) {
               mismatch = true;
-              return {};
+              return Common.BREAK;
             }
           },
           this
@@ -1683,7 +1687,11 @@
       Common.extend(this.__input.style, {
         backgroundColor: this.__color.toHexString(),
         color: "rgb(" + flip + "," + flip + "," + flip + ")",
-        textShadow: this.__input_textShadow + "rgba(" + _flip + "," + _flip + "," + _flip + ",.7)",
+        textShadow: this.__input_textShadow
+          .map(function (d) {
+            return d + " rgba(" + _flip + "," + _flip + "," + _flip + ",0.7)";
+          })
+          .join(", "),
       });
     };
     return ColorController;
@@ -2231,7 +2239,7 @@
   })(Controller);
 
   var saveDialogueContents =
-    '<div id="dg-save" class="dg dialogue">\n  Here\'s the new load parameter for your <code>GUI</code>\'s constructor:\n\n  <textarea id="dg-new-constructor"></textarea>\n\n  <div id="dg-save-locally">\n    <input id="dg-local-storage" type="checkbox"> Automatically save values to <code>localStorage</code> on exit.\n\n    <div id="dg-local-explain">\n      The values saved to <code>localStorage</code> will override those passed to <code>dat.GUI</code>\'s constructor.\n      This makes it easier to work incrementally, but <code>localStorage</code> is fragile, and your friends may not see\n      the same values you do.\n    </div>\n  </div>\n</div>\n';
+    '<div id="dg-save" class="dg dialogue">\n  Here\'s the new load parameter for your <code>GUI</code>\'s constructor:\n\n  <textarea id="dg-new-constructor"></textarea>\n\n  <div id="dg-save-locally">\n    <input id="dg-local-storage" type="checkbox">\n    Automatically save values to <code>localStorage</code> on exit.\n\n    <div id="dg-local-explain">\n      The values saved to <code>localStorage</code> will override those passed to <code>dat.GUI</code>\'s constructor.\n      This makes it easier to work incrementally, but <code>localStorage</code> is fragile, and your friends may not see\n      the same values you do.\n    </div>\n  </div>\n</div>\n';
 
   function pos2vec(pos, min, max) {
     return [pos[0] * (max[0] - min[0]) + min[0], pos[1] * (max[1] - min[1]) + min[1]];
@@ -2365,6 +2373,27 @@
     return VectorController;
   })(Controller);
 
+  var UndefinedController = (function (_Controller) {
+    _inheritsLoose(UndefinedController, _Controller);
+    function UndefinedController(object, property, options) {
+      var _this2;
+      _this2 = _Controller.call(this, object, property, "undefined", options) || this;
+      var _this = _assertThisInitialized(_this2);
+      _this2.__prev = _this2.getValue();
+      _this2.__elem = document.createElement("em");
+      _this2.domElement.appendChild(_this2.__elem);
+      _this2.updateDisplay();
+      return _this2;
+    }
+    var _proto = UndefinedController.prototype;
+    _proto.updateDisplay = function updateDisplay() {
+      this.__elem.innerText = "<undefined>";
+      return _Controller.prototype.updateDisplay.call(this);
+    };
+    return UndefinedController;
+  })(Controller);
+
+  var ARR_SLICE$1 = Array.prototype.slice;
   var ControllerFactory = function ControllerFactory(object, property) {
     var initialValue = object[property];
     if (
@@ -2415,13 +2444,20 @@
       return new TabbedController(object, property, "", arguments[2] || 0, arguments[3] || "Object");
     }
     if (Common.isFunction(initialValue)) {
-      return new FunctionController(object, property, "");
+      var opts = ARR_SLICE$1.call(arguments, 3);
+      if (opts.length === 0) {
+        opts = undefined;
+      }
+      return new FunctionController(object, property, options_1, opts);
     }
     if (Common.isBoolean(initialValue)) {
       return new BooleanController(object, property);
     }
     if (Common.isArray(initialValue)) {
       return new ArrayController(object, property);
+    }
+    if (Common.isUndefined(initialValue)) {
+      return new UndefinedController(object, property);
     }
     return null;
   };
@@ -2963,13 +2999,14 @@
     };
   }
 
+  var ARR_SLICE$2 = Array.prototype.slice;
   var CSS_NAMESPACE = "dg";
   var HIDE_KEY_CODE = 72;
   var CLOSE_BUTTON_HEIGHT = 20;
   var DEFAULT_DEFAULT_PRESET_NAME = "Default";
   var SUPPORTS_LOCAL_STORAGE = (function () {
     try {
-      return !!window.localStorage;
+      return "localStorage" in window && !!window.localStorage;
     } catch (e) {
       return false;
     }
@@ -2981,9 +3018,9 @@
   var autoPlaceContainer;
   var hide = false;
   var hideableGuis = [];
-  var GUI = function GUI(pars) {
+  var GUI = function GUI(params) {
     var _this = this;
-    var params = pars || {};
+    params = params || {};
     this.domElement = document.createElement("div");
     this.__ul = document.createElement("ul");
     this.domElement.appendChild(this.__ul);
@@ -3131,7 +3168,7 @@
           } else {
             dom.removeClass(_this.__ul, GUI.CLASS_CLOSED);
           }
-          this.onResize();
+          _this.onResize();
           if (_this.__closeButton) {
             _this.__closeButton.innerHTML = v ? GUI.TEXT_OPEN : GUI.TEXT_CLOSED;
           }
@@ -3229,13 +3266,13 @@
         setWidth(_this, params.width);
       }
     }
-    this.__resizeHandler = function () {
+    function __resizeHandler() {
       _this.onResizeDebounced();
-    };
-    dom.bind(window, "resize", this.__resizeHandler);
-    dom.bind(this.__ul, "webkitTransitionEnd", this.__resizeHandler);
-    dom.bind(this.__ul, "transitionend", this.__resizeHandler);
-    dom.bind(this.__ul, "oTransitionEnd", this.__resizeHandler);
+    }
+    dom.bind(window, "resize", __resizeHandler);
+    dom.bind(this.__ul, "webkitTransitionEnd", __resizeHandler);
+    dom.bind(this.__ul, "transitionend", __resizeHandler);
+    dom.bind(this.__ul, "oTransitionEnd", __resizeHandler);
     this.onResize();
     if (params.resizable) {
       addResizeHandle(this);
@@ -3487,7 +3524,7 @@
         throw new Error("You can only call remember on a top level GUI.");
       }
       var _this = this;
-      Common.each(Array.prototype.slice.call(arguments), function (object) {
+      Common.each(ARR_SLICE$2.call(arguments), function (object) {
         if (_this.__rememberedObjects.length === 0) {
           addSaveMenu(_this);
         }
@@ -3675,9 +3712,9 @@
         var pc = controller[method];
         var pb = box[method];
         controller[method] = box[method] = function () {
-          var args = Array.prototype.slice.call(arguments);
-          pb.apply(box, args);
-          return pc.apply(controller, args);
+          var args = ARR_SLICE$2.call(arguments);
+          pc.apply(controller, args);
+          return pb.apply(box, args);
         };
       });
       dom.addClass(li, "has-slider");
@@ -4026,7 +4063,7 @@
   }
   function updateDisplays(controllerArray) {
     if (controllerArray.length !== 0) {
-      requestAnimationFrame$2.call(window, function () {
+      requestAnimationFrame$2(function () {
         updateDisplays(controllerArray);
       });
     }

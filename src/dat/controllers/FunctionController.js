@@ -48,6 +48,21 @@ class FunctionController extends Controller {
     this.domElement.appendChild(this.__button);
   }
 
+  /**
+   * Invoke the function (property of the object), passing the `user_data` array as function
+   * arguments.
+   *
+   * Before the function is invoked, the dat.GUI `beforeChange` callback will be invoked
+   *
+   *
+   * @param  {Array} user_data  The array of function arguments; when the `user_data` is not
+   * an array, it will be assumed to be a single argument by itself and will be
+   * passed to the invoked function as is.
+   *
+   * @param  {boolean} silent   When truthy, no onBeforeChange/onChange events will be fired.
+   *
+   * @return {Controller}           This controller.
+   */
   fire() {
     if (this.__onChange) {
       this.__onChange.call(this, this.getValue());

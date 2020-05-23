@@ -41,11 +41,11 @@ class NumberController extends Controller {
   constructor(object, property, params) {
     super(object, property);
 
-    const _params = params || {};
+    params = params || {};
 
-    this.__min = _params.min;
-    this.__max = _params.max;
-    this.__step = _params.step;
+    this.__min = params.min;
+    this.__max = params.max;
+    this.__step = params.step;
 
     if (common.isUndefined(this.__step)) {
       if (this.initialValue === 0) {
@@ -62,19 +62,17 @@ class NumberController extends Controller {
   }
 
   setValue(v, disableOnChange = false) {
-    let _v = v;
-
-    if (this.__min !== undefined && _v < this.__min) {
-      _v = this.__min;
-    } else if (this.__max !== undefined && _v > this.__max) {
-      _v = this.__max;
+    if (this.__min != null && v < this.__min) {
+      v = this.__min;
+    } else if (this.__max != null && v > this.__max) {
+      v = this.__max;
     }
 
-    if (this.__step !== undefined && _v % this.__step !== 0) {
-      _v = Math.round(_v / this.__step) * this.__step;
+    if (this.__step != null && v % this.__step !== 0) {
+      v = Math.round(v / this.__step) * this.__step;
     }
 
-    return super.setValue(_v, disableOnChange);
+    return super.setValue(v, disableOnChange);
   }
 
   /**
@@ -118,7 +116,9 @@ class NumberController extends Controller {
     this.__step = stepValue;
     this.__impliedStep = stepValue;
     this.__precision = numDecimals(stepValue);
-    if (this.__input) this.__input.setAttribute("step", stepValue);
+    if (this.__input) {
+      this.__input.setAttribute("step", stepValue);
+    }
     return this;
   }
 }

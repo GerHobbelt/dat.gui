@@ -29,10 +29,8 @@ import common from "../utils/common";
  * @member dat.controllers
  */
 class OptionController extends Controller {
-  constructor(object, property, opts) {
+  constructor(object, property, options) {
     super(object, property);
-
-    let options = opts;
 
     const _this = this;
 
@@ -75,7 +73,9 @@ class OptionController extends Controller {
   }
 
   setValue(v, disableOnChange = false) {
-    if (this._readonly) return this.getValue();
+    if (this._readonly) {
+      return this.getValue();
+    }
     const toReturn = super.setValue(v, disableOnChange);
 
     if (this.__onFinishChange && !disableOnChange) {
@@ -85,7 +85,13 @@ class OptionController extends Controller {
   }
 
   updateDisplay() {
-    if (dom.isActive(this.__select) && !this.forceUpdateDisplay) return this; // prevent number from updating if user is trying to manually update
+    // prevent number from updating if user is trying to manually update
+    //
+    // Use the same solution from StringController.js to enable
+    // editing <input>s while "listen()"ing
+    if (dom.isActive(this.__select) && !this.forceUpdateDisplay) {
+      return this;
+    }
     this.__select.value = this.getValue();
     return super.updateDisplay();
   }

@@ -16,6 +16,8 @@
  *
  * @param {Object} object The object to be manipulated
  * @param {string} property The name of the property to be manipulated
+ *
+ * @member dat.controllers
  */
 class Controller {
   constructor(object, property) {
@@ -87,11 +89,11 @@ class Controller {
   }
 
   /**
-   * Specify that a function fire every time someone changes the value with
+   * Specify a function which fires every time someone has changed the value with
    * this Controller.
    *
    * @param {Function} fnc This function will be called whenever the value
-   * is modified via this Controller.
+   * has been modified via this Controller.
    * @returns {Controller} this
    */
   onChange(fnc) {
@@ -100,8 +102,8 @@ class Controller {
   }
 
   /**
-   * Specify that a function fire every time someone "finishes" changing
-   * the value wih this Controller. Useful for values that change
+   * Specify a function which fires every time someone "finishes" changing
+   * the value with this Controller. Useful for values that change
    * incrementally like numbers or strings.
    *
    * @param {Function} fnc This function will be called whenever
@@ -125,7 +127,6 @@ class Controller {
     if (this.__onChange && !disableOnChange) {
       this.__onChange.call(this, __newValue, oldValue);
     }
-
     this.updateDisplay();
     return this;
   }
@@ -149,7 +150,7 @@ class Controller {
   }
 
   /**
-   * @returns {Boolean} true if the value has deviated from initialValue
+   * @returns {boolean} true if the value has deviated from initialValue
    */
   isModified() {
     return this.initialValue !== this.getValue();

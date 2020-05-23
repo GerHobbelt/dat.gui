@@ -42,6 +42,14 @@ class StringController extends Controller {
       }
     }
 
+    function onKeyDown(e) {
+      if (e.keyCode === 13) {
+        /* jshint validthis: true */
+        this.blur();
+        /* jshint validthis: false */
+      }
+    }
+
     this.__input = document.createElement("input");
     this.__input.setAttribute("type", "text");
 
@@ -49,12 +57,6 @@ class StringController extends Controller {
     dom.bind(this.__input, "change", onChange, false, true);
     dom.bind(this.__input, "blur", onBlur, false, true);
     dom.bind(this.__input, "keydown", onKeyDown, false, true);
-
-    function onKeyDown(e) {
-      if (e.keyCode === 13) {
-        this.blur();
-      }
-    }
 
     this.updateDisplay();
 
@@ -64,9 +66,12 @@ class StringController extends Controller {
   updateDisplay() {
     // Stops the caret from moving on account of:
     // keyup -> setValue -> updateDisplay
-    if (!dom.isActive(this.__input)) {
-      this.__input.value = this.getValue();
+    //
+    // This enables editing <input>s while "listen()"ing
+    if (dom.isActive(this.__input)) {
+      return this;
     }
+    this.__input.value = this.getValue();
     return super.updateDisplay();
   }
 }

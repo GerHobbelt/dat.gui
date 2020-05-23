@@ -30,7 +30,8 @@ const css = {
     try {
       head.appendChild(injected);
     } catch (e) {
-      // Unable to inject CSS, probably because of a Content Security Policy
+      // At least log this error in the browser console:
+      console.error("Unable to inject CSS, probably because of a Content Security Policy");
     }
   },
 };

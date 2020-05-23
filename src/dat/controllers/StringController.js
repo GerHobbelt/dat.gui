@@ -17,10 +17,12 @@ import dom from "../dom/dom";
 /**
  * @class Provides a text input to alter the string property of an object.
  *
- * @extends dat.controllers.Controller
+ * @extends Controller
  *
  * @param {Object} object The object to be manipulated
  * @param {string} property The name of the property to be manipulated
+ *
+ * @member dat.controllers
  */
 class StringController extends Controller {
   constructor(object, property) {
@@ -29,12 +31,22 @@ class StringController extends Controller {
     const _this = this;
 
     function onChange() {
-      if (!_this._readonly) _this.setValue(_this.__input.value);
+      if (!_this._readonly) {
+        _this.setValue(_this.__input.value);
+      }
     }
 
     function onBlur() {
       if (_this.__onFinishChange) {
         _this.__onFinishChange.call(_this, _this.getValue());
+      }
+    }
+
+    function onKeyDown(e) {
+      if (e.keyCode === 13) {
+        /* jshint validthis: true */
+        this.blur();
+        /* jshint validthis: false */
       }
     }
 
@@ -44,17 +56,7 @@ class StringController extends Controller {
     dom.bind(this.__input, "keyup", onChange, false, true);
     dom.bind(this.__input, "change", onChange, false, true);
     dom.bind(this.__input, "blur", onBlur, false, true);
-    dom.bind(
-      this.__input,
-      "keydown",
-      function (e) {
-        if (e.keyCode === 13) {
-          this.blur();
-        }
-      },
-      false,
-      true
-    );
+    dom.bind(this.__input, "keydown", onKeyDown, false, true);
 
     this.updateDisplay();
 

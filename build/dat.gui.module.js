@@ -16,7 +16,7 @@ function colorToString(color, forceCSSHex) {
   var r = Math.round(color.r);
   var g = Math.round(color.g);
   var b = Math.round(color.b);
-  var a = color.a;
+  var a = color.a >= 1 || color.a == null ? 1 : color.a;
   var h = Math.round(color.h);
   var s = color.s.toFixed(1);
   var v = color.v.toFixed(1);
@@ -64,14 +64,11 @@ var Common = {
     this.each(
       ARR_SLICE.call(arguments, 1),
       function (obj) {
-        var keys = this.isObject(obj) ? Object.keys(obj) : [];
-        keys.forEach(
-          function (key) {
-            if (!this.isUndefined(obj[key])) {
-              target[key] = obj[key];
-            }
-          }.bind(this)
-        );
+        for (var key in obj) {
+          if (!this.isUndefined(obj[key])) {
+            target[key] = obj[key];
+          }
+        }
       },
       this
     );
@@ -81,14 +78,11 @@ var Common = {
     this.each(
       ARR_SLICE.call(arguments, 1),
       function (obj) {
-        var keys = this.isObject(obj) ? Object.keys(obj) : [];
-        keys.forEach(
-          function (key) {
-            if (this.isUndefined(target[key])) {
-              target[key] = obj[key];
-            }
-          }.bind(this)
-        );
+        for (var key in obj) {
+          if (this.isUndefined(target[key])) {
+            target[key] = obj[key];
+          }
+        }
       },
       this
     );
@@ -111,16 +105,14 @@ var Common = {
     if (obj.forEach) {
       obj.forEach(itr, scope);
     } else if (obj.length === obj.length + 0) {
-      var key;
-      var l;
-      for (key = 0, l = obj.length; key < l; key++) {
+      for (var key = 0, l = obj.length; key < l; key++) {
         if (key in obj && itr.call(scope, obj[key], key) === this.BREAK) {
           return;
         }
       }
     } else {
-      for (var _key in obj) {
-        if (itr.call(scope, obj[_key], _key) === this.BREAK) {
+      for (var objkey in obj) {
+        if (itr.call(scope, obj[objkey], objkey) === this.BREAK) {
           return;
         }
       }
@@ -147,7 +139,9 @@ var Common = {
     };
   },
   toArray: function toArray(obj) {
-    if (obj.toArray) return obj.toArray();
+    if (obj.toArray) {
+      return obj.toArray();
+    }
     return ARR_SLICE.call(obj);
   },
   isUndefined: function isUndefined(obj) {
@@ -167,16 +161,17 @@ var Common = {
   })(function (obj) {
     return isNaN(obj);
   }),
-  isArray:
-    Array.isArray ||
-    function (obj) {
-      return obj.constructor === Array;
-    },
+  isArray: function isArray(obj) {
+    return obj != null && obj.length >= 0 && typeof obj === "object";
+  },
   isObject: function isObject(obj) {
     return obj === Object(obj);
   },
   isNumber: function isNumber(obj) {
     return obj === obj + 0;
+  },
+  isFiniteNumber: function isFiniteNumber(obj) {
+    return obj === +obj && isFinite(obj);
   },
   isString: function isString(obj) {
     return obj === obj + "";
@@ -747,8 +742,8 @@ var dom = {
       elem.style.bottom = 0;
     }
   },
-  fakeEvent: function fakeEvent(elem, eventType, pars, aux) {
-    var params = pars || {};
+  fakeEvent: function fakeEvent(elem, eventType, params, aux) {
+    params = params || {};
     var className = EVENT_MAP_INV[eventType];
     if (!className) {
       throw new Error("Event type " + eventType + " not supported.");
@@ -810,9 +805,9 @@ var dom = {
     Common.defaults(evt, aux);
     elem.dispatchEvent(evt);
   },
-  bind: function bind(elem, event, func, newBool, newPassive) {
-    var bool = newBool || false;
-    var passive = newPassive || false;
+  bind: function bind(elem, event, func, bool, passive) {
+    bool = bool || false;
+    passive = passive || false;
     if (elem.addEventListener) {
       var listenerArg = Common.supportsPassive()
         ? {
@@ -826,8 +821,8 @@ var dom = {
     }
     return dom;
   },
-  unbind: function unbind(elem, event, func, newBool) {
-    var bool = newBool || false;
+  unbind: function unbind(elem, event, func, bool) {
+    bool = bool || false;
     if (elem.removeEventListener) {
       elem.removeEventListener(event, func, bool);
     } else if (elem.detachEvent) {
@@ -951,10 +946,9 @@ var BooleanController = (function (_Controller) {
 
 var OptionController = (function (_Controller) {
   _inheritsLoose(OptionController, _Controller);
-  function OptionController(object, property, opts) {
+  function OptionController(object, property, options) {
     var _this2;
     _this2 = _Controller.call(this, object, property) || this;
-    var options = opts;
     var _this = _assertThisInitialized(_this2);
     _this2.__select = document.createElement("select");
     if (Common.isArray(options)) {
@@ -986,7 +980,9 @@ var OptionController = (function (_Controller) {
   }
   var _proto = OptionController.prototype;
   _proto.setValue = function setValue(v) {
-    if (this._readonly) return this.getValue();
+    if (this._readonly) {
+      return this.getValue();
+    }
     var toReturn = _Controller.prototype.setValue.call(this, v);
     if (this.__onFinishChange) {
       this.__onFinishChange.call(this, this.getValue());
@@ -994,7 +990,9 @@ var OptionController = (function (_Controller) {
     return toReturn;
   };
   _proto.updateDisplay = function updateDisplay(force) {
-    if (!force && dom.isActive(this.__select) && !this.forceUpdateDisplay) return this;
+    if (!force && dom.isActive(this.__select) && !this.forceUpdateDisplay) {
+      return this;
+    }
     this.__select.value = this.getValue();
     return _Controller.prototype.updateDisplay.call(this, force);
   };
@@ -1008,11 +1006,18 @@ var StringController = (function (_Controller) {
     _this2 = _Controller.call(this, object, property) || this;
     var _this = _assertThisInitialized(_this2);
     function onChange() {
-      if (!_this._readonly) _this.setValue(_this.__input.value);
+      if (!_this._readonly) {
+        _this.setValue(_this.__input.value);
+      }
     }
     function onBlur() {
       if (_this.__onFinishChange) {
         _this.__onFinishChange.call(_this, _this.getValue());
+      }
+    }
+    function onKeyDown(e) {
+      if (e.keyCode === 13) {
+        this.blur();
       }
     }
     _this2.__input = document.createElement("input");
@@ -1020,17 +1025,7 @@ var StringController = (function (_Controller) {
     dom.bind(_this2.__input, "keyup", onChange, false, true);
     dom.bind(_this2.__input, "change", onChange, false, true);
     dom.bind(_this2.__input, "blur", onBlur, false, true);
-    dom.bind(
-      _this2.__input,
-      "keydown",
-      function (e) {
-        if (e.keyCode === 13) {
-          this.blur();
-        }
-      },
-      false,
-      true
-    );
+    dom.bind(_this2.__input, "keydown", onKeyDown, false, true);
     _this2.updateDisplay();
     _this2.domElement.appendChild(_this2.__input);
     return _this2;
@@ -1057,10 +1052,10 @@ var NumberController = (function (_Controller) {
   function NumberController(object, property, params) {
     var _this;
     _this = _Controller.call(this, object, property) || this;
-    var _params = params || {};
-    _this.__min = _params.min;
-    _this.__max = _params.max;
-    _this.__step = _params.step;
+    params = params || {};
+    _this.__min = params.min;
+    _this.__max = params.max;
+    _this.__step = params.step;
     if (Common.isUndefined(_this.__step)) {
       if (_this.initialValue === 0) {
         _this.__impliedStep = 1;
@@ -1075,16 +1070,15 @@ var NumberController = (function (_Controller) {
   }
   var _proto = NumberController.prototype;
   _proto.setValue = function setValue(v) {
-    var _v = v;
-    if (this.__min !== undefined && _v < this.__min) {
-      _v = this.__min;
-    } else if (this.__max !== undefined && _v > this.__max) {
-      _v = this.__max;
+    if (this.__min != null && v < this.__min) {
+      v = this.__min;
+    } else if (this.__max != null && v > this.__max) {
+      v = this.__max;
     }
-    if (this.__step !== undefined && _v % this.__step !== 0) {
-      _v = Math.round(_v / this.__step) * this.__step;
+    if (this.__step != null && v % this.__step !== 0) {
+      v = Math.round(v / this.__step) * this.__step;
     }
-    return _Controller.prototype.setValue.call(this, _v);
+    return _Controller.prototype.setValue.call(this, v);
   };
   _proto.min = function min(minValue) {
     this.__min = minValue;
@@ -1112,18 +1106,11 @@ var NumberControllerBox = (function (_NumberController) {
   function NumberControllerBox(object, property, params) {
     var _this2;
     _this2 = _NumberController.call(this, object, property, params) || this;
+    params = params || {};
     _this2.__truncationSuspended = false;
     var _this = _assertThisInitialized(_this2);
     _this2.__suspendUpdate = false;
     var prevY;
-    _this2.__input = document.createElement("input");
-    _this2.__input.setAttribute("type", "number");
-    dom.bind(_this2.__input, "focus", onFocus, false, true);
-    dom.bind(_this2.__input, "change", onChange, false, true);
-    dom.bind(_this2.__input, "blur", onBlur, false, true);
-    dom.bind(_this2.__input, "mousedown", onMouseDown, false, true);
-    dom.bind(_this2.__input, "wheel", onWheel);
-    dom.bind(_this2.__input, "keydown", onKeyDown, false, true);
     function onChange() {
       var attempted = parseFloat(_this.__input.value);
       if (!Common.isNaN(attempted) && !_this._readonly) {
@@ -1183,6 +1170,14 @@ var NumberControllerBox = (function (_NumberController) {
       var direction = -e.deltaY >> 10 || 1;
       _this.setValue(_this.getValue() + direction * _this.__impliedStep);
     }
+    _this2.__input = document.createElement("input");
+    _this2.__input.setAttribute("type", "number");
+    dom.bind(_this2.__input, "focus", onFocus, false, true);
+    dom.bind(_this2.__input, "change", onChange, false, true);
+    dom.bind(_this2.__input, "blur", onBlur, false, true);
+    dom.bind(_this2.__input, "mousedown", onMouseDown, false, true);
+    dom.bind(_this2.__input, "wheel", onWheel);
+    dom.bind(_this2.__input, "keydown", onKeyDown, false, true);
     _this2.updateDisplay();
     _this2.domElement.appendChild(_this2.__input);
     return _this2;
@@ -1229,7 +1224,9 @@ var NumberControllerSlider = (function (_NumberController) {
     function onMouseDrag(e) {
       e.preventDefault();
       var bgRect = _this.__background.getBoundingClientRect();
-      if (!_this._readonly) _this.setValue(map(e.clientX, bgRect.left, bgRect.right, _this.__min, _this.__max));
+      if (!_this._readonly) {
+        _this.setValue(map(e.clientX, bgRect.left, bgRect.right, _this.__min, _this.__max));
+      }
       return false;
     }
     function onMouseUp() {
@@ -1250,7 +1247,9 @@ var NumberControllerSlider = (function (_NumberController) {
     function onTouchMove(e) {
       var clientX = e.touches[0].clientX;
       var bgRect = _this.__background.getBoundingClientRect();
-      if (!_this._readonly) _this.setValue(map(clientX, bgRect.left, bgRect.right, _this.__min, _this.__max));
+      if (!_this._readonly) {
+        _this.setValue(map(clientX, bgRect.left, bgRect.right, _this.__min, _this.__max));
+      }
     }
     function onTouchEnd() {
       dom.unbind(window, "touchmove", onTouchMove);
@@ -1271,7 +1270,8 @@ var NumberControllerSlider = (function (_NumberController) {
   }
   var _proto = NumberControllerSlider.prototype;
   _proto.updateDisplay = function updateDisplay() {
-    var pct = (this.getValue() - this.__min) / (this.__max - this.__min);
+    var value = this.getValue();
+    var pct = (value - this.__min) / (this.__max - this.__min);
     this.__foreground.style.width = pct * 100 + "%";
     return _NumberController.prototype.updateDisplay.call(this);
   };
@@ -1317,7 +1317,6 @@ var ColorController = (function (_Controller) {
     _this2.__color = new Color(_this2.getValue());
     _this2.__temp = new Color(0);
     var _this = _assertThisInitialized(_this2);
-    _this2.domElement = document.createElement("div");
     dom.makeSelectable(_this2.domElement, false);
     _this2.__selector = document.createElement("div");
     _this2.__selector.className = "selector";
@@ -1348,8 +1347,8 @@ var ColorController = (function (_Controller) {
     dom.bind(
       _this2.__selector,
       "mousedown",
-      function () {
-        dom.addClass(this, "drag").bind(window, "mouseup", function () {
+      function (e) {
+        dom.addClass(this, "drag").bind(window, "mouseup", function (e) {
           dom.removeClass(_this.__selector, "drag");
         });
       },
@@ -1544,7 +1543,7 @@ var ColorController = (function (_Controller) {
             i[component] !== this.__color.__state[component]
           ) {
             mismatch = true;
-            return {};
+            return Common.BREAK;
           }
         },
         this
@@ -1681,30 +1680,10 @@ var PlotterController = (function (_Controller) {
   return PlotterController;
 })(Controller);
 
-var css = {
-  load: function load(url, indoc) {
-    var doc = indoc || document;
-    var link = doc.createElement("link");
-    link.type = "text/css";
-    link.rel = "stylesheet";
-    link.href = url;
-    doc.getElementsByTagName("head")[0].appendChild(link);
-  },
-  inject: function inject(cssContent, indoc) {
-    var doc = indoc || document;
-    var injected = document.createElement("style");
-    injected.type = "text/css";
-    injected.innerHTML = cssContent;
-    var head = doc.getElementsByTagName("head")[0];
-    try {
-      head.appendChild(injected);
-    } catch (e) {}
-  },
-};
-
 var saveDialogueContents =
-  '<div id="dg-save" class="dg dialogue">\n  Here\'s the new load parameter for your <code>GUI</code>\'s constructor:\n\n  <textarea id="dg-new-constructor"></textarea>\n\n  <div id="dg-save-locally">\n    <input id="dg-local-storage" type="checkbox"> Automatically save values to <code>localStorage</code> on exit.\n\n    <div id="dg-local-explain">\n      The values saved to <code>localStorage</code> will override those passed to <code>dat.GUI</code>\'s constructor.\n      This makes it easier to work incrementally, but <code>localStorage</code> is fragile, and your friends may not see\n      the same values you do.\n    </div>\n  </div>\n</div>\n';
+  '<div id="dg-save" class="dg dialogue">\n  Here\'s the new load parameter for your <code>GUI</code>\'s constructor:\n\n  <textarea id="dg-new-constructor"></textarea>\n\n  <div id="dg-save-locally">\n    <input id="dg-local-storage" type="checkbox">\n    Automatically save values to <code>localStorage</code> on exit.\n\n    <div id="dg-local-explain">\n      The values saved to <code>localStorage</code> will override those passed to <code>dat.GUI</code>\'s constructor.\n      This makes it easier to work incrementally, but <code>localStorage</code> is fragile, and your friends may not see\n      the same values you do.\n    </div>\n  </div>\n</div>\n';
 
+var ARR_SLICE$1 = Array.prototype.slice;
 var ControllerFactory = function ControllerFactory(object, property) {
   var initialValue = object[property];
   if (Common.isArray(arguments[2]) || Common.isObject(arguments[2])) {
@@ -1742,7 +1721,11 @@ var ControllerFactory = function ControllerFactory(object, property) {
     return new StringController(object, property);
   }
   if (Common.isFunction(initialValue)) {
-    return new FunctionController(object, property, arguments[2]);
+    var opts = ARR_SLICE$1.call(arguments, 3);
+    if (opts.length === 0) {
+      opts = undefined;
+    }
+    return new FunctionController(object, property, options_1, opts);
   }
   if (Common.isBoolean(initialValue)) {
     return new BooleanController(object, property);
@@ -1892,16 +1875,14 @@ var CenteredDiv = (function () {
   return CenteredDiv;
 })();
 
-var styleSheet = "";
-
-css.inject(styleSheet);
+var ARR_SLICE$2 = Array.prototype.slice;
 var CSS_NAMESPACE = "dg";
 var HIDE_KEY_CODE = 72;
 var CLOSE_BUTTON_HEIGHT = 20;
 var DEFAULT_DEFAULT_PRESET_NAME = "Default";
 var SUPPORTS_LOCAL_STORAGE = (function () {
   try {
-    return !!window.localStorage;
+    return "localStorage" in window && !!window.localStorage;
   } catch (e) {
     return false;
   }
@@ -1911,9 +1892,9 @@ var autoPlaceVirgin = true;
 var autoPlaceContainer;
 var hide = false;
 var hideableGuis = [];
-var GUI = function GUI(pars) {
+var GUI = function GUI(params) {
   var _this = this;
-  var params = pars || {};
+  params = params || {};
   this.domElement = document.createElement("div");
   this.__ul = document.createElement("ul");
   this.domElement.appendChild(this.__ul);
@@ -2023,7 +2004,7 @@ var GUI = function GUI(pars) {
         } else {
           dom.removeClass(_this.__ul, GUI.CLASS_CLOSED);
         }
-        this.onResize();
+        _this.onResize();
         if (_this.__closeButton) {
           if (params.name) {
             _this.__closeButton.innerHTML = params.name;
@@ -2120,13 +2101,13 @@ var GUI = function GUI(pars) {
       setWidth(_this, params.width);
     }
   }
-  this.__resizeHandler = function () {
+  function __resizeHandler() {
     _this.onResizeDebounced();
-  };
-  dom.bind(window, "resize", this.__resizeHandler);
-  dom.bind(this.__ul, "webkitTransitionEnd", this.__resizeHandler);
-  dom.bind(this.__ul, "transitionend", this.__resizeHandler);
-  dom.bind(this.__ul, "oTransitionEnd", this.__resizeHandler);
+  }
+  dom.bind(window, "resize", __resizeHandler);
+  dom.bind(this.__ul, "webkitTransitionEnd", __resizeHandler);
+  dom.bind(this.__ul, "transitionend", __resizeHandler);
+  dom.bind(this.__ul, "oTransitionEnd", __resizeHandler);
   this.onResize();
   if (params.resizable) {
     addResizeHandle(this);
@@ -2173,7 +2154,11 @@ GUI.DEFAULT_WIDTH = 245;
 GUI.TEXT_CLOSED = "Close Controls";
 GUI.TEXT_OPEN = "Open Controls";
 GUI._keydownHandler = function (e) {
-  if (document.activeElement.type !== "text" && (e.which === HIDE_KEY_CODE || e.keyCode === HIDE_KEY_CODE)) {
+  if (
+    document.activeElement &&
+    document.activeElement.type !== "text" &&
+    (e.which === HIDE_KEY_CODE || e.keyCode === HIDE_KEY_CODE)
+  ) {
     GUI.toggleHide();
   }
 };
@@ -2315,7 +2300,7 @@ Common.extend(GUI.prototype, {
       throw new Error("You can only call remember on a top level GUI.");
     }
     var _this = this;
-    Common.each(Array.prototype.slice.call(arguments), function (object) {
+    Common.each(ARR_SLICE$2.call(arguments), function (object) {
       if (_this.__rememberedObjects.length === 0) {
         addSaveMenu(_this);
       }
@@ -2327,6 +2312,7 @@ Common.extend(GUI.prototype, {
       this.width += 40;
       setWidth(this, this.width);
     }
+    return this;
   },
   getRoot: function getRoot() {
     var gui = this;
@@ -2358,6 +2344,7 @@ Common.extend(GUI.prototype, {
     this.load.remembered[this.preset] = getCurrentPreset(this);
     markPresetModified(this, false);
     this.saveToLocalStorageIfPossible();
+    return this;
   },
   saveAs: function saveAs(presetName) {
     if (!this.load.remembered) {
@@ -2368,6 +2355,7 @@ Common.extend(GUI.prototype, {
     this.preset = presetName;
     addPresetOption(this, presetName, true);
     this.saveToLocalStorageIfPossible();
+    return this;
   },
   revert: function revert(gui) {
     Common.each(
@@ -2390,6 +2378,7 @@ Common.extend(GUI.prototype, {
     if (!gui) {
       markPresetModified(this.getRoot(), false);
     }
+    return this;
   },
   deleteSave: function deleteSave() {
     if (this.preset === DEFAULT_DEFAULT_PRESET_NAME || !confirm('Delete preset "' + this.preset + '". Are you sure?')) {
@@ -2405,6 +2394,7 @@ Common.extend(GUI.prototype, {
     if (init) {
       updateDisplays(this.__listening);
     }
+    return this;
   },
   updateDisplay: function updateDisplay() {
     Common.each(this.__controllers, function (controller) {
@@ -2413,6 +2403,7 @@ Common.extend(GUI.prototype, {
     Common.each(this.__folders, function (folder) {
       folder.updateDisplay();
     });
+    return this;
   },
 });
 function addRow(gui, newDom, liBefore) {
@@ -2488,9 +2479,9 @@ function augmentController(gui, li, controller) {
       var pc = controller[method];
       var pb = box[method];
       controller[method] = box[method] = function () {
-        var args = Array.prototype.slice.call(arguments);
-        pb.apply(box, args);
-        return pc.apply(controller, args);
+        var args = ARR_SLICE$2.call(arguments);
+        pc.apply(controller, args);
+        return pb.apply(box, args);
       };
     });
     dom.addClass(li, "has-slider");
@@ -2793,7 +2784,7 @@ function setPresetSelectIndex(gui) {
 }
 function updateDisplays(controllerArray) {
   if (controllerArray.length !== 0) {
-    requestAnimationFrame$1.call(window, function () {
+    requestAnimationFrame$1(function () {
       updateDisplays(controllerArray);
     });
   }

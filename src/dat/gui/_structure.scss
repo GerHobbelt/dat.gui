@@ -1,3 +1,22 @@
+/**
+ * dat.GUI JavaScript Controller Library
+ * http://code.google.com/p/dat-gui
+ *
+ * Copyright 2011-2020 Data Arts Team, Google Creative Lab
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
+// ▐▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▌
+// ▐ Triggering UTF8 file save hack ▌
+// ▐▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▌
+//
+// --------------------------------------------------------------
+
 $nest-margin: 4px;
 $row-height: 27px;
 
@@ -20,6 +39,11 @@ $button-height: 20px;
     left: 0;
     right: 0;
     height: 0;
+    // we make sure the dat.gui sits in its own layer for repaint purposes:
+    // see http://benfrain.com/improving-css-performance-fixed-position-elements/
+    // Note that the backface style here comes from that article but is not
+    // really necessary any more now that we have our layer.
+    // Compare: https://developers.google.com/web/updates/2012/09/Stacking-Changes-Coming-to-position-fixed-elements?hl=en
     z-index: 0;
   }
 
@@ -53,7 +77,7 @@ $button-height: 20px;
     }
 
     .close-button {
-      /* opacity: 0; */
+      // opacity: 0;
       @include transition(opacity, 0.1s, linear);
 
       border: 0;
@@ -162,6 +186,8 @@ $button-height: 20px;
     width: 40%;
     overflow: hidden;
     text-overflow: ellipsis;
+    text-overflow: "…" "…"; // https://developer.mozilla.org/en-US/docs/Web/CSS/text-overflow
+    white-space: nowrap; // otherwise the text will simply wrap and the text-overflow ellipsis will not be applied, but instead the text simply disappears (if only partially)
   }
 
   /** Controller-half (right) */
@@ -187,7 +213,7 @@ $button-height: 20px;
     input[type="number"] {
       width: 30%;
 
-      /* display: none; */
+      // display: none;
       margin-left: 0;
     }
   }
@@ -227,7 +253,7 @@ $button-height: 20px;
 
   /** Ensure the entire boolean and function row shows a hand */
   .cr.function,
-  .cr.function .property-name, /* Don't know why I need to be this explicit */
+  .cr.function .property-name,  // Don't know why I need to be this explicit 
   .cr.function *,
   .cr.boolean,
   .cr.boolean * {

@@ -16,7 +16,7 @@ import dom from "../dom/dom";
 import common from "../utils/common";
 
 function roundToDecimal(value, decimals) {
-  const tenTo = Math.pow(10, decimals);
+  const tenTo = 10 ** decimals;
   return Math.round(value * tenTo) / tenTo;
 }
 
@@ -24,8 +24,8 @@ function roundToDecimal(value, decimals) {
  * @class Represents a given property of an object that is a number and
  * provides an input element with which to manipulate it.
  *
- * @extends dat.controllers.Controller
- * @extends dat.controllers.NumberController
+ * @extends Controller
+ * @extends NumberController
  *
  * @param {Object} object The object to be manipulated
  * @param {string} property The name of the property to be manipulated
@@ -33,10 +33,14 @@ function roundToDecimal(value, decimals) {
  * @param {Number} [params.min] Minimum allowed value
  * @param {Number} [params.max] Maximum allowed value
  * @param {Number} [params.step] Increment by which to change value
+ *
+ * @member dat.controllers
  */
 class NumberControllerBox extends NumberController {
   constructor(object, property, params) {
     super(object, property, params);
+
+    params = params || {};
 
     this.__truncationSuspended = false;
 
@@ -49,18 +53,6 @@ class NumberControllerBox extends NumberController {
      * @ignore
      */
     let prevY;
-
-    this.__input = document.createElement("input");
-    this.__input.setAttribute("type", "number");
-
-    // Makes it so manually specified values are not truncated.
-
-    dom.bind(this.__input, "focus", onFocus, false, true);
-    dom.bind(this.__input, "change", onChange, false, true);
-    dom.bind(this.__input, "blur", onBlur, false, true);
-    dom.bind(this.__input, "mousedown", onMouseDown, false, true);
-    dom.bind(this.__input, "wheel", onWheel);
-    dom.bind(this.__input, "keydown", onKeyDown, false, true);
 
     function onChange() {
       const attempted = parseFloat(_this.__input.value);
@@ -131,7 +123,7 @@ class NumberControllerBox extends NumberController {
       } else {
         switch (e.key) {
           case "Enter": {
-            // When pressing enter, you can be as precise as you want.
+            // When pressing ENTER key, you can be as precise as you want.
             _this.__truncationSuspended = true;
             this.blur();
             _this.__truncationSuspended = false;
@@ -158,6 +150,18 @@ class NumberControllerBox extends NumberController {
       const direction = -e.deltaY >> 10 || 1;
       _this.setValue(_this.getValue() + direction * _this.__impliedStep);
     }
+
+    this.__input = document.createElement("input");
+    this.__input.setAttribute("type", "number");
+
+    // Makes it so manually specified values are not truncated.
+
+    dom.bind(this.__input, "focus", onFocus, false, true);
+    dom.bind(this.__input, "change", onChange, false, true);
+    dom.bind(this.__input, "blur", onBlur, false, true);
+    dom.bind(this.__input, "mousedown", onMouseDown, false, true);
+    dom.bind(this.__input, "wheel", onWheel);
+    dom.bind(this.__input, "keydown", onKeyDown, false, true);
 
     this.updateDisplay();
 

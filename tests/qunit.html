@@ -920,20 +920,10 @@
 
         test("Auto placement", function () {
           const gui = new GUI();
-          gui.add(
-            {
-              x: 0,
-            },
-            "x"
-          );
+          gui.add({ x: 0 }, "x");
 
           const gui2 = new GUI();
-          gui2.add(
-            {
-              x: 0,
-            },
-            "x"
-          );
+          gui2.add({ x: 0 }, "x");
 
           equal($(".dg.ac").length, 1, "A single auto-place container created");
           equal($(".dg.ac").children().length, 2, "Containing two GUI's");
@@ -957,12 +947,7 @@
 
           // Add a lot of controllers. This will fail if you have some freakishly tall monitor.
           for (let i = 0; i < 100; i++) {
-            gui.add(
-              {
-                x: 0,
-              },
-              "x"
-            );
+            gui.add({ x: 0 }, "x");
           }
 
           setTimeout(function () {
@@ -1005,22 +990,12 @@
 
         test("Folders", function () {
           const gui = new GUI();
-          gui.add(
-            {
-              x: 0,
-            },
-            "x"
-          );
+          gui.add({ x: 0 }, "x");
 
           const name1 = "name";
           const f1 = gui.addFolder(name1);
 
-          f1.add(
-            {
-              x: 0,
-            },
-            "x"
-          );
+          f1.add({ x: 0 }, "x");
 
           equal(f1.name, name1, "Accepts name");
           equal($(f1.domElement).find("li.title").html(), name1, "Displays name");
@@ -1048,14 +1023,7 @@
         test("options", function () {
           const gui = new GUI();
 
-          let controller = gui
-            .add(
-              {
-                x: 0,
-              },
-              "x"
-            )
-            .options(0, 1, 2, 3, 4);
+          let controller = gui.add({ x: 0 }, "x").options(0, 1, 2, 3, 4);
 
           $(controller.__select)
             .children()
@@ -1064,20 +1032,13 @@
               equals(value.value, key, "By array value okay");
             });
 
-          controller = gui
-            .add(
-              {
-                x: 0,
-              },
-              "x"
-            )
-            .options({
-              0: "0",
-              1: "1",
-              2: "2",
-              3: "3",
-              4: "4",
-            });
+          controller = gui.add({ x: 0 }, "x").options({
+            0: "0",
+            1: "1",
+            2: "2",
+            3: "3",
+            4: "4",
+          });
 
           $(controller.__select)
             .children()
@@ -1095,14 +1056,7 @@
           const name = "hey man";
           const name2 = "yoyoo";
 
-          const controller = gui
-            .add(
-              {
-                x: 0,
-              },
-              "x"
-            )
-            .name(name);
+          const controller = gui.add({ x: 0 }, "x").name(name);
 
           equals($(controller.__li).find(".property-name").html(), name);
 
@@ -1115,9 +1069,7 @@
         test("listen", function () {
           const gui = new GUI();
 
-          const obj = {
-            x: 0,
-          };
+          const obj = { x: 0 };
 
           const returned1 = gui.add(obj, "x");
           const returned2 = returned1.listen();
@@ -1135,12 +1087,7 @@
         test("remove", function () {
           const gui = new GUI();
 
-          const c = gui.add(
-            {
-              x: 0,
-            },
-            "x"
-          );
+          const c = gui.add({ x: 0 }, "x");
 
           ok($.contains(gui.domElement, c.domElement), "Now you see it");
           c.remove();
@@ -1170,12 +1117,7 @@
           const max = 200;
           const step = 5;
 
-          const c = gui.add(
-            {
-              x: 0,
-            },
-            "x"
-          );
+          const c = gui.add({ x: 0 }, "x");
 
           c.min(min);
           equals(c.__min, min, "min");
@@ -1200,14 +1142,7 @@
         test("Adds NumberControllerBox to sliders", function () {
           const gui = new GUI();
 
-          const c = gui.add(
-            {
-              x: 0,
-            },
-            "x",
-            0,
-            10
-          );
+          const c = gui.add({ x: 0 }, "x", 0, 10);
 
           ok($(c.__li).find("input").length > 0, "NumberControllerBox added");
 
@@ -1217,12 +1152,7 @@
         test("Clickable rows for BooleanControllers", function () {
           const gui = new GUI();
 
-          const c = gui.add(
-            {
-              x: false,
-            },
-            "x"
-          );
+          const c = gui.add({ x: false }, "x");
 
           equal(c.__checkbox.checked, false, "Acknowledges original");
 

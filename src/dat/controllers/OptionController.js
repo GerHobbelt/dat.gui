@@ -19,24 +19,24 @@ import common from "../utils/common";
  * @class Provides a select input to alter the property of an object, using a
  * list of accepted values.
  *
- * @extends dat.controllers.Controller
+ * @extends Controller
  *
  * @param {Object} object The object to be manipulated
  * @param {string} property The name of the property to be manipulated
  * @param {Object|string[]} options A map of labels to acceptable values, or
  * a list of acceptable string values.
+ *
+ * @member dat.controllers
  */
 class OptionController extends Controller {
-  constructor(object, property, opts) {
+  constructor(object, property, options) {
     super(object, property);
-
-    let options = opts;
 
     const _this = this;
 
     /**
      * The drop down menu
-     * @ignore
+     * @private
      */
     this.__select = document.createElement("select");
 
@@ -73,7 +73,9 @@ class OptionController extends Controller {
   }
 
   setValue(v) {
-    if (this._readonly) return this.getValue();
+    if (this._readonly) {
+      return this.getValue();
+    }
     const toReturn = super.setValue(v);
 
     if (this.__onFinishChange) {
@@ -83,7 +85,10 @@ class OptionController extends Controller {
   }
 
   updateDisplay(force) {
-    if (!force && dom.isActive(this.__select) && !this.forceUpdateDisplay) return this; // prevent number from updating if user is trying to manually update
+    // prevent number from updating if user is trying to manually update
+    if (!force && dom.isActive(this.__select) && !this.forceUpdateDisplay) {
+      return this;
+    }
     this.__select.value = this.getValue();
     return super.updateDisplay(force);
   }

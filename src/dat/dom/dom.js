@@ -80,7 +80,6 @@ const dom = {
     if (common.isUndefined(horizontal)) {
       horizontal = true;
     }
-
     if (common.isUndefined(vertical)) {
       vertical = true;
     }
@@ -103,8 +102,8 @@ const dom = {
    * @param eventType
    * @param params
    */
-  fakeEvent: function (elem, eventType, pars, aux) {
-    const params = pars || {};
+  fakeEvent: function (elem, eventType, params, aux) {
+    params = params || {};
     const className = EVENT_MAP_INV[eventType];
     if (!className) {
       throw new Error("Event type " + eventType + " not supported.");
@@ -174,11 +173,16 @@ const dom = {
    * @param func
    * @param bool
    */
-  bind: function (elem, event, func, newBool, newPassive) {
-    const bool = newBool || false;
-    const passive = newPassive || false;
+  bind: function (elem, event, func, bool, passive) {
+    bool = bool || false;
+    passive = passive || false;
     if (elem.addEventListener) {
-      const listenerArg = common.supportsPassive() ? { capture: bool, passive: passive } : bool;
+      const listenerArg = common.supportsPassive()
+        ? {
+            capture: bool,
+            passive: passive,
+          }
+        : bool;
       elem.addEventListener(event, func, listenerArg);
     } else if (elem.attachEvent) {
       elem.attachEvent("on" + event, func);
@@ -193,8 +197,8 @@ const dom = {
    * @param func
    * @param bool
    */
-  unbind: function (elem, event, func, newBool) {
-    const bool = newBool || false;
+  unbind: function (elem, event, func, bool) {
+    bool = bool || false;
     if (elem.removeEventListener) {
       elem.removeEventListener(event, func, bool);
     } else if (elem.detachEvent) {
@@ -228,8 +232,9 @@ const dom = {
    */
   removeClass: function (elem, className) {
     if (className) {
+      /* jshint -W035 */ // jshint: ignore empty block
       if (elem.className === undefined) {
-        // elem.className = className;
+        // elem.className = undefined;
       } else if (elem.className === className) {
         elem.removeAttribute("class");
       } else {
@@ -240,6 +245,7 @@ const dom = {
           elem.className = classes.join(" ");
         }
       }
+      /* jshint +W035 */
     } else {
       elem.className = undefined;
     }

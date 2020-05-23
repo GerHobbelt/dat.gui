@@ -933,6 +933,9 @@
       return toReturn;
     };
     _proto.updateDisplay = function updateDisplay() {
+      if (dom.isActive(this.__select)) {
+        return this;
+      }
       this.__select.value = this.getValue();
       return _Controller.prototype.updateDisplay.call(this);
     };
@@ -945,6 +948,14 @@
       var _this2;
       _this2 = _Controller.call(this, object, property) || this;
       var _this = _assertThisInitialized(_this2);
+      function onChange() {
+        _this.setValue(_this.__input.value);
+      }
+      function onBlur() {
+        if (_this.__onFinishChange) {
+          _this.__onFinishChange.call(_this, _this.getValue());
+        }
+      }
       function onKeyDown(e) {
         if (e.keyCode === 13) {
           this.blur();
@@ -956,23 +967,16 @@
       dom.bind(_this2.__input, "change", onChange);
       dom.bind(_this2.__input, "blur", onBlur);
       dom.bind(_this2.__input, "keydown", onKeyDown);
-      function onChange() {
-        _this.setValue(_this.__input.value);
-      }
-      function onBlur() {
-        if (_this.__onFinishChange) {
-          _this.__onFinishChange.call(_this, _this.getValue());
-        }
-      }
       _this2.updateDisplay();
       _this2.domElement.appendChild(_this2.__input);
       return _this2;
     }
     var _proto = StringController.prototype;
     _proto.updateDisplay = function updateDisplay() {
-      if (!dom.isActive(this.__input)) {
-        this.__input.value = this.getValue();
+      if (dom.isActive(this.__input)) {
+        return this;
       }
+      this.__input.value = this.getValue();
       return _Controller.prototype.updateDisplay.call(this);
     };
     return StringController;
@@ -1047,25 +1051,20 @@
       _this2.__truncationSuspended = false;
       var _this = _assertThisInitialized(_this2);
       var prev_y;
-      _this2.__input = document.createElement("input");
-      _this2.__input.setAttribute("type", "text");
-      dom.bind(_this2.__input, "change", onChange);
-      dom.bind(_this2.__input, "blur", onBlur);
-      dom.bind(_this2.__input, "mousedown", onMouseDown);
-      dom.bind(_this2.__input, "keydown", function (e) {
+      function onKeyDown(e) {
         if (e.keyCode === 13) {
           _this.__truncationSuspended = true;
           this.blur();
           _this.__truncationSuspended = false;
         }
-      });
-      function onChange() {
+      }
+      function onChange(e) {
         var attempted = parseFloat(_this.__input.value);
         if (!Common.isNaN(attempted)) {
           _this.setValue(attempted);
         }
       }
-      function onBlur() {
+      function onBlur(e) {
         onChange();
         if (_this.__onFinishChange) {
           _this.__onFinishChange.call(_this, _this.getValue());
@@ -1081,21 +1080,28 @@
         _this.setValue(_this.getValue() + diff * _this.__impliedStep);
         prev_y = e.clientY;
       }
-      function onMouseUp() {
+      function onMouseUp(e) {
         dom.unbind(window, "mousemove", onMouseDrag);
         dom.unbind(window, "mouseup", onMouseUp);
       }
+      _this2.__input = document.createElement("input");
+      _this2.__input.setAttribute("type", "text");
+      dom.bind(_this2.__input, "change", onChange);
+      dom.bind(_this2.__input, "blur", onBlur);
+      dom.bind(_this2.__input, "mousedown", onMouseDown);
+      dom.bind(_this2.__input, "keydown", onKeyDown);
       _this2.updateDisplay();
       _this2.domElement.appendChild(_this2.__input);
       return _this2;
     }
     var _proto = NumberControllerBox.prototype;
     _proto.updateDisplay = function updateDisplay() {
-      if (!dom.isActive(this.__input)) {
-        this.__input.value = this.__truncationSuspended
-          ? this.getValue()
-          : roundToDecimal(this.getValue(), this.__precision);
+      if (dom.isActive(this.__input)) {
+        return this;
       }
+      this.__input.value = this.__truncationSuspended
+        ? this.getValue()
+        : roundToDecimal(this.getValue(), this.__precision);
       return _NumberController.prototype.updateDisplay.call(this);
     };
     return NumberControllerBox;
@@ -1132,7 +1138,7 @@
         _this.setValue(map(e.clientX, offset.left, offset.left + width, _this.__min, _this.__max));
         return false;
       }
-      function onMouseUp() {
+      function onMouseUp(e) {
         dom.unbind(window, "mousemove", onMouseDrag);
         dom.unbind(window, "mouseup", onMouseUp);
         if (_this.__onFinishChange) {
@@ -1145,9 +1151,6 @@
       return _this2;
     }
     var _proto = NumberControllerSlider.prototype;
-    _proto.useDefaultStyles = function useDefaultStyles() {
-      css.inject(styleSheet);
-    };
     _proto.updateDisplay = function updateDisplay() {
       var value = this.getValue();
       var pct = (value - this.__min) / (this.__max - this.__min);

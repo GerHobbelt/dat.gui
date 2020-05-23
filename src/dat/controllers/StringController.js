@@ -30,6 +30,16 @@ class StringController extends Controller {
 
     const _this = this;
 
+    function onChange() {
+      _this.setValue(_this.__input.value);
+    }
+
+    function onBlur() {
+      if (_this.__onFinishChange) {
+        _this.__onFinishChange.call(_this, _this.getValue());
+      }
+    }
+
     function onKeyDown(e) {
       if (e.keyCode === 13) {
         /* jshint validthis: true */
@@ -46,16 +56,6 @@ class StringController extends Controller {
     dom.bind(this.__input, "blur", onBlur);
     dom.bind(this.__input, "keydown", onKeyDown);
 
-    function onChange() {
-      _this.setValue(_this.__input.value);
-    }
-
-    function onBlur() {
-      if (_this.__onFinishChange) {
-        _this.__onFinishChange.call(_this, _this.getValue());
-      }
-    }
-
     this.updateDisplay();
 
     this.domElement.appendChild(this.__input);
@@ -64,9 +64,12 @@ class StringController extends Controller {
   updateDisplay() {
     // Stops the caret from moving on account of:
     // keyup -> setValue -> updateDisplay
-    if (!dom.isActive(this.__input)) {
-      this.__input.value = this.getValue();
+    //
+    // This enables editing <input>s while "listen()"ing
+    if (dom.isActive(this.__input)) {
+      return this;
     }
+    this.__input.value = this.getValue();
     return super.updateDisplay();
   }
 }

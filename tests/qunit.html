@@ -20,12 +20,33 @@
         const { BooleanController } = dat.controllers;
         const { OptionController } = dat.controllers;
         const { StringController } = dat.controllers;
+        const { ArrayController } = dat.controllers;
         const { NumberController } = dat.controllers;
         const { NumberControllerBox } = dat.controllers;
         const { NumberControllerSlider } = dat.controllers;
         const { FunctionController } = dat.controllers;
         const { ColorController } = dat.controllers;
+        const { CustomController } = dat.controllers;
         const { GUI } = dat.gui;
+
+        function match(a, b, msg) {
+          for (const i in b) {
+            if (Number.isNaN(b[i])) {
+              ok(Number.isNaN(a[i]), msg);
+            } else {
+              equal(b[i], a[i], msg);
+            }
+          }
+        }
+
+        function equalish(a, b, tolerance, label) {
+          return ok(Math.abs(a - b) < tolerance, label);
+        }
+
+        // disabled tests are renamed to xxxtest():
+        function xxxtest(description, f) {
+          console.warn("Disabled test: ", description);
+        }
 
         module("Color Math");
 
@@ -324,11 +345,7 @@
         });
 
         test("Setting HSV, Modifying RGB", function () {
-          const c = new Color({
-            h: 340,
-            s: 0.3,
-            v: 0.9,
-          });
+          const c = new Color({ h: 340, s: 0.3, v: 0.9 });
 
           c.g = 0;
 
@@ -362,24 +379,11 @@
           equal(c.h, prevHue, "black, hue intact");
         });
 
-        function match(a, b, msg) {
-          for (const i in b) {
-            if (b[i] !== b[i]) {
-              ok(a[i] !== a[i], msg);
-            } else {
-              equal(b[i], a[i], msg);
-            }
-          }
-        }
-
-        function equalish(a, b, tolerance, label) {
-          return ok(Math.abs(a - b) < tolerance, label);
-        }
-
         function initObject() {
           return {
             numberProperty: 10,
             stringProperty: "foo",
+            arrayProperty: [0, 0, 0],
             booleanProperty: false,
             functionProperty: function () {
               // do something
@@ -426,6 +430,8 @@
           const c2 = new BooleanController(object, "anotherBooleanProperty");
 
           equal(c1.__checkbox.checked, object.booleanProperty);
+
+          console.log(c2.__checkbox.getAttribute("checked"));
 
           equal(c2.__checkbox.getAttribute("checked") === "checked", object.anotherBooleanProperty);
         });
@@ -577,15 +583,50 @@
           equal(newVal, object.stringProperty);
         });
 
+        module("ArrayController");
+
+        test("Acknowledges original value", function () {
+          const object = initObject();
+          const c1 = new ArrayController(object, "arrayProperty");
+
+          const a = [];
+          $(c1.__inputs).each(function (idx) {
+            const el = $(c1.__inputs)[idx];
+            let v = $(el).val();
+            if (!Number.isNaN(parseFloat(v))) {
+              v = parseFloat(v);
+            }
+            a.push(v);
+          });
+          console.log({ a, b: object.arrayProperty });
+          deepEqual(a, object.arrayProperty);
+        });
+
+        test("Modifies values", function () {
+          const object = initObject();
+          const c1 = new ArrayController(object, "arrayProperty");
+
+          const newVal = [1, "a", true];
+
+          $(c1.__inputs).each(function (idx) {
+            const el = $(c1.__inputs)[idx];
+            const elem = $(el).val(newVal[idx])[0];
+            // dom.fakeEvent(elem, "change");
+          });
+          const elem = $(c1.__inputs)[0];
+          dom.fakeEvent(elem, "change");
+
+          // WARNING: ArrayController does not detect 'value type': everything is produced as string value:
+          equal("1", object.arrayProperty[0]);
+          equal("a", object.arrayProperty[1]);
+          equal("true", object.arrayProperty[2]);
+        });
+
         module("NumberController");
 
         test("Constraints", function () {
           const object = initObject();
-          const params = {
-            min: 0,
-            max: 10,
-            step: 2,
-          };
+          const params = { min: 0, max: 10, step: 2 };
 
           const c1 = new NumberController(object, "numberProperty", params);
 
@@ -640,12 +681,8 @@
         });
 
         test("Handles drag", function () {
-          const object = {
-            numberProperty: 0,
-          };
-          const params = {
-            step: Math.random() * 21,
-          };
+          const object = { numberProperty: 0 };
+          const params = { step: Math.random() * 21 };
 
           const c1 = new NumberControllerBox(object, "numberProperty", params);
 
@@ -753,7 +790,7 @@
           document.body.removeChild(c1.domElement);
         });
 
-        xxxtest("Set Color", function () {
+        test("Set Color", function () {
           // get from click, get from hover
           const object = initObject();
           const c1 = new ColorController(object, "colorProperty");
@@ -772,6 +809,25 @@
           // click hue slider
 
           equal(1, 0, "TODO: add set color tests.");
+
+          document.body.removeChild(c1.domElement);
+        });
+
+        module("CustomController");
+
+        test("Get Custom", function () {
+          const value = "value";
+          const c1 = new CustomController({
+            constructor: function (controller) {
+              const input = document.createElement("input");
+              input.value = value;
+              controller.domElement.appendChild(input);
+            },
+          });
+          document.body.appendChild(c1.domElement);
+
+          const input = c1.domElement.getElementsByTagName("input")[0];
+          equal(input.value, value, "Input value is the same as the " + value);
 
           document.body.removeChild(c1.domElement);
         });
@@ -911,10 +967,6 @@
 
           ok(c2_changed, "StringController fires when needed.");
         });
-
-        function equalish(a, b, tolerance, label) {
-          return ok(Math.abs(a - b) < tolerance, label);
-        }
 
         module("GUI Appearance");
 

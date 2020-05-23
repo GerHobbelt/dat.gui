@@ -5,6 +5,51 @@ hands-on examples, see the dat.GUI [tutorial](http://workshop.chromeexperiments.
 
 <!--- API BEGIN --->
 
+## Classes
+
+<dl>
+<dt><a href="#GUI">GUI</a></dt>
+<dd><p>A lightweight controller library for JavaScript. It allows you to easily
+manipulate variables and fire functions on the fly.</p>
+</dd>
+</dl>
+
+## Members
+
+<dl>
+<dt><a href="#autoPlaceVirgin">autoPlaceVirgin</a></dt>
+<dd><p>Have we yet to create an autoPlace GUI?</p>
+</dd>
+<dt><a href="#autoPlaceContainer">autoPlaceContainer</a></dt>
+<dd><p>Fixed position div that auto place GUI&#39;s go inside</p>
+</dd>
+<dt><a href="#hide">hide</a></dt>
+<dd><p>Are we hiding the GUI&#39;s ?</p>
+</dd>
+</dl>
+
+## Constants
+
+<dl>
+<dt><a href="#CSS_NAMESPACE">CSS_NAMESPACE</a></dt>
+<dd><p>Outer-most className for GUI&#39;s</p>
+</dd>
+<dt><a href="#CLOSE_BUTTON_HEIGHT">CLOSE_BUTTON_HEIGHT</a></dt>
+<dd><p>The only value shared between the JS and SCSS. Use caution.</p>
+</dd>
+<dt><a href="#CSS">CSS</a> : <code>String</code></dt>
+<dd><p>class name used to mark auto-placed items.</p>
+</dd>
+</dl>
+
+## Functions
+
+<dl>
+<dt><a href="#addRow">addRow(gui, [dom], [liBefore])</a></dt>
+<dd><p>Add a row to the end of the GUI or before another row.</p>
+</dd>
+</dl>
+
 <a name="GUI"></a>
 
 ## GUI
@@ -16,7 +61,7 @@ manipulate variables and fire functions on the fly.
 * [GUI](#GUI)
     * [new GUI([params])](#new_GUI_new)
     * [.domElement](#GUI+domElement) : <code>DOMElement</code>
-    * [.parent](#GUI+parent) : <code>dat.gui.GUI</code>
+    * [.parent](#GUI+parent) : [<code>GUI</code>](#GUI)
     * [.autoPlace](#GUI+autoPlace) : <code>Boolean</code>
     * [.closeOnTop](#GUI+closeOnTop) : <code>Boolean</code>
     * [.preset](#GUI+preset) : <code>String</code>
@@ -25,21 +70,31 @@ manipulate variables and fire functions on the fly.
     * [.closed](#GUI+closed) : <code>Boolean</code>
     * [.load](#GUI+load) : <code>Object</code>
     * [.useLocalStorage](#GUI+useLocalStorage) : <code>Boolean</code>
+    * [.saveToLocalStorageIfPossible](#GUI+saveToLocalStorageIfPossible) ⇒
+    * [.getAllGUIs(recurse, myArray)](#GUI+getAllGUIs) ⇒ <code>name/gui</code>
     * [.add(object, property, [min], [max], [step])](#GUI+add) ⇒ <code>Controller</code>
     * [.addColor(object, property)](#GUI+addColor) ⇒ <code>Controller</code>
+    * [.addTextArea(object, property)](#GUI+addTextArea) ⇒ <code>dat.controllers.TextAreaController</code>
+    * [.addEasingFunction(object, property)](#GUI+addEasingFunction) ⇒ <code>dat.controllers.EasingFunctionController</code>
     * [.addPlotter(object, property, max, period, type, fgColor, bgColor)](#GUI+addPlotter) ⇒ <code>Controller</code>
     * [.addImage(object, property)](#GUI+addImage) ⇒ <code>Controller</code>
     * [.remove(controller)](#GUI+remove)
     * [.destroy()](#GUI+destroy)
-    * [.addFolder(name)](#GUI+addFolder) ⇒ <code>dat.gui.GUI</code>
+    * [.addFolder(name)](#GUI+addFolder) ⇒ [<code>GUI</code>](#GUI)
     * [.removeFolder(folder)](#GUI+removeFolder)
     * [.open()](#GUI+open)
     * [.close()](#GUI+close)
     * [.hide()](#GUI+hide)
     * [.show()](#GUI+show)
     * [.remember(...objects)](#GUI+remember)
-    * [.getRoot()](#GUI+getRoot) ⇒ <code>dat.gui.GUI</code>
+    * [.getRoot()](#GUI+getRoot) ⇒ [<code>GUI</code>](#GUI)
     * [.getSaveObject()](#GUI+getSaveObject) ⇒ <code>Object</code>
+    * [.save()](#GUI+save) ⇒ [<code>GUI</code>](#GUI)
+    * [.saveAs(presetName)](#GUI+saveAs) ⇒ [<code>GUI</code>](#GUI)
+    * [.revert(gui)](#GUI+revert) ⇒ [<code>GUI</code>](#GUI)
+    * [.deleteSave()](#GUI+deleteSave) ⇒ [<code>GUI</code>](#GUI)
+    * [.listen(controller)](#GUI+listen) ⇒ [<code>GUI</code>](#GUI)
+    * [.updateDisplay()](#GUI+updateDisplay) ⇒ [<code>GUI</code>](#GUI)
 
 <a name="new_GUI_new"></a>
 
@@ -51,7 +106,7 @@ manipulate variables and fire functions on the fly.
 | [params.name] | <code>String</code> |  | The name of this GUI. |
 | [params.load] | <code>Object</code> |  | JSON object representing the saved state of this GUI. |
 | [params.object] | <code>Object</code> |  | Providing your object will create a controller for each property automatically |
-| [params.parent] | <code>dat.gui.GUI</code> |  | The GUI I'm nested in. |
+| [params.parent] | [<code>GUI</code>](#GUI) |  | The GUI I'm nested in. |
 | [params.autoPlace] | <code>Boolean</code> | <code>true</code> |  |
 | [params.hideable] | <code>Boolean</code> | <code>true</code> | If true, GUI is shown/hidden by <kbd>h</kbd> keypress. |
 | [params.closed] | <code>Boolean</code> | <code>false</code> | If true, starts closed |
@@ -76,7 +131,7 @@ Outermost DOM Element
 **Kind**: instance property of [<code>GUI</code>](#GUI)  
 <a name="GUI+parent"></a>
 
-### gui.parent : <code>dat.gui.GUI</code>
+### gui.parent : [<code>GUI</code>](#GUI)
 The parent <code>GUI</code>
 
 **Kind**: instance property of [<code>GUI</code>](#GUI)  
@@ -101,7 +156,7 @@ The identifier for a set of saved values
 <a name="GUI+width"></a>
 
 ### gui.width : <code>Number</code>
-The width of <code>GUI</code> element
+The width of the <code>GUI</code> element
 
 **Kind**: instance property of [<code>GUI</code>](#GUI)  
 <a name="GUI+name"></a>
@@ -130,6 +185,27 @@ Determines whether or not to use <a href="https://developer.mozilla.org/en/DOM/S
 <code>remember</code>ing
 
 **Kind**: instance property of [<code>GUI</code>](#GUI)  
+<a name="GUI+saveToLocalStorageIfPossible"></a>
+
+### gui.saveToLocalStorageIfPossible ⇒
+TODO:
+saveToLocalStorageIfPossible description
+
+**Kind**: instance property of [<code>GUI</code>](#GUI)  
+**Returns**: xxx  
+<a name="GUI+getAllGUIs"></a>
+
+### gui.getAllGUIs(recurse, myArray) ⇒ <code>name/gui</code>
+Gets this current GUI (usually) and all sub-folder GUIs under this GUI as an array of {name/gui} pairs. The "this" current gui uses empty string.
+
+**Kind**: instance method of [<code>GUI</code>](#GUI)  
+**Returns**: <code>name/gui</code> - The array of  value pairs  
+
+| Param | Description |
+| --- | --- |
+| recurse | (optional) By default, it will recurse multiple levels deep. Set to false to only scan current level from current GUI. |
+| myArray | (optional) Supply an existing array to use instead.  If supplied, will not push current GUI into array, only the subfolder GUIs. |
+
 <a name="GUI+add"></a>
 
 ### gui.add(object, property, [min], [max], [step]) ⇒ <code>Controller</code>
@@ -186,6 +262,28 @@ gui.addColor(palette, 'color2');
 gui.addColor(palette, 'color3');
 gui.addColor(palette, 'color4');
 ```
+<a name="GUI+addTextArea"></a>
+
+### gui.addTextArea(object, property) ⇒ <code>dat.controllers.TextAreaController</code>
+**Kind**: instance method of [<code>GUI</code>](#GUI)  
+**Returns**: <code>dat.controllers.TextAreaController</code> - The new controller that was added.  
+
+| Param |
+| --- |
+| object | 
+| property | 
+
+<a name="GUI+addEasingFunction"></a>
+
+### gui.addEasingFunction(object, property) ⇒ <code>dat.controllers.EasingFunctionController</code>
+**Kind**: instance method of [<code>GUI</code>](#GUI)  
+**Returns**: <code>dat.controllers.EasingFunctionController</code> - The new controller that was added.  
+
+| Param |
+| --- |
+| object | 
+| property | 
+
 <a name="GUI+addPlotter"></a>
 
 ### gui.addPlotter(object, property, max, period, type, fgColor, bgColor) ⇒ <code>Controller</code>
@@ -250,11 +348,11 @@ For subfolders, use `gui.removeFolder(folder)` instead.
 **Kind**: instance method of [<code>GUI</code>](#GUI)  
 <a name="GUI+addFolder"></a>
 
-### gui.addFolder(name) ⇒ <code>dat.gui.GUI</code>
+### gui.addFolder(name) ⇒ [<code>GUI</code>](#GUI)
 Creates a new subfolder GUI instance.
 
 **Kind**: instance method of [<code>GUI</code>](#GUI)  
-**Returns**: <code>dat.gui.GUI</code> - The new folder.  
+**Returns**: [<code>GUI</code>](#GUI) - The new folder.  
 **Throws**:
 
 - <code>Error</code> if this GUI already has a folder by the specified
@@ -274,7 +372,7 @@ Removes a subfolder GUI instance.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| folder | <code>dat.gui.GUI</code> | The folder to remove. |
+| folder | [<code>GUI</code>](#GUI) | The folder to remove. |
 
 <a name="GUI+open"></a>
 
@@ -319,13 +417,125 @@ of the list.
 
 <a name="GUI+getRoot"></a>
 
-### gui.getRoot() ⇒ <code>dat.gui.GUI</code>
+### gui.getRoot() ⇒ [<code>GUI</code>](#GUI)
 **Kind**: instance method of [<code>GUI</code>](#GUI)  
-**Returns**: <code>dat.gui.GUI</code> - the topmost parent GUI of a nested GUI.  
+**Returns**: [<code>GUI</code>](#GUI) - the topmost parent GUI of a nested GUI.  
 <a name="GUI+getSaveObject"></a>
 
 ### gui.getSaveObject() ⇒ <code>Object</code>
 **Kind**: instance method of [<code>GUI</code>](#GUI)  
 **Returns**: <code>Object</code> - a JSON object representing the current state of
 this GUI as well as its remembered properties.  
+<a name="GUI+save"></a>
+
+### gui.save() ⇒ [<code>GUI</code>](#GUI)
+TODO:
+[save description]
+
+**Kind**: instance method of [<code>GUI</code>](#GUI)  
+**Returns**: [<code>GUI</code>](#GUI) - [description]  
+<a name="GUI+saveAs"></a>
+
+### gui.saveAs(presetName) ⇒ [<code>GUI</code>](#GUI)
+TODO:
+[saveAs description]
+
+**Kind**: instance method of [<code>GUI</code>](#GUI)  
+**Returns**: [<code>GUI</code>](#GUI) - [description]  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| presetName | <code>String</code> | [description] |
+
+<a name="GUI+revert"></a>
+
+### gui.revert(gui) ⇒ [<code>GUI</code>](#GUI)
+TODO:
+[revert description]
+
+**Kind**: instance method of [<code>GUI</code>](#GUI)  
+**Returns**: [<code>GUI</code>](#GUI) - [description]  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| gui | [<code>GUI</code>](#GUI) | [description] |
+
+<a name="GUI+deleteSave"></a>
+
+### gui.deleteSave() ⇒ [<code>GUI</code>](#GUI)
+TODO:
+deleteSave description
+
+**Kind**: instance method of [<code>GUI</code>](#GUI)  
+**Returns**: [<code>GUI</code>](#GUI) - description  
+<a name="GUI+listen"></a>
+
+### gui.listen(controller) ⇒ [<code>GUI</code>](#GUI)
+TODO:
+listen description
+
+**Kind**: instance method of [<code>GUI</code>](#GUI)  
+**Returns**: [<code>GUI</code>](#GUI) - [description]  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| controller | <code>Controller</code> | [description] |
+
+<a name="GUI+updateDisplay"></a>
+
+### gui.updateDisplay() ⇒ [<code>GUI</code>](#GUI)
+TODO:
+updateDisplay description
+
+**Kind**: instance method of [<code>GUI</code>](#GUI)  
+**Returns**: [<code>GUI</code>](#GUI) - description  
+<a name="autoPlaceVirgin"></a>
+
+## autoPlaceVirgin
+Have we yet to create an autoPlace GUI?
+
+**Kind**: global variable  
+<a name="autoPlaceContainer"></a>
+
+## autoPlaceContainer
+Fixed position div that auto place GUI's go inside
+
+**Kind**: global variable  
+<a name="hide"></a>
+
+## hide
+Are we hiding the GUI's ?
+
+**Kind**: global variable  
+<a name="CSS_NAMESPACE"></a>
+
+## CSS\_NAMESPACE
+Outer-most className for GUI's
+
+**Kind**: global constant  
+<a name="CLOSE_BUTTON_HEIGHT"></a>
+
+## CLOSE\_BUTTON\_HEIGHT
+The only value shared between the JS and SCSS. Use caution.
+
+**Kind**: global constant  
+<a name="CSS"></a>
+
+## CSS : <code>String</code>
+class name used to mark auto-placed items.
+
+**Kind**: global constant  
+<a name="addRow"></a>
+
+## addRow(gui, [dom], [liBefore])
+Add a row to the end of the GUI or before another row.
+
+**Kind**: global function  
+
+| Param | Description |
+| --- | --- |
+| gui |  |
+| [dom] | If specified, inserts the dom content in the new row |
+| [liBefore] | If specified, places the new row before another row |
+
 <!--- API END --->

@@ -15,7 +15,10 @@ import Controller from "./Controller";
 import dom from "../dom/dom";
 
 /**
- * @class Provides a controller to represent an UNDEFINED-valued property of an object.
+ * @class Provides a *disabled* text input indicating the value of the property
+ *        is undefined. Calling reset() on the controller will remove and re-add it.
+ *        It is intended to be used as a placeholder, where the gui is built before
+ *        some required variable has been initialized.
  *
  * @extends dat.controllers.Controller
  *

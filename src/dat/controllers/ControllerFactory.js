@@ -15,6 +15,8 @@ import OptionController from "./OptionController";
 import NumberControllerBox from "./NumberControllerBox";
 import NumberControllerSlider from "./NumberControllerSlider";
 import StringController from "./StringController";
+import TextAreaController from "./TextAreaController";
+import ArrayController from "./ArrayController";
 import FunctionController from "./FunctionController";
 import BooleanController from "./BooleanController";
 import ColorController from "./ColorController";
@@ -23,34 +25,38 @@ import common from "../utils/common";
 
 const ARR_SLICE = Array.prototype.slice;
 
-const ControllerFactory = function (object, property) {
+const controllerFactory = function (object, property, ...optionalArgs) {
   const initialValue = object[property];
+  const [optlist] = optionalArgs;
 
   // Providing options?
-  if (common.isArray(arguments[2]) || common.isObject(arguments[2])) {
-    return new OptionController(object, property, arguments[2]);
+  if (common.isArray(optlist) || common.isObject(optlist)) {
+    return new OptionController(object, property, optlist);
   }
 
   // Providing a map?
   if (common.isNumber(initialValue)) {
+    const [min, max, step, enumeration] = optionalArgs;
     // Has min and max? (slider)
-    if (common.isNumber(arguments[2]) && common.isNumber(arguments[3])) {
-      // has step?
-      if (common.isNumber(arguments[4])) {
-        return new NumberControllerSlider(object, property, arguments[2], arguments[3], arguments[4]);
-      }
-
-      return new NumberControllerSlider(object, property, arguments[2], arguments[3]);
+    // Don't care about step (may be undefined) or enumeration value (that one's optional too)
+    if (common.isNumber(min) && common.isNumber(max)) {
+      return new NumberControllerSlider(object, property, min, max, step, enumeration);
     }
 
-    // number box
-    if (common.isNumber(arguments[4])) {
-      // has step
-      return new NumberControllerBox(object, property, { min: arguments[2], max: arguments[3], step: arguments[4] });
-    }
-    return new NumberControllerBox(object, property, { min: arguments[2], max: arguments[3] });
+    // number box: step is optional and may be 'undefined'.
+    return new NumberControllerBox(object, property, {
+      min,
+      max,
+      step,
+    });
   }
 
+  // Color iff any is true:
+  // - the RGB(A) values have been specified as an array
+  // - the value is an HSV object
+  // - the value is a string starting with '#' followed by 3-6 digits
+  //
+  // TODO: make the string check more strict and matching this comment.
   if (
     (common.isArray(initialValue) && initialValue.length >= 3 && initialValue.length <= 4) ||
     (common.isObject(initialValue) && initialValue.h && initialValue.s && initialValue.v) ||
@@ -66,15 +72,20 @@ const ControllerFactory = function (object, property) {
   }
 
   if (common.isFunction(initialValue)) {
-    let opts = ARR_SLICE.call(arguments, 3);
+    const [arg1] = optionalArgs;
+    let opts = ARR_SLICE.call(optionalArgs, 1);
     if (opts.length === 0) {
       opts = undefined;
     }
-    return new FunctionController(object, property, options_1, opts);
+    return new FunctionController(object, property, arg1, opts);
   }
 
   if (common.isBoolean(initialValue)) {
     return new BooleanController(object, property);
+  }
+
+  if (common.isArray(initialValue)) {
+    return new ArrayController(object, property);
   }
 
   if (common.isUndefined(initialValue)) {
@@ -87,4 +98,4 @@ const ControllerFactory = function (object, property) {
   return null;
 };
 
-export default ControllerFactory;
+export default controllerFactory;

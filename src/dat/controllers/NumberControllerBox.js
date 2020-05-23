@@ -62,7 +62,9 @@ class NumberControllerBox extends NumberController {
           // When pressing ENTER key, you can be as precise as you want.
           case 13:
             _this.__truncationSuspended = true;
+            /* jshint validthis: true */
             this.blur();
+            /* jshint validthis: false */
             _this.__truncationSuspended = false;
             onFinish();
             break;
@@ -84,7 +86,9 @@ class NumberControllerBox extends NumberController {
           case "Enter": {
             // When pressing ENTER key, you can be as precise as you want.
             _this.__truncationSuspended = true;
+            /* jshint validthis: true */
             this.blur();
+            /* jshint validthis: false */
             _this.__truncationSuspended = false;
             onFinish();
             break;
@@ -104,7 +108,7 @@ class NumberControllerBox extends NumberController {
       }
     }
 
-    function onChange() {
+    function onChange(e) {
       const attempted = parseFloat(_this.__input.value);
       if (!common.isNaN(attempted) && !_this._readonly) {
         _this.setValue(attempted);
@@ -133,7 +137,7 @@ class NumberControllerBox extends NumberController {
       prevY = e.clientY;
     }
 
-    function onMouseUp() {
+    function onMouseUp(e) {
       dom.unbind(window, "mousemove", onMouseDrag);
       dom.unbind(window, "mouseup", onMouseUp);
       onFinish();
@@ -171,6 +175,7 @@ class NumberControllerBox extends NumberController {
   updateDisplay(force) {
     // TODO: next two statements are from different fixes for the same problem:
     // no updating while editing number field. See which one works best.
+    //
     // Use the same solution from StringController.js to enable
     // editing <input>s while "listen()"ing
     if (!force && dom.isActive(this.__input)) {
@@ -182,6 +187,14 @@ class NumberControllerBox extends NumberController {
       ? this.getValue()
       : roundToDecimal(this.getValue(), this.__precision);
     return super.updateDisplay();
+  }
+
+  step(v) {
+    if (this.__input.getAttribute("type") !== "number") {
+      this.__input.setAttribute("type", "number");
+    }
+    this.__input.setAttribute("step", v);
+    return super.step(...arguments);
   }
 }
 

@@ -24,6 +24,8 @@ import common from "../utils/common";
  *
  * @param {Object} object The object to be manipulated
  * @param {string} property The name of the property to be manipulated
+ *
+ * @member dat.controllers
  */
 class ImageController extends Controller {
   constructor(object, property) {

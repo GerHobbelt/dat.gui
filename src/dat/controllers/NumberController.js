@@ -19,7 +19,6 @@ function numDecimals(x) {
   if (_x.indexOf(".") > -1) {
     return _x.length - _x.indexOf(".") - 1;
   }
-
   return 0;
 }
 
@@ -81,7 +80,7 @@ class NumberController extends Controller {
    * @param {Number} minValue The minimum value for
    * <code>object[property]</code>
    *
-   * @returns {dat.controllers.NumberController} this
+   * @returns {NumberController} this
    */
   min(minValue) {
     this.__min = minValue;

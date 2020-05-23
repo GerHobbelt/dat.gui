@@ -156,7 +156,7 @@ class Controller {
    *
    * @param {Number} ro
    * @default false
-   * @returns {dat.controllers.StringController} this
+   * @returns {StringController} this
    */
   readonly(ro) {
     this._readonly = ro;

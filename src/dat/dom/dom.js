@@ -173,8 +173,8 @@ const dom = {
    * @param func
    * @param bool
    */
-  bind: function (elem, event, func, newBool) {
-    const bool = newBool || false;
+  bind: function (elem, event, func, bool) {
+    bool = bool || false;
     if (elem.addEventListener) {
       elem.addEventListener(event, func, bool);
     } else if (elem.attachEvent) {
@@ -190,8 +190,8 @@ const dom = {
    * @param func
    * @param bool
    */
-  unbind: function (elem, event, func, newBool) {
-    const bool = newBool || false;
+  unbind: function (elem, event, func, bool) {
+    bool = bool || false;
     if (elem.removeEventListener) {
       elem.removeEventListener(event, func, bool);
     } else if (elem.detachEvent) {
@@ -283,11 +283,13 @@ const dom = {
 
   /**
    *
-   * @param el
+   * @param elem
    */
-  getOffset: function (el) {
-    let elem = el;
-    const offset = { left: 0, top: 0 };
+  getOffset: function (elem) {
+    const offset = {
+      left: 0,
+      top: 0,
+    };
     if (elem.offsetParent) {
       do {
         offset.left += elem.offsetLeft;

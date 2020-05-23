@@ -17,32 +17,18 @@ import dom from "../dom/dom";
 /**
  * @class Provides a text input to alter the string property of an object.
  *
- * @extends dat.controllers.Controller
+ * @extends Controller
  *
  * @param {Object} object The object to be manipulated
  * @param {string} property The name of the property to be manipulated
+ *
+ * @member dat.controllers
  */
 class StringController extends Controller {
   constructor(object, property) {
     super(object, property);
 
     const _this = this;
-
-    this.__input = document.createElement("input");
-    this.__input.setAttribute("type", "text");
-
-    dom.bind(this.__input, "keyup", onChange);
-    dom.bind(this.__input, "change", onChange);
-    dom.bind(this.__input, "blur", onBlur);
-    dom.bind(this.__input, "keydown", onKeyDown);
-
-    function onKeyDown(e) {
-      if (e.keyCode === 13) {
-        /* jshint validthis: true */
-        this.blur();
-        /* jshint validthis: false */
-      }
-    }
 
     function onChange() {
       _this.setValue(_this.__input.value);
@@ -53,6 +39,22 @@ class StringController extends Controller {
         _this.__onFinishChange.call(_this, _this.getValue());
       }
     }
+
+    function onKeyDown(e) {
+      if (e.keyCode === 13) {
+        /* jshint validthis: true */
+        this.blur();
+        /* jshint validthis: false */
+      }
+    }
+
+    this.__input = document.createElement("input");
+    this.__input.setAttribute("type", "text");
+
+    dom.bind(this.__input, "keyup", onChange);
+    dom.bind(this.__input, "change", onChange);
+    dom.bind(this.__input, "blur", onBlur);
+    dom.bind(this.__input, "keydown", onKeyDown);
 
     this.updateDisplay();
 

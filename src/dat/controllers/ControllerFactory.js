@@ -19,6 +19,8 @@ import FunctionController from "./FunctionController";
 import BooleanController from "./BooleanController";
 import common from "../utils/common";
 
+const ARR_SLICE = Array.prototype.slice;
+
 const ControllerFactory = function (object, property) {
   const initialValue = object[property];
 
@@ -52,12 +54,19 @@ const ControllerFactory = function (object, property) {
   }
 
   if (common.isFunction(initialValue)) {
-    return new FunctionController(object, property, "");
+    let opts = ARR_SLICE.call(arguments, 3);
+    if (opts.length === 0) {
+      opts = undefined;
+    }
+    return new FunctionController(object, property, options_1, opts);
   }
 
   if (common.isBoolean(initialValue)) {
     return new BooleanController(object, property);
   }
+
+  // otherwise: we cannot 'sniff' the type of controller you want, since the
+  // `initialValue` is null or undefined.
 
   return null;
 };

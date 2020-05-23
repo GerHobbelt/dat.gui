@@ -12,13 +12,16 @@
  */
 
 import Controller from "./Controller";
-import ControllerFactory from "./ControllerFactory";
 
 /**
  * @class Represents a custom controller.
  *
- * @extends dat.controllers.Controller
+ * @extends Controller
  *
+ * @param {Object} object
+ * @param {string} property
+ *
+ * @member dat.controllers
  */
 class CustomController extends Controller {
   /**

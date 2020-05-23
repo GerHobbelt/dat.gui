@@ -14,6 +14,8 @@
 import NumberController from "./NumberController";
 import dom from "../dom/dom";
 
+// import "./NumberControllerSlider.css";
+
 function map(v, i1, i2, o1, o2) {
   return o1 + (o2 - o1) * ((v - i1) / (i2 - i1));
 }
@@ -25,14 +27,16 @@ function map(v, i1, i2, o1, o2) {
  * <code>&lt;div&gt;</code> tags, <strong>not</strong> the html5
  * <code>&lt;slider&gt;</code> element.
  *
- * @extends dat.controllers.Controller
- * @extends dat.controllers.NumberController
+ * @extends Controller
+ * @extends NumberController
  *
  * @param {Object} object The object to be manipulated
  * @param {string} property The name of the property to be manipulated
  * @param {Number} minValue Minimum allowed value
  * @param {Number} maxValue Maximum allowed value
  * @param {Number} stepValue Increment by which to change value
+ *
+ * @member dat.controllers
  */
 class NumberControllerSlider extends NumberController {
   constructor(object, property, min, max, step) {
@@ -107,8 +111,10 @@ class NumberControllerSlider extends NumberController {
   }
 
   updateDisplay() {
-    const pct = (this.getValue() - this.__min) / (this.__max - this.__min);
+    const value = this.getValue();
+    const pct = (value - this.__min) / (this.__max - this.__min);
     this.__foreground.style.width = pct * 100 + "%";
+
     return super.updateDisplay();
   }
 }

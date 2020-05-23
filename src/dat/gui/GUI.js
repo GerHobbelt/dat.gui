@@ -26,9 +26,12 @@ import CenteredDiv from "../dom/CenteredDiv";
 import dom from "../dom/dom";
 import common from "../utils/common";
 
-import styleSheet from "./style.scss"; // CSS to embed in build
+// import styleSheet from "./style.scss"; // CSS to embed in build
 
-css.inject(styleSheet);
+// var ARR_EACH = Array.prototype.forEach;
+const ARR_SLICE = Array.prototype.slice;
+
+// css.inject(styleSheet);
 
 /** @ignore Outer-most className for GUI's */
 const CSS_NAMESPACE = "dg";
@@ -42,7 +45,7 @@ const DEFAULT_DEFAULT_PRESET_NAME = "Default";
 
 const SUPPORTS_LOCAL_STORAGE = (function () {
   try {
-    return !!window.localStorage;
+    return "localStorage" in window && !!window.localStorage;
   } catch (e) {
     return false;
   }
@@ -87,10 +90,10 @@ const hideableGuis = [];
  * @param {Boolean} [params.closed=false] If true, starts closed
  * @param {Boolean} [params.closeOnTop=false] If true, close/open button shows on top of the GUI
  */
-const GUI = function (pars) {
+const GUI = function (params) {
   const _this = this;
 
-  let params = pars || {};
+  params = params || {};
 
   /**
    * Outermost DOM Element
@@ -104,7 +107,7 @@ const GUI = function (pars) {
 
   /**
    * Nested GUI's by name
-   * @ignore
+   * @private
    */
   this.__folders = {};
 
@@ -112,7 +115,7 @@ const GUI = function (pars) {
 
   /**
    * List of objects I'm remembering for save, only used in top level GUI
-   * @ignore
+   * @private
    */
   this.__rememberedObjects = [];
 
@@ -121,7 +124,6 @@ const GUI = function (pars) {
    * in top level GUI.
    *
    * @private
-   * @ignore
    *
    * @example
    * [
@@ -368,8 +370,9 @@ const GUI = function (pars) {
     dom.bind(this.__closeButton, "click", function () {
       _this.closed = !_this.closed;
     });
-    // Oh, you're a nested GUI!
   } else {
+    // Oh, you're a nested GUI!
+
     if (params.closed === undefined) {
       params.closed = true;
     }
@@ -418,14 +421,14 @@ const GUI = function (pars) {
     }
   }
 
-  this.__resizeHandler = function () {
+  function __resizeHandler() {
     _this.onResizeDebounced();
-  };
+  }
 
-  dom.bind(window, "resize", this.__resizeHandler);
-  dom.bind(this.__ul, "webkitTransitionEnd", this.__resizeHandler);
-  dom.bind(this.__ul, "transitionend", this.__resizeHandler);
-  dom.bind(this.__ul, "oTransitionEnd", this.__resizeHandler);
+  dom.bind(window, "resize", __resizeHandler);
+  dom.bind(this.__ul, "webkitTransitionEnd", __resizeHandler);
+  dom.bind(this.__ul, "transitionend", __resizeHandler);
+  dom.bind(this.__ul, "oTransitionEnd", __resizeHandler);
   this.onResize();
 
   if (params.resizable) {
@@ -477,7 +480,11 @@ GUI.TEXT_CLOSED = "Close Controls";
 GUI.TEXT_OPEN = "Open Controls";
 
 GUI._keydownHandler = function (e) {
-  if (document.activeElement.type !== "text" && (e.which === HIDE_KEY_CODE || e.keyCode === HIDE_KEY_CODE)) {
+  if (
+    document.activeElement &&
+    document.activeElement.type !== "text" &&
+    (e.which === HIDE_KEY_CODE || e.keyCode === HIDE_KEY_CODE)
+  ) {
     GUI.toggleHide();
   }
 };
@@ -643,8 +650,10 @@ common.extend(
 
       // Do we have saved appearance data for this folder?
       if (
-        this.load && // Anything loaded?
-        this.load.folders && // Was my parent a dead-end?
+        // Anything loaded?
+        this.load &&
+        // Was my parent a dead-end?
+        this.load.folders &&
         this.load.folders[folder.name]
       ) {
         delete this.load.folders[folder.name];
@@ -736,7 +745,6 @@ common.extend(
      * @param {...Object} objects
      * @throws {Error} if not called on a top level GUI.
      * @instance
-     * @ignore
      */
     remember: function (/* ...args */) {
       if (common.isUndefined(SAVE_DIALOGUE)) {
@@ -750,7 +758,7 @@ common.extend(
 
       const _this = this;
 
-      common.each(Array.prototype.slice.call(arguments), function (object) {
+      common.each(ARR_SLICE.call(arguments), function (object) {
         if (_this.__rememberedObjects.length === 0) {
           addSaveMenu(_this);
         }
@@ -999,9 +1007,9 @@ function augmentController(gui, li, controller) {
       const pc = controller[method];
       const pb = box[method];
       controller[method] = box[method] = function () {
-        const args = Array.prototype.slice.call(arguments);
-        pb.apply(box, args);
-        return pc.apply(controller, args);
+        const args = ARR_SLICE.call(arguments);
+        pc.apply(controller, args);
+        return pb.apply(box, args);
       };
     });
 
@@ -1011,9 +1019,9 @@ function augmentController(gui, li, controller) {
     const r = function (returned) {
       // Have we defined both boundaries?
       if (common.isNumber(controller.__min) && common.isNumber(controller.__max)) {
-        // Well, then lets just replace this with a slider.
+        // Well, then let's just replace this with a slider.
 
-        // lets remember if the old controller had a specific name or was listening
+        // Let's remember if the old controller had a specific name or was listening
         const oldName = controller.__li.firstElementChild.firstElementChild.innerHTML;
         const wasListening = controller.__gui.__listening.indexOf(controller) > -1;
 
@@ -1083,11 +1091,11 @@ function recallSavedValue(gui, controller) {
 
   // Why yes, it does!
   if (matchedIndex !== -1) {
-    // Let me fetch a map of controllers for thcommon.isObject.
+    // Let me fetch a map of controllers for this object.
     let controllerMap = root.__rememberedObjectIndecesToControllers[matchedIndex];
 
-    // Ohp, I believe this is the first controller we've created for this
-    // object. Lets make the map fresh.
+    // I believe this is the first controller we've created for this
+    // object. Let's make a fresh map.
     if (controllerMap === undefined) {
       controllerMap = {};
       root.__rememberedObjectIndecesToControllers[matchedIndex] = controllerMap;
@@ -1113,8 +1121,12 @@ function recallSavedValue(gui, controller) {
         return;
       }
 
-      // Did the loaded object remember this object?  &&  Did we remember this particular property?
-      if (preset[matchedIndex] && preset[matchedIndex][controller.property] !== undefined) {
+      // Did the loaded object remember this object?
+      if (
+        preset[matchedIndex] &&
+        // Did we remember this particular property?
+        preset[matchedIndex][controller.property] !== undefined
+      ) {
         // We did remember something for this guy ...
         const value = preset[matchedIndex][controller.property];
 
@@ -1151,8 +1163,11 @@ function add(gui, object, property, params) {
     const factoryArgs = [object, property].concat(params.factoryArgs);
     controller = ControllerFactory.apply(gui, factoryArgs);
   }
-  if (controller === null) controller = customObject;
-  else if (customObject !== undefined) customObject.controller = controller;
+  if (controller === null) {
+    controller = customObject;
+  } else if (customObject !== undefined) {
+    customObject.controller = controller;
+  }
 
   if (params.before instanceof Controller) {
     params.before = params.before.__li;
@@ -1165,8 +1180,12 @@ function add(gui, object, property, params) {
   const name = document.createElement("span");
   dom.addClass(name, "property-name");
   if (customObject !== undefined && typeof customObject.property === "object") {
-    for (const propertyName in customObject.property) name.appendChild(customObject.property[propertyName]);
-  } else name.innerHTML = controller.property;
+    for (const propertyName in customObject.property) {
+      name.appendChild(customObject.property[propertyName]);
+    }
+  } else {
+    name.innerHTML = controller.property;
+  }
 
   const container = document.createElement("div");
   container.appendChild(name);
@@ -1405,7 +1424,7 @@ function setPresetSelectIndex(gui) {
 
 function updateDisplays(controllerArray) {
   if (controllerArray.length !== 0) {
-    requestAnimationFrame.call(window, function () {
+    requestAnimationFrame(function () {
       updateDisplays(controllerArray);
     });
   }

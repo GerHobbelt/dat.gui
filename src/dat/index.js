@@ -11,6 +11,13 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
+// ------------------------------------------------------------------
+//
+// extra: help rollup to produce the accompanying CSS file
+//
+import "./index.scss";
+// ------------------------------------------------------------------
+
 import Color from "./color/Color";
 import math from "./color/math";
 import interpret from "./color/interpret";

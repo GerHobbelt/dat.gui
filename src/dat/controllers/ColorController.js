@@ -34,7 +34,7 @@ class ColorController extends Controller {
 
     const _this = this;
 
-    this.domElement = document.createElement("div");
+    // this.domElement = document.createElement('div');
 
     dom.makeSelectable(this.domElement, false);
 
@@ -286,7 +286,7 @@ class ColorController extends Controller {
             i[component] !== this.__color.__state[component]
           ) {
             mismatch = true;
-            return {}; // break
+            return common.BREAK; // break
           }
         },
         this

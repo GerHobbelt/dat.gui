@@ -20,9 +20,9 @@
     })(),
   };
 
-  var testId = 0,
-    toString = Object.prototype.toString,
-    hasOwn = Object.prototype.hasOwnProperty;
+  var testId = 0;
+  var toString = Object.prototype.toString;
+  var hasOwn = Object.prototype.hasOwnProperty;
 
   var Test = function (name, testName, expected, testEnvironmentArg, async, callback) {
     this.name = name;
@@ -136,9 +136,9 @@
         QUnit.ok(false, "Expected " + this.expected + " assertions, but " + this.assertions.length + " were run");
       }
 
-      var good = 0,
-        bad = 0,
-        tests = id("qunit-tests");
+      var good = 0;
+      var bad = 0;
+      var tests = id("qunit-tests");
 
       config.stats.all += this.assertions.length;
       config.moduleStats.all += this.assertions.length;
@@ -196,8 +196,8 @@
         });
 
         addEvent(b, "click", function () {
-          var next = b.nextSibling.nextSibling,
-            display = next.style.display;
+          var next = b.nextSibling.nextSibling;
+          var display = next.style.display;
           next.style.display = display === "none" ? "block" : "none";
         });
 
@@ -296,8 +296,8 @@
     },
 
     test: function (testName, expected, callback, async) {
-      var name = '<span class="test-name">' + testName + "</span>",
-        testEnvironmentArg;
+      var name = '<span class="test-name">' + testName + "</span>";
+      var testEnvironmentArg;
 
       if (arguments.length === 2) {
         callback = expected;
@@ -385,8 +385,8 @@
     },
 
     raises: function (block, expected, message) {
-      var actual,
-        ok = false;
+      var actual;
+      var ok = false;
 
       if (typeof expected === "string") {
         message = expected;
@@ -462,12 +462,12 @@
     },
   };
 
-  //We want access to the constructor's prototype
+  // We want access to the constructor's prototype
   (function () {
     function F() {}
     F.prototype = QUnit;
     QUnit = new F();
-    //Make F QUnit's constructor so that we can add to the prototype later
+    // Make F QUnit's constructor so that we can add to the prototype later
     QUnit.constructor = F;
   })();
 
@@ -496,7 +496,7 @@
 
     urlConfig: ["noglobals", "notrycatch"],
 
-    //logging callback queues
+    // logging callback queues
     begin: [],
     done: [],
     log: [],
@@ -508,11 +508,11 @@
 
   // Load paramaters
   (function () {
-    var location = window.location || { search: "", protocol: "file:" },
-      params = location.search.slice(1).split("&"),
-      length = params.length,
-      urlParams = {},
-      current;
+    var location = window.location || { search: "", protocol: "file:" };
+    var params = location.search.slice(1).split("&");
+    var length = params.length;
+    var urlParams = {};
+    var current;
 
     if (params[0]) {
       for (var i = 0; i < length; i++) {
@@ -560,9 +560,9 @@
         semaphore: 0,
       });
 
-      var tests = id("qunit-tests"),
-        banner = id("qunit-banner"),
-        result = id("qunit-testresult");
+      var tests = id("qunit-tests");
+      var banner = id("qunit-banner");
+      var result = id("qunit-testresult");
 
       if (tests) {
         tests.innerHTML = "";
@@ -710,8 +710,8 @@
 
     url: function (params) {
       params = extend(extend({}, QUnit.urlParams), params);
-      var querystring = "?",
-        key;
+      var querystring = "?";
+      var key;
       for (key in params) {
         if (!hasOwn.call(params, key)) {
           continue;
@@ -726,9 +726,9 @@
     addEvent: addEvent,
   });
 
-  //QUnit.constructor is set to the empty F() above so that we can add to it's prototype later
-  //Doing this allows us to tell if the following methods have been overwritten on the actual
-  //QUnit object, which is a deprecated way of using the callbacks.
+  // QUnit.constructor is set to the empty F() above so that we can add to it's prototype later
+  // Doing this allows us to tell if the following methods have been overwritten on the actual
+  // QUnit object, which is a deprecated way of using the callbacks.
   extend(QUnit.constructor.prototype, {
     // Logging callbacks; all receive a single argument with the listed properties
     // run test/logs.html for any related changes
@@ -761,8 +761,8 @@
 
     config.blocking = false;
 
-    var urlConfigHtml = "",
-      len = config.urlConfig.length;
+    var urlConfigHtml = "";
+    var len = config.urlConfig.length;
     for (var i = 0, val; i < len, (val = config.urlConfig[i]); i++) {
       config[val] = QUnit.urlParams[val];
       urlConfigHtml +=
@@ -860,22 +860,22 @@
       });
     }
 
-    var banner = id("qunit-banner"),
-      tests = id("qunit-tests"),
-      runtime = +new Date() - config.started,
-      passed = config.stats.all - config.stats.bad,
-      html = [
-        "Tests completed in ",
-        runtime,
-        " milliseconds.<br/>",
-        '<span class="passed">',
-        passed,
-        '</span> tests of <span class="total">',
-        config.stats.all,
-        '</span> passed, <span class="failed">',
-        config.stats.bad,
-        "</span> failed.",
-      ].join("");
+    var banner = id("qunit-banner");
+    var tests = id("qunit-tests");
+    var runtime = +new Date() - config.started;
+    var passed = config.stats.all - config.stats.bad;
+    var html = [
+      "Tests completed in ",
+      runtime,
+      " milliseconds.<br/>",
+      '<span class="passed">',
+      passed,
+      '</span> tests of <span class="total">',
+      config.stats.all,
+      '</span> passed, <span class="failed">',
+      config.stats.bad,
+      "</span> failed.",
+    ].join("");
 
     if (banner) {
       banner.className = config.stats.bad ? "qunit-fail" : "qunit-pass";
@@ -902,8 +902,8 @@
   }
 
   function validTest(name) {
-    var filter = config.filter,
-      run = false;
+    var filter = config.filter;
+    var run = false;
 
     if (!filter) {
       return true;
@@ -940,7 +940,7 @@
       } else if (e.sourceURL) {
         // Safari, PhantomJS
         // TODO sourceURL points at the 'throw new Error' line above, useless
-        //return e.sourceURL + ":" + e.line;
+        // return e.sourceURL + ":" + e.line;
       }
     }
   }
@@ -1081,7 +1081,7 @@
 
   // Supports deprecated method of completely overwriting logging callbacks
   function runLoggingCallbacks(key, scope, args) {
-    //debugger;
+    // debugger;
     var callbacks;
     if (QUnit.hasOwnProperty(key)) {
       QUnit[key].call(scope, args);
@@ -1196,8 +1196,8 @@
         object: function (b, a) {
           var i, j, loop;
           var eq = true; // unless we can proove it
-          var aProperties = [],
-            bProperties = []; // collection of
+          var aProperties = [];
+          var bProperties = []; // collection of
           // strings
 
           // comparing constructors is more strict than using
@@ -1289,16 +1289,16 @@
       return o + "";
     }
     function join(pre, arr, post) {
-      var s = jsDump.separator(),
-        base = jsDump.indent(),
-        inner = jsDump.indent(1);
+      var s = jsDump.separator();
+      var base = jsDump.indent();
+      var inner = jsDump.indent(1);
       if (arr.join) arr = arr.join("," + s + inner);
       if (!arr) return pre + post;
       return [pre, inner + arr, base + post].join(s);
     }
     function array(arr, stack) {
-      var i = arr.length,
-        ret = Array(i);
+      var i = arr.length;
+      var ret = Array(i);
       this.up();
       while (i--) ret[i] = this.parse(arr[i], undefined, stack);
       this.down();
@@ -1309,7 +1309,7 @@
 
     var jsDump = {
       parse: function (obj, type, stack) {
-        //type is used mostly internally, you can fix a (custom)type in advance
+        // type is used mostly internally, you can fix a (custom)type in advance
         stack = stack || [];
         var parser = this.parsers[type || this.typeOf(obj)];
         type = typeof parser;
@@ -1317,7 +1317,7 @@
         if (inStack != -1) {
           return "recursion(" + (inStack - stack.length) + ")";
         }
-        //else
+        // else
         if (type == "function") {
           stack.push(obj);
           var res = parser.call(this, obj, stack);
@@ -1392,13 +1392,13 @@
       parsers: {
         window: "[Window]",
         document: "[Document]",
-        error: "[ERROR]", //when no parser is found, shouldn't happen
+        error: "[ERROR]", // when no parser is found, shouldn't happen
         unknown: "[Unknown]",
         null: "null",
         undefined: "undefined",
         function: function (fn) {
-          var ret = "function",
-            name = "name" in fn ? fn.name : (reName.exec(fn) || [])[1]; //functions never have name in IE
+          var ret = "function";
+          var name = "name" in fn ? fn.name : (reName.exec(fn) || [])[1]; // functions never have name in IE
           if (name) ret += " " + name;
           ret += "(";
 
@@ -1419,11 +1419,11 @@
           return join("{", ret, "}");
         },
         node: function (node) {
-          var open = QUnit.jsDump.HTML ? "&lt;" : "<",
-            close = QUnit.jsDump.HTML ? "&gt;" : ">";
+          var open = QUnit.jsDump.HTML ? "&lt;" : "<";
+          var close = QUnit.jsDump.HTML ? "&gt;" : ">";
 
-          var tag = node.nodeName.toLowerCase(),
-            ret = open + tag;
+          var tag = node.nodeName.toLowerCase();
+          var ret = open + tag;
 
           for (var a in QUnit.jsDump.DOMAttrs) {
             var val = node[QUnit.jsDump.DOMAttrs[a]];
@@ -1432,32 +1432,32 @@
           return ret + close + open + "/" + tag + close;
         },
         functionArgs: function (fn) {
-          //function calls it internally, it's the arguments part of the function
+          // function calls it internally, it's the arguments part of the function
           var l = fn.length;
           if (!l) return "";
 
           var args = Array(l);
-          while (l--) args[l] = String.fromCharCode(97 + l); //97 is 'a'
+          while (l--) args[l] = String.fromCharCode(97 + l); // 97 is 'a'
           return " " + args.join(", ") + " ";
         },
-        key: quote, //object calls it internally, the key part of an item in a map
-        functionCode: "[code]", //function calls it internally, it's the content of the function
-        attribute: quote, //node calls it internally, it's an html attribute value
+        key: quote, // object calls it internally, the key part of an item in a map
+        functionCode: "[code]", // function calls it internally, it's the content of the function
+        attribute: quote, // node calls it internally, it's an html attribute value
         string: quote,
         date: quote,
-        regexp: literal, //regex
+        regexp: literal, // regex
         number: literal,
         boolean: literal,
       },
       DOMAttrs: {
-        //attributes to dump from nodes, name=>realName
+        // attributes to dump from nodes, name=>realName
         id: "id",
         name: "name",
         class: "className",
       },
-      HTML: false, //if true, entities are escaped ( <, >, \t, space and \n )
-      indentChar: "  ", //indentation unit
-      multiline: true, //if true, items in a collection, are separated by a \n, else just a space.
+      HTML: false, // if true, entities are escaped ( <, >, \t, space and \n )
+      indentChar: "  ", // indentation unit
+      multiline: true, // if true, items in a collection, are separated by a \n, else just a space.
     };
 
     return jsDump;
@@ -1465,8 +1465,8 @@
 
   // from Sizzle.js
   function getText(elems) {
-    var ret = "",
-      elem;
+    var ret = "";
+    var elem;
 
     for (var i = 0; elems[i]; i++) {
       elem = elems[i];
@@ -1484,7 +1484,7 @@
     return ret;
   }
 
-  //from jquery.js
+  // from jquery.js
   function inArray(elem, array) {
     if (array.indexOf) {
       return array.indexOf(elem);
@@ -1519,20 +1519,22 @@
       var os = {};
 
       for (var i = 0; i < n.length; i++) {
-        if (ns[n[i]] == null)
+        if (ns[n[i]] == null) {
           ns[n[i]] = {
             rows: [],
             o: null,
           };
+        }
         ns[n[i]].rows.push(i);
       }
 
       for (var i = 0; i < o.length; i++) {
-        if (os[o[i]] == null)
+        if (os[o[i]] == null) {
           os[o[i]] = {
             rows: [],
             n: null,
           };
+        }
         os[o[i]].rows.push(i);
       }
 
@@ -1540,7 +1542,7 @@
         if (!hasOwn.call(ns, i)) {
           continue;
         }
-        if (ns[i].rows.length == 1 && typeof os[i] != "undefined" && os[i].rows.length == 1) {
+        if (ns[i].rows.length == 1 && typeof os[i] !== "undefined" && os[i].rows.length == 1) {
           n[ns[i].rows[0]] = {
             text: n[ns[i].rows[0]],
             row: os[i].rows[0],

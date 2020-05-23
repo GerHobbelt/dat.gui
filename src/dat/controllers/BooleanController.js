@@ -17,10 +17,12 @@ import dom from "../dom/dom";
 /**
  * @class Provides a checkbox input to alter the boolean property of an object.
  *
- * @extends dat.controllers.Controller
+ * @extends Controller
  *
  * @param {Object} object The object to be manipulated
  * @param {string} property The name of the property to be manipulated
+ *
+ * @member dat.controllers
  */
 class BooleanController extends Controller {
   constructor(object, property) {
@@ -32,16 +34,16 @@ class BooleanController extends Controller {
     this.__checkbox = document.createElement("input");
     this.__checkbox.setAttribute("type", "checkbox");
 
+    function onChange() {
+      _this.setValue(!_this.__prev);
+    }
+
     dom.bind(this.__checkbox, "change", onChange, false);
 
     this.domElement.appendChild(this.__checkbox);
 
     // Match original value
     this.updateDisplay();
-  }
-
-  onChange() {
-    _this.setValue(!_this.__prev);
   }
 
   setValue(v) {

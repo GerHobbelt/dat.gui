@@ -1,3 +1,4 @@
+@charset "UTF-8";
 /**
  * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
@@ -11,9 +12,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-@charset "UTF-8";
-@import "./controllers/NumberControllerSlider.css";
-@import "./controllers/ImageController.css";
+
 .dg {
   /** Clear list styles */
   /* Auto-place container */
@@ -377,4 +376,59 @@
 }
 .dg .c .slider:hover .slider-fg {
   background: #44abda;
+}
+
+/* ====================================================================== */
+
+.slider {
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15);
+  height: 1em;
+  border-radius: 1em;
+  background-color: #EEEEEE;
+  padding: 0 0.5em;
+  overflow: hidden;
+}
+
+.slider-fg {
+  padding: 1px 0 2px 0;
+  background-color: #AAAAAA;
+  height: 1em;
+  margin-left: -0.5em;
+  padding-right: 0.5em;
+  border-radius: 1em 0 0 1em;
+}
+
+.slider-fg::after {
+  display: inline-block;
+  border-radius: 1em;
+  background-color: #FFFFFF;
+  border: 1px solid #AAAAAA;
+  content: "";
+  float: right;
+  margin-right: -1em;
+  margin-top: -1px;
+  height: 0.9em;
+  width: 0.9em;
+}
+
+/* ====================================================================== */
+
+.GUI-preview-image {
+  float: left;
+  padding: 0.4em;
+  max-width: 2em;
+  max-height: 2em;
+}
+
+.GUI-label-image {
+  color: #d6d6f5;
+  text-decoration: underline;
+  display: block;
+  background-color: #3C3C3C;
+  width: 100%;
+  cursor: pointer;
+}
+
+.GUI-label-image:hover {
+  background: #3C3C3C;
 }

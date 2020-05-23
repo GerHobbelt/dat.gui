@@ -57,11 +57,11 @@ class Controller {
   }
 
   /**
-   * Specify that a function fire every time someone changes the value with
+   * Specify a function which fires every time someone has changed the value with
    * this Controller.
    *
    * @param {Function} fnc This function will be called whenever the value
-   * is modified via this Controller.
+   * has been modified via this Controller.
    * @returns {Controller} this
    */
   onChange(fnc) {
@@ -70,8 +70,8 @@ class Controller {
   }
 
   /**
-   * Specify that a function fire every time someone "finishes" changing
-   * the value wih this Controller. Useful for values that change
+   * Specify a function which fires every time someone "finishes" changing
+   * the value with this Controller. Useful for values that change
    * incrementally like numbers or strings.
    *
    * @param {Function} fnc This function will be called whenever
@@ -95,6 +95,7 @@ class Controller {
     } else if (this.__onFinishChange) {
       this.__onFinishChange.call(this, newValue);
     }
+
     this.updateDisplay();
     return this;
   }

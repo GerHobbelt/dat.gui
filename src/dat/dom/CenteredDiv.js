@@ -73,6 +73,9 @@ class CenteredDiv {
     });
   }
 
+  /**
+   * Hide centered div
+   */
   hide() {
     const _this = this;
 

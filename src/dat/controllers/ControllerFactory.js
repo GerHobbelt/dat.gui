@@ -31,7 +31,6 @@ const ControllerFactory = function (object, property) {
   }
 
   // Providing a map?
-
   if (common.isNumber(initialValue)) {
     if (common.isNumber(arguments[2]) && common.isNumber(arguments[3])) {
       // Has min and max.
@@ -55,6 +54,8 @@ const ControllerFactory = function (object, property) {
   if (common.isArray(initialValue)) {
     return new ArrayController(object, property);
   }
+
+  return null;
 };
 
 export default ControllerFactory;

@@ -65,7 +65,7 @@ let hide = false;
 const hideable_guis = [];
 
 /**
- * A lightweight controller library for JavaScript. It allows you to easily
+ * @class A lightweight controller library for JavaScript. It allows you to easily
  * manipulate variables and fire functions on the fly.
  * @class
  *
@@ -209,9 +209,8 @@ class GUI {
           get: function () {
             if (_this.parent) {
               return _this.getRoot().preset;
-            } else {
-              return params.load.preset;
             }
+            return params.load.preset;
           },
 
           set: function (v) {
@@ -275,7 +274,7 @@ class GUI {
             // For browsers that aren't going to respect the CSS transition,
             // Lets just check our height against the settings.WINDOW height right off
             // the bat.
-            this.onResize();
+            _this.onResize();
 
             if (_this.__closeButton) {
               _this.__closeButton.innerHTML = v ? GUI.TEXT_OPEN : GUI.TEXT_CLOSED;
@@ -624,6 +623,7 @@ class GUI {
   }
 
   /**
+   * Creates a new subfolder GUI instance.
    * @param name
    * @returns {dat.gui.GUI} The new folder.
    * @throws {Error} if this GUI already has a folder by the specified
@@ -674,6 +674,9 @@ class GUI {
     return gui;
   }
 
+  /**
+   * Opens the GUI.
+   */
   open() {
     this.closed = false;
   }
@@ -689,7 +692,7 @@ class GUI {
     const root = this.getRoot();
 
     if (root.scrollable) {
-      const top = dom.getOffset(root.__ul).top;
+      const { top } = dom.getOffset(root.__ul);
       let h = 0;
 
       common.each(root.__ul.childNodes, function (node) {
@@ -932,6 +935,10 @@ function augmentController(gui, li, controller) {
   controller.__gui = gui;
 
   common.extend(controller, {
+    /**
+     * @param  {Array|Object} options
+     * @return {Controller}
+     */
     options: function (options) {
       if (arguments.length > 1) {
         const nextSibling = controller.__li.nextElementSibling;
@@ -954,16 +961,29 @@ function augmentController(gui, li, controller) {
       }
     },
 
-    name: function (v) {
-      controller.__li.firstElementChild.firstElementChild.innerHTML = v;
+    /**
+     * Sets the name of the controller.
+     * @param  {string} name
+     * @return {Controller}
+     */
+    name: function (name) {
+      controller.__li.firstElementChild.firstElementChild.innerHTML = name;
       return controller;
     },
 
+    /**
+     * Sets controller to listen for changes on its underlying object.
+     * @return {Controller}
+     */
     listen: function () {
       controller.__gui.listen(controller);
       return controller;
     },
 
+    /**
+     * Removes the controller from its parent GUI.
+     * @return {Controller}
+     */
     remove: function () {
       controller.__gui.remove(controller);
       return controller;
@@ -1098,7 +1118,7 @@ function recallSavedValue(gui, controller) {
         return;
       }
 
-      // Did the loaded object remember thcommon.isObject?
+      // Did the loaded object remember this object?
       if (
         preset[matched_index] &&
         // Did we remember this particular property?
@@ -1153,7 +1173,7 @@ function addSaveMenu(gui) {
 
   if (gui.load && gui.load.remembered) {
     common.each(gui.load.remembered, function (value, key) {
-      addPresetOption(gui, key, key == gui.preset);
+      addPresetOption(gui, key, key === gui.preset);
     });
   } else {
     addPresetOption(gui, DEFAULT_DEFAULT_PRESET_NAME, false);
@@ -1219,7 +1239,9 @@ function addSaveMenu(gui) {
 
   dom.bind(button2, "click", function () {
     const presetName = prompt("Enter a new preset name.");
-    if (presetName) gui.saveAs(presetName);
+    if (presetName) {
+      gui.saveAs(presetName);
+    }
   });
 
   dom.bind(button3, "click", function () {
@@ -1310,7 +1332,7 @@ function getCurrentPreset(gui, useInitialValues) {
   common.each(gui.__rememberedObjects, function (val, index) {
     const saved_values = {};
 
-    // The controllers I've made for thcommon.isObject by property
+    // The controllers I've made for this object by property
     const controller_map = gui.__rememberedObjectIndecesToControllers[index];
 
     // Remember each value for each property
@@ -1337,7 +1359,7 @@ function addPresetOption(gui, name, setSelected) {
 
 function setPresetSelectIndex(gui) {
   for (let index = 0; index < gui.__preset_select.length; index++) {
-    if (gui.__preset_select[index].value == gui.preset) {
+    if (gui.__preset_select[index].value === gui.preset) {
       gui.__preset_select.selectedIndex = index;
     }
   }
@@ -1354,7 +1376,7 @@ function markPresetModified(gui, modified) {
 }
 
 function updateDisplays(controllerArray) {
-  if (controllerArray.length != 0) {
+  if (controllerArray.length !== 0) {
     requestAnimationFrame(function () {
       updateDisplays(controllerArray);
     });

@@ -649,8 +649,12 @@
       elem.unselectable = selectable ? "on" : "off";
     },
     makeFullscreen: function makeFullscreen(elem, horizontal, vertical) {
-      if (Common.isUndefined(horizontal)) horizontal = true;
-      if (Common.isUndefined(vertical)) vertical = true;
+      if (Common.isUndefined(horizontal)) {
+        horizontal = true;
+      }
+      if (Common.isUndefined(vertical)) {
+        vertical = true;
+      }
       elem.style.position = "absolute";
       if (horizontal) {
         elem.style.left = 0;
@@ -724,10 +728,13 @@
       Common.defaults(evt, aux);
       elem.dispatchEvent(evt);
     },
-    bind: function bind(elem, event, func, bool) {
-      bool = bool || false;
-      if (elem.addEventListener) elem.addEventListener(event, func, bool);
-      else if (elem.attachEvent) elem.attachEvent("on" + event, func);
+    bind: function bind(elem, event, func, newBool) {
+      var bool = newBool || false;
+      if (elem.addEventListener) {
+        elem.addEventListener(event, func, bool);
+      } else if (elem.attachEvent) {
+        elem.attachEvent("on" + event, func);
+      }
       return dom;
     },
     unbind: function unbind(elem, event, func, newBool) {
@@ -2302,9 +2309,8 @@
           get: function get() {
             if (_this.parent) {
               return _this.getRoot().preset;
-            } else {
-              return params.load.preset;
             }
+            return params.load.preset;
           },
           set: function set(v) {
             if (_this.parent) {
@@ -2347,7 +2353,7 @@
             } else {
               dom.removeClass(_this.__ul, GUI.CLASS_CLOSED);
             }
-            this.onResize();
+            _this.onResize();
             if (_this.__closeButton) {
               _this.__closeButton.innerHTML = v ? GUI.TEXT_OPEN : GUI.TEXT_CLOSED;
             }
@@ -2612,7 +2618,8 @@
     _proto.onResize = function onResize() {
       var root = this.getRoot();
       if (root.scrollable) {
-        var top = dom.getOffset(root.__ul).top;
+        var _dom$getOffset = dom.getOffset(root.__ul),
+          top = _dom$getOffset.top;
         var h = 0;
         Common.each(root.__ul.childNodes, function (node) {
           if (!(root.autoPlace && node === root.__save_row) && node.nodeType === 1) h += dom.getHeight(node);
@@ -2802,8 +2809,8 @@
           });
         }
       },
-      name: function name(v) {
-        controller.__li.firstElementChild.firstElementChild.innerHTML = v;
+      name: function name(_name) {
+        controller.__li.firstElementChild.firstElementChild.innerHTML = _name;
         return controller;
       },
       listen: function listen() {
@@ -2938,7 +2945,7 @@
     var select = (gui.__preset_select = settings.DOCUMENT.createElement("select"));
     if (gui.load && gui.load.remembered) {
       Common.each(gui.load.remembered, function (value, key) {
-        addPresetOption(gui, key, key == gui.preset);
+        addPresetOption(gui, key, key === gui.preset);
       });
     } else {
       addPresetOption(gui, DEFAULT_DEFAULT_PRESET_NAME, false);
@@ -2988,7 +2995,9 @@
     });
     dom.bind(button2, "click", function () {
       var presetName = prompt("Enter a new preset name.");
-      if (presetName) gui.saveAs(presetName);
+      if (presetName) {
+        gui.saveAs(presetName);
+      }
     });
     dom.bind(button3, "click", function () {
       gui.revert();
@@ -3072,7 +3081,7 @@
   }
   function setPresetSelectIndex(gui) {
     for (var index = 0; index < gui.__preset_select.length; index++) {
-      if (gui.__preset_select[index].value == gui.preset) {
+      if (gui.__preset_select[index].value === gui.preset) {
         gui.__preset_select.selectedIndex = index;
       }
     }
@@ -3086,7 +3095,7 @@
     }
   }
   function updateDisplays(controllerArray) {
-    if (controllerArray.length != 0) {
+    if (controllerArray.length !== 0) {
       requestAnimationFrame$1(function () {
         updateDisplays(controllerArray);
       });

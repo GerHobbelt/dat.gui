@@ -39,6 +39,17 @@ hands-on examples, see the dat.GUI [tutorial](http://workshop.chromeexperiments.
 <dt><a href="#addRow">addRow(gui, [dom], [liBefore])</a></dt>
 <dd><p>Add a row to the end of the GUI or before another row.</p>
 </dd>
+<dt><a href="#options">options(options)</a> ⇒ <code>Controller</code></dt>
+<dd></dd>
+<dt><a href="#name">name(name)</a> ⇒ <code>Controller</code></dt>
+<dd><p>Sets the name of the controller.</p>
+</dd>
+<dt><a href="#listen">listen()</a> ⇒ <code>Controller</code></dt>
+<dd><p>Sets controller to listen for changes on its underlying object.</p>
+</dd>
+<dt><a href="#remove">remove()</a> ⇒ <code>Controller</code></dt>
+<dd><p>Removes the controller from its parent GUI.</p>
+</dd>
 </dl>
 
 <a name="auto_place_virgin"></a>
@@ -90,4 +101,36 @@ Add a row to the end of the GUI or before another row.
 | [dom] | If specified, inserts the dom content in the new row |
 | [liBefore] | If specified, places the new row before another row |
 
+<a name="options"></a>
+
+## options(options) ⇒ <code>Controller</code>
+**Kind**: global function  
+
+| Param | Type |
+| --- | --- |
+| options | <code>Array</code> \| <code>Object</code> | 
+
+<a name="name"></a>
+
+## name(name) ⇒ <code>Controller</code>
+Sets the name of the controller.
+
+**Kind**: global function  
+
+| Param | Type |
+| --- | --- |
+| name | <code>string</code> | 
+
+<a name="listen"></a>
+
+## listen() ⇒ <code>Controller</code>
+Sets controller to listen for changes on its underlying object.
+
+**Kind**: global function  
+<a name="remove"></a>
+
+## remove() ⇒ <code>Controller</code>
+Removes the controller from its parent GUI.
+
+**Kind**: global function  
 <!--- API END --->

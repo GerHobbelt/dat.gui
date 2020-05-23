@@ -48,7 +48,7 @@ function cssValueToPixels(val) {
  * @namespace
  * @member dat.dom
  */
-var dom = {
+const dom = {
   /**
    *
    * @param elem
@@ -77,8 +77,12 @@ var dom = {
    * @param vertical
    */
   makeFullscreen: function (elem, horizontal, vertical) {
-    if (common.isUndefined(horizontal)) horizontal = true;
-    if (common.isUndefined(vertical)) vertical = true;
+    if (common.isUndefined(horizontal)) {
+      horizontal = true;
+    }
+    if (common.isUndefined(vertical)) {
+      vertical = true;
+    }
 
     elem.style.position = "absolute";
 
@@ -169,10 +173,13 @@ var dom = {
    * @param func
    * @param bool
    */
-  bind: function (elem, event, func, bool) {
-    bool = bool || false;
-    if (elem.addEventListener) elem.addEventListener(event, func, bool);
-    else if (elem.attachEvent) elem.attachEvent("on" + event, func);
+  bind: function (elem, event, func, newBool) {
+    const bool = newBool || false;
+    if (elem.addEventListener) {
+      elem.addEventListener(event, func, bool);
+    } else if (elem.attachEvent) {
+      elem.attachEvent("on" + event, func);
+    }
     return dom;
   },
 
@@ -218,8 +225,9 @@ var dom = {
    */
   removeClass: function (elem, className) {
     if (className) {
+      /* jshint -W035 */ // jshint: ignore empty block
       if (elem.className === undefined) {
-        // elem.className = className;
+        // elem.className = undefined;
       } else if (elem.className === className) {
         elem.removeAttribute("class");
       } else {
@@ -230,6 +238,7 @@ var dom = {
           elem.className = classes.join(" ");
         }
       }
+      /* jshint +W035 */
     } else {
       elem.className = undefined;
     }

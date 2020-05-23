@@ -685,7 +685,7 @@
 
   var EVENT_MAP = {
     HTMLEvents: ["change"],
-    MouseEvents: ["click", "mousemove", "mousedown", "mouseup", "mouseover"],
+    MouseEvents: ["click", "mousemove", "mousedown", "mouseup", "mouseover", "wheel"],
     KeyboardEvents: ["keydown"],
   };
   var EVENT_MAP_INV = {};

@@ -25,22 +25,26 @@ function FizzyText(message, font) {
   // we've defined a variable 'this.message'. This way, whenever we
   // change the message variable, we can call some more functions.
 
-  this.__defineGetter__("message", function () {
-    return message;
+  Object.defineProperty(this, "message", {
+    get: function () {
+      return message;
+    },
+
+    set: function (m) {
+      message = m;
+      createBitmap(message, font);
+    },
   });
 
-  this.__defineSetter__("message", function (m) {
-    message = m;
-    createBitmap(message, font);
-  });
+  Object.defineProperty(this, "font", {
+    get: function () {
+      return font;
+    },
 
-  this.__defineGetter__("font", function () {
-    return font;
-  });
-
-  this.__defineSetter__("font", function (f) {
-    font = f;
-    createBitmap(message, font);
+    set: function (f) {
+      font = f;
+      createBitmap(message, font);
+    },
   });
 
   // We can even add functions to the DAT.GUI! As long as they have

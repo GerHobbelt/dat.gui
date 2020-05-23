@@ -7,8 +7,10 @@ const GUI = function () {
     json = GUI.loadedJSON.guis.splice(0, 1)[0];
   }
 
-  this.__defineGetter__("json", function () {
-    return json;
+  Object.defineProperty(this, "json", {
+    get: function () {
+      return json;
+    },
   });
 
   const _this = this;
@@ -239,15 +241,17 @@ const GUI = function () {
     }, this.autoListenIntervalTime);
   };
 
-  this.__defineSetter__("autoListen", function (v) {
-    autoListen = v;
-    if (!autoListen) {
-      clearInterval(listenInterval);
-    } else if (listening.length > 0) createListenInterval();
-  });
+  Object.defineProperty(this, "autoListen", {
+    get: function (v) {
+      return autoListen;
+    },
 
-  this.__defineGetter__("autoListen", function (v) {
-    return autoListen;
+    set: function (v) {
+      autoListen = v;
+      if (!autoListen) {
+        clearInterval(listenInterval);
+      } else if (listening.length > 0) createListenInterval();
+    },
   });
 
   this.listenTo = function (controller) {
@@ -374,7 +378,7 @@ const GUI = function () {
     }
 
     if (this.timer != null) {
-      new GUI.Scrubber(controllerObject, this.timer);
+      GUI.Scrubber(controllerObject, this.timer);
     }
 
     return controllerObject;
@@ -600,7 +604,7 @@ GUI.getOffset = function (obj, relativeTo) {
 };
 
 GUI.roundToDecimal = function (n, decimals) {
-  const t = Math.pow(10, decimals);
+  const t = 10 ** decimals;
   return Math.round(n * t) / t;
 };
 

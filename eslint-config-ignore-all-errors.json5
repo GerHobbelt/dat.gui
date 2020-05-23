@@ -41,5 +41,5 @@ rules: {
 	indent: 1,
 	no-proto: 1,
 	no-inner-declarations: 1,
-	getter-return: 1,
+	prefer-spread: 1,
 }}

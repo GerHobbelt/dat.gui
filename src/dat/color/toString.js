@@ -11,16 +11,14 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define(["dat/utils/common"], function (common) {
-  return function (color) {
-    if (color.a == 1 || common.isUndefined(color.a)) {
-      let s = color.hex.toString(16);
-      while (s.length < 6) {
-        s = "0" + s;
-      }
-
-      return "#" + s;
+export default function (color) {
+  if (color.a == 1 || common.isUndefined(color.a)) {
+    let s = color.hex.toString(16);
+    while (s.length < 6) {
+      s = "0" + s;
     }
-    return "rgba(" + Math.round(color.r) + "," + Math.round(color.g) + "," + Math.round(color.b) + "," + color.a + ")";
-  };
-});
+
+    return "#" + s;
+  }
+  return "rgba(" + Math.round(color.r) + "," + Math.round(color.g) + "," + Math.round(color.b) + "," + color.a + ")";
+}

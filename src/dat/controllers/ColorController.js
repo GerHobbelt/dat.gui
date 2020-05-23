@@ -11,15 +11,23 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define([
-  "dat/controllers/Controller",
-  "dat/dom/dom",
-  "dat/color/Color",
-  "dat/color/interpret",
-  "dat/utils/common",
-], function (Controller, dom, Color, interpret, common) {
-  var ColorController = function (object, property) {
-    ColorController.superclass.call(this, object, property);
+import Controller from "./Controller";
+import dom from "../dom/dom";
+import Color from "../color/Color";
+import interpret from "../color/interpret";
+import common from "../utils/common";
+
+/**
+ * @class Represents a given property of an object that is a color.
+ *
+ * @extends Controller
+ *
+ * @param {Object} object
+ * @param {string} property
+ */
+class ColorController extends Controller {
+  constructor(object, property) {
+    super(object, property);
 
     this.__color = new Color(this.getValue());
     this.__temp = new Color(0);
@@ -218,97 +226,88 @@ define([
 
       return false;
     }
-  };
+  }
 
-  ColorController.superclass = Controller;
+  updateDisplay() {
+    const i = interpret(this.getValue());
 
-  common.extend(
-    ColorController.prototype,
-    Controller.prototype,
+    if (i !== false) {
+      let mismatch = false;
 
-    {
-      updateDisplay: function () {
-        const i = interpret(this.getValue());
+      // Check for mismatch on the interpreted value.
 
-        if (i !== false) {
-          let mismatch = false;
-
-          // Check for mismatch on the interpreted value.
-
-          common.each(
-            Color.COMPONENTS,
-            function (component) {
-              if (
-                !common.isUndefined(i[component]) &&
-                !common.isUndefined(this.__color.__state[component]) &&
-                i[component] !== this.__color.__state[component]
-              ) {
-                mismatch = true;
-                return {}; // break
-              }
-            },
-            this
-          );
-
-          // If nothing diverges, we keep our previous values
-          // for statefulness, otherwise we recalculate fresh
-          if (mismatch) {
-            common.extend(this.__color.__state, i);
+      common.each(
+        Color.COMPONENTS,
+        function (component) {
+          if (
+            !common.isUndefined(i[component]) &&
+            !common.isUndefined(this.__color.__state[component]) &&
+            i[component] !== this.__color.__state[component]
+          ) {
+            mismatch = true;
+            return {}; // break
           }
-        }
+        },
+        this
+      );
 
-        common.extend(this.__temp.__state, this.__color.__state);
-
-        this.__temp.a = 1;
-
-        const flip = this.__color.v < 0.5 || this.__color.s > 0.5 ? 255 : 0;
-        const _flip = 255 - flip;
-
-        common.extend(this.__field_knob.style, {
-          marginLeft: 100 * this.__color.s - 7 + "px",
-          marginTop: 100 * (1 - this.__color.v) - 7 + "px",
-          backgroundColor: this.__temp.toString(),
-          border: this.__field_knob_border + "rgb(" + flip + "," + flip + "," + flip + ")",
-        });
-
-        this.__hue_knob.style.marginTop = (1 - this.__color.h / 360) * 100 + "px";
-
-        this.__temp.s = 1;
-        this.__temp.v = 1;
-
-        linearGradient(this.__saturation_field, "left", "#fff", this.__temp.toString());
-
-        common.extend(this.__input.style, {
-          backgroundColor: (this.__input.value = this.__color.toString()),
-          color: "rgb(" + flip + "," + flip + "," + flip + ")",
-          textShadow: this.__input_textShadow + "rgba(" + _flip + "," + _flip + "," + _flip + ",.7)",
-        });
-      },
+      // If nothing diverges, we keep our previous values
+      // for statefulness, otherwise we recalculate fresh
+      if (mismatch) {
+        common.extend(this.__color.__state, i);
+      }
     }
-  );
 
-  const vendors = ["-moz-", "-o-", "-webkit-", "-ms-", ""];
+    common.extend(this.__temp.__state, this.__color.__state);
 
-  function linearGradient(elem, x, a, b) {
-    elem.style.background = "";
-    common.each(vendors, function (vendor) {
-      elem.style.cssText += "background: " + vendor + "linear-gradient(" + x + ", " + a + " 0%, " + b + " 100%); ";
+    this.__temp.a = 1;
+
+    const flip = this.__color.v < 0.5 || this.__color.s > 0.5 ? 255 : 0;
+    const _flip = 255 - flip;
+
+    common.extend(this.__field_knob.style, {
+      marginLeft: 100 * this.__color.s - 7 + "px",
+      marginTop: 100 * (1 - this.__color.v) - 7 + "px",
+      backgroundColor: this.__temp.toString(),
+      border: this.__field_knob_border + "rgb(" + flip + "," + flip + "," + flip + ")",
+    });
+
+    this.__hue_knob.style.marginTop = (1 - this.__color.h / 360) * 100 + "px";
+
+    this.__temp.s = 1;
+    this.__temp.v = 1;
+
+    linearGradient(this.__saturation_field, "left", "#fff", this.__temp.toString());
+
+    common.extend(this.__input.style, {
+      backgroundColor: (this.__input.value = this.__color.toString()),
+      color: "rgb(" + flip + "," + flip + "," + flip + ")",
+      textShadow: this.__input_textShadow + "rgba(" + _flip + "," + _flip + "," + _flip + ",.7)",
     });
   }
+}
 
-  function hueGradient(elem) {
-    elem.style.background = "";
-    elem.style.cssText +=
-      "background: -moz-linear-gradient(top,  #ff0000 0%, #ff00ff 17%, #0000ff 34%, #00ffff 50%, #00ff00 67%, #ffff00 84%, #ff0000 100%);";
-    elem.style.cssText +=
-      "background: -webkit-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
-    elem.style.cssText +=
-      "background: -o-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
-    elem.style.cssText +=
-      "background: -ms-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
-    elem.style.cssText +=
-      "background: linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
-  }
+const vendors = ["-moz-", "-o-", "-webkit-", "-ms-", ""];
 
-  return ColorController;
-});
+function linearGradient(elem, x, a, b) {
+  elem.style.background = "";
+  common.each(vendors, function (vendor) {
+    elem.style.cssText += "background: " + vendor + "linear-gradient(" + x + ", " + a + " 0%, " + b + " 100%); ";
+  });
+}
+
+function hueGradient(elem) {
+  elem.style.background = "";
+  elem.style.cssText +=
+    "background: -moz-linear-gradient(top,  #ff0000 0%, #ff00ff 17%, #0000ff 34%, #00ffff 50%, #00ff00 67%, #ffff00 84%, #ff0000 100%);";
+  elem.style.cssText +=
+    "background: -webkit-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
+  elem.style.cssText +=
+    "background: -o-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
+  elem.style.cssText +=
+    "background: -ms-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
+  elem.style.cssText +=
+    "background: linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
+}
+
+export default ColorController;

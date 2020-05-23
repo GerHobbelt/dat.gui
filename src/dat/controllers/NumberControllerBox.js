@@ -11,31 +11,31 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define(["dat/controllers/NumberController", "dat/dom/dom", "dat/utils/common"], function (
-  NumberController,
-  dom,
-  common
-) {
-  /**
-   * @class Represents a given property of an object that is a number and
-   * provides an input element with which to manipulate it.
-   *
-   * @extends dat.controllers.Controller
-   * @extends dat.controllers.NumberController
-   *
-   * @param {Object} object The object to be manipulated
-   * @param {string} property The name of the property to be manipulated
-   * @param {Object} [params] Optional parameters
-   * @param {Number} [params.min] Minimum allowed value
-   * @param {Number} [params.max] Maximum allowed value
-   * @param {Number} [params.step] Increment by which to change value
-   *
-   * @member dat.controllers
-   */
-  var NumberControllerBox = function (object, property, params) {
+import NumberController from "./NumberController";
+import dom from "../dom/dom";
+import common from "../utils/common";
+
+/**
+ * @class Represents a given property of an object that is a number and
+ * provides an input element with which to manipulate it.
+ *
+ * @extends dat.controllers.Controller
+ * @extends dat.controllers.NumberController
+ *
+ * @param {Object} object The object to be manipulated
+ * @param {string} property The name of the property to be manipulated
+ * @param {Object} [params] Optional parameters
+ * @param {Number} [params.min] Minimum allowed value
+ * @param {Number} [params.max] Maximum allowed value
+ * @param {Number} [params.step] Increment by which to change value
+ *
+ * @member dat.controllers
+ */
+class NumberControllerBox extends NumberController {
+  constructor(object, property, params) {
     this.__truncationSuspended = false;
 
-    NumberControllerBox.superclass.call(this, object, property, params);
+    super(object, property, params);
 
     const _this = this;
 
@@ -64,7 +64,9 @@ define(["dat/controllers/NumberController", "dat/dom/dom", "dat/utils/common"], 
 
     function onChange() {
       const attempted = parseFloat(_this.__input.value);
-      if (!common.isNaN(attempted)) _this.setValue(attempted);
+      if (!common.isNaN(attempted)) {
+        _this.setValue(attempted);
+      }
     }
 
     function onBlur() {
@@ -95,32 +97,23 @@ define(["dat/controllers/NumberController", "dat/dom/dom", "dat/utils/common"], 
     this.updateDisplay();
 
     this.domElement.appendChild(this.__input);
-  };
-
-  NumberControllerBox.superclass = NumberController;
-
-  common.extend(
-    NumberControllerBox.prototype,
-    NumberController.prototype,
-
-    {
-      updateDisplay: function () {
-        // Use the same solution from StringController.js to enable
-        // editing <input>s while "listen()"ing
-        if (!dom.isActive(this.__input)) {
-          this.__input.value = this.__truncationSuspended
-            ? this.getValue()
-            : roundToDecimal(this.getValue(), this.__precision);
-        }
-        return NumberControllerBox.superclass.prototype.updateDisplay.call(this);
-      },
-    }
-  );
-
-  function roundToDecimal(value, decimals) {
-    const tenTo = Math.pow(10, decimals);
-    return Math.round(value * tenTo) / tenTo;
   }
 
-  return NumberControllerBox;
-});
+  updateDisplay() {
+    // Use the same solution from StringController.js to enable
+    // editing <input>s while "listen()"ing
+    if (!dom.isActive(this.__input)) {
+      this.__input.value = this.__truncationSuspended
+        ? this.getValue()
+        : roundToDecimal(this.getValue(), this.__precision);
+    }
+    return super.updateDisplay();
+  }
+}
+
+function roundToDecimal(value, decimals) {
+  const tenTo = Math.pow(10, decimals);
+  return Math.round(value * tenTo) / tenTo;
+}
+
+export default NumberControllerBox;

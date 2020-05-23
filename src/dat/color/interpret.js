@@ -64,7 +64,9 @@ const INTERPRETATIONS = [
       CSS_RGB: {
         read: function (original) {
           const test = original.match(/^rgb\(\s*(.+)\s*,\s*(.+)\s*,\s*(.+)\s*\)/);
-          if (test === null) return false;
+          if (test === null) {
+            return false;
+          }
 
           return {
             space: "RGB",
@@ -129,6 +131,7 @@ const INTERPRETATIONS = [
           if (original.length !== 3) {
             return false;
           }
+
           return {
             space: "RGB",
             r: original[0],

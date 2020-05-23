@@ -11,37 +11,32 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define([
-  "dat/controllers/NumberController",
-  "dat/dom/dom",
-  "dat/utils/css",
-  "dat/utils/common",
-  "text!dat/controllers/NumberControllerSlider.css",
-], function (NumberController, dom, css, common, styleSheet) {
-  /**
-   * @class Represents a given property of an object that is a number, contains
-   * a minimum and maximum, and provides a slider element with which to
-   * manipulate it. It should be noted that the slider element is made up of
-   * <code>&lt;div&gt;</code> tags, <strong>not</strong> the html5
-   * <code>&lt;slider&gt;</code> element.
-   *
-   * @extends dat.controllers.Controller
-   * @extends dat.controllers.NumberController
-   *
-   * @param {Object} object The object to be manipulated
-   * @param {string} property The name of the property to be manipulated
-   * @param {Number} minValue Minimum allowed value
-   * @param {Number} maxValue Maximum allowed value
-   * @param {Number} stepValue Increment by which to change value
-   *
-   * @member dat.controllers
-   */
-  var NumberControllerSlider = function (object, property, min, max, step) {
-    NumberControllerSlider.superclass.call(this, object, property, {
-      min: min,
-      max: max,
-      step: step,
-    });
+import NumberController from "./NumberController";
+import dom from "../dom/dom";
+
+//  "text!dat/controllers/NumberControllerSlider.css"
+
+/**
+ * @class Represents a given property of an object that is a number, contains
+ * a minimum and maximum, and provides a slider element with which to
+ * manipulate it. It should be noted that the slider element is made up of
+ * <code>&lt;div&gt;</code> tags, <strong>not</strong> the html5
+ * <code>&lt;slider&gt;</code> element.
+ *
+ * @extends dat.controllers.Controller
+ * @extends dat.controllers.NumberController
+ *
+ * @param {Object} object The object to be manipulated
+ * @param {string} property The name of the property to be manipulated
+ * @param {Number} minValue Minimum allowed value
+ * @param {Number} maxValue Maximum allowed value
+ * @param {Number} stepValue Increment by which to change value
+ *
+ * @member dat.controllers
+ */
+class NumberControllerSlider extends NumberController {
+  constructor(object, property, min, max, step) {
+    super(object, property, { min: min, max: max, step: step });
 
     const _this = this;
 
@@ -83,33 +78,24 @@ define([
 
     this.__background.appendChild(this.__foreground);
     this.domElement.appendChild(this.__background);
-  };
-
-  NumberControllerSlider.superclass = NumberController;
+  }
 
   /**
    * Injects default stylesheet for slider elements.
    */
-  NumberControllerSlider.useDefaultStyles = function () {
+  useDefaultStyles() {
     css.inject(styleSheet);
-  };
-
-  common.extend(
-    NumberControllerSlider.prototype,
-    NumberController.prototype,
-
-    {
-      updateDisplay: function () {
-        const pct = (this.getValue() - this.__min) / (this.__max - this.__min);
-        this.__foreground.style.width = pct * 100 + "%";
-        return NumberControllerSlider.superclass.prototype.updateDisplay.call(this);
-      },
-    }
-  );
-
-  function map(v, i1, i2, o1, o2) {
-    return o1 + (o2 - o1) * ((v - i1) / (i2 - i1));
   }
 
-  return NumberControllerSlider;
-});
+  updateDisplay() {
+    const pct = (this.getValue() - this.__min) / (this.__max - this.__min);
+    this.__foreground.style.width = pct * 100 + "%";
+    return super.updateDisplay();
+  }
+}
+
+function map(v, i1, i2, o1, o2) {
+  return o1 + (o2 - o1) * ((v - i1) / (i2 - i1));
+}
+
+export default NumberControllerSlider;

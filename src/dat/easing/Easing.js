@@ -176,7 +176,8 @@ EasingFunction.prototype = {
     let type;
 
     this.points.forEach(function (p, i) {
-      (dx = x - p.x), (dy = y - p.y);
+      dx = x - p.x;
+      dy = y - p.y;
       h = dx * dx + dy * dy;
       if (h < r * r && minD > h) {
         minD = h;
@@ -221,9 +222,11 @@ EasingFunction.prototype = {
       }
 
       candidates.forEach(function (cand) {
-        (d = cand[0]), (type = cand[1]);
+        d = cand[0];
+        type = cand[1];
 
-        (dx = x - p.x - d), (dy = y - p.y);
+        dx = x - p.x - d;
+        dy = y - p.y;
         h = dx * dx + dy * dy;
         if (h < r * r && minD > h) {
           minD = h;

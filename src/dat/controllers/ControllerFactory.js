@@ -22,6 +22,8 @@ import BooleanController from "./BooleanController";
 import Vec3Controller from "./Vec3Controller";
 import common from "../utils/common";
 
+const ARR_SLICE = Array.prototype.slice;
+
 const ControllerFactory = function (object, property) {
   const initialValue = object[property];
 
@@ -32,10 +34,12 @@ const ControllerFactory = function (object, property) {
 
   // Providing a map?
   if (common.isNumber(initialValue)) {
+    // Has min and max? (slider)
     if (common.isNumber(arguments[2]) && common.isNumber(arguments[3])) {
       // Has min and max.
       return new NumberControllerSlider(object, property, arguments[2], arguments[3], arguments[4], arguments[5]);
     }
+    // number box
     return new NumberControllerBox(object, property, { min: arguments[2], max: arguments[3], step: arguments[4] });
   }
 
@@ -44,7 +48,11 @@ const ControllerFactory = function (object, property) {
   }
 
   if (common.isFunction(initialValue)) {
-    return new FunctionController(object, property, "");
+    let opts = ARR_SLICE.call(arguments, 3);
+    if (opts.length === 0) {
+      opts = undefined;
+    }
+    return new FunctionController(object, property, options_1, opts);
   }
 
   if (common.isBoolean(initialValue)) {
@@ -54,6 +62,9 @@ const ControllerFactory = function (object, property) {
   if (common.isArray(initialValue)) {
     return new ArrayController(object, property);
   }
+
+  // otherwise: we cannot 'sniff' the type of controller you want, since the
+  // `initialValue` is null or undefined.
 
   return null;
 };

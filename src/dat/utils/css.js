@@ -25,7 +25,13 @@ const css = {
     const injected = settings.DOCUMENT.createElement("style");
     injected.type = "text/css";
     injected.innerHTML = css;
-    doc.getElementsByTagName("head")[0].appendChild(injected);
+    const head = doc.getElementsByTagName("head")[0];
+    try {
+      head.appendChild(injected);
+    } catch (e) {
+      // At least log this error in the browser console:
+      console.error("Unable to inject CSS, probably because of a Content Security Policy");
+    }
   },
 };
 

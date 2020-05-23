@@ -11,13 +11,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-export default function (color) {
-  if (color.a === 1 || common.isUndefined(color.a)) {
-    let str = color.hex.toString(16);
-    while (str.length < 6) {
-      str = "0" + str;
-    }
-    return "#" + str;
-  }
-  return "rgba(" + Math.round(color.r) + "," + Math.round(color.g) + "," + Math.round(color.b) + "," + color.a + ")";
-}
+@import "./gui/style.scss"; // CSS to embed in build
+
+// CSS for the various controllers
+@import "./controllers/NumberControllerSlider.scss";

@@ -16,6 +16,7 @@
 *.md            text eol=lf
 *.php           text eol=lf
 *.sass          text eol=lf
+*.scss          text eol=lf
 *.sed           text eol=lf
 *.sh            text eol=lf
 *.src           text eol=lf

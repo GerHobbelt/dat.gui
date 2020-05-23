@@ -28,9 +28,12 @@ import CenteredDiv from "../dom/CenteredDiv";
 import dom from "../dom/dom";
 import common from "../utils/common";
 
-import styleSheet from "./style.scss"; // CSS to embed in build
+// import styleSheet from "./style.scss"; // CSS to embed in build
 
-css.inject(styleSheet);
+// var ARR_EACH = Array.prototype.forEach;
+const ARR_SLICE = Array.prototype.slice;
+
+// css.inject(styleSheet);
 
 /** Outer-most className for GUI's */
 const CSS_NAMESPACE = "dg";
@@ -248,7 +251,12 @@ class GUI {
             return params.name || "";
           },
           set: function (v) {
-            // TODO Check for collisions among sibling folders
+            // Check for collisions among sibling folders:
+            // We have to prevent collisions on names in order to have a key
+            // by which to remember saved values.
+            if (v !== params.name && _this.__folders[v] !== undefined) {
+              throw new Error("name collision: another sibling GUI folder has the same name");
+            }
             params.name = v;
             if (title_row_name) {
               title_row_name.innerHTML = params.name;
@@ -345,9 +353,9 @@ class GUI {
         _this.closed = !_this.closed;
         if (_this.__onClosedChange) _this.__onClosedChange.call(_this, _this.closed);
       });
-
-      // Oh, you're a nested GUI!
     } else {
+      // Oh, you're a nested GUI!
+
       if (params.closed === undefined) {
         params.closed = true;
       }
@@ -392,7 +400,9 @@ class GUI {
       }
 
       // Make it not elastic.
-      if (!this.parent) setWidth(_this, params.width);
+      if (!this.parent) {
+        setWidth(_this, params.width);
+      }
     }
 
     this.__resizeHandler = function () {
@@ -578,6 +588,12 @@ class GUI {
     });
   }
 
+  /**
+   * @param object
+   * @param property
+   * @returns {dat.controllers.HifiColorController} The new controller that was added.
+   * @instance
+   */
   addHifiColor(object, property) {
     return add(this, object, property, {
       hifiColor: true,
@@ -587,7 +603,7 @@ class GUI {
   /**
    * @param object
    * @param property
-   * @returns {dat.controllers.ColorController} The new controller that was added.
+   * @returns {dat.controllers.Vec3Controller} The new controller that was added.
    * @instance
    */
   addVec3(object, property) {
@@ -596,6 +612,12 @@ class GUI {
     });
   }
 
+  /**
+   * @param object
+   * @param property
+   * @returns {dat.controllers.QuatController} The new controller that was added.
+   * @instance
+   */
   addQuat(object, property) {
     return add(this, object, property, {
       quat: true,
@@ -616,6 +638,11 @@ class GUI {
     });
   }
 
+  /**
+   * Removes the root GUI from the document and unbinds all event listeners.
+   * For subfolders, use `gui.removeFolder(folder)` instead.
+   * @instance
+   */
   destroy() {
     if (this.autoPlace) {
       auto_place_container.removeChild(this.domElement);
@@ -696,7 +723,9 @@ class GUI {
       let h = 0;
 
       common.each(root.__ul.childNodes, function (node) {
-        if (!(root.autoPlace && node === root.__save_row) && node.nodeType === 1) h += dom.getHeight(node);
+        if (!(root.autoPlace && node === root.__save_row) && node.nodeType === 1) {
+          h += dom.getHeight(node);
+        }
       });
 
       if (settings.WINDOW.innerHeight - top - CLOSE_BUTTON_HEIGHT < h) {
@@ -740,11 +769,11 @@ class GUI {
 
     const _this = this;
 
-    common.each(Array.prototype.slice.call(arguments), function (object) {
-      if (_this.__rememberedObjects.length == 0) {
+    common.each(ARR_SLICE.call(arguments), function (object) {
+      if (_this.__rememberedObjects.length === 0) {
         addSaveMenu(_this);
       }
-      if (_this.__rememberedObjects.indexOf(object) == -1) {
+      if (_this.__rememberedObjects.indexOf(object) === -1) {
         _this.__rememberedObjects.push(object);
       }
     });
@@ -845,7 +874,9 @@ class GUI {
   listen(controller) {
     const init = this.__listening.length == 0;
     this.__listening.push(controller);
-    if (init) updateDisplays(this.__listening);
+    if (init) {
+      updateDisplays(this.__listening);
+    }
   }
 }
 
@@ -863,7 +894,7 @@ GUI.TEXT_CLOSED = "Close Controls";
 GUI.TEXT_OPEN = "Open Controls";
 
 function add(gui, object, property, params) {
-  if (object[property] === undefined) {
+  if (!(property in object)) {
     throw new Error("Object " + object + ' has no property "' + property + '"');
   }
 
@@ -878,6 +909,16 @@ function add(gui, object, property, params) {
   } else {
     const factoryArgs = [object, property].concat(params.factoryArgs);
     controller = controllerFactory.apply(gui, factoryArgs);
+  }
+
+  if (!controller) {
+    throw new Error(
+      "Object " +
+        object +
+        ' has a (probably null-ed) property "' +
+        property +
+        '" for which you did not explicitly specify a suitable controller'
+    );
   }
 
   if (params.before instanceof Controller) {
@@ -920,7 +961,9 @@ function add(gui, object, property, params) {
  */
 function addRow(gui, dom, liBefore) {
   const li = settings.DOCUMENT.createElement("li");
-  if (dom) li.appendChild(dom);
+  if (dom) {
+    li.appendChild(dom);
+  }
   if (liBefore) {
     gui.__ul.insertBefore(li, params.before);
   } else {
@@ -934,61 +977,64 @@ function augmentController(gui, li, controller) {
   controller.__li = li;
   controller.__gui = gui;
 
-  common.extend(controller, {
-    /**
-     * @param  {Array|Object} options
-     * @return {Controller}
-     */
-    options: function (options) {
-      if (arguments.length > 1) {
-        const nextSibling = controller.__li.nextElementSibling;
-        controller.remove();
+  common.extend(
+    controller,
+    /** @lends Controller.prototype */ {
+      /**
+       * @param  {Array|Object} options
+       * @return {Controller}
+       */
+      options: function (options) {
+        if (arguments.length > 1) {
+          const nextSibling = controller.__li.nextElementSibling;
+          controller.remove();
 
-        return add(gui, controller.object, controller.property, {
-          before: nextSibling,
-          factoryArgs: [common.toArray(arguments)],
-        });
-      }
+          return add(gui, controller.object, controller.property, {
+            before: nextSibling,
+            factoryArgs: [common.toArray(arguments)],
+          });
+        }
 
-      if (common.isArray(options) || common.isObject(options)) {
-        const nextSibling = controller.__li.nextElementSibling;
-        controller.remove();
+        if (common.isArray(options) || common.isObject(options)) {
+          const nextSibling = controller.__li.nextElementSibling;
+          controller.remove();
 
-        return add(gui, controller.object, controller.property, {
-          before: nextSibling,
-          factoryArgs: [options],
-        });
-      }
-    },
+          return add(gui, controller.object, controller.property, {
+            before: nextSibling,
+            factoryArgs: [options],
+          });
+        }
+      },
 
-    /**
-     * Sets the name of the controller.
-     * @param  {string} name
-     * @return {Controller}
-     */
-    name: function (name) {
-      controller.__li.firstElementChild.firstElementChild.innerHTML = name;
-      return controller;
-    },
+      /**
+       * Sets the name of the controller.
+       * @param  {string} name
+       * @return {Controller}
+       */
+      name: function (name) {
+        controller.__li.firstElementChild.firstElementChild.innerHTML = name;
+        return controller;
+      },
 
-    /**
-     * Sets controller to listen for changes on its underlying object.
-     * @return {Controller}
-     */
-    listen: function () {
-      controller.__gui.listen(controller);
-      return controller;
-    },
+      /**
+       * Sets controller to listen for changes on its underlying object.
+       * @return {Controller}
+       */
+      listen: function () {
+        controller.__gui.listen(controller);
+        return controller;
+      },
 
-    /**
-     * Removes the controller from its parent GUI.
-     * @return {Controller}
-     */
-    remove: function () {
-      controller.__gui.remove(controller);
-      return controller;
-    },
-  });
+      /**
+       * Removes the controller from its parent GUI.
+       * @return {Controller}
+       */
+      remove: function () {
+        controller.__gui.remove(controller);
+        return controller;
+      },
+    }
+  );
 
   // All sliders should be accompanied by a box.
   if (controller instanceof NumberControllerSlider) {
@@ -1004,7 +1050,7 @@ function augmentController(gui, li, controller) {
       const pc = controller[method];
       const pb = box[method];
       controller[method] = box[method] = function () {
-        const args = Array.prototype.slice.call(arguments);
+        const args = ARR_SLICE.call(arguments);
         pc.apply(controller, args);
         return pb.apply(box, args);
       };
@@ -1016,12 +1062,14 @@ function augmentController(gui, li, controller) {
     const r = function (returned) {
       // Have we defined both boundaries?
       if (common.isNumber(controller.__min) && common.isNumber(controller.__max)) {
-        // Well, then lets just replace this with a slider.
+        // Well, then let's just replace this with a slider.
         controller.remove();
-        return add(gui, controller.object, controller.property, {
+        const newController = add(gui, controller.object, controller.property, {
           before: controller.__li.nextElementSibling,
           factoryArgs: [controller.__min, controller.__max, controller.__step],
         });
+
+        return newController;
       }
 
       return returned;
@@ -1073,6 +1121,7 @@ function augmentController(gui, li, controller) {
     if (gui.getRoot().__preset_select && controller.isModified()) {
       markPresetModified(gui.getRoot(), true);
     }
+
     return r;
   }, controller.setValue);
 }
@@ -1086,12 +1135,12 @@ function recallSavedValue(gui, controller) {
   const matched_index = root.__rememberedObjects.indexOf(controller.object);
 
   // Why yes, it does!
-  if (matched_index != -1) {
-    // Let me fetch a map of controllers for thcommon.isObject.
+  if (matched_index !== -1) {
+    // Let me fetch a map of controllers for this object.
     let controller_map = root.__rememberedObjectIndecesToControllers[matched_index];
 
-    // Ohp, I believe this is the first controller we've created for this
-    // object. Lets make the map fresh.
+    // I believe this is the first controller we've created for this
+    // object. Let's make a fresh map.
     if (controller_map === undefined) {
       controller_map = {};
       root.__rememberedObjectIndecesToControllers[matched_index] = controller_map;
@@ -1193,6 +1242,10 @@ function addSaveMenu(gui) {
   div.appendChild(button2);
   div.appendChild(button3);
 
+  function showHideExplain() {
+    explain.style.display = gui.useLocalStorage ? "block" : "none";
+  }
+
   if (SUPPORTS_LOCAL_STORAGE) {
     const saveLocally = settings.DOCUMENT.getElementById("dg-save-locally");
     const explain = settings.DOCUMENT.getElementById("dg-local-explain");
@@ -1203,10 +1256,6 @@ function addSaveMenu(gui) {
 
     if (localStorage.getItem(getLocalStorageHash(gui, "isLocal")) === "true") {
       localStorageCheckBox.setAttribute("checked", "checked");
-    }
-
-    function showHideExplain() {
-      explain.style.display = gui.useLocalStorage ? "block" : "none";
     }
 
     showHideExplain();
@@ -1221,7 +1270,7 @@ function addSaveMenu(gui) {
   const newConstructorTextArea = settings.DOCUMENT.getElementById("dg-new-constructor");
 
   dom.bind(newConstructorTextArea, "keydown", function (e) {
-    if (e.metaKey && (e.which === 67 || e.keyCode == 67)) {
+    if (e.metaKey && (e.which === 67 || e.keyCode === 67)) {
       SAVE_DIALOGUE.hide();
     }
   });
@@ -1332,7 +1381,7 @@ function getCurrentPreset(gui, useInitialValues) {
   common.each(gui.__rememberedObjects, function (val, index) {
     const saved_values = {};
 
-    // The controllers I've made for this object by property
+    // The controllers I've made for thcommon.isObject by property
     const controller_map = gui.__rememberedObjectIndecesToControllers[index];
 
     // Remember each value for each property

@@ -19,7 +19,6 @@ function numDecimals(x) {
   if (_x.indexOf(".") > -1) {
     return _x.length - _x.indexOf(".") - 1;
   }
-
   return 0;
 }
 

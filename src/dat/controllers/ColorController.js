@@ -34,7 +34,7 @@ class ColorController extends Controller {
 
     const _this = this;
 
-    this.domElement = settings.DOCUMENT.createElement("div");
+    // this.domElement = document.createElement('div');
 
     dom.makeSelectable(this.domElement, false);
 
@@ -192,15 +192,22 @@ class ColorController extends Controller {
       e.preventDefault();
 
       const w = dom.getWidth(_this.__saturation_field);
+      const h = dom.getHeight(_this.__saturation_field);
       const o = dom.getOffset(_this.__saturation_field);
       let s = (e.clientX - o.left + settings.DOCUMENT.body.scrollLeft) / w;
-      let v = 1 - (e.clientY - o.top + settings.DOCUMENT.body.scrollTop) / w;
+      let v = 1 - (e.clientY - o.top + settings.DOCUMENT.body.scrollTop) / h;
 
-      if (v > 1) v = 1;
-      else if (v < 0) v = 0;
+      if (v > 1) {
+        v = 1;
+      } else if (v < 0) {
+        v = 0;
+      }
 
-      if (s > 1) s = 1;
-      else if (s < 0) s = 0;
+      if (s > 1) {
+        s = 1;
+      } else if (s < 0) {
+        s = 0;
+      }
 
       _this.__color.v = v;
       _this.__color.s = s;
@@ -217,8 +224,11 @@ class ColorController extends Controller {
       const o = dom.getOffset(_this.__hue_field);
       let h = 1 - (e.clientY - o.top + settings.DOCUMENT.body.scrollTop) / s;
 
-      if (h > 1) h = 1;
-      else if (h < 0) h = 0;
+      if (h > 1) {
+        h = 1;
+      } else if (h < 0) {
+        h = 0;
+      }
 
       _this.__color.h = h * 360;
 
@@ -245,7 +255,7 @@ class ColorController extends Controller {
             i[component] !== this.__color.__state[component]
           ) {
             mismatch = true;
-            return {}; // break
+            return common.BREAK; // break
           }
         },
         this
@@ -279,8 +289,10 @@ class ColorController extends Controller {
 
     linearGradient(this.__saturation_field, "left", "#fff", this.__temp.toString());
 
+    this.__input.value = this.__color.toString();
+
     common.extend(this.__input.style, {
-      backgroundColor: (this.__input.value = this.__color.toString()),
+      backgroundColor: this.__color.toString(),
       color: "rgb(" + flip + "," + flip + "," + flip + ")",
       textShadow: this.__input_textShadow + "rgba(" + _flip + "," + _flip + "," + _flip + ",.7)",
     });

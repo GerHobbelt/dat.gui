@@ -95,7 +95,8 @@ class Controller {
     } else if (this.__onFinishChange) {
       this.__onFinishChange.call(this, newValue);
     }
-
+    // Whenever you call `setValue`, the display will be updated automatically.
+    // This reduces some clutter in subclasses.
     this.updateDisplay();
     return this;
   }
@@ -136,7 +137,7 @@ class Controller {
   }
 
   /**
-   * @returns {Boolean} true if the value has deviated from initialValue
+   * @returns {boolean} true if the value has deviated from initialValue
    */
   isModified() {
     return this.initialValue !== this.getValue();

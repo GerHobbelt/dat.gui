@@ -79,7 +79,7 @@ class CenteredDiv {
   hide() {
     const _this = this;
 
-    var hide = function () {
+    const hide = function () {
       _this.domElement.style.display = "none";
       _this.backgroundElement.style.display = "none";
 

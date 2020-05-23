@@ -150,6 +150,17 @@ $input-color: lighten($background-color, 8.5%);
 
     &.function {
       border-left: 3px solid $function-color;
+
+      .button {
+        //@include button;
+
+        margin: 3px 0;
+        padding: 2px 3px;
+        border: 2px solid darken($function-color, 15%);
+        line-height: 18px;
+        background: lighten($function-color, 10%);
+        border-radius: 2px;
+      }
     }
 
     &.number {

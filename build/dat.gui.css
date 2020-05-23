@@ -116,7 +116,7 @@
 }
 .dg li.folder {
   padding: 0;
-  border-left: 4px solid rgba(0, 0, 0, 0);
+  border-left: 4px solid transparent;
 }
 .dg li.title {
   cursor: pointer;
@@ -335,6 +335,14 @@
 }
 .dg .cr.function {
   border-left: 3px solid #E61D5F;
+}
+.dg .cr.function .button {
+  margin: 3px 0;
+  padding: 2px 3px;
+  border: 2px solid #a41242;
+  line-height: 18px;
+  background: #eb4b80;
+  border-radius: 2px;
 }
 .dg .cr.number {
   border-left: 3px solid #2FA1D6;

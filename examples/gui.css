@@ -84,6 +84,12 @@
   color: #FFFFFF;
   opacity: 0.97;
   text-align: left;
+
+  /*
+  float: right;
+  margin-right: 20px;
+  margin-bottom: 20px;
+*/
   background-color: #FFFFFF;
 }
 
@@ -149,12 +155,19 @@ a.guidat-toggle:hover {
   background-color: #222222;
 }
 
+.guidat-controller select {
+  margin-top: 4px;
+  float: right;
+}
+
 .guidat-controller input:hover {
   background-color: #444444;
 }
 
-.guidat-controller input:focus {
+.guidat-controller input:focus,
+.guidat-controller.active input {
   background-color: #555555;
+  color: #FFFFFF;
 }
 
 .guidat-controller.number {
@@ -167,9 +180,9 @@ a.guidat-toggle:hover {
 
 .guidat-controller.string input {
   border: 0;
-  width: 125px;
   color: #1ED36F;
   margin-right: 2px;
+  width: 148px;
 }
 
 .guidat-controller.boolean {
@@ -178,6 +191,18 @@ a.guidat-toggle:hover {
 
 .guidat-controller.function {
   border-left: 5px solid #E61D5F;
+}
+
+.guidat-controller.function button {
+  margin: 3px 0;
+  border: 2px solid #666666;
+  line-height: 18px;
+  background: #333333;
+  border-radius: 3px;
+}
+
+.guidat-controller.object {
+  border-left: 5px solid #FFFF00;
 }
 
 .guidat-controller.number input[type="text"] {
@@ -220,15 +245,16 @@ a.guidat-toggle:hover {
 .guidat-slider-bg {
   background-color: #222222;
   cursor: ew-resize;
-  width: 85px;
+  width: 40%;
   margin-top: 2px;
   float: right;
   height: 21px;
 }
 
 .guidat-slider-fg {
+  cursor: ew-resize;
   background-color: #00AEFF;
-  height: 20px;
+  height: 21px;
 }
 
 /* Styles for timed GUI */

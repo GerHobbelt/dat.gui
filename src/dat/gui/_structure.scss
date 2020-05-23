@@ -133,7 +133,7 @@ $button-height: 20px;
 
   li.folder {
     padding: 0;
-    border-left: $nest-margin solid rgba(0, 0, 0, 0);
+    border-left: $nest-margin solid transparent;
   }
 
   /** Folder names */

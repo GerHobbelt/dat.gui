@@ -1334,7 +1334,7 @@ var ColorController = (function (_Controller) {
     _this2.__hue_field.className = "hue-field";
     _this2.__input = document.createElement("input");
     _this2.__input.type = "text";
-    _this2.__input_textShadow = "0 1px 1px ";
+    _this2.__input_textShadow = ["1px 0px 0px ", "-1px 0px 0px ", "0px 1px 0px ", "0px -1px 0px "];
     dom.bind(
       _this2.__input,
       "keydown",
@@ -1429,7 +1429,11 @@ var ColorController = (function (_Controller) {
       color: "#fff",
       border: 0,
       fontWeight: "bold",
-      textShadow: _this2.__input_textShadow + "rgba(0,0,0,0.7)",
+      textShadow: _this2.__input_textShadow
+        .map(function (d) {
+          return d + " rgba(0,0,0,0.7)";
+        })
+        .join(", "),
     });
     dom.bind(_this2.__saturation_field, "mousedown", fieldDown);
     dom.bind(_this2.__saturation_field, "touchstart", fieldDown);
@@ -1573,7 +1577,11 @@ var ColorController = (function (_Controller) {
     Common.extend(this.__input.style, {
       backgroundColor: this.__color.toHexString(),
       color: "rgb(" + flip + "," + flip + "," + flip + ")",
-      textShadow: this.__input_textShadow + "rgba(" + _flip + "," + _flip + "," + _flip + ",.7)",
+      textShadow: this.__input_textShadow
+        .map(function (d) {
+          return d + " rgba(" + _flip + "," + _flip + "," + _flip + ",0.7)";
+        })
+        .join(", "),
     });
   };
   return ColorController;

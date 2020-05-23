@@ -86,6 +86,9 @@ class OptionController extends Controller {
 
   updateDisplay(force) {
     // prevent number from updating if user is trying to manually update
+    //
+    // Use the same solution from StringController.js to enable
+    // editing <input>s while "listen()"ing
     if (!force && dom.isActive(this.__select) && !this.forceUpdateDisplay) {
       return this;
     }

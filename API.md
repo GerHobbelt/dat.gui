@@ -5,280 +5,80 @@ hands-on examples, see the dat.GUI [tutorial](http://workshop.chromeexperiments.
 
 <!--- API BEGIN --->
 
-<a name="GUI"></a>
+## Members
 
-## GUI
-A lightweight controller library for JavaScript. It allows you to easily
-manipulate variables and fire functions on the fly.
+<dl>
+<dt><a href="#autoPlaceVirgin">autoPlaceVirgin</a></dt>
+<dd><p>Have we yet to create an autoPlace GUI?</p>
+</dd>
+<dt><a href="#autoPlaceContainer">autoPlaceContainer</a></dt>
+<dd><p>Fixed position div that auto place GUI&#39;s go inside</p>
+</dd>
+<dt><a href="#hide">hide</a></dt>
+<dd><p>Are we hiding the GUI&#39;s ?</p>
+</dd>
+</dl>
 
-**Kind**: global class  
+## Constants
 
-* [GUI](#GUI)
-    * [new GUI([params])](#new_GUI_new)
-    * [.domElement](#GUI+domElement) : <code>DOMElement</code>
-    * [.parent](#GUI+parent) : <code>dat.gui.GUI</code>
-    * [.autoPlace](#GUI+autoPlace) : <code>Boolean</code>
-    * [.closeOnTop](#GUI+closeOnTop) : <code>Boolean</code>
-    * [.preset](#GUI+preset) : <code>String</code>
-    * [.width](#GUI+width) : <code>Number</code>
-    * [.name](#GUI+name) : <code>String</code>
-    * [.closed](#GUI+closed) : <code>Boolean</code>
-    * [.load](#GUI+load) : <code>Object</code>
-    * [.useLocalStorage](#GUI+useLocalStorage) : <code>Boolean</code>
-    * [.add(object, property, [min], [max], [step])](#GUI+add) ⇒ <code>Controller</code>
-    * [.addColor(object, property)](#GUI+addColor) ⇒ <code>Controller</code>
-    * [.remove(controller)](#GUI+remove)
-    * [.destroy()](#GUI+destroy)
-    * [.addFolder(name)](#GUI+addFolder) ⇒ <code>dat.gui.GUI</code>
-    * [.removeFolder(folder)](#GUI+removeFolder)
-    * [.open()](#GUI+open)
-    * [.close()](#GUI+close)
-    * [.hide()](#GUI+hide)
-    * [.show()](#GUI+show)
-    * [.remember(...objects)](#GUI+remember)
-    * [.getRoot()](#GUI+getRoot) ⇒ <code>dat.gui.GUI</code>
-    * [.getSaveObject()](#GUI+getSaveObject) ⇒ <code>Object</code>
+<dl>
+<dt><a href="#CSS_NAMESPACE">CSS_NAMESPACE</a></dt>
+<dd><p>Outer-most className for GUI&#39;s</p>
+</dd>
+<dt><a href="#CLOSE_BUTTON_HEIGHT">CLOSE_BUTTON_HEIGHT</a></dt>
+<dd><p>The only value shared between the JS and SCSS. Use caution.</p>
+</dd>
+</dl>
 
-<a name="new_GUI_new"></a>
+## Functions
 
-### new GUI([params])
+<dl>
+<dt><a href="#addRow">addRow(gui, [dom], [liBefore])</a></dt>
+<dd><p>Add a row to the end of the GUI or before another row.</p>
+</dd>
+</dl>
 
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
-| [params] | <code>Object</code> |  |  |
-| [params.name] | <code>String</code> |  | The name of this GUI. |
-| [params.load] | <code>Object</code> |  | JSON object representing the saved state of this GUI. |
-| [params.parent] | <code>dat.gui.GUI</code> |  | The GUI I'm nested in. |
-| [params.autoPlace] | <code>Boolean</code> | <code>true</code> |  |
-| [params.hideable] | <code>Boolean</code> | <code>true</code> | If true, GUI is shown/hidden by <kbd>h</kbd> keypress. |
-| [params.closed] | <code>Boolean</code> | <code>false</code> | If true, starts closed |
-| [params.closeOnTop] | <code>Boolean</code> | <code>false</code> | If true, close/open button shows on top of the GUI |
+<a name="autoPlaceVirgin"></a>
 
-**Example**  
-```js
-// Creating a GUI with options.
-var gui = new dat.GUI({name: 'My GUI'});
-```
-**Example**  
-```js
-// Creating a GUI and a subfolder.
-var gui = new dat.GUI();
-var folder1 = gui.addFolder('Flow Field');
-```
-<a name="GUI+domElement"></a>
+## autoPlaceVirgin
+Have we yet to create an autoPlace GUI?
 
-### gui.domElement : <code>DOMElement</code>
-Outermost DOM Element
+**Kind**: global variable  
+<a name="autoPlaceContainer"></a>
 
-**Kind**: instance property of [<code>GUI</code>](#GUI)  
-<a name="GUI+parent"></a>
+## autoPlaceContainer
+Fixed position div that auto place GUI's go inside
 
-### gui.parent : <code>dat.gui.GUI</code>
-The parent <code>GUI</code>
+**Kind**: global variable  
+<a name="hide"></a>
 
-**Kind**: instance property of [<code>GUI</code>](#GUI)  
-<a name="GUI+autoPlace"></a>
+## hide
+Are we hiding the GUI's ?
 
-### gui.autoPlace : <code>Boolean</code>
-Handles <code>GUI</code>'s element placement for you
+**Kind**: global variable  
+<a name="CSS_NAMESPACE"></a>
 
-**Kind**: instance property of [<code>GUI</code>](#GUI)  
-<a name="GUI+closeOnTop"></a>
+## CSS\_NAMESPACE
+Outer-most className for GUI's
 
-### gui.closeOnTop : <code>Boolean</code>
-Handles <code>GUI</code>'s position of open/close button
+**Kind**: global constant  
+<a name="CLOSE_BUTTON_HEIGHT"></a>
 
-**Kind**: instance property of [<code>GUI</code>](#GUI)  
-<a name="GUI+preset"></a>
+## CLOSE\_BUTTON\_HEIGHT
+The only value shared between the JS and SCSS. Use caution.
 
-### gui.preset : <code>String</code>
-The identifier for a set of saved values
+**Kind**: global constant  
+<a name="addRow"></a>
 
-**Kind**: instance property of [<code>GUI</code>](#GUI)  
-<a name="GUI+width"></a>
+## addRow(gui, [dom], [liBefore])
+Add a row to the end of the GUI or before another row.
 
-### gui.width : <code>Number</code>
-The width of <code>GUI</code> element
+**Kind**: global function  
 
-**Kind**: instance property of [<code>GUI</code>](#GUI)  
-<a name="GUI+name"></a>
-
-### gui.name : <code>String</code>
-The name of <code>GUI</code>. Used for folders. i.e
-a folder's name
-
-**Kind**: instance property of [<code>GUI</code>](#GUI)  
-<a name="GUI+closed"></a>
-
-### gui.closed : <code>Boolean</code>
-Whether the <code>GUI</code> is collapsed or not
-
-**Kind**: instance property of [<code>GUI</code>](#GUI)  
-<a name="GUI+load"></a>
-
-### gui.load : <code>Object</code>
-Contains all presets
-
-**Kind**: instance property of [<code>GUI</code>](#GUI)  
-<a name="GUI+useLocalStorage"></a>
-
-### gui.useLocalStorage : <code>Boolean</code>
-Determines whether or not to use <a href="https://developer.mozilla.org/en/DOM/Storage#localStorage">localStorage</a> as the means for
-<code>remember</code>ing
-
-**Kind**: instance property of [<code>GUI</code>](#GUI)  
-<a name="GUI+add"></a>
-
-### gui.add(object, property, [min], [max], [step]) ⇒ <code>Controller</code>
-Adds a new [Controller](Controller) to the GUI. The type of controller created
-is inferred from the initial value of <code>object[property]</code>. For
-color properties, see [addColor](addColor).
-
-**Kind**: instance method of [<code>GUI</code>](#GUI)  
-**Returns**: <code>Controller</code> - The controller that was added to the GUI.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| object | <code>Object</code> | The object to be manipulated |
-| property | <code>String</code> | The name of the property to be manipulated |
-| [min] | <code>Number</code> | Minimum allowed value |
-| [max] | <code>Number</code> | Maximum allowed value |
-| [step] | <code>Number</code> | Increment by which to change value |
-
-**Example**  
-```js
-// Add a string controller.
-var person = {name: 'Sam'};
-gui.add(person, 'name');
-```
-**Example**  
-```js
-// Add a number controller slider.
-var person = {age: 45};
-gui.add(person, 'age', 0, 100);
-```
-<a name="GUI+addColor"></a>
-
-### gui.addColor(object, property) ⇒ <code>Controller</code>
-Adds a new color controller to the GUI.
-
-**Kind**: instance method of [<code>GUI</code>](#GUI)  
-**Returns**: <code>Controller</code> - The controller that was added to the GUI.  
-
-| Param |
-| --- |
-| object | 
-| property | 
-
-**Example**  
-```js
-var palette = {
-  color1: '#FF0000', // CSS string
-  color2: [ 0, 128, 255 ], // RGB array
-  color3: [ 0, 128, 255, 0.3 ], // RGB with alpha
-  color4: { h: 350, s: 0.9, v: 0.3 } // Hue, saturation, value
-};
-gui.addColor(palette, 'color1');
-gui.addColor(palette, 'color2');
-gui.addColor(palette, 'color3');
-gui.addColor(palette, 'color4');
-```
-<a name="GUI+remove"></a>
-
-### gui.remove(controller)
-Removes the given controller from the GUI.
-
-**Kind**: instance method of [<code>GUI</code>](#GUI)  
-
-| Param | Type |
+| Param | Description |
 | --- | --- |
-| controller | <code>Controller</code> | 
+| gui |  |
+| [dom] | If specified, inserts the dom content in the new row |
+| [liBefore] | If specified, places the new row before another row |
 
-<a name="GUI+destroy"></a>
-
-### gui.destroy()
-Removes the root GUI from the document and unbinds all event listeners.
-For subfolders, use `gui.removeFolder(folder)` instead.
-
-**Kind**: instance method of [<code>GUI</code>](#GUI)  
-<a name="GUI+addFolder"></a>
-
-### gui.addFolder(name) ⇒ <code>dat.gui.GUI</code>
-Creates a new subfolder GUI instance.
-
-**Kind**: instance method of [<code>GUI</code>](#GUI)  
-**Returns**: <code>dat.gui.GUI</code> - The new folder.  
-**Throws**:
-
-- <code>Error</code> if this GUI already has a folder by the specified
-name
-
-
-| Param |
-| --- |
-| name | 
-
-<a name="GUI+removeFolder"></a>
-
-### gui.removeFolder(folder)
-Removes a subfolder GUI instance.
-
-**Kind**: instance method of [<code>GUI</code>](#GUI)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| folder | <code>dat.gui.GUI</code> | The folder to remove. |
-
-<a name="GUI+open"></a>
-
-### gui.open()
-Opens the GUI.
-
-**Kind**: instance method of [<code>GUI</code>](#GUI)  
-<a name="GUI+close"></a>
-
-### gui.close()
-Closes the GUI.
-
-**Kind**: instance method of [<code>GUI</code>](#GUI)  
-<a name="GUI+hide"></a>
-
-### gui.hide()
-Hides the GUI.
-
-**Kind**: instance method of [<code>GUI</code>](#GUI)  
-<a name="GUI+show"></a>
-
-### gui.show()
-Shows the GUI.
-
-**Kind**: instance method of [<code>GUI</code>](#GUI)  
-<a name="GUI+remember"></a>
-
-### gui.remember(...objects)
-Mark objects for saving. The order of these objects cannot change as
-the GUI grows. When remembering new objects, append them to the end
-of the list.
-
-**Kind**: instance method of [<code>GUI</code>](#GUI)  
-**Throws**:
-
-- <code>Error</code> if not called on a top level GUI.
-
-
-| Param | Type |
-| --- | --- |
-| ...objects | <code>Object</code> | 
-
-<a name="GUI+getRoot"></a>
-
-### gui.getRoot() ⇒ <code>dat.gui.GUI</code>
-**Kind**: instance method of [<code>GUI</code>](#GUI)  
-**Returns**: <code>dat.gui.GUI</code> - the topmost parent GUI of a nested GUI.  
-<a name="GUI+getSaveObject"></a>
-
-### gui.getSaveObject() ⇒ <code>Object</code>
-**Kind**: instance method of [<code>GUI</code>](#GUI)  
-**Returns**: <code>Object</code> - a JSON object representing the current state of
-this GUI as well as its remembered properties.  
 <!--- API END --->

@@ -56,13 +56,15 @@ class NumberControllerBox extends NumberController {
       // When pressing ENTER key, you can be as precise as you want.
       if (e.keyCode === 13) {
         _this.__truncationSuspended = true;
+        /* jshint validthis: true */
         this.blur();
+        /* jshint validthis: false */
         _this.__truncationSuspended = false;
         onFinish();
       }
     }
 
-    function onChange() {
+    function onChange(e) {
       const attempted = parseFloat(_this.__input.value);
       if (!common.isNaN(attempted)) {
         _this.setValue(attempted);
@@ -86,7 +88,7 @@ class NumberControllerBox extends NumberController {
       prevY = e.clientY;
     }
 
-    function onMouseUp() {
+    function onMouseUp(e) {
       dom.unbind(window, "mousemove", onMouseDrag);
       dom.unbind(window, "mouseup", onMouseUp);
       onFinish();

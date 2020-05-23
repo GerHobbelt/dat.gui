@@ -764,7 +764,7 @@ common.extend(
       // we debounce this function to prevent performance issues when rotating on tablet/mobile
       const root = this.getRoot();
       if (root.scrollable) {
-        const top = dom.getOffset(root.__ul).top;
+        const { top } = dom.getOffset(root.__ul);
         let h = 0;
 
         common.each(root.__ul.childNodes, function (node) {
@@ -1159,11 +1159,11 @@ function recallSavedValue(gui, controller) {
 
   // Why yes, it does!
   if (matchedIndex !== -1) {
-    // Let me fetch a map of controllers for thcommon.isObject.
+    // Let me fetch a map of controllers for this object.
     let controllerMap = root.__rememberedObjectIndecesToControllers[matchedIndex];
 
-    // Ohp, I believe this is the first controller we've created for this
-    // object. Lets make the map fresh.
+    // I believe this is the first controller we've created for this
+    // object. Let's make a fresh map.
     if (controllerMap === undefined) {
       controllerMap = {};
       root.__rememberedObjectIndecesToControllers[matchedIndex] = controllerMap;

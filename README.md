@@ -105,12 +105,11 @@ gui.add(obj, 'x').onChange(function() {
 
 ## Directory Contents
 
-```
-├── build - Concatenated source code for browsers.
-├── src - source code in commonjs format.
-├── tests - [QUnit](https://github.com/jquery/qunit) test suite.
-└── util - [node.js](http://nodejs.org/) utility scripts for compiling source.
-```
++ `build` - Concatenated source code for browsers.
++ `src` - source code in commonjs format.
++ `tests` - [QUnit](https://github.com/jquery/qunit) test suite.
++ `util` - [node.js](http://nodejs.org/) utility scripts for compiling source.
+
 
 
 ## Building your own dat.GUI

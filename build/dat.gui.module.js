@@ -26,23 +26,32 @@ function colorToString(color, forceCSSHex) {
       str = "0" + str;
     }
     return "#" + str;
-  } else if (colorFormat === "CSS_RGB") {
+  }
+  if (colorFormat === "CSS_RGB") {
     return "rgb(" + r + "," + g + "," + b + ")";
-  } else if (colorFormat === "CSS_RGBA") {
+  }
+  if (colorFormat === "CSS_RGBA") {
     return "rgba(" + r + "," + g + "," + b + "," + a + ")";
-  } else if (colorFormat === "HEX") {
+  }
+  if (colorFormat === "HEX") {
     return "0x" + color.hex.toString(16);
-  } else if (colorFormat === "RGB_ARRAY") {
+  }
+  if (colorFormat === "RGB_ARRAY") {
     return "[" + r + "," + g + "," + b + "]";
-  } else if (colorFormat === "RGBA_ARRAY") {
+  }
+  if (colorFormat === "RGBA_ARRAY") {
     return "[" + r + "," + g + "," + b + "," + a + "]";
-  } else if (colorFormat === "RGB_OBJ") {
+  }
+  if (colorFormat === "RGB_OBJ") {
     return "{r:" + r + ",g:" + g + ",b:" + b + "}";
-  } else if (colorFormat === "RGBA_OBJ") {
+  }
+  if (colorFormat === "RGBA_OBJ") {
     return "{r:" + r + ",g:" + g + ",b:" + b + ",a:" + a + "}";
-  } else if (colorFormat === "HSV_OBJ") {
+  }
+  if (colorFormat === "HSV_OBJ") {
     return "{h:" + h + ",s:" + s + ",v:" + v + "}";
-  } else if (colorFormat === "HSVA_OBJ") {
+  }
+  if (colorFormat === "HSVA_OBJ") {
     return "{h:" + h + ",s:" + s + ",v:" + v + ",a:" + a + "}";
   }
   return "unknown format";
@@ -444,7 +453,6 @@ var interpret = function interpret() {
   return toReturn;
 };
 
-var tmpComponent;
 var ColorMath = {
   hsv_to_rgb: function hsv_to_rgb(h, s, v) {
     var hi = Math.floor(h / 60) % 6;
@@ -508,7 +516,8 @@ var ColorMath = {
     return (hex >> (componentIndex * 8)) & 0xff;
   },
   hex_with_component: function hex_with_component(hex, componentIndex, value) {
-    value = (value << (tmpComponent = componentIndex * 8)) | (hex & ~(0xff << tmpComponent));
+    var tmpComponent = componentIndex * 8;
+    value = (value << tmpComponent) | (hex & ~(0xff << tmpComponent));
     return value;
   },
 };
@@ -721,9 +730,7 @@ var dom = {
     elem.style.KhtmlUserSelect = selectable ? "auto" : "none";
     elem.unselectable = selectable ? "on" : "off";
   },
-  makeFullscreen: function makeFullscreen(elem, hor, vert) {
-    var vertical = vert;
-    var horizontal = hor;
+  makeFullscreen: function makeFullscreen(elem, horizontal, vertical) {
     if (Common.isUndefined(horizontal)) {
       horizontal = true;
     }
@@ -842,7 +849,8 @@ var dom = {
   },
   removeClass: function removeClass(elem, className) {
     if (className) {
-      if (elem.className === className) {
+      if (elem.className === undefined);
+      else if (elem.className === className) {
         elem.removeAttribute("class");
       } else {
         var classes = elem.className.split(/ +/);
@@ -880,8 +888,7 @@ var dom = {
       cssValueToPixels(style.height)
     );
   },
-  getOffset: function getOffset(el) {
-    var elem = el;
+  getOffset: function getOffset(elem) {
     var offset = {
       left: 0,
       top: 0,
@@ -2271,7 +2278,8 @@ Common.extend(GUI.prototype, {
   onResize: function onResize() {
     var root = this.getRoot();
     if (root.scrollable) {
-      var top = dom.getOffset(root.__ul).top;
+      var _dom$getOffset = dom.getOffset(root.__ul),
+        top = _dom$getOffset.top;
       var h = 0;
       Common.each(root.__ul.childNodes, function (node) {
         if (!(root.autoPlace && node === root.__save_row)) {

@@ -74,12 +74,9 @@ const dom = {
    *
    * @param elem
    * @param horizontal
-   * @param vert
+   * @param vertical
    */
-  makeFullscreen: function (elem, hor, vert) {
-    let vertical = vert;
-    let horizontal = hor;
-
+  makeFullscreen: function (elem, horizontal, vertical) {
     if (common.isUndefined(horizontal)) {
       horizontal = true;
     }
@@ -231,7 +228,9 @@ const dom = {
    */
   removeClass: function (elem, className) {
     if (className) {
-      if (elem.className === className) {
+      if (elem.className === undefined) {
+        // elem.className = className;
+      } else if (elem.className === className) {
         elem.removeAttribute("class");
       } else {
         const classes = elem.className.split(/ +/);
@@ -285,11 +284,13 @@ const dom = {
 
   /**
    *
-   * @param el
+   * @param elem
    */
-  getOffset: function (el) {
-    let elem = el;
-    const offset = { left: 0, top: 0 };
+  getOffset: function (elem) {
+    const offset = {
+      left: 0,
+      top: 0,
+    };
     if (elem.offsetParent) {
       do {
         offset.left += elem.offsetLeft;

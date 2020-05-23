@@ -11,7 +11,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import Controller from "./Controller";
+import NumberController from "./NumberController";
 import dom from "../dom/dom";
 
 /**

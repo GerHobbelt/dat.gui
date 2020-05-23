@@ -193,6 +193,18 @@ a.guidat-toggle:hover {
   border-left: 5px solid #E61D5F;
 }
 
+.guidat-controller.function button {
+  margin: 3px 0;
+  border: 2px solid #666666;
+  line-height: 18px;
+  background: #333333;
+  border-radius: 3px;
+}
+
+.guidat-controller.object {
+  border-left: 5px solid #FFFF00;
+}
+
 .guidat-controller.number input[type="text"] {
   margin-left: 5px;
   margin-right: 2px;

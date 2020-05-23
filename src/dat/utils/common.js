@@ -137,7 +137,7 @@ const Common = {
   },
 
   isString: function (obj) {
-    return obj === obj + "";
+    return typeof obj === "string";
   },
 
   isBoolean: function (obj) {

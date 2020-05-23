@@ -13,7 +13,7 @@
 
 import css from "../utils/css";
 import saveDialogueContents from "./saveDialogue.html";
-import ControllerFactory from "../controllers/ControllerFactory";
+import controllerFactory from "../controllers/ControllerFactory";
 import Controller from "../controllers/Controller";
 import BooleanController from "../controllers/BooleanController";
 import FunctionController from "../controllers/FunctionController";
@@ -103,7 +103,14 @@ class GUI {
      */
     this.__folders = {};
 
+    /**
+     * The collection of currently active controller instances in the UI.
+     *
+     * Use the {getControllerByName()} API to get search this list and obtain a controller instance reference.
+     * @private
+     */
     this.__controllers = [];
+
     this.__onClosedChange = null;
 
     /**
@@ -545,10 +552,8 @@ class GUI {
    * @returns {dat.controllers.Controller} The new controller that was added.
    * @instance
    */
-  add(object, property) {
-    return add(this, object, property, {
-      factoryArgs: Array.prototype.slice.call(arguments, 2),
-    });
+  add(object, property, ...factoryArgs) {
+    return add(this, object, property, { factoryArgs });
   }
 
   /**
@@ -1245,12 +1250,14 @@ function addSaveMenu(gui) {
   div.appendChild(button3);
 
   function showHideExplain() {
-    explain.style.display = gui.useLocalStorage ? "block" : "none";
+    const explain = document.getElementById("dg-local-explain");
+    if (explain) {
+      explain.style.display = gui.useLocalStorage ? "block" : "none";
+    }
   }
 
   if (SUPPORTS_LOCAL_STORAGE) {
     const saveLocally = document.getElementById("dg-save-locally");
-    const explain = document.getElementById("dg-local-explain");
 
     saveLocally.style.display = "block";
 

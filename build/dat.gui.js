@@ -158,7 +158,7 @@
       return obj === +obj && isFinite(obj);
     },
     isString: function isString(obj) {
-      return obj === obj + "";
+      return typeof obj === "string";
     },
     isBoolean: function isBoolean(obj) {
       return obj === false || obj === true;
@@ -991,7 +991,7 @@
     }
     return 0;
   }
-  var NumberController$1 = (function (_Controller) {
+  var NumberController = (function (_Controller) {
     _inheritsLoose(NumberController, _Controller);
     function NumberController(object, property, params) {
       var _this;
@@ -1128,7 +1128,7 @@
       return _NumberController.prototype.step.apply(this, arguments);
     };
     return NumberControllerBox;
-  })(NumberController$1);
+  })(NumberController);
 
   function map(v, i1, i2, o1, o2) {
     return o1 + (o2 - o1) * ((v - i1) / (i2 - i1));
@@ -1220,7 +1220,7 @@
       return _NumberController.prototype.updateDisplay.call(this);
     };
     return NumberControllerSlider;
-  })(NumberController$1);
+  })(NumberController);
 
   var FunctionController = (function (_Controller) {
     _inheritsLoose(FunctionController, _Controller);
@@ -1685,6 +1685,57 @@
     };
     return UndefinedController;
   })(Controller);
+
+  var ARR_SLICE$1 = Array.prototype.slice;
+  var controllerFactory = function controllerFactory(object, property) {
+    var initialValue = object[property];
+    for (
+      var _len = arguments.length, optionalArgs = new Array(_len > 2 ? _len - 2 : 0), _key = 2;
+      _key < _len;
+      _key++
+    ) {
+      optionalArgs[_key - 2] = arguments[_key];
+    }
+    var optlist = optionalArgs[0];
+    if (Common.isArray(optlist) || Common.isObject(optlist)) {
+      return new OptionController(object, property, optlist);
+    }
+    if (Common.isNumber(initialValue)) {
+      var min = optionalArgs[0],
+        max = optionalArgs[1],
+        step = optionalArgs[2],
+        enumeration = optionalArgs[3];
+      if (Common.isNumber(min) && Common.isNumber(max)) {
+        return new NumberControllerSlider(object, property, min, max, step, enumeration);
+      }
+      return new NumberControllerBox(object, property, {
+        min: min,
+        max: max,
+        step: step,
+      });
+    }
+    if (Common.isString(initialValue)) {
+      return new StringController(object, property);
+    }
+    if (Common.isFunction(initialValue)) {
+      var arg1 = optionalArgs[0];
+      var opts = ARR_SLICE$1.call(optionalArgs, 1);
+      if (opts.length === 0) {
+        opts = undefined;
+      }
+      return new FunctionController(object, property, arg1, opts);
+    }
+    if (Common.isBoolean(initialValue)) {
+      return new BooleanController(object, property);
+    }
+    if (Common.isArray(initialValue)) {
+      return new ArrayController(object, property);
+    }
+    if (Common.isUndefined(initialValue)) {
+      return new UndefinedController(object, property);
+    }
+    return null;
+  };
 
   function clipFunc(min, max) {
     return function (v) {
@@ -2306,7 +2357,7 @@
     return CenteredDiv;
   })();
 
-  var ARR_SLICE$1 = Array.prototype.slice;
+  var ARR_SLICE$2 = Array.prototype.slice;
   var CSS_NAMESPACE = "dg";
   var HIDE_KEY_CODE = 72;
   var CLOSE_BUTTON_HEIGHT = 20;
@@ -2623,8 +2674,15 @@
       }
     };
     _proto.add = function add(object, property) {
+      for (
+        var _len = arguments.length, factoryArgs = new Array(_len > 2 ? _len - 2 : 0), _key = 2;
+        _key < _len;
+        _key++
+      ) {
+        factoryArgs[_key - 2] = arguments[_key];
+      }
       return _add(this, object, property, {
-        factoryArgs: Array.prototype.slice.call(arguments, 2),
+        factoryArgs: factoryArgs,
       });
     };
     _proto.addColor = function addColor(object, property) {
@@ -2736,7 +2794,7 @@
         throw new Error("You can only call remember on a top level GUI.");
       }
       var _this = this;
-      Common.each(ARR_SLICE$1.call(arguments), function (object) {
+      Common.each(ARR_SLICE$2.call(arguments), function (object) {
         if (_this.__rememberedObjects.length === 0) {
           addSaveMenu(_this);
         }
@@ -2932,7 +2990,7 @@
         var pc = controller[method];
         var pb = box[method];
         controller[method] = box[method] = function () {
-          var args = ARR_SLICE$1.call(arguments);
+          var args = ARR_SLICE$2.call(arguments);
           pc.apply(controller, args);
           return pb.apply(box, args);
         };
@@ -3062,11 +3120,13 @@
     div.appendChild(button2);
     div.appendChild(button3);
     function showHideExplain() {
-      explain.style.display = gui.useLocalStorage ? "block" : "none";
+      var explain = document.getElementById("dg-local-explain");
+      if (explain) {
+        explain.style.display = gui.useLocalStorage ? "block" : "none";
+      }
     }
     if (SUPPORTS_LOCAL_STORAGE) {
       var saveLocally = document.getElementById("dg-save-locally");
-      var _explain = document.getElementById("dg-local-explain");
       saveLocally.style.display = "block";
       var localStorageCheckBox = document.getElementById("dg-local-storage");
       if (localStorage.getItem(getLocalStorageHash(gui, "isLocal")) === "true") {
@@ -3215,7 +3275,7 @@
     BooleanController: BooleanController,
     OptionController: OptionController,
     StringController: StringController,
-    NumberController: NumberController$1,
+    NumberController: NumberController,
     NumberControllerBox: NumberControllerBox,
     NumberControllerSlider: NumberControllerSlider,
     FunctionController: FunctionController,

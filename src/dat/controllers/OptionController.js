@@ -39,7 +39,7 @@ class OptionController extends Controller {
 
     /**
      * The drop down menu
-     * @ignore
+     * @private
      */
     this.__select = document.createElement("select");
 
@@ -74,11 +74,11 @@ class OptionController extends Controller {
     this.updateDisplay();
 
     dom.bind(this.__select, "change", function () {
-      let { value } = this.options[this.selectedIndex];
+      let desiredValue = this.options[this.selectedIndex].value;
       if (value === _this.CUSTOM_FLAG) {
-        value = _this.__custom_controller.getValue();
+        desiredValue = _this.__custom_controller.getValue();
       }
-      _this.setValue(value);
+      _this.setValue(desiredValue);
     });
 
     if (this.__custom_controller) {
@@ -102,7 +102,9 @@ class OptionController extends Controller {
 
   updateDisplay() {
     // prevent number from updating if user is trying to manually update
-    if (dom.isActive(this.__select)) return this;
+    if (dom.isActive(this.__select)) {
+      return this;
+    }
 
     const value = this.getValue();
     let custom = true;

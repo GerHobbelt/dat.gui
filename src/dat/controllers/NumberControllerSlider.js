@@ -119,16 +119,11 @@ class NumberControllerSlider extends NumberController {
     this.domElement.appendChild(this.__background);
   }
 
-  /**
-   * Injects default stylesheet for slider elements.
-   */
-  useDefaultStyles() {
-    css.inject(styleSheet);
-  }
-
   updateDisplay() {
-    const pct = (this.getValue() - this.__min) / (this.__max - this.__min);
+    const value = this.getValue();
+    const pct = (value - this.__min) / (this.__max - this.__min);
     this.__foreground.style.width = pct * 100 + "%";
+
     return super.updateDisplay();
   }
 }

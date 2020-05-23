@@ -37,7 +37,7 @@ function guestimateImpliedStep(initialValue, userSpecifiedStep, minimumSaneStepS
     // make the step a rounded 10th of the initial value.
     // (the floor(log) minus 1 ensures that the result still is as accurate as possible for very small numbers;
     // while the old code performed pow(floor(log)) / 10 which would already cause trouble at values near 1E-6)
-    v = Math.pow(10, Math.floor(Math.log(Math.abs(initialValue)) / Math.LN10) - 1);
+    v = 10 ** (Math.floor(Math.log(Math.abs(initialValue)) / Math.LN10) - 1);
   }
   return Math.max(minimumSaneStepSize, Math.min(maximumSaneStepSize, v));
 }
@@ -61,7 +61,7 @@ class NumberController extends Controller {
     super(object, property, "number", options);
 
     if (typeof this.getValue() !== "number") {
-      throw "Provided value is not a number";
+      throw new Error("Provided value is not a number");
     }
 
     params = params || {};
@@ -84,13 +84,13 @@ class NumberController extends Controller {
   }
 
   setValue(v) {
-    if (this.__min !== undefined && v < this.__min) {
+    if (this.__min != null && v < this.__min) {
       v = this.__min;
-    } else if (this.__max !== undefined && v > this.__max) {
+    } else if (this.__max != null && v > this.__max) {
       v = this.__max;
     }
 
-    if (this.__step !== undefined && v % this.__step !== 0) {
+    if (this.__step != null && v % this.__step !== 0) {
       v = Math.round(v / this.__step) * this.__step;
     }
 

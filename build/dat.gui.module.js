@@ -11,15 +11,50 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-function colorToString(color) {
-  if (color.a === 1 || common.isUndefined(color.a)) {
+function colorToString(color, forceCSSHex) {
+  var colorFormat = color.__state.conversionName.toString();
+  var r = Math.round(color.r);
+  var g = Math.round(color.g);
+  var b = Math.round(color.b);
+  var a = color.a >= 1 || color.a == null ? 1 : color.a;
+  var h = Math.round(color.h);
+  var s = color.s.toFixed(1);
+  var v = color.v.toFixed(1);
+  if (forceCSSHex || colorFormat === "THREE_CHAR_HEX" || colorFormat === "SIX_CHAR_HEX") {
     var str = color.hex.toString(16);
     while (str.length < 6) {
       str = "0" + str;
     }
     return "#" + str;
   }
-  return "rgba(" + Math.round(color.r) + "," + Math.round(color.g) + "," + Math.round(color.b) + "," + color.a + ")";
+  if (colorFormat === "CSS_RGB") {
+    return "rgb(" + r + "," + g + "," + b + ")";
+  }
+  if (colorFormat === "CSS_RGBA") {
+    return "rgba(" + r + "," + g + "," + b + "," + a + ")";
+  }
+  if (colorFormat === "HEX") {
+    return "0x" + color.hex.toString(16);
+  }
+  if (colorFormat === "RGB_ARRAY") {
+    return "[" + r + "," + g + "," + b + "]";
+  }
+  if (colorFormat === "RGBA_ARRAY") {
+    return "[" + r + "," + g + "," + b + "," + a + "]";
+  }
+  if (colorFormat === "RGB_OBJ") {
+    return "{r:" + r + ",g:" + g + ",b:" + b + "}";
+  }
+  if (colorFormat === "RGBA_OBJ") {
+    return "{r:" + r + ",g:" + g + ",b:" + b + ",a:" + a + "}";
+  }
+  if (colorFormat === "HSV_OBJ") {
+    return "{h:" + h + ",s:" + s + ",v:" + v + "}";
+  }
+  if (colorFormat === "HSVA_OBJ") {
+    return "{h:" + h + ",s:" + s + ",v:" + v + ",a:" + a + "}";
+  }
+  return "unknown format";
 }
 
 var ARR_SLICE = Array.prototype.slice;
@@ -118,11 +153,9 @@ var Common = {
   isNaN: function isNaN(obj) {
     return obj !== obj;
   },
-  isArray:
-    Array.isArray ||
-    function (obj) {
-      return obj.constructor === Array;
-    },
+  isArray: function isArray(obj) {
+    return obj != null && obj.length >= 0 && typeof obj === "object";
+  },
   isObject: function isObject(obj) {
     return obj === Object(obj);
   },
@@ -494,7 +527,7 @@ var Color = (function () {
     return colorToString(this);
   };
   _proto.toHexString = function toHexString() {
-    return colorToString(this);
+    return colorToString(this, true);
   };
   _proto.toOriginal = function toOriginal() {
     return this.__state.conversion.write(this);
@@ -711,7 +744,7 @@ function _assertThisInitialized(self) {
 
 var EVENT_MAP = {
   HTMLEvents: ["change"],
-  MouseEvents: ["click", "mousemove", "mousedown", "mouseup", "mouseover"],
+  MouseEvents: ["click", "mousemove", "mousedown", "mouseup", "mouseover", "wheel"],
   KeyboardEvents: ["keydown"],
 };
 var EVENT_MAP_INV = {};
@@ -896,8 +929,7 @@ var dom = {
       cssValueToPixels(style.height)
     );
   },
-  getOffset: function getOffset(el) {
-    var elem = el;
+  getOffset: function getOffset(elem) {
     var offset = {
       left: 0,
       top: 0,
@@ -925,15 +957,15 @@ var BooleanController = (function (_Controller) {
     _this2.__prev = _this2.getValue();
     _this2.__checkbox = document.createElement("input");
     _this2.__checkbox.setAttribute("type", "checkbox");
+    function onChange() {
+      _this.setValue(!_this.__prev);
+    }
     dom.bind(_this2.__checkbox, "change", onChange, false);
     _this2.domElement.appendChild(_this2.__checkbox);
     _this2.updateDisplay();
     return _this2;
   }
   var _proto = BooleanController.prototype;
-  _proto.onChange = function onChange() {
-    _this.setValue(!_this.__prev);
-  };
   _proto.setValue = function setValue(v) {
     var toReturn = _Controller.prototype.setValue.call(this, v);
     this.__prev = this.getValue();
@@ -985,11 +1017,11 @@ var OptionController$1 = (function (_Controller) {
     }
     _this2.updateDisplay();
     dom.bind(_this2.__select, "change", function () {
-      var value = this.options[this.selectedIndex].value;
+      var desiredValue = this.options[this.selectedIndex].value;
       if (value === _this.CUSTOM_FLAG) {
-        value = _this.__custom_controller.getValue();
+        desiredValue = _this.__custom_controller.getValue();
       }
-      _this.setValue(value);
+      _this.setValue(desiredValue);
     });
     if (_this2.__custom_controller) {
       _this2.__custom_controller.onChange(function () {
@@ -1010,7 +1042,9 @@ var OptionController$1 = (function (_Controller) {
     return toReturn;
   };
   _proto.updateDisplay = function updateDisplay() {
-    if (dom.isActive(this.__select)) return this;
+    if (dom.isActive(this.__select)) {
+      return this;
+    }
     var value = this.getValue();
     var custom = true;
     if (value !== this.CUSTOM_FLAG) {
@@ -1037,17 +1071,6 @@ var StringController$1 = (function (_Controller) {
     var _this2;
     _this2 = _Controller.call(this, object, property, "string", options) || this;
     var _this = _assertThisInitialized(_this2);
-    _this2.__input = document.createElement("input");
-    _this2.__input.setAttribute("type", "text");
-    dom.bind(_this2.__input, "keyup", onChange);
-    dom.bind(_this2.__input, "change", onChange);
-    dom.bind(_this2.__input, "blur", onBlur);
-    dom.bind(_this2.__input, "keydown", onKeyDown);
-    function onKeyDown(e) {
-      if (e.keyCode === 13) {
-        this.blur();
-      }
-    }
     function onChange() {
       _this.setValue(_this.__input.value);
     }
@@ -1056,6 +1079,17 @@ var StringController$1 = (function (_Controller) {
         _this.__onFinishChange.call(_this, _this.getValue());
       }
     }
+    function onKeyDown(e) {
+      if (e.keyCode === 13) {
+        this.blur();
+      }
+    }
+    _this2.__input = document.createElement("input");
+    _this2.__input.setAttribute("type", "text");
+    dom.bind(_this2.__input, "keyup", onChange);
+    dom.bind(_this2.__input, "change", onChange);
+    dom.bind(_this2.__input, "blur", onBlur);
+    dom.bind(_this2.__input, "keydown", onKeyDown);
     _this2.updateDisplay();
     _this2.domElement.appendChild(_this2.__input);
     return _this2;
@@ -1096,7 +1130,7 @@ var NumberController$1 = (function (_Controller) {
     var _this;
     _this = _Controller.call(this, object, property, "number", options) || this;
     if (typeof _this.getValue() !== "number") {
-      throw "Provided value is not a number";
+      throw new Error("Provided value is not a number");
     }
     params = params || {};
     _this.__min = Common.isFiniteNumber(params.min) ? params.min : undefined;
@@ -1116,12 +1150,12 @@ var NumberController$1 = (function (_Controller) {
   }
   var _proto = NumberController.prototype;
   _proto.setValue = function setValue(v) {
-    if (this.__min !== undefined && v < this.__min) {
+    if (this.__min != null && v < this.__min) {
       v = this.__min;
-    } else if (this.__max !== undefined && v > this.__max) {
+    } else if (this.__max != null && v > this.__max) {
       v = this.__max;
     }
-    if (this.__step !== undefined && v % this.__step !== 0) {
+    if (this.__step != null && v % this.__step !== 0) {
       v = Math.round(v / this.__step) * this.__step;
     }
     if (this.__mode !== "linear") {
@@ -1185,17 +1219,11 @@ var NumberControllerBox = (function (_NumberController) {
   _inheritsLoose(NumberControllerBox, _NumberController);
   function NumberControllerBox(object, property, params) {
     var _this2;
-    _this2.__truncationSuspended = false;
     _this2 = _NumberController.call(this, object, property, params) || this;
+    params = params || {};
+    _this2.__truncationSuspended = false;
     var _this = _assertThisInitialized(_this2);
     var prev_y;
-    _this2.__input = document.createElement("input");
-    _this2.__input.setAttribute("type", "text");
-    dom.bind(_this2.__input, "change", onChange);
-    dom.bind(_this2.__input, "blur", onBlur);
-    dom.bind(_this2.__input, "touchdown", onTouchDown);
-    dom.bind(_this2.__input, "mousedown", onMouseDown);
-    dom.bind(_this2.__input, "keydown", onKeyDown);
     function onKeyDown(e) {
       if (e.keyCode === 13) {
         _this.__truncationSuspended = true;
@@ -1258,6 +1286,13 @@ var NumberControllerBox = (function (_NumberController) {
         eventSource: "onMouseUp",
       });
     }
+    _this2.__input = document.createElement("input");
+    _this2.__input.setAttribute("type", "text");
+    dom.bind(_this2.__input, "change", onChange);
+    dom.bind(_this2.__input, "blur", onBlur);
+    dom.bind(_this2.__input, "touchdown", onTouchDown);
+    dom.bind(_this2.__input, "mousedown", onMouseDown);
+    dom.bind(_this2.__input, "keydown", onKeyDown);
     _this2.updateDisplay();
     _this2.domElement.appendChild(_this2.__input);
     return _this2;
@@ -1340,11 +1375,9 @@ var NumberControllerSlider = (function (_NumberController) {
     return _this2;
   }
   var _proto = NumberControllerSlider.prototype;
-  _proto.useDefaultStyles = function useDefaultStyles() {
-    css.inject(styleSheet);
-  };
   _proto.updateDisplay = function updateDisplay() {
-    var pct = (this.getValue() - this.__min) / (this.__max - this.__min);
+    var value = this.getValue();
+    var pct = (value - this.__min) / (this.__max - this.__min);
     this.__foreground.style.width = pct * 100 + "%";
     return _NumberController.prototype.updateDisplay.call(this);
   };
@@ -1824,9 +1857,6 @@ var ImageController = (function (_Controller) {
     return _this2;
   }
   var _proto = ImageController.prototype;
-  _proto.useDefaultStyles = function useDefaultStyles() {
-    css.inject(styleSheet);
-  };
   _proto.updateDisplay = function updateDisplay() {
     this.__previewImage.src = this.getValue();
     return _Controller.prototype.updateDisplay.call(this);
@@ -2238,7 +2268,7 @@ var CLOSE_BUTTON_HEIGHT = 20;
 var DEFAULT_DEFAULT_PRESET_NAME = "Default";
 var SUPPORTS_LOCAL_STORAGE = (function () {
   try {
-    return "localStorage" in window && window.localStorage != null;
+    return "localStorage" in window && !!window.localStorage;
   } catch (e) {
     return false;
   }
@@ -2869,17 +2899,17 @@ function augmentController(gui, li, controller) {
     });
   } else if (controller instanceof ColorController) {
     dom.addClass(li, "color");
-    controller.updateDisplay = Common.compose(function (r) {
-      li.style.borderLeftColor = controller.__color.toString();
-      return r;
+    controller.updateDisplay = Common.compose(function (val) {
+      li.style.borderLeftColor = controller.__color.toHexString();
+      return val;
     }, controller.updateDisplay);
     controller.updateDisplay();
   }
-  controller.setValue = Common.compose(function (r) {
+  controller.setValue = Common.compose(function (val) {
     if (gui.getRoot().__preset_select && controller.isModified()) {
       markPresetModified(gui.getRoot(), true);
     }
-    return r;
+    return val;
   }, controller.setValue);
 }
 function recallSavedValue(gui, controller) {

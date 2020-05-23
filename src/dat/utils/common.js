@@ -139,11 +139,11 @@ const Common = {
     return obj !== obj;
   },
 
-  isArray:
-    Array.isArray ||
-    function (obj) {
-      return obj.constructor === Array;
-    },
+  // isArray: Array.isArray || function(obj) {
+  isArray: function (obj) {
+    // return obj.constructor === Array;
+    return obj != null && obj.length >= 0 && typeof obj === "object";
+  },
 
   isObject: function (obj) {
     return obj === Object(obj);

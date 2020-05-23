@@ -48,7 +48,7 @@ const DEFAULT_DEFAULT_PRESET_NAME = "Default";
 
 const SUPPORTS_LOCAL_STORAGE = (function () {
   try {
-    return "localStorage" in window && window.localStorage != null;
+    return "localStorage" in window && !!window.localStorage;
   } catch (e) {
     return false;
   }
@@ -105,7 +105,7 @@ const GUI = function (params) {
 
   /**
    * Outermost DOM Element
-   * @type DOMElement
+   * @type {DOMElement}
    */
   this.domElement = document.createElement("div");
   this.__ul = document.createElement("ul");
@@ -1117,20 +1117,20 @@ function augmentController(gui, li, controller) {
     });
   } else if (controller instanceof ColorController) {
     dom.addClass(li, "color");
-    controller.updateDisplay = common.compose(function (r) {
-      li.style.borderLeftColor = controller.__color.toString();
-      return r;
+    controller.updateDisplay = common.compose(function (val) {
+      li.style.borderLeftColor = controller.__color.toHexString();
+      return val;
     }, controller.updateDisplay);
 
     controller.updateDisplay();
   }
 
-  controller.setValue = common.compose(function (r) {
+  controller.setValue = common.compose(function (val) {
     if (gui.getRoot().__preset_select && controller.isModified()) {
       markPresetModified(gui.getRoot(), true);
     }
 
-    return r;
+    return val;
   }, controller.setValue);
 }
 
@@ -1372,7 +1372,7 @@ function getCurrentPreset(gui, useInitialValues) {
   common.each(gui.__rememberedObjects, function (val, index) {
     const savedValues = {};
 
-    // The controllers I've made for thcommon.isObject by property
+    // The controllers I've made for this object by property
     const controllerMap = gui.__rememberedObjectIndecesToControllers[index];
 
     // Remember each value for each property

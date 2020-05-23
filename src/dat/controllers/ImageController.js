@@ -64,13 +64,6 @@ class ImageController extends Controller {
     this.domElement.appendChild(this.__label);
   }
 
-  /**
-   * Injects default stylesheet for slider elements.
-   */
-  useDefaultStyles() {
-    css.inject(styleSheet);
-  }
-
   updateDisplay() {
     this.__previewImage.src = this.getValue();
     return super.updateDisplay();

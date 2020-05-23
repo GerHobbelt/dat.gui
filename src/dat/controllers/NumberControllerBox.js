@@ -38,9 +38,11 @@ function roundToDecimal(value, decimals) {
  */
 class NumberControllerBox extends NumberController {
   constructor(object, property, params) {
-    this.__truncationSuspended = false;
-
     super(object, property, params);
+
+    params = params || {};
+
+    this.__truncationSuspended = false;
 
     const _this = this;
 
@@ -49,17 +51,6 @@ class NumberControllerBox extends NumberController {
      * @ignore
      */
     let prev_y;
-
-    this.__input = document.createElement("input");
-    this.__input.setAttribute("type", "text");
-
-    // Makes it so manually specified values are not truncated.
-
-    dom.bind(this.__input, "change", onChange);
-    dom.bind(this.__input, "blur", onBlur);
-    dom.bind(this.__input, "touchdown", onTouchDown);
-    dom.bind(this.__input, "mousedown", onMouseDown);
-    dom.bind(this.__input, "keydown", onKeyDown);
 
     function onKeyDown(e) {
       // When pressing ENTER key, you can be as precise as you want.
@@ -142,6 +133,17 @@ class NumberControllerBox extends NumberController {
         eventSource: "onMouseUp",
       });
     }
+
+    this.__input = document.createElement("input");
+    this.__input.setAttribute("type", "text");
+
+    // Makes it so manually specified values are not truncated.
+
+    dom.bind(this.__input, "change", onChange);
+    dom.bind(this.__input, "blur", onBlur);
+    dom.bind(this.__input, "touchdown", onTouchDown);
+    dom.bind(this.__input, "mousedown", onMouseDown);
+    dom.bind(this.__input, "keydown", onKeyDown);
 
     this.updateDisplay();
 

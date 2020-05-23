@@ -11,7 +11,6 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import Controller from "./Controller";
 import OptionController from "./OptionController";
 import NumberControllerBox from "./NumberControllerBox";
 import NumberControllerSlider from "./NumberControllerSlider";
@@ -89,7 +88,7 @@ const ControllerFactory = function (
 
   if (common.isImagePath(initialValue)) {
     if (firstTimeImageController) {
-      ImageController.useDefaultStyles();
+      // ImageController.useDefaultStyles();
       firstTimeImageController = false;
     }
     return new ImageController(object, property);
@@ -99,8 +98,6 @@ const ControllerFactory = function (
     return new StringController(object, property);
   }
 
-  // TODO: check that the isFunction() API also recognizes async functions properly.
-  // if (common.isFunction(initialValue) || common.isAsyncFunction(initialValue)) {
   if (common.isFunction(initialValue)) {
     let opts = ARR_SLICE.call(arguments, 3);
     if (opts.length === 0) {

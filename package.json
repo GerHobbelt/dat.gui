@@ -12,7 +12,8 @@
   "scripts": {
     "test": "tests/index.html",
     "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"serve --listen 8080\"",
-    "build": "rollup -c && prettier --print-width 120 --write build/**/*.js && rollup -c rollup.config.min.js && npm run update-banner",
+    "build": "rollup -c && prettier --print-width 120 --write build/**/*.js && npm run update-banner",
+    "build-min": "rollup -c rollup.config.min.js && npm run update-banner",
     "watch": "rollup --watch -c && rollup --watch -c rollup.config.js",
     "build-docs": "jsdoc2md -f src/dat/gui/GUI.js src/dat/controllers/Controller.js src/dat/controllers/NumberController.js | replace-between --target API.md --token API",
     "build-all": "npm run prettier && npm run fix && npm run stylefix && npm run update-banner && npm run build && npm run build-docs",

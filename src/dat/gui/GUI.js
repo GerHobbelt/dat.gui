@@ -33,36 +33,36 @@ import styleSheet from "./style.scss"; // CSS to embed in build
 css.inject(styleSheet);
 
 /** Outer-most className for GUI's */
-var CSS_NAMESPACE = "dg";
+const CSS_NAMESPACE = "dg";
 
-var HIDE_KEY_CODE = 72;
+const HIDE_KEY_CODE = 72;
 
 /** The only value shared between the JS and SCSS. Use caution. */
-var CLOSE_BUTTON_HEIGHT = 20;
+const CLOSE_BUTTON_HEIGHT = 20;
 
-var DEFAULT_DEFAULT_PRESET_NAME = "Default";
+const DEFAULT_DEFAULT_PRESET_NAME = "Default";
 
-var SUPPORTS_LOCAL_STORAGE = (function () {
+const SUPPORTS_LOCAL_STORAGE = (function () {
   try {
-    return "localStorage" in settings.WINDOW && settings.WINDOW["localStorage"] != null;
+    return "localStorage" in settings.WINDOW && settings.WINDOW.localStorage != null;
   } catch (e) {
     return false;
   }
 })();
 
-var SAVE_DIALOGUE;
+let SAVE_DIALOGUE;
 
 /** Have we yet to create an autoPlace GUI? */
-var auto_place_virgin = true;
+let auto_place_virgin = true;
 
 /** Fixed position div that auto place GUI's go inside */
-var auto_place_container;
+let auto_place_container;
 
 /** Are we hiding the GUI's ? */
-var hide = false;
+let hide = false;
 
 /** GUI's which should be hidden */
-var hideable_guis = [];
+const hideable_guis = [];
 
 /**
  * A lightweight controller library for JavaScript. It allows you to easily
@@ -81,7 +81,7 @@ var hideable_guis = [];
  */
 class GUI {
   constructor(params) {
-    var _this = this;
+    const _this = this;
 
     /**
      * Outermost DOM Element
@@ -165,10 +165,10 @@ class GUI {
 
     // Not part of params because I don't want people passing this in via
     // constructor. Should be a 'remembered' value.
-    var use_local_storage =
+    let use_local_storage =
       SUPPORTS_LOCAL_STORAGE && localStorage.getItem(getLocalStorageHash(this, "isLocal")) === "true";
 
-    var saveToLocalStorage;
+    let saveToLocalStorage;
 
     Object.defineProperties(
       this,
@@ -329,7 +329,7 @@ class GUI {
         if (use_local_storage) {
           _this.useLocalStorage = true;
 
-          var saved_gui = localStorage.getItem(getLocalStorageHash(this, "gui"));
+          const saved_gui = localStorage.getItem(getLocalStorageHash(this, "gui"));
 
           if (saved_gui) {
             params.load = JSON.parse(saved_gui);
@@ -356,9 +356,9 @@ class GUI {
       var title_row_name = settings.DOCUMENT.createTextNode(params.name);
       dom.addClass(title_row_name, "controller-name");
 
-      var title_row = addRow(_this, title_row_name);
+      const title_row = addRow(_this, title_row_name);
 
-      var on_click_title = function (e) {
+      const on_click_title = function (e) {
         e.preventDefault();
         _this.closed = !_this.closed;
         if (_this.__onClosedChange) _this.__onClosedChange.call(_this, _this.closed);
@@ -419,9 +419,9 @@ class GUI {
     // expose this method publicly
     this.saveToLocalStorageIfPossible = saveToLocalStorage;
 
-    var root = _this.getRoot();
+    const root = _this.getRoot();
     function resetWidth() {
-      var root = _this.getRoot();
+      const root = _this.getRoot();
       root.width += 1;
       common.defer(function () {
         root.width -= 1;
@@ -439,15 +439,15 @@ class GUI {
   }
 
   getControllerByName(name, recurse) {
-    var controllers = this.__controllers;
-    var i = controllers.length;
+    const controllers = this.__controllers;
+    let i = controllers.length;
     while (--i > -1) {
       if (controllers[i].property === name) {
         return controllers[i];
       }
     }
-    var folders = this.__folders;
-    var tryFI;
+    const folders = this.__folders;
+    let tryFI;
     if (recurse) {
       for (i in folders) {
         tryFI = folders[i].getControllerByName(name, true);
@@ -463,16 +463,16 @@ class GUI {
 
   getAllControllers(recurse, myArray) {
     if (recurse == undefined) recurse = true;
-    var i;
-    var arr = myArray != null ? myArray : [];
+    let i;
+    const arr = myArray != null ? myArray : [];
 
-    var controllers = this.__controllers;
+    const controllers = this.__controllers;
     for (i in controllers) {
       arr.push(controllers[i]);
     }
 
     if (recurse) {
-      var folders = this.__folders;
+      const folders = this.__folders;
       for (i in folders) {
         folders[i].getAllControllers(true, arr);
       }
@@ -488,9 +488,9 @@ class GUI {
    */
   getAllGUIs(recurse, myArray) {
     if (recurse == undefined) recurse = true;
-    var i;
-    var arr = myArray != null ? myArray : [this];
-    var folders = this.__folders;
+    let i;
+    const arr = myArray != null ? myArray : [this];
+    const folders = this.__folders;
 
     for (i in folders) {
       arr.push(folders[i]);
@@ -512,19 +512,6 @@ class GUI {
     });
   }
 
-  CLASS_AUTO_PLACE = "a";
-  CLASS_AUTO_PLACE_CONTAINER = "ac";
-  CLASS_MAIN = "main";
-  CLASS_CONTROLLER_ROW = "cr";
-  CLASS_TOO_TALL = "taller-than-window";
-  CLASS_CLOSED = "closed";
-  CLASS_CLOSE_BUTTON = "close-button";
-  CLASS_DRAG = "drag";
-
-  DEFAULT_WIDTH = 245;
-  TEXT_CLOSED = "Close Controls";
-  TEXT_OPEN = "Open Controls";
-
   _keydownHandler(e) {
     if (
       settings.DOCUMENT.activeElement.type !== "text" &&
@@ -539,7 +526,7 @@ class GUI {
   dom.bind(
     settings.WINDOW,
     "keydown",
-    _keydownHandler, 
+    _keydownHandler,
     false
   );
 */
@@ -624,7 +611,7 @@ class GUI {
     // TODO listening?
     this.__ul.removeChild(controller.__li);
     this.__controllers.splice(this.__controllers.indexOf(controller), 1);
-    var _this = this;
+    const _this = this;
     common.defer(function () {
       _this.onResize();
     });
@@ -650,7 +637,7 @@ class GUI {
       throw new Error(`You already have a folder in this GUI by the name "${name}"`);
     }
 
-    var new_gui_params = { name: name, parent: this };
+    const new_gui_params = { name: name, parent: this };
 
     // We need to pass down the autoPlace trait so that we can
     // attach event listeners to open/close folder actions to
@@ -675,10 +662,10 @@ class GUI {
       new_gui_params.load = this.load.folders[name];
     }
 
-    var gui = new GUI(new_gui_params);
+    const gui = new GUI(new_gui_params);
     this.__folders[name] = gui;
 
-    var li = addRow(this, gui.domElement);
+    const li = addRow(this, gui.domElement);
     li.setAttribute("draggable", "true");
     li.ondragstart = function (event) {
       event.dataTransfer.setData("text", name);
@@ -699,11 +686,11 @@ class GUI {
   }
 
   onResize() {
-    var root = this.getRoot();
+    const root = this.getRoot();
 
     if (root.scrollable) {
-      var top = dom.getOffset(root.__ul).top;
-      var h = 0;
+      const top = dom.getOffset(root.__ul).top;
+      let h = 0;
 
       common.each(root.__ul.childNodes, function (node) {
         if (!(root.autoPlace && node === root.__save_row) && node.nodeType === 1) h += dom.getHeight(node);
@@ -734,7 +721,7 @@ class GUI {
    * the GUI grows. When remembering new objects, append them to the end
    * of the list.
    *
-   * @param {Object...} objects
+   * @param {...Object} objects
    * @throws {Error} if not called on a top level GUI.
    * @instance
    */
@@ -748,7 +735,7 @@ class GUI {
       throw new Error("You can only call remember on a top level GUI.");
     }
 
-    var _this = this;
+    const _this = this;
 
     common.each(Array.prototype.slice.call(arguments), function (object) {
       if (_this.__rememberedObjects.length == 0) {
@@ -770,7 +757,7 @@ class GUI {
    * @instance
    */
   getRoot() {
-    var gui = this;
+    let gui = this;
     while (gui.parent) {
       gui = gui.parent;
     }
@@ -783,7 +770,7 @@ class GUI {
    * @instance
    */
   getSaveObject() {
-    var toReturn = this.load;
+    const toReturn = this.load;
 
     toReturn.closed = this.closed;
 
@@ -853,18 +840,31 @@ class GUI {
   }
 
   listen(controller) {
-    var init = this.__listening.length == 0;
+    const init = this.__listening.length == 0;
     this.__listening.push(controller);
     if (init) updateDisplays(this.__listening);
   }
 }
+
+GUI.CLASS_AUTO_PLACE = "a";
+GUI.CLASS_AUTO_PLACE_CONTAINER = "ac";
+GUI.CLASS_MAIN = "main";
+GUI.CLASS_CONTROLLER_ROW = "cr";
+GUI.CLASS_TOO_TALL = "taller-than-window";
+GUI.CLASS_CLOSED = "closed";
+GUI.CLASS_CLOSE_BUTTON = "close-button";
+GUI.CLASS_DRAG = "drag";
+
+GUI.DEFAULT_WIDTH = 245;
+GUI.TEXT_CLOSED = "Close Controls";
+GUI.TEXT_OPEN = "Open Controls";
 
 function add(gui, object, property, params) {
   if (object[property] === undefined) {
     throw new Error("Object " + object + ' has no property "' + property + '"');
   }
 
-  var controller;
+  let controller;
 
   if (params.color) {
     controller = new ColorController(object, property);
@@ -873,7 +873,7 @@ function add(gui, object, property, params) {
   } else if (params.multiline) {
     controller = new TextAreaController(object, property);
   } else {
-    var factoryArgs = [object, property].concat(params.factoryArgs);
+    const factoryArgs = [object, property].concat(params.factoryArgs);
     controller = controllerFactory.apply(gui, factoryArgs);
   }
 
@@ -885,18 +885,18 @@ function add(gui, object, property, params) {
 
   dom.addClass(controller.domElement, "c");
 
-  var name = settings.DOCUMENT.createElement("span");
+  const name = settings.DOCUMENT.createElement("span");
   dom.addClass(name, "property-name");
   name.innerHTML = controller.label;
 
-  var clear = settings.DOCUMENT.createElement("div");
+  const clear = settings.DOCUMENT.createElement("div");
   clear.style.clear = "both";
-  var container = settings.DOCUMENT.createElement("div");
+  const container = settings.DOCUMENT.createElement("div");
   container.appendChild(name);
   container.appendChild(controller.domElement);
   container.appendChild(clear);
 
-  var li = addRow(gui, container, params.before);
+  const li = addRow(gui, container, params.before);
 
   dom.addClass(li, GUI.CLASS_CONTROLLER_ROW);
   dom.addClass(li, typeof controller.getValue());
@@ -916,7 +916,7 @@ function add(gui, object, property, params) {
  * @param [liBefore] If specified, places the new row before another row
  */
 function addRow(gui, dom, liBefore) {
-  var li = settings.DOCUMENT.createElement("li");
+  const li = settings.DOCUMENT.createElement("li");
   if (dom) li.appendChild(dom);
   if (liBefore) {
     gui.__ul.insertBefore(li, params.before);
@@ -972,7 +972,7 @@ function augmentController(gui, li, controller) {
 
   // All sliders should be accompanied by a box.
   if (controller instanceof NumberControllerSlider) {
-    var box = new NumberControllerBox(controller.object, controller.property, {
+    const box = new NumberControllerBox(controller.object, controller.property, {
       min: controller.__min,
       max: controller.__max,
       step: controller.__step,
@@ -981,10 +981,10 @@ function augmentController(gui, li, controller) {
     controller.__valueControllerBox = box;
 
     common.each(["updateDisplay", "onChange", "onFinishChange"], function (method) {
-      var pc = controller[method];
-      var pb = box[method];
+      const pc = controller[method];
+      const pb = box[method];
       controller[method] = box[method] = function () {
-        var args = Array.prototype.slice.call(arguments);
+        const args = Array.prototype.slice.call(arguments);
         pc.apply(controller, args);
         return pb.apply(box, args);
       };
@@ -993,7 +993,7 @@ function augmentController(gui, li, controller) {
     dom.addClass(li, "has-slider");
     controller.domElement.insertBefore(box.domElement, controller.domElement.firstElementChild);
   } else if (controller instanceof NumberControllerBox) {
-    var r = function (returned) {
+    const r = function (returned) {
       // Have we defined both boundaries?
       if (common.isNumber(controller.__min) && common.isNumber(controller.__max)) {
         // Well, then lets just replace this with a slider.
@@ -1059,16 +1059,16 @@ function augmentController(gui, li, controller) {
 
 function recallSavedValue(gui, controller) {
   // Find the topmost GUI, that's where remembered objects live.
-  var root = gui.getRoot();
+  const root = gui.getRoot();
 
   // Does the object we're controlling match anything we've been told to
   // remember?
-  var matched_index = root.__rememberedObjects.indexOf(controller.object);
+  const matched_index = root.__rememberedObjects.indexOf(controller.object);
 
   // Why yes, it does!
   if (matched_index != -1) {
     // Let me fetch a map of controllers for thcommon.isObject.
-    var controller_map = root.__rememberedObjectIndecesToControllers[matched_index];
+    let controller_map = root.__rememberedObjectIndecesToControllers[matched_index];
 
     // Ohp, I believe this is the first controller we've created for this
     // object. Lets make the map fresh.
@@ -1082,10 +1082,10 @@ function recallSavedValue(gui, controller) {
 
     // Okay, now have we saved any values for this controller?
     if (root.load && root.load.remembered) {
-      var preset_map = root.load.remembered;
+      const preset_map = root.load.remembered;
 
       // Which preset are we trying to load?
-      var preset;
+      let preset;
 
       if (preset_map[gui.preset]) {
         preset = preset_map[gui.preset];
@@ -1105,7 +1105,7 @@ function recallSavedValue(gui, controller) {
         preset[matched_index][controller.property] !== undefined
       ) {
         // We did remember something for this guy ...
-        var value = preset[matched_index][controller.property];
+        const value = preset[matched_index][controller.property];
 
         // And that's what it is.
         controller.initialValue = value;
@@ -1121,7 +1121,7 @@ function getLocalStorageHash(gui, key) {
 }
 
 function addSaveMenu(gui) {
-  var div = (gui.__save_row = settings.DOCUMENT.createElement("li"));
+  const div = (gui.__save_row = settings.DOCUMENT.createElement("li"));
 
   dom.addClass(gui.domElement, "has-save");
 
@@ -1129,27 +1129,27 @@ function addSaveMenu(gui) {
 
   dom.addClass(div, "save-row");
 
-  var gears = settings.DOCUMENT.createElement("span");
+  const gears = settings.DOCUMENT.createElement("span");
   gears.innerHTML = "&nbsp;";
   dom.addClass(gears, "button gears");
 
   // TODO replace with FunctionController
-  var button = settings.DOCUMENT.createElement("span");
+  const button = settings.DOCUMENT.createElement("span");
   button.innerHTML = "Save";
   dom.addClass(button, "button");
   dom.addClass(button, "save");
 
-  var button2 = settings.DOCUMENT.createElement("span");
+  const button2 = settings.DOCUMENT.createElement("span");
   button2.innerHTML = "New";
   dom.addClass(button2, "button");
   dom.addClass(button2, "save-as");
 
-  var button3 = settings.DOCUMENT.createElement("span");
+  const button3 = settings.DOCUMENT.createElement("span");
   button3.innerHTML = "Revert";
   dom.addClass(button3, "button");
   dom.addClass(button3, "revert");
 
-  var select = (gui.__preset_select = settings.DOCUMENT.createElement("select"));
+  const select = (gui.__preset_select = settings.DOCUMENT.createElement("select"));
 
   if (gui.load && gui.load.remembered) {
     common.each(gui.load.remembered, function (value, key) {
@@ -1160,7 +1160,7 @@ function addSaveMenu(gui) {
   }
 
   dom.bind(select, "change", function () {
-    for (var index = 0; index < gui.__preset_select.length; index++) {
+    for (let index = 0; index < gui.__preset_select.length; index++) {
       gui.__preset_select[index].innerHTML = gui.__preset_select[index].value;
     }
 
@@ -1174,12 +1174,12 @@ function addSaveMenu(gui) {
   div.appendChild(button3);
 
   if (SUPPORTS_LOCAL_STORAGE) {
-    var saveLocally = settings.DOCUMENT.getElementById("dg-save-locally");
-    var explain = settings.DOCUMENT.getElementById("dg-local-explain");
+    const saveLocally = settings.DOCUMENT.getElementById("dg-save-locally");
+    const explain = settings.DOCUMENT.getElementById("dg-local-explain");
 
     saveLocally.style.display = "block";
 
-    var localStorageCheckBox = settings.DOCUMENT.getElementById("dg-local-storage");
+    const localStorageCheckBox = settings.DOCUMENT.getElementById("dg-local-storage");
 
     if (localStorage.getItem(getLocalStorageHash(gui, "isLocal")) === "true") {
       localStorageCheckBox.setAttribute("checked", "checked");
@@ -1198,7 +1198,7 @@ function addSaveMenu(gui) {
     });
   }
 
-  var newConstructorTextArea = settings.DOCUMENT.getElementById("dg-new-constructor");
+  const newConstructorTextArea = settings.DOCUMENT.getElementById("dg-new-constructor");
 
   dom.bind(newConstructorTextArea, "keydown", function (e) {
     if (e.metaKey && (e.which === 67 || e.keyCode == 67)) {
@@ -1218,7 +1218,7 @@ function addSaveMenu(gui) {
   });
 
   dom.bind(button2, "click", function () {
-    var presetName = prompt("Enter a new preset name.");
+    const presetName = prompt("Enter a new preset name.");
     if (presetName) gui.saveAs(presetName);
   });
 
@@ -1241,7 +1241,7 @@ function addResizeHandle(gui) {
     //      border: '1px solid blue'
   });
 
-  var pmouseX;
+  let pmouseX;
 
   dom.bind(gui.__resize_handle, "mousedown", dragStart);
   dom.bind(gui.__closeButton, "mousedown", dragStart);
@@ -1304,14 +1304,14 @@ function setWidth(gui, w) {
 }
 
 function getCurrentPreset(gui, useInitialValues) {
-  var toReturn = {};
+  const toReturn = {};
 
   // For each object I'm remembering
   common.each(gui.__rememberedObjects, function (val, index) {
-    var saved_values = {};
+    const saved_values = {};
 
     // The controllers I've made for thcommon.isObject by property
-    var controller_map = gui.__rememberedObjectIndecesToControllers[index];
+    const controller_map = gui.__rememberedObjectIndecesToControllers[index];
 
     // Remember each value for each property
     common.each(controller_map, function (controller, property) {
@@ -1326,7 +1326,7 @@ function getCurrentPreset(gui, useInitialValues) {
 }
 
 function addPresetOption(gui, name, setSelected) {
-  var opt = settings.DOCUMENT.createElement("option");
+  const opt = settings.DOCUMENT.createElement("option");
   opt.innerHTML = name;
   opt.value = name;
   gui.__preset_select.appendChild(opt);
@@ -1336,7 +1336,7 @@ function addPresetOption(gui, name, setSelected) {
 }
 
 function setPresetSelectIndex(gui) {
-  for (var index = 0; index < gui.__preset_select.length; index++) {
+  for (let index = 0; index < gui.__preset_select.length; index++) {
     if (gui.__preset_select[index].value == gui.preset) {
       gui.__preset_select.selectedIndex = index;
     }
@@ -1344,7 +1344,7 @@ function setPresetSelectIndex(gui) {
 }
 
 function markPresetModified(gui, modified) {
-  var opt = gui.__preset_select[gui.__preset_select.selectedIndex];
+  const opt = gui.__preset_select[gui.__preset_select.selectedIndex];
   //    console.log('mark', modified, opt);
   if (modified) {
     opt.innerHTML = opt.value + "*";

@@ -40,10 +40,10 @@ class BooleanController extends Controller {
 
     // Match original value
     this.updateDisplay();
+  }
 
-    function onChange() {
-      _this.setValue(!_this.__prev);
-    }
+  onChange() {
+    _this.setValue(!_this.__prev);
   }
 
   setValue(v) {

@@ -136,13 +136,13 @@ class NumberControllerBox extends NumberController {
     this.__input.value = this.__truncationSuspended
       ? this.getValue()
       : roundToDecimal(this.getValue(), this.__precision);
-    return NumberControllerBox.superclass.prototype.updateDisplay.call(this);
+    return super.updateDisplay();
   }
 
   step(v) {
     if (this.__input.getAttribute("type") !== "number") this.__input.setAttribute("type", "number");
     this.__input.setAttribute("step", v);
-    return NumberControllerBox.superclass.prototype.step.apply(this, arguments);
+    return super.step(...arguments);
   }
 }
 

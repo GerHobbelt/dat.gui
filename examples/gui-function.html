@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>dat.GUI - function controller</title>
+
+    <link rel="icon" type="image/png" href="assets/favicon.png" />
+
+    <link href="examples.css" media="screen" rel="stylesheet" type="text/css" />
+
+    <!-- data-main attribute tells require.js to load examples/init.js after require.js loads. -->
+    <script data-main="init" src="assets/require-plus-config.js"></script>
+  </head>
+  <body>
+    <div class="demo-info">
+      <h1>About this example</h1>
+      <p>
+        This example shows the dat.GUI controller for function members (UI: button to invoke function; API:
+        <code>.add(object, "function_member")</code> + <code>.name("title")</code>).
+      </p>
+
+      <h2>Notes about the display below</h2>
+      <p>
+        Below the object data members, which are linked to dat.GUI controllers, are displayed; note that display update
+        delays are due to the relatively low display refresh rate.
+      </p>
+    </div>
+
+    <script type="text/javascript">
+      require(["domReady", "dat.GUI", "testbed"], function (domReady, dat, testbed) {
+        "use strict";
+
+        domReady(function () {
+          //This function is called once the DOM is ready.
+          //It will be safe to query the DOM and manipulate
+          //DOM nodes in this function.
+          var obj = {
+            x: function execute() {
+              console.log("execute: ", arguments);
+              alert("execute!");
+            },
+            y: function execute() {
+              console.log("execute: ", arguments);
+              alert("execute!");
+            },
+          };
+          var gui = new dat.gui.GUI();
+          gui.add(obj, "x");
+          gui.add(obj, "y").name("click me (or click the item above...)");
+
+          // ---------------------------------------------------------------
+          testbed.init(obj, document);
+        });
+      });
+    </script>
+  </body>
+</html>

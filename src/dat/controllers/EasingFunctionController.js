@@ -351,7 +351,7 @@ class EasingFunctionController extends Controller {
   }
 
   setValue(v) {
-    const toReturn = EasingFunctionController.superclass.prototype.setValue.call(this, v);
+    const toReturn = super.setValue(v);
     if (this.__onFinishChange) {
       this.__onFinishChange.call(this, this.getValue());
     }

@@ -19,6 +19,9 @@ import common from "../utils/common";
 
 /**
  * @class Represents a given property of an object that is a color.
+ *
+ * @extends Controller
+ *
  * @param {Object} object
  * @param {string} property
  */

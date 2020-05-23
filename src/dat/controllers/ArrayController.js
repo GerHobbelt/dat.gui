@@ -80,7 +80,7 @@ class ArrayController extends Controller {
     if (!dom.isActive(this.__input)) {
       this.__input.value = this.getValue();
     }
-    return ArrayController.superclass.prototype.updateDisplay.call(this);
+    return super.updateDisplay();
   }
 }
 

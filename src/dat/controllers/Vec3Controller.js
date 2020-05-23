@@ -140,7 +140,7 @@ class Vec3Controller extends NumberController {
     this[whichInput].value = this.__truncationSuspended
       ? this.getValue()
       : roundToDecimal(this.getValue(), this.__precision);
-    return Vec3Controller.superclass.prototype.updateDisplay.call(this);
+    return super.updateDisplay();
   }
 }
 

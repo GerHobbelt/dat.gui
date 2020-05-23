@@ -1,4 +1,6 @@
 @charset "UTF-8";
+@import "./controllers/NumberControllerSlider.css";
+@import "./controllers/ImageController.css";
 .dg {
   /** Clear list styles */
   /* Auto-place container */

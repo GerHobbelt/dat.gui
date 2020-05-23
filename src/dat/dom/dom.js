@@ -48,7 +48,7 @@ function cssValueToPixels(val) {
  * @namespace
  * @member dat.dom
  */
-var dom = {
+const dom = {
   /**
    *
    * @param elem
@@ -110,9 +110,9 @@ var dom = {
     }
     const evt = document.createEvent(className);
     switch (className) {
-      case "MouseEvents":
-        var clientX = params.x || params.clientX || 0;
-        var clientY = params.y || params.clientY || 0;
+      case "MouseEvents": {
+        const clientX = params.x || params.clientX || 0;
+        const clientY = params.y || params.clientY || 0;
         evt.initMouseEvent(
           eventType,
           params.bubbles || false,
@@ -131,9 +131,9 @@ var dom = {
           null
         );
         break;
-
-      case "KeyboardEvents":
-        var init = evt.initKeyboardEvent || evt.initKeyEvent; // webkit || moz
+      }
+      case "KeyboardEvents": {
+        const init = evt.initKeyboardEvent || evt.initKeyEvent; // webkit || moz
         common.defaults(params, {
           cancelable: true,
           ctrlKey: false,
@@ -156,10 +156,11 @@ var dom = {
           params.charCode
         );
         break;
-
-      default:
+      }
+      default: {
         evt.initEvent(eventType, params.bubbles || false, params.cancelable || true);
         break;
+      }
     }
     common.defaults(evt, aux);
     elem.dispatchEvent(evt);

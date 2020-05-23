@@ -29,29 +29,12 @@ import CenteredDiv from "../dom/CenteredDiv";
 import dom from "../dom/dom";
 import common from "../utils/common";
 
-import styleSheet from "./style.scss"; // CSS to embed in build
-
-//  "text!dat/gui/saveDialogue.html",
-//  "text!dat/gui/style.css",
-//
-//  "dat/controllers/NumberController",
-//  "dat/controllers/OptionController",
-//  "dat/controllers/StringController",
-//  "dat/controllers/ObjectController",
-//  // 'dat/controllers/NullController',
-//  // 'dat/controllers/UndefinedController',
-//
-//
-//  NumberController,
-//  OptionController,
-//  StringController,
-//  ObjectController,
-//  /* NullController, UndefinedController, */
+// import styleSheet from "./style.scss"; // CSS to embed in build
 
 // var ARR_EACH = Array.prototype.forEach;
 const ARR_SLICE = Array.prototype.slice;
 
-css.inject(styleSheet);
+// css.inject(styleSheet);
 
 /** Outer-most className for GUI's */
 const CSS_NAMESPACE = "dg";
@@ -100,7 +83,7 @@ const hideable_guis = [];
  * @param {dat.gui.GUI} [params.parent] The GUI I'm nested in.
  * @param {Boolean} [params.closed] If true, starts closed
  */
-var GUI = function (params) {
+const GUI = function (params) {
   const _this = this;
 
   this.__typeControllers = {
@@ -423,9 +406,9 @@ var GUI = function (params) {
     dom.bind(this.__closeButton, "click", function () {
       _this.closed = !_this.closed;
     });
-
-    // Oh, you're a nested GUI!
   } else {
+    // Oh, you're a nested GUI!
+
     if (params.closed === undefined) {
       params.closed = true;
     }
@@ -573,10 +556,27 @@ common.extend(
     },
 
     /**
-     * @param object
-     * @param property
-     * @returns {dat.controllers.Controller} The new controller that was added.
+     * Adds a new {@link Controller} to the GUI. The type of controller created
+     * is inferred from the initial value of <code>object[property]</code>. For
+     * color properties, see {@link addColor}.
+     *
+     * @param {Object} object The object to be manipulated
+     * @param {String} property The name of the property to be manipulated
+     * @param {Number} [min] Minimum allowed value
+     * @param {Number} [max] Maximum allowed value
+     * @param {Number} [step] Increment by which to change value
+     * @returns {Controller} The new controller that was added to the GUI.
      * @instance
+     *
+     * @example
+     * // Add a string controller.
+     * var person = {name: 'Sam'};
+     * gui.add(person, 'name');
+     *
+     * @example
+     * // Add a number controller slider.
+     * var person = {age: 45};
+     * gui.add(person, 'age', 0, 100);
      */
     add: function (object, property /* ...args */) {
       return add(this, object, property, {
@@ -585,10 +585,24 @@ common.extend(
     },
 
     /**
+     * Adds a new color controller to the GUI.
+     *
      * @param object
      * @param property
-     * @returns {dat.controllers.ColorController} The new controller that was added.
+     * @returns {Controller} The new controller that was added to the GUI.
      * @instance
+     *
+     * @example
+     * var palette = {
+     *   color1: '#FF0000', // CSS string
+     *   color2: [ 0, 128, 255 ], // RGB array
+     *   color3: [ 0, 128, 255, 0.3 ], // RGB with alpha
+     *   color4: { h: 350, s: 0.9, v: 0.3 } // Hue, saturation, value
+     * };
+     * gui.addColor(palette, 'color1');
+     * gui.addColor(palette, 'color2');
+     * gui.addColor(palette, 'color3');
+     * gui.addColor(palette, 'color4');
      */
     addColor: function (object, property) {
       return add(this, object, property, {
@@ -610,7 +624,8 @@ common.extend(
     },
 
     /**
-     * @param controller
+     * Removes the given controller from the GUI.
+     * @param {Controller} controller
      * @instance
      */
     remove: function (controller) {
@@ -624,6 +639,11 @@ common.extend(
       return this;
     },
 
+    /**
+     * Removes the root GUI from the document and unbinds all event listeners.
+     * For subfolders, use `gui.removeFolder(folder)` instead.
+     * @instance
+     */
     destroy: function () {
       if (this.autoPlace) {
         auto_place_container.removeChild(this.domElement);
@@ -631,6 +651,7 @@ common.extend(
     },
 
     /**
+     * Creates a new subfolder GUI instance.
      * @param name
      * @returns {dat.gui.GUI} The new folder.
      * @throws {Error} if this GUI already has a folder by the specified
@@ -641,7 +662,7 @@ common.extend(
       // We have to prevent collisions on names in order to have a key
       // by which to remember saved values
       if (this.__folders[name] !== undefined) {
-        throw new Error('You already have a folder in this GUI by the name "' + name + '"');
+        throw new Error(`You already have a folder in this GUI by the name "${name}"`);
       }
 
       const new_gui_params = { name: name, parent: this };
@@ -675,6 +696,9 @@ common.extend(
       return gui;
     },
 
+    /**
+     * Opens the GUI.
+     */
     open: function () {
       this.closed = false;
       return this;
@@ -962,46 +986,65 @@ function augmentController(gui, li, controller) {
   controller.__li = li;
   controller.__gui = gui;
 
-  common.extend(controller, {
-    options: function (options) {
-      let next_sibling;
+  common.extend(
+    controller,
+    /** @lends Controller.prototype */ {
+      /**
+       * @param  {Array|Object} options
+       * @return {Controller}
+       */
+      options: function (options) {
+        if (arguments.length > 1) {
+          const nextSibling = controller.__li.nextElementSibling;
+          controller.remove();
 
-      if (arguments.length > 1) {
-        next_sibling = controller.__li.nextElementSibling;
-        controller.remove();
+          return add(gui, controller.object, controller.property, {
+            before: nextSibling,
+            factoryArgs: [common.toArray(arguments)],
+          });
+        }
 
-        return add(gui, controller.object, controller.property, {
-          before: next_sibling,
-          factoryArgs: [common.toArray(arguments)],
-        });
-      }
+        if (common.isArray(options) || common.isObject(options)) {
+          const nextSibling = controller.__li.nextElementSibling;
+          controller.remove();
 
-      if (common.isArray(options) || common.isObject(options)) {
-        next_sibling = controller.__li.nextElementSibling;
-        controller.remove();
+          return add(gui, controller.object, controller.property, {
+            before: nextSibling,
+            factoryArgs: [options],
+          });
+        }
+      },
 
-        return add(gui, controller.object, controller.property, {
-          before: next_sibling,
-          factoryArgs: [options],
-        });
-      }
-    },
+      /**
+       * Sets the name of the controller.
+       * @param  {string} name
+       * @return {Controller}
+       */
+      name: function (name) {
+        controller.__li.firstElementChild.firstElementChild.innerHTML = name;
+        return controller;
+      },
 
-    name: function (v) {
-      controller.__li.firstElementChild.firstElementChild.innerHTML = v;
-      return controller;
-    },
+      /**
+       * Sets controller to listen for changes on its underlying object.
+       * @param {boolean} forceUpdateDisplay Whether to force update a display, even when input is active (default: false).
+       * @return {Controller}
+       */
+      listen: function () {
+        controller.__gui.listen(controller);
+        return controller;
+      },
 
-    listen: function () {
-      controller.__gui.listen(controller);
-      return controller;
-    },
-
-    remove: function () {
-      controller.__gui.remove(controller);
-      return controller;
-    },
-  });
+      /**
+       * Removes the controller from its parent GUI.
+       * @return {Controller}
+       */
+      remove: function () {
+        controller.__gui.remove(controller);
+        return controller;
+      },
+    }
+  );
 
   // All sliders should be accompanied by a box.
   if (controller instanceof NumberControllerSlider) {
@@ -1039,10 +1082,12 @@ function augmentController(gui, li, controller) {
       if (common.isNumber(controller.__min) && common.isNumber(controller.__max)) {
         // Well, then let's just replace this with a slider.
         controller.remove();
-        return add(gui, controller.object, controller.property, {
+        const newController = add(gui, controller.object, controller.property, {
           before: controller.__li.nextElementSibling,
           factoryArgs: [controller.__min, controller.__max, controller.__step],
         });
+
+        return newController;
       }
 
       return returned;
@@ -1325,18 +1370,18 @@ function getCurrentPreset(gui, useInitialValues) {
 
   // For each object I'm remembering
   common.each(gui.__rememberedObjects, function (val, index) {
-    const saved_values = {};
+    const savedValues = {};
 
-    // The controllers I've made for this object by property
-    const controller_map = gui.__rememberedObjectIndecesToControllers[index];
+    // The controllers I've made for thcommon.isObject by property
+    const controllerMap = gui.__rememberedObjectIndecesToControllers[index];
 
     // Remember each value for each property
-    common.each(controller_map, function (controller, property) {
-      saved_values[property] = useInitialValues ? controller.initialValue : controller.getValue();
+    common.each(controllerMap, function (controller, property) {
+      savedValues[property] = useInitialValues ? controller.initialValue : controller.getValue();
     });
 
-    // Save the values for this object
-    toReturn[index] = saved_values;
+    // Save the values for thcommon.isObject
+    toReturn[index] = savedValues;
   });
 
   return toReturn;

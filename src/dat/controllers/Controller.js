@@ -92,7 +92,7 @@ class Controller {
    *
    * @param {Function} fnc This function will be called whenever the value
    * has been modified via this Controller.
-   * @returns {dat.controllers.Controller} this
+   * @returns {Controller} this
    */
   onChange(fnc) {
     this.__onChange = fnc;
@@ -271,7 +271,7 @@ class Controller {
   }
 
   /**
-   * @returns {Boolean} true if the value has deviated from initialValue
+   * @returns {boolean} true if the value has deviated from initialValue
    */
   isModified() {
     return this.initialValue !== this.getValue();

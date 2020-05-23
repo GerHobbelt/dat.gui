@@ -17,7 +17,7 @@ import dom from "../dom/dom";
 /**
  * @class Provides a checkbox input to alter the boolean property of an object.
  *
- * @extends dat.controllers.Controller
+ * @extends Controller
  *
  * @param {Object} object The object to be manipulated
  * @param {string} property The name of the property to be manipulated

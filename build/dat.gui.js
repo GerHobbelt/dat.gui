@@ -1,3 +1,16 @@
+/**
+ * dat.GUI JavaScript Controller Library
+ * http://code.google.com/p/dat-gui
+ *
+ * Copyright 2011-2020 Data Arts Team, Google Creative Lab
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 (function (global, factory) {
   typeof exports === "object" && typeof module !== "undefined"
     ? factory(exports)
@@ -9,16 +22,15 @@
 
   function colorToString(color) {
     if (color.a === 1 || common.isUndefined(color.a)) {
-      var s = color.hex.toString(16);
-      while (s.length < 6) {
-        s = "0" + s;
+      var str = color.hex.toString(16);
+      while (str.length < 6) {
+        str = "0" + str;
       }
-      return "#" + s;
+      return "#" + str;
     }
     return "rgba(" + Math.round(color.r) + "," + Math.round(color.g) + "," + Math.round(color.b) + "," + color.a + ")";
   }
 
-  var ARR_EACH = Array.prototype.forEach;
   var ARR_SLICE = Array.prototype.slice;
   var Common = {
     BREAK: {},
@@ -64,7 +76,7 @@
       if (!obj) {
         return;
       }
-      if (ARR_EACH && obj.forEach && obj.forEach === ARR_EACH) {
+      if (obj.forEach) {
         obj.forEach(itr, scope);
       } else if (obj.length === obj.length + 0) {
         for (var key = 0, l = obj.length; key < l; key++) {
@@ -136,7 +148,7 @@
       return obj === false || obj === true;
     },
     isFunction: function isFunction(obj) {
-      return Object.prototype.toString.call(obj) === "[object Function]";
+      return obj instanceof Function;
     },
     isImagePath: function isImagePath(obj) {
       return typeof obj === "string" && obj.search(/\.(gif|jpg|jpeg|png)$/) > -1;
@@ -572,8 +584,9 @@
   });
   Object.defineProperty(Color.prototype, "hex", {
     get: function get() {
-      if (!this.__state.space !== "HEX") {
+      if (this.__state.space !== "HEX") {
         this.__state.hex = ColorMath.rgb_to_hex(this.r, this.g, this.b);
+        this.__state.space = "HEX";
       }
       return this.__state.hex;
     },
@@ -766,7 +779,7 @@
       }
       var evt = document.createEvent(className);
       switch (className) {
-        case "MouseEvents":
+        case "MouseEvents": {
           var clientX = params.x || params.clientX || 0;
           var clientY = params.y || params.clientY || 0;
           evt.initMouseEvent(
@@ -787,7 +800,8 @@
             null
           );
           break;
-        case "KeyboardEvents":
+        }
+        case "KeyboardEvents": {
           var init = evt.initKeyboardEvent || evt.initKeyEvent;
           Common.defaults(params, {
             cancelable: true,
@@ -811,9 +825,11 @@
             params.charCode
           );
           break;
-        default:
+        }
+        default: {
           evt.initEvent(eventType, params.bubbles || false, params.cancelable || true);
           break;
+        }
       }
       Common.defaults(evt, aux);
       elem.dispatchEvent(evt);
@@ -1003,6 +1019,7 @@
       return toReturn;
     };
     _proto.updateDisplay = function updateDisplay() {
+      if (dom.isActive(this.__select)) return this;
       var value = this.getValue();
       var custom = true;
       if (value !== this.CUSTOM_FLAG) {
@@ -1064,9 +1081,9 @@
   })(Controller);
 
   function numDecimals(x) {
-    x = x.toString();
-    if (x.indexOf(".") > -1) {
-      return x.length - x.indexOf(".") - 1;
+    var _x = x.toString();
+    if (_x.indexOf(".") > -1) {
+      return _x.length - _x.indexOf(".") - 1;
     }
     return 0;
   }
@@ -1129,7 +1146,7 @@
           console.log("number controller: new step = ", this.__impliedStep, ", precision: ", this.__precision);
         }
       }
-      return NumberController.superclass.prototype.setValue.call(this, v);
+      return _Controller.prototype.setValue.call(this, v);
     };
     _proto.min = function min(v) {
       this.__min = Common.isFiniteNumber(v) ? v : undefined;
@@ -1263,48 +1280,6 @@
     };
     return NumberControllerBox;
   })(NumberController$1);
-
-  function styleInject(css, ref) {
-    if (ref === void 0) ref = {};
-    var insertAt = ref.insertAt;
-    if (!css || typeof document === "undefined") {
-      return;
-    }
-    var head = document.head || document.getElementsByTagName("head")[0];
-    var style = document.createElement("style");
-    style.type = "text/css";
-    if (insertAt === "top") {
-      if (head.firstChild) {
-        head.insertBefore(style, head.firstChild);
-      } else {
-        head.appendChild(style);
-      }
-    } else {
-      head.appendChild(style);
-    }
-    if (style.styleSheet) {
-      style.styleSheet.cssText = css;
-    } else {
-      style.appendChild(document.createTextNode(css));
-    }
-  }
-
-  var css_248z =
-    '/**
- * dat.GUI JavaScript Controller Library
- * http://code.google.com/p/dat-gui
- *
- * Copyright 2011-2020 Data Arts Team, Google Creative Lab
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- */
-
-\n\n.slider {\n  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15);\n  height: 1em;\n  border-radius: 1em;\n  background-color: #EEEEEE;\n  padding: 0 0.5em;\n  overflow: hidden;\n}\n\n.slider-fg {\n  padding: 1px 0 2px 0;\n  background-color: #AAAAAA;\n  height: 1em;\n  margin-left: -0.5em;\n  padding-right: 0.5em;\n  border-radius: 1em 0 0 1em;\n}\n\n.slider-fg::after {\n  display: inline-block;\n  border-radius: 1em;\n  background-color: #FFFFFF;\n  border: 1px solid #AAAAAA;\n  content: "";\n  float: right;\n  margin-right: -1em;\n  margin-top: -1px;\n  height: 0.9em;\n  width: 0.9em;\n}\n';
-  styleInject(css_248z);
 
   function map(v, i1, i2, o1, o2) {
     return o1 + (o2 - o1) * ((v - i1) / (i2 - i1));
@@ -1663,10 +1638,11 @@
       function setSV(e) {
         e.preventDefault();
         var w = dom.getWidth(_this.__saturation_field);
+        var h = dom.getHeight(_this.__saturation_field);
         var o = dom.getOffset(_this.__saturation_field);
         var scroll = getScroll(_this.__saturation_field);
         var s = (e.clientX - o.left + scroll.left) / w;
-        var v = 1 - (e.clientY - o.top + scroll.top) / w;
+        var v = 1 - (e.clientY - o.top + scroll.top) / h;
         if (v > 1) {
           v = 1;
         } else if (v < 0) {
@@ -1730,13 +1706,15 @@
           top: el.scrollTop || 0,
           left: el.scrollLeft || 0,
         };
-        while ((el = el.parentNode)) {
+        el = el.parentNode;
+        while (el) {
           scroll.top += el.scrollTop || 0;
           scroll.left += el.scrollLeft || 0;
           var cs = getComputedStyle(el, null);
           if (cs.position === "fixed") {
             break;
           }
+          el = el.parentNode;
         }
         return scroll;
       }
@@ -1780,8 +1758,9 @@
       this.__temp.s = 1;
       this.__temp.v = 1;
       linearGradient(this.__saturation_field, "left", "#fff", this.__temp.toString());
+      this.__input.value = this.__color.toString();
       Common.extend(this.__input.style, {
-        backgroundColor: (this.__input.value = this.__color.toString()),
+        backgroundColor: this.__color.toString(),
         color: "rgb(" + flip + "," + flip + "," + flip + ")",
         textShadow: this.__input_textShadow
           .map(function (d) {
@@ -1826,15 +1805,11 @@
     });
   }
 
-  var css_248z$1 =
-    ".GUI-preview-image {\n  float: left;\n  padding: 0.4em;\n  max-width: 2em;\n  max-height: 2em;\n}\n\n.GUI-label-image {\n  color: rgb(214, 214, 245);\n  text-decoration: underline;\n  display: block;\n  background-color: #3C3C3C;\n  width: 100%;\n  cursor: pointer;\n}\n\n.GUI-label-image:hover {\n  background: #3C3C3C;\n}\n";
-  styleInject(css_248z$1);
-
   var ImageController = (function (_Controller) {
     _inheritsLoose(ImageController, _Controller);
-    function ImageController(Object, property) {
+    function ImageController(object, property) {
       var _this2;
-      _this2 = _Controller.call(this, Object, property) || this;
+      _this2 = _Controller.call(this, object, property) || this;
       var _this = _assertThisInitialized(_this2);
       _this2.__input = document.createElement("input");
       _this2.__input.setAttribute("type", "file");
@@ -1867,27 +1842,6 @@
     };
     return ImageController;
   })(Controller);
-
-  var css$1 = {
-    load: function load(url, indoc) {
-      var doc = indoc || document;
-      var link = doc.createElement("link");
-      link.type = "text/css";
-      link.rel = "stylesheet";
-      link.href = url;
-      doc.getElementsByTagName("head")[0].appendChild(link);
-    },
-    inject: function inject(cssContent, indoc) {
-      var doc = indoc || document;
-      var injected = document.createElement("style");
-      injected.type = "text/css";
-      injected.innerHTML = cssContent;
-      var head = doc.getElementsByTagName("head")[0];
-      try {
-        head.appendChild(injected);
-      } catch (e) {}
-    },
-  };
 
   var saveDialogueContents =
     '<div id="dg-save" class="dg dialogue">\n  Here\'s the new load parameter for your <code>GUI</code>\'s constructor:\n\n  <textarea id="dg-new-constructor"></textarea>\n\n  <div id="dg-save-locally">\n    <input id="dg-local-storage" type="checkbox">\n    Automatically save values to <code>localStorage</code> on exit.\n\n    <div id="dg-local-explain">\n      The values saved to <code>localStorage</code> will override those passed to <code>dat.GUI</code>\'s constructor.\n      This makes it easier to work incrementally, but <code>localStorage</code> is fragile, and your friends may not see\n      the same values you do.\n    </div>\n  </div>\n</div>\n';
@@ -2286,10 +2240,7 @@
     return CenteredDiv;
   })();
 
-  var styleSheet$1 = "";
-
   var ARR_SLICE$1 = Array.prototype.slice;
-  css$1.inject(styleSheet$1);
   var CSS_NAMESPACE = "dg";
   var HIDE_KEY_CODE = 72;
   var CLOSE_BUTTON_HEIGHT = 20;
@@ -2837,26 +2788,25 @@
     controller.__gui = gui;
     Common.extend(controller, {
       options: function options(_options) {
-        var next_sibling;
         if (arguments.length > 1) {
-          next_sibling = controller.__li.nextElementSibling;
+          var nextSibling = controller.__li.nextElementSibling;
           controller.remove();
           return _add(gui, controller.object, controller.property, {
-            before: next_sibling,
+            before: nextSibling,
             factoryArgs: [Common.toArray(arguments)],
           });
         }
         if (Common.isArray(_options) || Common.isObject(_options)) {
-          next_sibling = controller.__li.nextElementSibling;
+          var _nextSibling = controller.__li.nextElementSibling;
           controller.remove();
           return _add(gui, controller.object, controller.property, {
-            before: next_sibling,
+            before: _nextSibling,
             factoryArgs: [_options],
           });
         }
       },
-      name: function name(v) {
-        controller.__li.firstElementChild.firstElementChild.innerHTML = v;
+      name: function name(_name) {
+        controller.__li.firstElementChild.firstElementChild.innerHTML = _name;
         return controller;
       },
       listen: function listen() {
@@ -2899,10 +2849,11 @@
       var r = function r(returned) {
         if (Common.isNumber(controller.__min) && Common.isNumber(controller.__max)) {
           controller.remove();
-          return _add(gui, controller.object, controller.property, {
+          var newController = _add(gui, controller.object, controller.property, {
             before: controller.__li.nextElementSibling,
             factoryArgs: [controller.__min, controller.__max, controller.__step],
           });
+          return newController;
         }
         return returned;
       };
@@ -3098,12 +3049,12 @@
   function getCurrentPreset(gui, useInitialValues) {
     var toReturn = {};
     Common.each(gui.__rememberedObjects, function (val, index) {
-      var saved_values = {};
-      var controller_map = gui.__rememberedObjectIndecesToControllers[index];
-      Common.each(controller_map, function (controller, property) {
-        saved_values[property] = useInitialValues ? controller.initialValue : controller.getValue();
+      var savedValues = {};
+      var controllerMap = gui.__rememberedObjectIndecesToControllers[index];
+      Common.each(controllerMap, function (controller, property) {
+        savedValues[property] = useInitialValues ? controller.initialValue : controller.getValue();
       });
-      toReturn[index] = saved_values;
+      toReturn[index] = savedValues;
     });
     return toReturn;
   }
@@ -3167,7 +3118,7 @@
     GUI: GUI,
   };
   var GUI$1 = GUI;
-  var index = {
+  var datGUI = {
     color: color,
     controllers: controllers,
     dom: dom$1,
@@ -3178,7 +3129,7 @@
   exports.GUI = GUI$1;
   exports.color = color;
   exports.controllers = controllers;
-  exports.default = index;
+  exports.default = datGUI;
   exports.dom = dom$1;
   exports.gui = gui;
 

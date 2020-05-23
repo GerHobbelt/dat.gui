@@ -15,9 +15,9 @@ import Controller from "./Controller";
 import common from "../utils/common";
 
 function numDecimals(x) {
-  x = x.toString();
-  if (x.indexOf(".") > -1) {
-    return x.length - x.indexOf(".") - 1;
+  const _x = x.toString();
+  if (_x.indexOf(".") > -1) {
+    return _x.length - _x.indexOf(".") - 1;
   }
   return 0;
 }
@@ -108,7 +108,7 @@ class NumberController extends Controller {
       }
     }
 
-    return NumberController.superclass.prototype.setValue.call(this, v);
+    return super.setValue(v);
   }
 
   /**

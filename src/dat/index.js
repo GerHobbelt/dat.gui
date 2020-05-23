@@ -11,6 +11,13 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
+// ------------------------------------------------------------------
+//
+// extra: help rollup to produce the accompanying CSS file
+//
+import "./index.scss";
+// ------------------------------------------------------------------
+
 import Color from "./color/Color";
 import math from "./color/math";
 import interpret from "./color/interpret";
@@ -30,12 +37,22 @@ import ImageController from "./controllers/ImageController";
 import domImport from "./dom/dom";
 import GUIImport from "./gui/GUI";
 
+/** @module dat */
+
+/**
+ * [color description]
+ * @type {Object}
+ */
 export const color = {
   Color: Color,
   math: math,
   interpret: interpret,
 };
 
+/**
+ * [controllers description]
+ * @type {Object}
+ */
 export const controllers = {
   Controller: Controller,
   BooleanController: BooleanController,
@@ -50,16 +67,32 @@ export const controllers = {
   ImageController: ImageController,
 };
 
+/**
+ * [dom description]
+ * @type {Object}
+ */
 export const dom = { dom: domImport };
 
+/**
+ * [gui description]
+ * @type {Object}
+ */
 export const gui = { GUI: GUIImport };
 
+/**
+ * [GUI description]
+ * @type {[type]}
+ */
 export const GUI = GUIImport;
 
-export default {
+/**
+ * TBD
+ */
+const datGUI = {
   color,
   controllers,
   dom,
   gui,
   GUI,
 };
+export default datGUI;

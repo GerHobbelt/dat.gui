@@ -13,12 +13,11 @@
 
 export default function (color) {
   if (color.a === 1 || common.isUndefined(color.a)) {
-    let s = color.hex.toString(16);
-    while (s.length < 6) {
-      s = "0" + s;
+    let str = color.hex.toString(16);
+    while (str.length < 6) {
+      str = "0" + str;
     }
-
-    return "#" + s;
+    return "#" + str;
   }
   return "rgba(" + Math.round(color.r) + "," + Math.round(color.g) + "," + Math.round(color.b) + "," + color.a + ")";
 }

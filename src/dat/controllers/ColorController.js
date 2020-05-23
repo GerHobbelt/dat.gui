@@ -288,10 +288,11 @@ class ColorController extends Controller {
       e.preventDefault();
 
       const w = dom.getWidth(_this.__saturation_field);
+      const h = dom.getHeight(_this.__saturation_field);
       const o = dom.getOffset(_this.__saturation_field);
       const scroll = getScroll(_this.__saturation_field);
       let s = (e.clientX - o.left + scroll.left) / w;
-      let v = 1 - (e.clientY - o.top + scroll.top) / w;
+      let v = 1 - (e.clientY - o.top + scroll.top) / h;
 
       if (v > 1) {
         v = 1;
@@ -376,13 +377,15 @@ class ColorController extends Controller {
         top: el.scrollTop || 0,
         left: el.scrollLeft || 0,
       };
-      while ((el = el.parentNode)) {
+      el = el.parentNode;
+      while (el) {
         scroll.top += el.scrollTop || 0;
         scroll.left += el.scrollLeft || 0;
         const cs = getComputedStyle(el, null);
         if (cs.position === "fixed") {
           break;
         }
+        el = el.parentNode;
       }
       return scroll;
     }
@@ -440,8 +443,10 @@ class ColorController extends Controller {
 
     linearGradient(this.__saturation_field, "left", "#fff", this.__temp.toString());
 
+    this.__input.value = this.__color.toString();
+
     common.extend(this.__input.style, {
-      backgroundColor: (this.__input.value = this.__color.toString()),
+      backgroundColor: this.__color.toString(),
       color: "rgb(" + flip + "," + flip + "," + flip + ")",
       textShadow: this.__input_textShadow
         .map(function (d) {

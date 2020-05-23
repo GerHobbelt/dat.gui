@@ -61,8 +61,8 @@ const ControllerFactory = function (
   }
 
   // Providing a map?
-
   if (common.isNumber(initialValue)) {
+    // Has min and max? (slider)
     if (common.isNumber(options_1) && common.isNumber(options_2)) {
       // Has min and max.
       return new NumberControllerSlider(
@@ -76,6 +76,7 @@ const ControllerFactory = function (
         options_6
       );
     }
+    // number box
     return new NumberControllerBox(object, property, {
       min: options_1,
       max: options_2,
@@ -98,6 +99,8 @@ const ControllerFactory = function (
     return new StringController(object, property);
   }
 
+  // TODO: check that the isFunction() API also recognizes async functions properly.
+  // if (common.isFunction(initialValue) || common.isAsyncFunction(initialValue)) {
   if (common.isFunction(initialValue)) {
     let opts = ARR_SLICE.call(arguments, 3);
     if (opts.length === 0) {
@@ -124,7 +127,7 @@ const ControllerFactory = function (
     return new UndefinedController(object, property);
   }
 
-  return false;
+  return null;
 };
 
 export default ControllerFactory;

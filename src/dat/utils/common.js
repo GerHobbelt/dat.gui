@@ -71,7 +71,8 @@ const Common = {
       return;
     }
 
-    if (ARR_EACH && obj.forEach && obj.forEach === ARR_EACH) {
+    // if (ARR_EACH && obj.forEach && obj.forEach === ARR_EACH) {
+    if (obj.forEach) {
       obj.forEach(itr, scope);
     } else if (obj.length === obj.length + 0) {
       // Is number but not NaN
@@ -93,7 +94,10 @@ const Common = {
     setTimeout(fnc, 0);
   },
 
-  // if the function is called repeatedly, wait until threshold passes until we execute the function
+  /**
+   * If the function is called repeatedly, wait until threshold passes
+   * until we execute the function.
+   */
   debounce: function (func, threshold, callImmediately) {
     let timeout;
 
@@ -162,7 +166,7 @@ const Common = {
   },
 
   isFunction: function (obj) {
-    return Object.prototype.toString.call(obj) === "[object Function]";
+    return obj instanceof Function;
   },
 
   isImagePath: function (obj) {

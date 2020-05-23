@@ -101,6 +101,9 @@ class OptionController extends Controller {
   }
 
   updateDisplay() {
+    // prevent number from updating if user is trying to manually update
+    if (dom.isActive(this.__select)) return this;
+
     const value = this.getValue();
     let custom = true;
     if (value !== this.CUSTOM_FLAG) {

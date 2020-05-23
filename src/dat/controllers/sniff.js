@@ -42,10 +42,10 @@
 //     if (common.isNumber(initialValue)) {
 //         if (common.isNumber(args[0]) && common.isNumber(args[1])) {
 //             return 'numberSlider';
-// 		} else {
-// 			return 'numberBox';
-// 		}
-// 	}
+//      } else {
+//          return 'numberBox';
+//      }
+//  }
 //     if (common.isString(initialValue)) {
 //         return 'string';
 //     }

@@ -1032,9 +1032,10 @@ var StringController = (function (_Controller) {
   }
   var _proto = StringController.prototype;
   _proto.updateDisplay = function updateDisplay() {
-    if (!dom.isActive(this.__input)) {
-      this.__input.value = this.getValue();
+    if (dom.isActive(this.__input)) {
+      return this;
     }
+    this.__input.value = this.getValue();
     return _Controller.prototype.updateDisplay.call(this);
   };
   return StringController;
@@ -1111,6 +1112,27 @@ var NumberControllerBox = (function (_NumberController) {
     var _this = _assertThisInitialized(_this2);
     _this2.__suspendUpdate = false;
     var prevY;
+    function onKeyDown(e) {
+      {
+        var step = _this.__step || 1;
+        switch (e.keyCode) {
+          case 13:
+            _this.__truncationSuspended = true;
+            this.blur();
+            _this.__truncationSuspended = false;
+            onFinish();
+            break;
+          case 38:
+            var newVal = _this.getValue() + step;
+            _this.setValue(newVal);
+            break;
+          case 40:
+            var newVal = _this.getValue() - step;
+            _this.setValue(newVal);
+            break;
+        }
+      }
+    }
     function onChange() {
       var attempted = parseFloat(_this.__input.value);
       if (!Common.isNaN(attempted) && !_this._readonly) {
@@ -1144,27 +1166,6 @@ var NumberControllerBox = (function (_NumberController) {
       dom.bind(window, "mouseup", onMouseUp, false, true);
       prevY = e.clientY;
     }
-    function onKeyDown(e) {
-      {
-        var step = _this.__step || 1;
-        switch (e.keyCode) {
-          case 13:
-            _this.__truncationSuspended = true;
-            this.blur();
-            _this.__truncationSuspended = false;
-            onFinish();
-            break;
-          case 38:
-            var newVal = _this.getValue() + step;
-            _this.setValue(newVal);
-            break;
-          case 40:
-            var newVal = _this.getValue() - step;
-            _this.setValue(newVal);
-            break;
-        }
-      }
-    }
     function onWheel(e) {
       e.preventDefault();
       var direction = -e.deltaY >> 10 || 1;
@@ -1184,7 +1185,9 @@ var NumberControllerBox = (function (_NumberController) {
   }
   var _proto = NumberControllerBox.prototype;
   _proto.updateDisplay = function updateDisplay(force) {
-    if (!force && dom.isActive(this.__input)) return this;
+    if (!force && dom.isActive(this.__input)) {
+      return this;
+    }
     if (this.__suspendUpdate) return;
     this.__input.value = this.__truncationSuspended
       ? this.getValue()
@@ -1683,6 +1686,26 @@ var PlotterController = (function (_Controller) {
 var saveDialogueContents =
   '<div id="dg-save" class="dg dialogue">\n  Here\'s the new load parameter for your <code>GUI</code>\'s constructor:\n\n  <textarea id="dg-new-constructor"></textarea>\n\n  <div id="dg-save-locally">\n    <input id="dg-local-storage" type="checkbox">\n    Automatically save values to <code>localStorage</code> on exit.\n\n    <div id="dg-local-explain">\n      The values saved to <code>localStorage</code> will override those passed to <code>dat.GUI</code>\'s constructor.\n      This makes it easier to work incrementally, but <code>localStorage</code> is fragile, and your friends may not see\n      the same values you do.\n    </div>\n  </div>\n</div>\n';
 
+var UndefinedController = (function (_Controller) {
+  _inheritsLoose(UndefinedController, _Controller);
+  function UndefinedController(object, property, options) {
+    var _this2;
+    _this2 = _Controller.call(this, object, property, "undefined", options) || this;
+    var _this = _assertThisInitialized(_this2);
+    _this2.__prev = _this2.getValue();
+    _this2.__elem = document.createElement("em");
+    _this2.domElement.appendChild(_this2.__elem);
+    _this2.updateDisplay();
+    return _this2;
+  }
+  var _proto = UndefinedController.prototype;
+  _proto.updateDisplay = function updateDisplay() {
+    this.__elem.innerText = "<undefined>";
+    return _Controller.prototype.updateDisplay.call(this);
+  };
+  return UndefinedController;
+})(Controller);
+
 var ARR_SLICE$1 = Array.prototype.slice;
 var ControllerFactory = function ControllerFactory(object, property) {
   var initialValue = object[property];
@@ -1729,6 +1752,9 @@ var ControllerFactory = function ControllerFactory(object, property) {
   }
   if (Common.isBoolean(initialValue)) {
     return new BooleanController(object, property);
+  }
+  if (Common.isUndefined(initialValue)) {
+    return new UndefinedController(object, property);
   }
   return null;
 };

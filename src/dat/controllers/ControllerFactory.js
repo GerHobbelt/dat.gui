@@ -18,6 +18,7 @@ import StringController from "./StringController";
 import FunctionController from "./FunctionController";
 import BooleanController from "./BooleanController";
 import ColorController from "./ColorController";
+import UndefinedController from "./UndefinedController";
 import common from "../utils/common";
 
 const ARR_SLICE = Array.prototype.slice;
@@ -74,6 +75,10 @@ const ControllerFactory = function (object, property) {
 
   if (common.isBoolean(initialValue)) {
     return new BooleanController(object, property);
+  }
+
+  if (common.isUndefined(initialValue)) {
+    return new UndefinedController(object, property);
   }
 
   // otherwise: we cannot 'sniff' the type of controller you want, since the

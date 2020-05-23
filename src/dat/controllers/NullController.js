@@ -15,8 +15,7 @@ import Controller from "./Controller";
 import dom from "../dom/dom";
 
 /**
- * @class Provides a controller to represent an UNDEFINED-valued property of an object.
- *
+ * @class Provides a NULL controller to represent a NULL property of an object.
  * @extends dat.controllers.Controller
  *
  * @param {Object} object The object to be manipulated
@@ -24,9 +23,9 @@ import dom from "../dom/dom";
  *
  * @member dat.controllers
  */
-class UndefinedController extends Controller {
+class NullController extends Controller {
   constructor(object, property, options) {
-    super(object, property, "undefined", options);
+    super(object, property, "null", options);
 
     const _this = this;
     this.__prev = this.getValue();
@@ -39,9 +38,9 @@ class UndefinedController extends Controller {
   }
 
   updateDisplay() {
-    this.__elem.innerText = "<undefined>";
+    this.__elem.innerText = "<null>";
     return super.updateDisplay();
   }
 }
 
-export default UndefinedController;
+export default NullController;

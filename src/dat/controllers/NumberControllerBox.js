@@ -54,47 +54,6 @@ class NumberControllerBox extends NumberController {
      */
     let prevY;
 
-    function onChange() {
-      const attempted = parseFloat(_this.__input.value);
-      if (!common.isNaN(attempted) && !_this._readonly) {
-        _this.setValue(attempted);
-      }
-    }
-
-    function onFinish() {
-      if (_this.__onFinishChange) {
-        _this.__onFinishChange.call(_this, _this.getValue());
-      }
-    }
-
-    function onFocus() {
-      this.__suspendUpdate = true;
-    }
-
-    function onBlur() {
-      this.__suspendUpdate = false;
-      onFinish();
-    }
-
-    function onMouseDrag(e) {
-      const diff = prevY - e.clientY;
-      _this.setValue(_this.getValue() + diff * _this.__impliedStep);
-
-      prevY = e.clientY;
-    }
-
-    function onMouseUp() {
-      dom.unbind(window, "mousemove", onMouseDrag);
-      dom.unbind(window, "mouseup", onMouseUp);
-      onFinish();
-    }
-
-    function onMouseDown(e) {
-      dom.bind(window, "mousemove", onMouseDrag, false, true);
-      dom.bind(window, "mouseup", onMouseUp, false, true);
-      prevY = e.clientY;
-    }
-
     function onKeyDown(e) {
       // TODO: pick one of the two keyboard switch-case handlers below:
       if (1) {
@@ -145,6 +104,47 @@ class NumberControllerBox extends NumberController {
       }
     }
 
+    function onChange() {
+      const attempted = parseFloat(_this.__input.value);
+      if (!common.isNaN(attempted) && !_this._readonly) {
+        _this.setValue(attempted);
+      }
+    }
+
+    function onFinish() {
+      if (_this.__onFinishChange) {
+        _this.__onFinishChange.call(_this, _this.getValue());
+      }
+    }
+
+    function onFocus() {
+      this.__suspendUpdate = true;
+    }
+
+    function onBlur() {
+      this.__suspendUpdate = false;
+      onFinish();
+    }
+
+    function onMouseDrag(e) {
+      const diff = prevY - e.clientY;
+      _this.setValue(_this.getValue() + diff * _this.__impliedStep);
+
+      prevY = e.clientY;
+    }
+
+    function onMouseUp() {
+      dom.unbind(window, "mousemove", onMouseDrag);
+      dom.unbind(window, "mouseup", onMouseUp);
+      onFinish();
+    }
+
+    function onMouseDown(e) {
+      dom.bind(window, "mousemove", onMouseDrag, false, true);
+      dom.bind(window, "mouseup", onMouseUp, false, true);
+      prevY = e.clientY;
+    }
+
     function onWheel(e) {
       e.preventDefault();
       const direction = -e.deltaY >> 10 || 1;
@@ -171,7 +171,11 @@ class NumberControllerBox extends NumberController {
   updateDisplay(force) {
     // TODO: next two statements are from different fixes for the same problem:
     // no updating while editing number field. See which one works best.
-    if (!force && dom.isActive(this.__input)) return this;
+    // Use the same solution from StringController.js to enable
+    // editing <input>s while "listen()"ing
+    if (!force && dom.isActive(this.__input)) {
+      return this;
+    }
     if (this.__suspendUpdate) return;
 
     this.__input.value = this.__truncationSuspended

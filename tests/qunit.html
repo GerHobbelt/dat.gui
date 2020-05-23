@@ -20,10 +20,12 @@
         const { BooleanController } = dat.controllers;
         const { OptionController } = dat.controllers;
         const { StringController } = dat.controllers;
+        const { ArrayController } = dat.controllers;
         const { NumberController } = dat.controllers;
         const { NumberControllerBox } = dat.controllers;
         const { NumberControllerSlider } = dat.controllers;
         const { FunctionController } = dat.controllers;
+        const { TabbedController } = dat.controllers;
         const { ColorController } = dat.controllers;
         const { CustomController } = dat.controllers;
         const { GUI } = dat.gui;
@@ -344,11 +346,7 @@
         });
 
         test("Setting HSV, Modifying RGB", function () {
-          const c = new Color({
-            h: 340,
-            s: 0.3,
-            v: 0.9,
-          });
+          const c = new Color({ h: 340, s: 0.3, v: 0.9 });
 
           c.g = 0;
 
@@ -375,6 +373,8 @@
           const c = new Color(120, 100, 20, 0.3);
 
           const prevHue = c.h;
+          console.log("heh?");
+
           c.r = 0;
           c.b = 0;
           c.g = 0;
@@ -386,6 +386,7 @@
           return {
             numberProperty: 10,
             stringProperty: "foo",
+            arrayProperty: [0, 0, 0],
             booleanProperty: false,
             functionProperty: function () {
               // do something
@@ -433,13 +434,13 @@
 
           equal(c1.__checkbox.checked, object.booleanProperty);
 
+          console.log(c2.__checkbox.getAttribute("checked"));
+
           equal(c2.__checkbox.getAttribute("checked") === "checked", object.anotherBooleanProperty);
         });
 
         test("Modifies values (starting true)", function () {
-          const object = {
-            booleanProperty: true,
-          };
+          const object = { booleanProperty: true };
 
           const c1 = new BooleanController(object, "booleanProperty");
 
@@ -462,9 +463,7 @@
         });
 
         test("Modifies values (starting false)", function () {
-          const object = {
-            booleanProperty: false,
-          };
+          const object = { booleanProperty: false };
 
           const c1 = new BooleanController(object, "booleanProperty");
 
@@ -583,15 +582,50 @@
           equal(newVal, object.stringProperty);
         });
 
+        module("ArrayController");
+
+        test("Acknowledges original value", function () {
+          const object = initObject();
+          const c1 = new ArrayController(object, "arrayProperty");
+
+          const a = [];
+          $(c1.__inputs).each(function (idx) {
+            const el = $(c1.__inputs)[idx];
+            let v = $(el).val();
+            if (!Number.isNaN(parseFloat(v))) {
+              v = parseFloat(v);
+            }
+            a.push(v);
+          });
+          console.log({ a, b: object.arrayProperty });
+          deepEqual(a, object.arrayProperty);
+        });
+
+        test("Modifies values", function () {
+          const object = initObject();
+          const c1 = new ArrayController(object, "arrayProperty");
+
+          const newVal = [1, "a", true];
+
+          $(c1.__inputs).each(function (idx) {
+            const el = $(c1.__inputs)[idx];
+            const elem = $(el).val(newVal[idx])[0];
+            // dom.fakeEvent(elem, "change");
+          });
+          const elem = $(c1.__inputs)[0];
+          dom.fakeEvent(elem, "change");
+
+          // WARNING: ArrayController does not detect 'value type': everything is produced as string value:
+          equal("1", object.arrayProperty[0]);
+          equal("a", object.arrayProperty[1]);
+          equal("true", object.arrayProperty[2]);
+        });
+
         module("NumberController");
 
         test("Constraints", function () {
           const object = initObject();
-          const params = {
-            min: 0,
-            max: 10,
-            step: 2,
-          };
+          const params = { min: 0, max: 10, step: 2 };
 
           const c1 = new NumberController(object, "numberProperty", params);
 
@@ -646,12 +680,8 @@
         });
 
         test("Handles drag", function () {
-          const object = {
-            numberProperty: 0,
-          };
-          const params = {
-            step: Math.random() * 21,
-          };
+          const object = { numberProperty: 0 };
+          const params = { step: Math.random() * 21 };
 
           const c1 = new NumberControllerBox(object, "numberProperty", params);
 
@@ -782,6 +812,25 @@
           document.body.removeChild(c1.domElement);
         });
 
+        module("CustomController");
+
+        test("Get Custom", function () {
+          const value = "value";
+          const c1 = new CustomController({
+            constructor: function (controller) {
+              const input = document.createElement("input");
+              input.value = value;
+              controller.domElement.appendChild(input);
+            },
+          });
+          document.body.appendChild(c1.domElement);
+
+          const input = c1.domElement.getElementsByTagName("input")[0];
+          equal(input.value, value, "Input value is the same as the " + value);
+
+          document.body.removeChild(c1.domElement);
+        });
+
         module("Controller Events");
 
         test("onChange", function () {
@@ -793,6 +842,7 @@
           const c3 = new BooleanController(object, "booleanProperty");
           const c4 = new FunctionController(object, "functionProperty");
           const c5 = new OptionController(object, "stringProperty", [0, 1, 2]);
+          const c6 = new TabbedController(object, "functionProperty");
 
           let c0_changed = false;
           let c1_changed = false;
@@ -800,6 +850,7 @@
           let c3_changed = false;
           let c4_changed = false;
           let c5_changed = false;
+          let c6_changed = false;
 
           c0.onChange(function () {
             c0_changed = true;
@@ -825,6 +876,10 @@
             c5_changed = true;
           });
 
+          c6.onChange(function () {
+            c6_changed = true;
+          });
+
           hidden.appendChild(c3.domElement);
 
           c0.setValue(0.5);
@@ -833,6 +888,7 @@
           c3.setValue(false);
           c4.fire();
           c5.setValue("yo");
+          c6.fire();
 
           ok(c1_changed, "NumberControllerSlider");
           ok(c1_changed, "NumberControllerBox");
@@ -840,6 +896,7 @@
           ok(c3_changed, "BooleanController");
           ok(c4_changed, "FunctionController");
           ok(c5_changed, "OptionController");
+          ok(c6_changed, "TabbedController");
         });
 
         test("onFinishChange", function () {
@@ -922,20 +979,10 @@
 
         test("Auto placement", function () {
           const gui = new GUI();
-          gui.add(
-            {
-              x: 0,
-            },
-            "x"
-          );
+          gui.add({ x: 0 }, "x");
 
           const gui2 = new GUI();
-          gui2.add(
-            {
-              x: 0,
-            },
-            "x"
-          );
+          gui2.add({ x: 0 }, "x");
 
           equal($(".dg.ac").length, 1, "A single auto-place container created");
           equal($(".dg.ac").children().length, 2, "Containing two GUI's");
@@ -959,12 +1006,7 @@
 
           // Add a lot of controllers. This will fail if you have some freakishly tall monitor.
           for (let i = 0; i < 100; i++) {
-            gui.add(
-              {
-                x: 0,
-              },
-              "x"
-            );
+            gui.add({ x: 0 }, "x");
           }
 
           setTimeout(function () {
@@ -976,12 +1018,8 @@
         });
 
         test("close/open button position", function () {
-          const gui = new GUI({
-            closeOnTop: true,
-          });
-          const gui2 = new GUI({
-            closeOnTop: false,
-          });
+          const gui = new GUI({ closeOnTop: true });
+          const gui2 = new GUI({ closeOnTop: false });
           const gui3 = new GUI();
 
           ok(
@@ -1007,22 +1045,12 @@
 
         test("Folders", function () {
           const gui = new GUI();
-          gui.add(
-            {
-              x: 0,
-            },
-            "x"
-          );
+          gui.add({ x: 0 }, "x");
 
           const name1 = "name";
           const f1 = gui.addFolder(name1);
 
-          f1.add(
-            {
-              x: 0,
-            },
-            "x"
-          );
+          f1.add({ x: 0 }, "x");
 
           equal(f1.name, name1, "Accepts name");
           equal($(f1.domElement).find("li.title").html(), name1, "Displays name");
@@ -1050,14 +1078,7 @@
         test("options", function () {
           const gui = new GUI();
 
-          let controller = gui
-            .add(
-              {
-                x: 0,
-              },
-              "x"
-            )
-            .options(0, 1, 2, 3, 4);
+          let controller = gui.add({ x: 0 }, "x").options(0, 1, 2, 3, 4);
 
           $(controller.__select)
             .children()
@@ -1066,20 +1087,13 @@
               equals(value.value, key, "By array value okay");
             });
 
-          controller = gui
-            .add(
-              {
-                x: 0,
-              },
-              "x"
-            )
-            .options({
-              0: "0",
-              1: "1",
-              2: "2",
-              3: "3",
-              4: "4",
-            });
+          controller = gui.add({ x: 0 }, "x").options({
+            0: "0",
+            1: "1",
+            2: "2",
+            3: "3",
+            4: "4",
+          });
 
           $(controller.__select)
             .children()
@@ -1097,14 +1111,7 @@
           const name = "hey man";
           const name2 = "yoyoo";
 
-          const controller = gui
-            .add(
-              {
-                x: 0,
-              },
-              "x"
-            )
-            .name(name);
+          const controller = gui.add({ x: 0 }, "x").name(name);
 
           equals($(controller.__li).find(".property-name").html(), name);
 
@@ -1117,9 +1124,7 @@
         test("listen", function () {
           const gui = new GUI();
 
-          const obj = {
-            x: 0,
-          };
+          const obj = { x: 0 };
 
           const returned1 = gui.add(obj, "x");
           const returned2 = returned1.listen();
@@ -1137,12 +1142,7 @@
         test("remove", function () {
           const gui = new GUI();
 
-          const c = gui.add(
-            {
-              x: 0,
-            },
-            "x"
-          );
+          const c = gui.add({ x: 0 }, "x");
 
           ok($.contains(gui.domElement, c.domElement), "Now you see it");
           c.remove();
@@ -1172,12 +1172,7 @@
           const max = 200;
           const step = 5;
 
-          const c = gui.add(
-            {
-              x: 0,
-            },
-            "x"
-          );
+          const c = gui.add({ x: 0 }, "x");
 
           c.min(min);
           equals(c.__min, min, "min");
@@ -1202,14 +1197,7 @@
         test("Adds NumberControllerBox to sliders", function () {
           const gui = new GUI();
 
-          const c = gui.add(
-            {
-              x: 0,
-            },
-            "x",
-            0,
-            10
-          );
+          const c = gui.add({ x: 0 }, "x", 0, 10);
 
           ok($(c.__li).find("input").length > 0, "NumberControllerBox added");
 
@@ -1219,12 +1207,7 @@
         test("Clickable rows for BooleanControllers", function () {
           const gui = new GUI();
 
-          const c = gui.add(
-            {
-              x: false,
-            },
-            "x"
-          );
+          const c = gui.add({ x: false }, "x");
 
           equal(c.__checkbox.checked, false, "Acknowledges original");
 

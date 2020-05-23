@@ -13,7 +13,7 @@
 
 const css = {
   load: function (url, doc) {
-    doc = doc || settings.DOCUMENT;
+    doc = doc || document;
     const link = doc.createElement("link");
     link.type = "text/css";
     link.rel = "stylesheet";
@@ -21,8 +21,8 @@ const css = {
     doc.getElementsByTagName("head")[0].appendChild(link);
   },
   inject: function (css, doc) {
-    doc = doc || settings.DOCUMENT;
-    const injected = settings.DOCUMENT.createElement("style");
+    doc = doc || document;
+    const injected = document.createElement("style");
     injected.type = "text/css";
     injected.innerHTML = css;
     const head = doc.getElementsByTagName("head")[0];

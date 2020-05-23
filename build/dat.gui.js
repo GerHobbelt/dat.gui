@@ -593,7 +593,7 @@
   var Controller = (function () {
     function Controller(object, property) {
       this.initialValue = object[property];
-      this.domElement = settings.DOCUMENT.createElement("div");
+      this.domElement = document.createElement("div");
       this.object = object;
       this.property = property;
       this.__onChange = undefined;
@@ -713,7 +713,7 @@
       if (!className) {
         throw new Error("Event type " + eventType + " not supported.");
       }
-      var evt = settings.DOCUMENT.createEvent(className);
+      var evt = document.createEvent(className);
       switch (className) {
         case "MouseEvents": {
           var clientX = params.x || params.clientX || 0;
@@ -722,7 +722,7 @@
             eventType,
             params.bubbles || false,
             params.cancelable || true,
-            settings.WINDOW,
+            window,
             params.clickCount || 1,
             0,
             0,
@@ -752,7 +752,7 @@
             eventType,
             params.bubbles || false,
             params.cancelable,
-            settings.WINDOW,
+            window,
             params.ctrlKey,
             params.altKey,
             params.shiftKey,
@@ -856,7 +856,7 @@
       return offset;
     },
     isActive: function isActive(elem) {
-      return elem === settings.DOCUMENT.activeElement && (elem.type || elem.href);
+      return elem === document.activeElement && (elem.type || elem.href);
     },
   };
 
@@ -867,7 +867,7 @@
       _this2 = _Controller.call(this, object, property) || this;
       var _this = _assertThisInitialized(_this2);
       _this2.__prev = _this2.getValue();
-      _this2.__checkbox = settings.DOCUMENT.createElement("input");
+      _this2.__checkbox = document.createElement("input");
       _this2.__checkbox.setAttribute("type", "checkbox");
       function onChange() {
         _this.setValue(!_this.__prev);
@@ -904,7 +904,7 @@
       var _this2;
       _this2 = _Controller.call(this, object, property) || this;
       var _this = _assertThisInitialized(_this2);
-      _this2.__select = settings.DOCUMENT.createElement("select");
+      _this2.__select = document.createElement("select");
       if (Common.isArray(options)) {
         var map = {};
         Common.each(options, function (element) {
@@ -913,7 +913,7 @@
         options = map;
       }
       Common.each(options, function (value, key) {
-        var opt = settings.DOCUMENT.createElement("option");
+        var opt = document.createElement("option");
         opt.innerHTML = key;
         opt.setAttribute("value", value);
         _this.__select.appendChild(opt);
@@ -963,7 +963,7 @@
           this.blur();
         }
       }
-      _this2.__input = settings.DOCUMENT.createElement("input");
+      _this2.__input = document.createElement("input");
       _this2.__input.setAttribute("type", "text");
       dom.bind(_this2.__input, "keyup", onChange);
       dom.bind(_this2.__input, "change", onChange);
@@ -1096,7 +1096,7 @@
           _this.__onFinishChange.call(_this, _this.getValue());
         }
       }
-      _this2.__input = settings.DOCUMENT.createElement("input");
+      _this2.__input = document.createElement("input");
       if (_this2.__step != null) {
         _this2.__input.setAttribute("step", _this2.__step);
         _this2.__input.setAttribute("type", "number");
@@ -1171,8 +1171,8 @@
       dom.addClass(_this2.__label, "label");
       dom.addClass(_this2.__foreground, "slider-fg");
       function onMouseDown(e) {
-        dom.bind(settings.WINDOW, "mousemove", onMouseDrag);
-        dom.bind(settings.WINDOW, "mouseup", onMouseUp);
+        dom.bind(window, "mousemove", onMouseDrag);
+        dom.bind(window, "mouseup", onMouseUp);
         onMouseDrag(e);
       }
       function onMouseDrag(e) {
@@ -1183,8 +1183,8 @@
         return false;
       }
       function onMouseUp(e) {
-        dom.unbind(settings.WINDOW, "mousemove", onMouseDrag);
-        dom.unbind(settings.WINDOW, "mouseup", onMouseUp);
+        dom.unbind(window, "mousemove", onMouseDrag);
+        dom.unbind(window, "mouseup", onMouseUp);
         if (_this.__onFinishChange) {
           _this.__onFinishChange.call(_this, _this.getValue());
         }
@@ -1228,7 +1228,7 @@
       var _this2;
       _this2 = _Controller.call(this, object, property) || this;
       var _this = _assertThisInitialized(_this2);
-      _this2.__button = settings.DOCUMENT.createElement("div");
+      _this2.__button = document.createElement("div");
       _this2.__button.innerHTML = text === undefined ? "Fire" : text;
       dom.bind(_this2.__button, "click", function (e) {
         e.preventDefault();
@@ -1261,18 +1261,18 @@
       _this2.__temp = new Color(0);
       var _this = _assertThisInitialized(_this2);
       dom.makeSelectable(_this2.domElement, false);
-      _this2.__selector = settings.DOCUMENT.createElement("div");
+      _this2.__selector = document.createElement("div");
       _this2.__selector.className = "selector";
-      _this2.__saturation_field = settings.DOCUMENT.createElement("div");
+      _this2.__saturation_field = document.createElement("div");
       _this2.__saturation_field.className = "saturation-field";
-      _this2.__field_knob = settings.DOCUMENT.createElement("div");
+      _this2.__field_knob = document.createElement("div");
       _this2.__field_knob.className = "field-knob";
       _this2.__field_knob_border = "2px solid ";
-      _this2.__hue_knob = settings.DOCUMENT.createElement("div");
+      _this2.__hue_knob = document.createElement("div");
       _this2.__hue_knob.className = "hue-knob";
-      _this2.__hue_field = settings.DOCUMENT.createElement("div");
+      _this2.__hue_field = document.createElement("div");
       _this2.__hue_field.className = "hue-field";
-      _this2.__input = settings.DOCUMENT.createElement("input");
+      _this2.__input = document.createElement("input");
       _this2.__input.type = "text";
       _this2.__input_textShadow = ["1px 0px 0px ", "-1px 0px 0px ", "0px 1px 0px ", "0px -1px 0px "];
       dom.bind(_this2.__input, "keydown", function (e) {
@@ -1282,11 +1282,11 @@
       });
       dom.bind(_this2.__input, "blur", onBlur);
       dom.bind(_this2.__selector, "mousedown", function (e) {
-        dom.addClass(this, "drag").bind(settings.WINDOW, "mouseup", function (evt) {
+        dom.addClass(this, "drag").bind(window, "mouseup", function (evt) {
           dom.removeClass(_this.__selector, "drag");
         });
       });
-      var valueField = settings.DOCUMENT.createElement("div");
+      var valueField = document.createElement("div");
       Common.extend(_this2.__selector.style, {
         width: "124px",
         height: "102px",
@@ -1348,17 +1348,17 @@
       dom.bind(_this2.__field_knob, "mousedown", fieldDown);
       dom.bind(_this2.__hue_field, "mousedown", function (e) {
         setH(e);
-        dom.bind(settings.WINDOW, "mousemove", setH);
-        dom.bind(settings.WINDOW, "mouseup", unbindH);
+        dom.bind(window, "mousemove", setH);
+        dom.bind(window, "mouseup", unbindH);
       });
       function fieldDown(e) {
         setSV(e);
-        dom.bind(settings.WINDOW, "mousemove", setSV);
-        dom.bind(settings.WINDOW, "mouseup", unbindSV);
+        dom.bind(window, "mousemove", setSV);
+        dom.bind(window, "mouseup", unbindSV);
       }
       function unbindSV() {
-        dom.unbind(settings.WINDOW, "mousemove", setSV);
-        dom.unbind(settings.WINDOW, "mouseup", unbindSV);
+        dom.unbind(window, "mousemove", setSV);
+        dom.unbind(window, "mouseup", unbindSV);
       }
       function onBlur() {
         var i = interpret(this.value);
@@ -1370,8 +1370,8 @@
         }
       }
       function unbindH() {
-        dom.unbind(settings.WINDOW, "mousemove", setH);
-        dom.unbind(settings.WINDOW, "mouseup", unbindH);
+        dom.unbind(window, "mousemove", setH);
+        dom.unbind(window, "mouseup", unbindH);
       }
       _this2.__saturation_field.appendChild(valueField);
       _this2.__selector.appendChild(_this2.__field_knob);
@@ -1386,8 +1386,8 @@
         var w = dom.getWidth(_this.__saturation_field);
         var h = dom.getHeight(_this.__saturation_field);
         var o = dom.getOffset(_this.__saturation_field);
-        var s = (e.clientX - o.left + settings.DOCUMENT.body.scrollLeft) / w;
-        var v = 1 - (e.clientY - o.top + settings.DOCUMENT.body.scrollTop) / h;
+        var s = (e.clientX - o.left + document.body.scrollLeft) / w;
+        var v = 1 - (e.clientY - o.top + document.body.scrollTop) / h;
         if (v > 1) {
           v = 1;
         } else if (v < 0) {
@@ -1407,7 +1407,7 @@
         e.preventDefault();
         var s = dom.getHeight(_this.__hue_field);
         var o = dom.getOffset(_this.__hue_field);
-        var h = 1 - (e.clientY - o.top + settings.DOCUMENT.body.scrollTop) / s;
+        var h = 1 - (e.clientY - o.top + document.body.scrollTop) / s;
         if (h > 1) {
           h = 1;
         } else if (h < 0) {
@@ -2240,7 +2240,7 @@
 
   var CenteredDiv = (function () {
     function CenteredDiv() {
-      this.backgroundElement = settings.DOCUMENT.createElement("div");
+      this.backgroundElement = document.createElement("div");
       Common.extend(this.backgroundElement.style, {
         backgroundColor: "rgba(0,0,0,0.8)",
         top: 0,
@@ -2253,7 +2253,7 @@
       });
       dom.makeFullscreen(this.backgroundElement);
       this.backgroundElement.style.position = "fixed";
-      this.domElement = settings.DOCUMENT.createElement("div");
+      this.domElement = document.createElement("div");
       Common.extend(this.domElement.style, {
         position: "fixed",
         display: "none",
@@ -2262,8 +2262,8 @@
         WebkitTransition: "-webkit-transform 0.2s ease-out, opacity 0.2s linear",
         transition: "transform 0.2s ease-out, opacity 0.2s linear",
       });
-      settings.DOCUMENT.body.appendChild(this.backgroundElement);
-      settings.DOCUMENT.body.appendChild(this.domElement);
+      document.body.appendChild(this.backgroundElement);
+      document.body.appendChild(this.domElement);
       var _this = this;
       dom.bind(this.backgroundElement, "click", function () {
         _this.hide();
@@ -2300,8 +2300,8 @@
       this.domElement.style.webkitTransform = "scale(1.1)";
     };
     _proto.layout = function layout() {
-      this.domElement.style.left = settings.WINDOW.innerWidth / 2 - dom.getWidth(this.domElement) / 2 + "px";
-      this.domElement.style.top = settings.WINDOW.innerHeight / 2 - dom.getHeight(this.domElement) / 2 + "px";
+      this.domElement.style.left = window.innerWidth / 2 - dom.getWidth(this.domElement) / 2 + "px";
+      this.domElement.style.top = window.innerHeight / 2 - dom.getHeight(this.domElement) / 2 + "px";
     };
     return CenteredDiv;
   })();
@@ -2313,7 +2313,7 @@
   var DEFAULT_DEFAULT_PRESET_NAME = "Default";
   var SUPPORTS_LOCAL_STORAGE = (function () {
     try {
-      return "localStorage" in settings.WINDOW && settings.WINDOW.localStorage != null;
+      return "localStorage" in window && window.localStorage != null;
     } catch (e) {
       return false;
     }
@@ -2326,8 +2326,8 @@
   var GUI = (function () {
     function GUI(params) {
       var _this = this;
-      this.domElement = settings.DOCUMENT.createElement("div");
-      this.__ul = settings.DOCUMENT.createElement("ul");
+      this.domElement = document.createElement("div");
+      this.__ul = document.createElement("ul");
       this.domElement.appendChild(this.__ul);
       dom.addClass(this.domElement, CSS_NAMESPACE);
       this.__folders = {};
@@ -2450,9 +2450,9 @@
             if (SUPPORTS_LOCAL_STORAGE) {
               use_local_storage = bool;
               if (bool) {
-                dom.bind(settings.WINDOW, "unload", saveToLocalStorage);
+                dom.bind(window, "unload", saveToLocalStorage);
               } else {
-                dom.unbind(settings.WINDOW, "unload", saveToLocalStorage);
+                dom.unbind(window, "unload", saveToLocalStorage);
               }
               localStorage.setItem(getLocalStorageHash(_this, "isLocal"), bool);
             }
@@ -2472,7 +2472,7 @@
             }
           }
         }
-        this.__closeButton = settings.DOCUMENT.createElement("div");
+        this.__closeButton = document.createElement("div");
         this.__closeButton.innerHTML = GUI.TEXT_CLOSED;
         dom.addClass(this.__closeButton, GUI.CLASS_CLOSE_BUTTON);
         this.domElement.appendChild(this.__closeButton);
@@ -2486,7 +2486,7 @@
         if (params.closed === undefined) {
           params.closed = true;
         }
-        var title_row_name = settings.DOCUMENT.createTextNode(params.name);
+        var title_row_name = document.createTextNode(params.name);
         dom.addClass(title_row_name, "controller-name");
         var title_row = addRow(_this, title_row_name);
         var on_click_title = function on_click_title(e) {
@@ -2507,10 +2507,10 @@
       if (params.autoPlace) {
         if (Common.isUndefined(params.parent)) {
           if (auto_place_virgin) {
-            auto_place_container = settings.DOCUMENT.createElement("div");
+            auto_place_container = document.createElement("div");
             dom.addClass(auto_place_container, CSS_NAMESPACE);
             dom.addClass(auto_place_container, GUI.CLASS_AUTO_PLACE_CONTAINER);
-            settings.DOCUMENT.body.appendChild(auto_place_container);
+            document.body.appendChild(auto_place_container);
             auto_place_virgin = false;
           }
           auto_place_container.appendChild(this.domElement);
@@ -2523,7 +2523,7 @@
       function __resizeHandler() {
         _this.onResize();
       }
-      dom.bind(settings.WINDOW, "resize", __resizeHandler);
+      dom.bind(window, "resize", __resizeHandler);
       dom.bind(this.__ul, "webkitTransitionEnd", __resizeHandler);
       dom.bind(this.__ul, "transitionend", __resizeHandler);
       dom.bind(this.__ul, "oTransitionEnd", __resizeHandler);
@@ -2615,8 +2615,8 @@
     };
     _proto._keydownHandler = function _keydownHandler(e) {
       if (
-        settings.DOCUMENT.activeElement.type !== "text" &&
-        settings.DOCUMENT.activeElement.nodeName.toString().toLowerCase() !== "textarea" &&
+        document.activeElement.type !== "text" &&
+        document.activeElement.nodeName.toString().toLowerCase() !== "textarea" &&
         (e.which === HIDE_KEY_CODE || e.keyCode == HIDE_KEY_CODE)
       ) {
         GUI.toggleHide();
@@ -2710,9 +2710,9 @@
             h += dom.getHeight(node);
           }
         });
-        if (settings.WINDOW.innerHeight - top - CLOSE_BUTTON_HEIGHT < h) {
+        if (window.innerHeight - top - CLOSE_BUTTON_HEIGHT < h) {
           dom.addClass(root.domElement, GUI.CLASS_TOO_TALL);
-          root.__ul.style.height = settings.WINDOW.innerHeight - top - CLOSE_BUTTON_HEIGHT + "px";
+          root.__ul.style.height = window.innerHeight - top - CLOSE_BUTTON_HEIGHT + "px";
         } else {
           dom.removeClass(root.domElement, GUI.CLASS_TOO_TALL);
           root.__ul.style.height = "auto";
@@ -2857,12 +2857,12 @@
     }
     recallSavedValue(gui, controller);
     dom.addClass(controller.domElement, "c");
-    var name = settings.DOCUMENT.createElement("span");
+    var name = document.createElement("span");
     dom.addClass(name, "property-name");
     name.innerHTML = controller.label;
-    var clear = settings.DOCUMENT.createElement("div");
+    var clear = document.createElement("div");
     clear.style.clear = "both";
-    var container = settings.DOCUMENT.createElement("div");
+    var container = document.createElement("div");
     container.appendChild(name);
     container.appendChild(controller.domElement);
     container.appendChild(clear);
@@ -2874,7 +2874,7 @@
     return controller;
   }
   function addRow(gui, dom, liBefore) {
-    var li = settings.DOCUMENT.createElement("li");
+    var li = document.createElement("li");
     if (dom) {
       li.appendChild(dom);
     }
@@ -3020,29 +3020,29 @@
     }
   }
   function getLocalStorageHash(gui, key) {
-    return settings.DOCUMENT.location.href + "." + key;
+    return document.location.href + "." + key;
   }
   function addSaveMenu(gui) {
-    var div = (gui.__save_row = settings.DOCUMENT.createElement("li"));
+    var div = (gui.__save_row = document.createElement("li"));
     dom.addClass(gui.domElement, "has-save");
     gui.__ul.insertBefore(div, gui.__ul.firstChild);
     dom.addClass(div, "save-row");
-    var gears = settings.DOCUMENT.createElement("span");
+    var gears = document.createElement("span");
     gears.innerHTML = "&nbsp;";
     dom.addClass(gears, "button gears");
-    var button = settings.DOCUMENT.createElement("span");
+    var button = document.createElement("span");
     button.innerHTML = "Save";
     dom.addClass(button, "button");
     dom.addClass(button, "save");
-    var button2 = settings.DOCUMENT.createElement("span");
+    var button2 = document.createElement("span");
     button2.innerHTML = "New";
     dom.addClass(button2, "button");
     dom.addClass(button2, "save-as");
-    var button3 = settings.DOCUMENT.createElement("span");
+    var button3 = document.createElement("span");
     button3.innerHTML = "Revert";
     dom.addClass(button3, "button");
     dom.addClass(button3, "revert");
-    var select = (gui.__preset_select = settings.DOCUMENT.createElement("select"));
+    var select = (gui.__preset_select = document.createElement("select"));
     if (gui.load && gui.load.remembered) {
       Common.each(gui.load.remembered, function (value, key) {
         addPresetOption(gui, key, key === gui.preset);
@@ -3065,10 +3065,10 @@
       explain.style.display = gui.useLocalStorage ? "block" : "none";
     }
     if (SUPPORTS_LOCAL_STORAGE) {
-      var saveLocally = settings.DOCUMENT.getElementById("dg-save-locally");
-      var _explain = settings.DOCUMENT.getElementById("dg-local-explain");
+      var saveLocally = document.getElementById("dg-save-locally");
+      var _explain = document.getElementById("dg-local-explain");
       saveLocally.style.display = "block";
-      var localStorageCheckBox = settings.DOCUMENT.getElementById("dg-local-storage");
+      var localStorageCheckBox = document.getElementById("dg-local-storage");
       if (localStorage.getItem(getLocalStorageHash(gui, "isLocal")) === "true") {
         localStorageCheckBox.setAttribute("checked", "checked");
       }
@@ -3078,7 +3078,7 @@
         showHideExplain();
       });
     }
-    var newConstructorTextArea = settings.DOCUMENT.getElementById("dg-new-constructor");
+    var newConstructorTextArea = document.getElementById("dg-new-constructor");
     dom.bind(newConstructorTextArea, "keydown", function (e) {
       if (e.metaKey && (e.which === 67 || e.keyCode === 67)) {
         SAVE_DIALOGUE.hide();
@@ -3104,7 +3104,7 @@
     });
   }
   function addResizeHandle(gui) {
-    gui.__resize_handle = settings.DOCUMENT.createElement("div");
+    gui.__resize_handle = document.createElement("div");
     Common.extend(gui.__resize_handle.style, {
       width: "6px",
       marginLeft: "-3px",
@@ -3120,8 +3120,8 @@
       e.preventDefault();
       pmouseX = e.clientX;
       dom.addClass(gui.__closeButton, GUI.CLASS_DRAG);
-      dom.bind(settings.WINDOW, "mousemove", drag);
-      dom.bind(settings.WINDOW, "mouseup", dragStop);
+      dom.bind(window, "mousemove", drag);
+      dom.bind(window, "mouseup", dragStop);
       gui.domElement.dispatchEvent(
         new CustomEvent("dragstart", {
           bubbles: true,
@@ -3139,8 +3139,8 @@
     }
     function dragStop() {
       dom.removeClass(gui.__closeButton, GUI.CLASS_DRAG);
-      dom.unbind(settings.WINDOW, "mousemove", drag);
-      dom.unbind(settings.WINDOW, "mouseup", dragStop);
+      dom.unbind(window, "mousemove", drag);
+      dom.unbind(window, "mouseup", dragStop);
       gui.domElement.dispatchEvent(
         new CustomEvent("dragstop", {
           bubbles: true,
@@ -3171,7 +3171,7 @@
     return toReturn;
   }
   function addPresetOption(gui, name, setSelected) {
-    var opt = settings.DOCUMENT.createElement("option");
+    var opt = document.createElement("option");
     opt.innerHTML = name;
     opt.value = name;
     gui.__preset_select.appendChild(opt);

@@ -27,7 +27,7 @@ class Controller {
      * Those who extend this class will put their DOM elements in here.
      * @type {DOMElement}
      */
-    this.domElement = settings.DOCUMENT.createElement("div");
+    this.domElement = document.createElement("div");
 
     /**
      * The object to manipulate

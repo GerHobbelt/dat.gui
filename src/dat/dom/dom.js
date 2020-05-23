@@ -108,7 +108,7 @@ const dom = {
     if (!className) {
       throw new Error("Event type " + eventType + " not supported.");
     }
-    const evt = settings.DOCUMENT.createEvent(className);
+    const evt = document.createEvent(className);
     switch (className) {
       case "MouseEvents": {
         const clientX = params.x || params.clientX || 0;
@@ -117,7 +117,7 @@ const dom = {
           eventType,
           params.bubbles || false,
           params.cancelable || true,
-          settings.WINDOW,
+          window,
           params.clickCount || 1,
           0, // screen X
           0, // screen Y
@@ -147,7 +147,7 @@ const dom = {
           eventType,
           params.bubbles || false,
           params.cancelable,
-          settings.WINDOW,
+          window,
           params.ctrlKey,
           params.altKey,
           params.shiftKey,
@@ -306,7 +306,7 @@ const dom = {
    * @param elem
    */
   isActive: function (elem) {
-    return elem === settings.DOCUMENT.activeElement && (elem.type || elem.href);
+    return elem === document.activeElement && (elem.type || elem.href);
   },
 };
 

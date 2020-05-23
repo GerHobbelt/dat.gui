@@ -38,7 +38,7 @@ class OptionController extends Controller {
      * The drop down menu
      * @private
      */
-    this.__select = settings.DOCUMENT.createElement("select");
+    this.__select = document.createElement("select");
 
     if (common.isArray(options)) {
       const map = {};
@@ -49,7 +49,7 @@ class OptionController extends Controller {
     }
 
     common.each(options, function (value, key) {
-      const opt = settings.DOCUMENT.createElement("option");
+      const opt = document.createElement("option");
       opt.innerHTML = key;
       opt.setAttribute("value", value);
       _this.__select.appendChild(opt);

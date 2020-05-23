@@ -100,8 +100,8 @@ class NumberControllerBox extends NumberController {
     }
 
     function onMouseDown(e) {
-      dom.bind(settings.WINDOW, "mousemove", onMouseDrag);
-      dom.bind(settings.WINDOW, "mouseup", onMouseUp);
+      dom.bind(window, "mousemove", onMouseDrag);
+      dom.bind(window, "mouseup", onMouseUp);
       prevY = e.clientY;
     }
 
@@ -113,11 +113,11 @@ class NumberControllerBox extends NumberController {
     }
 
     function onMouseUp(e) {
-      dom.unbind(settings.WINDOW, "mousemove", onMouseDrag);
-      dom.unbind(settings.WINDOW, "mouseup", onMouseUp);
+      dom.unbind(window, "mousemove", onMouseDrag);
+      dom.unbind(window, "mouseup", onMouseUp);
     }
 
-    this.__input = settings.DOCUMENT.createElement("input");
+    this.__input = document.createElement("input");
 
     if (this.__step != null) {
       this.__input.setAttribute("step", this.__step);

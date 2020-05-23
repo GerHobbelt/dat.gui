@@ -76,8 +76,8 @@ class NumberControllerSlider extends NumberController {
     dom.addClass(this.__foreground, "slider-fg");
 
     function onMouseDown(e) {
-      dom.bind(settings.WINDOW, "mousemove", onMouseDrag);
-      dom.bind(settings.WINDOW, "mouseup", onMouseUp);
+      dom.bind(window, "mousemove", onMouseDrag);
+      dom.bind(window, "mouseup", onMouseUp);
 
       onMouseDrag(e);
     }
@@ -94,8 +94,8 @@ class NumberControllerSlider extends NumberController {
     }
 
     function onMouseUp(e) {
-      dom.unbind(settings.WINDOW, "mousemove", onMouseDrag);
-      dom.unbind(settings.WINDOW, "mouseup", onMouseUp);
+      dom.unbind(window, "mousemove", onMouseDrag);
+      dom.unbind(window, "mouseup", onMouseUp);
       if (_this.__onFinishChange) {
         _this.__onFinishChange.call(_this, _this.getValue());
       }

@@ -31,7 +31,7 @@ class BooleanController extends Controller {
     const _this = this;
     this.__prev = this.getValue();
 
-    this.__checkbox = settings.DOCUMENT.createElement("input");
+    this.__checkbox = document.createElement("input");
     this.__checkbox.setAttribute("type", "checkbox");
 
     function onChange() {

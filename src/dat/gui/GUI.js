@@ -48,7 +48,7 @@ const DEFAULT_DEFAULT_PRESET_NAME = "Default";
 
 const SUPPORTS_LOCAL_STORAGE = (function () {
   try {
-    return "localStorage" in settings.WINDOW && settings.WINDOW.localStorage != null;
+    return "localStorage" in window && window.localStorage != null;
   } catch (e) {
     return false;
   }
@@ -91,8 +91,8 @@ class GUI {
      * Outermost DOM Element
      * @type DOMElement
      */
-    this.domElement = settings.DOCUMENT.createElement("div");
-    this.__ul = settings.DOCUMENT.createElement("ul");
+    this.domElement = document.createElement("div");
+    this.__ul = document.createElement("ul");
     this.domElement.appendChild(this.__ul);
 
     dom.addClass(this.domElement, CSS_NAMESPACE);
@@ -283,7 +283,7 @@ class GUI {
               dom.removeClass(_this.__ul, GUI.CLASS_CLOSED);
             }
             // For browsers that aren't going to respect the CSS transition,
-            // Lets just check our height against the settings.WINDOW height right off
+            // Lets just check our height against the window height right off
             // the bat.
             _this.onResize();
 
@@ -316,9 +316,9 @@ class GUI {
             if (SUPPORTS_LOCAL_STORAGE) {
               use_local_storage = bool;
               if (bool) {
-                dom.bind(settings.WINDOW, "unload", saveToLocalStorage);
+                dom.bind(window, "unload", saveToLocalStorage);
               } else {
-                dom.unbind(settings.WINDOW, "unload", saveToLocalStorage);
+                dom.unbind(window, "unload", saveToLocalStorage);
               }
               localStorage.setItem(getLocalStorageHash(_this, "isLocal"), bool);
             }
@@ -347,7 +347,7 @@ class GUI {
         }
       }
 
-      this.__closeButton = settings.DOCUMENT.createElement("div");
+      this.__closeButton = document.createElement("div");
       this.__closeButton.innerHTML = GUI.TEXT_CLOSED;
       dom.addClass(this.__closeButton, GUI.CLASS_CLOSE_BUTTON);
       this.domElement.appendChild(this.__closeButton);
@@ -365,7 +365,7 @@ class GUI {
         params.closed = true;
       }
 
-      var title_row_name = settings.DOCUMENT.createTextNode(params.name);
+      var title_row_name = document.createTextNode(params.name);
       dom.addClass(title_row_name, "controller-name");
 
       const title_row = addRow(_this, title_row_name);
@@ -392,10 +392,10 @@ class GUI {
     if (params.autoPlace) {
       if (common.isUndefined(params.parent)) {
         if (auto_place_virgin) {
-          auto_place_container = settings.DOCUMENT.createElement("div");
+          auto_place_container = document.createElement("div");
           dom.addClass(auto_place_container, CSS_NAMESPACE);
           dom.addClass(auto_place_container, GUI.CLASS_AUTO_PLACE_CONTAINER);
-          settings.DOCUMENT.body.appendChild(auto_place_container);
+          document.body.appendChild(auto_place_container);
           auto_place_virgin = false;
         }
 
@@ -416,7 +416,7 @@ class GUI {
       _this.onResize();
     }
 
-    dom.bind(settings.WINDOW, "resize", __resizeHandler);
+    dom.bind(window, "resize", __resizeHandler);
     dom.bind(this.__ul, "webkitTransitionEnd", __resizeHandler);
     dom.bind(this.__ul, "transitionend", __resizeHandler);
     dom.bind(this.__ul, "oTransitionEnd", __resizeHandler);
@@ -531,8 +531,8 @@ class GUI {
 
   _keydownHandler(e) {
     if (
-      settings.DOCUMENT.activeElement.type !== "text" &&
-      settings.DOCUMENT.activeElement.nodeName.toString().toLowerCase() !== "textarea" &&
+      document.activeElement.type !== "text" &&
+      document.activeElement.nodeName.toString().toLowerCase() !== "textarea" &&
       (e.which === HIDE_KEY_CODE || e.keyCode == HIDE_KEY_CODE)
     ) {
       GUI.toggleHide();
@@ -730,9 +730,9 @@ class GUI {
         }
       });
 
-      if (settings.WINDOW.innerHeight - top - CLOSE_BUTTON_HEIGHT < h) {
+      if (window.innerHeight - top - CLOSE_BUTTON_HEIGHT < h) {
         dom.addClass(root.domElement, GUI.CLASS_TOO_TALL);
-        root.__ul.style.height = settings.WINDOW.innerHeight - top - CLOSE_BUTTON_HEIGHT + "px";
+        root.__ul.style.height = window.innerHeight - top - CLOSE_BUTTON_HEIGHT + "px";
       } else {
         dom.removeClass(root.domElement, GUI.CLASS_TOO_TALL);
         root.__ul.style.height = "auto";
@@ -931,13 +931,13 @@ function add(gui, object, property, params) {
 
   dom.addClass(controller.domElement, "c");
 
-  const name = settings.DOCUMENT.createElement("span");
+  const name = document.createElement("span");
   dom.addClass(name, "property-name");
   name.innerHTML = controller.label;
 
-  const clear = settings.DOCUMENT.createElement("div");
+  const clear = document.createElement("div");
   clear.style.clear = "both";
-  const container = settings.DOCUMENT.createElement("div");
+  const container = document.createElement("div");
   container.appendChild(name);
   container.appendChild(controller.domElement);
   container.appendChild(clear);
@@ -962,7 +962,7 @@ function add(gui, object, property, params) {
  * @param [liBefore] If specified, places the new row before another row
  */
 function addRow(gui, dom, liBefore) {
-  const li = settings.DOCUMENT.createElement("li");
+  const li = document.createElement("li");
   if (dom) {
     li.appendChild(dom);
   }
@@ -1188,11 +1188,11 @@ function recallSavedValue(gui, controller) {
 
 function getLocalStorageHash(gui, key) {
   // TODO how does this deal with multiple GUI's?
-  return settings.DOCUMENT.location.href + "." + key;
+  return document.location.href + "." + key;
 }
 
 function addSaveMenu(gui) {
-  const div = (gui.__save_row = settings.DOCUMENT.createElement("li"));
+  const div = (gui.__save_row = document.createElement("li"));
 
   dom.addClass(gui.domElement, "has-save");
 
@@ -1200,27 +1200,27 @@ function addSaveMenu(gui) {
 
   dom.addClass(div, "save-row");
 
-  const gears = settings.DOCUMENT.createElement("span");
+  const gears = document.createElement("span");
   gears.innerHTML = "&nbsp;";
   dom.addClass(gears, "button gears");
 
   // TODO replace with FunctionController
-  const button = settings.DOCUMENT.createElement("span");
+  const button = document.createElement("span");
   button.innerHTML = "Save";
   dom.addClass(button, "button");
   dom.addClass(button, "save");
 
-  const button2 = settings.DOCUMENT.createElement("span");
+  const button2 = document.createElement("span");
   button2.innerHTML = "New";
   dom.addClass(button2, "button");
   dom.addClass(button2, "save-as");
 
-  const button3 = settings.DOCUMENT.createElement("span");
+  const button3 = document.createElement("span");
   button3.innerHTML = "Revert";
   dom.addClass(button3, "button");
   dom.addClass(button3, "revert");
 
-  const select = (gui.__preset_select = settings.DOCUMENT.createElement("select"));
+  const select = (gui.__preset_select = document.createElement("select"));
 
   if (gui.load && gui.load.remembered) {
     common.each(gui.load.remembered, function (value, key) {
@@ -1249,12 +1249,12 @@ function addSaveMenu(gui) {
   }
 
   if (SUPPORTS_LOCAL_STORAGE) {
-    const saveLocally = settings.DOCUMENT.getElementById("dg-save-locally");
-    const explain = settings.DOCUMENT.getElementById("dg-local-explain");
+    const saveLocally = document.getElementById("dg-save-locally");
+    const explain = document.getElementById("dg-local-explain");
 
     saveLocally.style.display = "block";
 
-    const localStorageCheckBox = settings.DOCUMENT.getElementById("dg-local-storage");
+    const localStorageCheckBox = document.getElementById("dg-local-storage");
 
     if (localStorage.getItem(getLocalStorageHash(gui, "isLocal")) === "true") {
       localStorageCheckBox.setAttribute("checked", "checked");
@@ -1269,7 +1269,7 @@ function addSaveMenu(gui) {
     });
   }
 
-  const newConstructorTextArea = settings.DOCUMENT.getElementById("dg-new-constructor");
+  const newConstructorTextArea = document.getElementById("dg-new-constructor");
 
   dom.bind(newConstructorTextArea, "keydown", function (e) {
     if (e.metaKey && (e.which === 67 || e.keyCode === 67)) {
@@ -1303,7 +1303,7 @@ function addSaveMenu(gui) {
 }
 
 function addResizeHandle(gui) {
-  gui.__resize_handle = settings.DOCUMENT.createElement("div");
+  gui.__resize_handle = document.createElement("div");
 
   common.extend(gui.__resize_handle.style, {
     width: "6px",
@@ -1327,8 +1327,8 @@ function addResizeHandle(gui) {
     pmouseX = e.clientX;
 
     dom.addClass(gui.__closeButton, GUI.CLASS_DRAG);
-    dom.bind(settings.WINDOW, "mousemove", drag);
-    dom.bind(settings.WINDOW, "mouseup", dragStop);
+    dom.bind(window, "mousemove", drag);
+    dom.bind(window, "mouseup", dragStop);
 
     gui.domElement.dispatchEvent(
       new CustomEvent("dragstart", {
@@ -1352,8 +1352,8 @@ function addResizeHandle(gui) {
 
   function dragStop() {
     dom.removeClass(gui.__closeButton, GUI.CLASS_DRAG);
-    dom.unbind(settings.WINDOW, "mousemove", drag);
-    dom.unbind(settings.WINDOW, "mouseup", dragStop);
+    dom.unbind(window, "mousemove", drag);
+    dom.unbind(window, "mouseup", dragStop);
 
     gui.domElement.dispatchEvent(
       new CustomEvent("dragstop", {
@@ -1399,7 +1399,7 @@ function getCurrentPreset(gui, useInitialValues) {
 }
 
 function addPresetOption(gui, name, setSelected) {
-  const opt = settings.DOCUMENT.createElement("option");
+  const opt = document.createElement("option");
   opt.innerHTML = name;
   opt.value = name;
   gui.__preset_select.appendChild(opt);

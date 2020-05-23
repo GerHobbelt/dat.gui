@@ -30,7 +30,7 @@ class FunctionController extends Controller {
 
     const _this = this;
 
-    this.__button = settings.DOCUMENT.createElement("div");
+    this.__button = document.createElement("div");
     this.__button.innerHTML = text === undefined ? "Fire" : text;
 
     dom.bind(this.__button, "click", function (e) {

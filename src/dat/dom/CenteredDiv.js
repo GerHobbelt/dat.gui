@@ -16,7 +16,7 @@ import common from "../utils/common";
 
 class CenteredDiv {
   constructor() {
-    this.backgroundElement = settings.DOCUMENT.createElement("div");
+    this.backgroundElement = document.createElement("div");
     common.extend(this.backgroundElement.style, {
       backgroundColor: "rgba(0,0,0,0.8)",
       top: 0,
@@ -31,7 +31,7 @@ class CenteredDiv {
     dom.makeFullscreen(this.backgroundElement);
     this.backgroundElement.style.position = "fixed";
 
-    this.domElement = settings.DOCUMENT.createElement("div");
+    this.domElement = document.createElement("div");
     common.extend(this.domElement.style, {
       position: "fixed",
       display: "none",
@@ -41,8 +41,8 @@ class CenteredDiv {
       transition: "transform 0.2s ease-out, opacity 0.2s linear",
     });
 
-    settings.DOCUMENT.body.appendChild(this.backgroundElement);
-    settings.DOCUMENT.body.appendChild(this.domElement);
+    document.body.appendChild(this.backgroundElement);
+    document.body.appendChild(this.domElement);
 
     const _this = this;
     dom.bind(this.backgroundElement, "click", function () {
@@ -95,8 +95,8 @@ class CenteredDiv {
   }
 
   layout() {
-    this.domElement.style.left = settings.WINDOW.innerWidth / 2 - dom.getWidth(this.domElement) / 2 + "px";
-    this.domElement.style.top = settings.WINDOW.innerHeight / 2 - dom.getHeight(this.domElement) / 2 + "px";
+    this.domElement.style.left = window.innerWidth / 2 - dom.getWidth(this.domElement) / 2 + "px";
+    this.domElement.style.top = window.innerHeight / 2 - dom.getHeight(this.domElement) / 2 + "px";
   }
 }
 

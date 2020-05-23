@@ -48,7 +48,7 @@ class StringController extends Controller {
       }
     }
 
-    this.__input = settings.DOCUMENT.createElement("input");
+    this.__input = document.createElement("input");
     this.__input.setAttribute("type", "text");
 
     dom.bind(this.__input, "keyup", onChange);

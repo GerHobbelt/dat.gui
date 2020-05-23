@@ -31,27 +31,27 @@ class HifiColorController extends Controller {
 
     const _this = this;
 
-    this.domElement = settings.DOCUMENT.createElement("div");
+    this.domElement = document.createElement("div");
 
     dom.makeSelectable(this.domElement, false);
 
-    this.__selector = settings.DOCUMENT.createElement("div");
+    this.__selector = document.createElement("div");
     this.__selector.className = "selector";
 
-    this.__saturation_field = settings.DOCUMENT.createElement("div");
+    this.__saturation_field = document.createElement("div");
     this.__saturation_field.className = "saturation-field";
 
-    this.__field_knob = settings.DOCUMENT.createElement("div");
+    this.__field_knob = document.createElement("div");
     this.__field_knob.className = "field-knob";
     this.__field_knob_border = "2px solid ";
 
-    this.__hue_knob = settings.DOCUMENT.createElement("div");
+    this.__hue_knob = document.createElement("div");
     this.__hue_knob.className = "hue-knob";
 
-    this.__hue_field = settings.DOCUMENT.createElement("div");
+    this.__hue_field = document.createElement("div");
     this.__hue_field.className = "hue-field";
 
-    this.__input = settings.DOCUMENT.createElement("input");
+    this.__input = document.createElement("input");
     this.__input.type = "text";
     this.__input_textShadow = "0 1px 1px ";
 
@@ -65,12 +65,12 @@ class HifiColorController extends Controller {
     dom.bind(this.__input, "blur", onBlur);
 
     dom.bind(this.__selector, "mousedown", function (e) {
-      dom.addClass(this, "drag").bind(settings.WINDOW, "mouseup", function (evt) {
+      dom.addClass(this, "drag").bind(window, "mouseup", function (evt) {
         dom.removeClass(_this.__selector, "drag");
       });
     });
 
-    const valueField = settings.DOCUMENT.createElement("div");
+    const valueField = document.createElement("div");
 
     common.extend(this.__selector.style, {
       width: "122px",
@@ -142,21 +142,21 @@ class HifiColorController extends Controller {
 
     dom.bind(this.__hue_field, "mousedown", function (e) {
       setH(e);
-      dom.bind(settings.WINDOW, "mousemove", setH);
-      dom.bind(settings.WINDOW, "mouseup", unbindH);
+      dom.bind(window, "mousemove", setH);
+      dom.bind(window, "mouseup", unbindH);
     });
 
     function fieldDown(e) {
       setSV(e);
-      // settings.DOCUMENT.body.style.cursor = 'none';
-      dom.bind(settings.WINDOW, "mousemove", setSV);
-      dom.bind(settings.WINDOW, "mouseup", unbindSV);
+      // document.body.style.cursor = 'none';
+      dom.bind(window, "mousemove", setSV);
+      dom.bind(window, "mouseup", unbindSV);
     }
 
     function unbindSV() {
-      dom.unbind(settings.WINDOW, "mousemove", setSV);
-      dom.unbind(settings.WINDOW, "mouseup", unbindSV);
-      // settings.DOCUMENT.body.style.cursor = 'default';
+      dom.unbind(window, "mousemove", setSV);
+      dom.unbind(window, "mouseup", unbindSV);
+      // document.body.style.cursor = 'default';
     }
 
     function onBlur() {
@@ -170,8 +170,8 @@ class HifiColorController extends Controller {
     }
 
     function unbindH() {
-      dom.unbind(settings.WINDOW, "mousemove", setH);
-      dom.unbind(settings.WINDOW, "mouseup", unbindH);
+      dom.unbind(window, "mousemove", setH);
+      dom.unbind(window, "mouseup", unbindH);
     }
 
     this.__saturation_field.appendChild(valueField);
@@ -190,8 +190,8 @@ class HifiColorController extends Controller {
 
       const w = dom.getWidth(_this.__saturation_field);
       const o = dom.getOffset(_this.__saturation_field);
-      let s = (e.clientX - o.left + settings.DOCUMENT.body.scrollLeft) / w;
-      let v = 1 - (e.clientY - o.top + settings.DOCUMENT.body.scrollTop) / w;
+      let s = (e.clientX - o.left + document.body.scrollLeft) / w;
+      let v = 1 - (e.clientY - o.top + document.body.scrollTop) / w;
 
       if (v > 1) v = 1;
       else if (v < 0) v = 0;
@@ -212,7 +212,7 @@ class HifiColorController extends Controller {
 
       const s = dom.getHeight(_this.__hue_field);
       const o = dom.getOffset(_this.__hue_field);
-      let h = 1 - (e.clientY - o.top + settings.DOCUMENT.body.scrollTop) / s;
+      let h = 1 - (e.clientY - o.top + document.body.scrollTop) / s;
 
       if (h > 1) h = 1;
       else if (h < 0) h = 0;

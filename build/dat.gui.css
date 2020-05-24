@@ -311,3 +311,89 @@
     background: #555555; }
     .dg .c .slider:hover .slider-fg {
       background: #2083e4; }
+/* Light theme for dat.gui
+ * via https://github.com/liabru/dat-gui-light-theme
+ */
+.dg.main.taller-than-window .close-button {
+    border-top: 1px solid #ddd;
+}
+
+.dg.main .close-button {
+    background-color: rgb(230, 230, 230);
+}
+ 
+.dg.main .close-button:hover {
+    background-color: #ddd;
+}
+
+.dg {
+    color: #555;
+    text-shadow: none !important;
+}
+
+.dg.main::-webkit-scrollbar {
+    background: #fafafa;
+}
+
+.dg.main::-webkit-scrollbar-thumb {
+    background: #bbb;
+}
+ 
+.dg li:not(.folder) {
+    background: #fafafa;
+    border-bottom: 1px solid #ddd;
+}
+ 
+.dg li.save-row .button {
+    text-shadow: none !important;
+}
+
+.dg li.title {
+  background: rgb(250, 250, 250);
+}
+.dg li.title::before {
+  font-family: "FontAwesome";
+  content: "\\f0d7";   /*note: have to escape the leading slash due to dat.gui build tools */
+  float: left;
+  width: 1.5em;
+}
+
+.dg .closed li.title {
+  background: rgb(250, 250, 250);
+}
+
+.dg .closed li.title::before {
+  font-family: "FontAwesome";
+  content: "\\f0da";   /*note: have to escape the leading slash due to dat.gui build tools */
+  float: left;
+  width: 1.5em;
+}
+
+
+.dg .cr.function:hover,.dg .cr.boolean:hover {
+    background: #fff;
+}
+ 
+.dg .c input[type=text] {
+    background: #e9e9e9;
+}
+ 
+.dg .c input[type=text]:hover {
+    background: #eee;
+}
+ 
+.dg .c input[type=text]:focus {
+    background: #eee;
+    color: #555;
+}
+ 
+.dg .c .slider {
+    background: #e9e9e9;
+}
+
+.dg .c .slider:hover {
+    background: #eee;
+}
+
+/* end theme */
+

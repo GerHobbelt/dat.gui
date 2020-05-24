@@ -1,3 +1,16 @@
+/**
+ * dat.GUI JavaScript Controller Library
+ * http://code.google.com/p/dat-gui
+ *
+ * Copyright 2011-2020 Data Arts Team, Google Creative Lab
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 $background-color: #333333;
 
 $hover-lighten: 5%;
@@ -34,14 +47,16 @@ $input-color: lighten($background-color, 8.5%);
   line-height: 7px;
   padding: 4px 4px 5px 4px;
   background: $button-color;
-  color: #fff;
+  color: #FFFFFF;
   text-shadow: 0 1px 0 darken($button-color, 10%);
   box-shadow: 0 -1px 0 darken($button-color, 10%);
   cursor: pointer;
 }
 
 @mixin gears() {
-  background: $button-color url('https://icon.now.sh/settings/FFFFFF/12') center center no-repeat;
+  background: 
+  $button-color 
+  url('https://icon.now.sh/settings/FFFFFF/12') center center no-repeat;
   height: 7px;
   width: 8px;
 }
@@ -50,39 +65,40 @@ $input-color: lighten($background-color, 8.5%);
 
 /** Main type */
 .dg {
-
-  color: #eee;
+  color: #EEEEEE;
   font: 12px Roboto, Helvetica, sans-serif;
-  text-shadow: 0 -1px 0 #111;
+  text-shadow: 0 -1px 0 #111111;
 
   /** Auto place */
   &.main {
-
     /** Scrollbar */
     &::-webkit-scrollbar {
       width: 5px;
       background: $background-color;
     }
+
     &::-webkit-scrollbar-corner {
       height: 0;
       display: none;
     }
+
     &::-webkit-scrollbar-thumb {
       border-radius: 5px;
       background: lighten($background-color, 30%);
     }
-
+    // Firefox
+    scrollbar-width: none;
+    // IE, Edge
+    -ms-overflow-style: none;
   }
 
   li {
-
     &:not(.folder) {
       background: $background-color;
       border-bottom: 1px solid $border-color;
     }
 
     &.save-row {
-
       line-height: 30px;
       background: $save-row-color;
       border: 0;
@@ -95,7 +111,6 @@ $input-color: lighten($background-color, 8.5%);
       .button {
 
         text-transform: uppercase;
-
         &.gears {
           @include gears;
         }
@@ -106,9 +121,7 @@ $input-color: lighten($background-color, 8.5%);
           background-color: darken($button-color, 5%);
           box-shadow: 0 -1px 0 darken($button-color, 10%);
         }
-
       }
-
     }
 
     &.folder {
@@ -127,7 +140,6 @@ $input-color: lighten($background-color, 8.5%);
         vertical-align: middle;
       }
     }
-
   }
 
   .closed li.title {
@@ -138,7 +150,6 @@ $input-color: lighten($background-color, 8.5%);
 
   /* Controller row, <li> */
   .cr {
-
     &.boolean {
       border-left: 3px solid $boolean-color;
     }
@@ -147,46 +158,57 @@ $input-color: lighten($background-color, 8.5%);
       border-left: 3px solid;
     }
 
+    &.image {
+      position: relative;
+      height: auto;
+      border-left: 3px solid;
+    }
+
+    &.plotter {
+      height: 58px;
+    }
+
     &.function {
       border-left: 3px solid $function-color;
     }
 
     &.number {
       border-left: 3px solid $number-color;
-      input[type=text] {
+
+      input[type="number"] {
         color: $number-color;
       }
     }
 
     &.string {
       border-left: 3px solid $string-color;
-      input[type=text] {
+
+      input[type="text"] {
         color: $string-color;
       }
     }
 
     &.function:hover,
     &.boolean:hover {
-      background: #111;
+      background: #111111;
     }
-
   }
 
   /** Controllers */
   .c {
-
-    input[type=text] {
-
+    input[type="text"],
+    input[type="number"] {
       background: $input-color;
       outline: none;
+
       &:hover {
         background: lighten($input-color, $hover-lighten);
       }
+
       &:focus {
         background: lighten($input-color, $active-lighten);
-        color: #fff;
+        color: #FFFFFF;
       }
-
     }
 
     .slider {
@@ -201,11 +223,10 @@ $input-color: lighten($background-color, 8.5%);
 
     .slider:hover {
       background: lighten($input-color, $hover-lighten);
+
       .slider-fg {
         background: lighten($number-color, $hover-lighten);
       }
     }
-
   }
-
 }

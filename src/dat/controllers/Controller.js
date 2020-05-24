@@ -1,8 +1,8 @@
 /**
- * dat-gui JavaScript Controller Library
+ * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2020 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
  *
  * @param {Object} object The object to be manipulated
  * @param {string} property The name of the property to be manipulated
+ *
+ * @member dat.controllers
  */
 class Controller {
   constructor(object, property) {
@@ -25,7 +27,7 @@ class Controller {
      * Those who extend this class will put their DOM elements in here.
      * @type {DOMElement}
      */
-    this.domElement = document.createElement('div');
+    this.domElement = document.createElement("div");
 
     /**
      * The object to manipulate
@@ -47,26 +49,54 @@ class Controller {
 
 
     /**
+     * Readonly field
+     * @type {Object}
+     */
+    this._readonly = false;
+
+    /**
      * The function to be called on change.
      * @type {Function}
-     * @ignore
+     * @private
      */
     this.__onChange = undefined;
 
     /**
      * The function to be called on finishing change.
      * @type {Function}
-     * @ignore
+     * @private
      */
     this.__onFinishChange = undefined;
+
+    /**
+     * Whether to force update a display, even when input is active.
+     * @type boolean
+     */
+    this.forceUpdateDisplay = false;
   }
 
   /**
-   * Specify that a function fire every time someone changes the value with
+   * Hides the controller on it's parent GUI.
+   */
+  hide() {
+    this.domElement.parentNode.parentNode.style.display = "none";
+    return this;
+  }
+
+  /**
+   * Shows the controller on it's parent GUI.
+   */
+  show() {
+    this.domElement.parentNode.parentNode.style.display = "";
+    return this;
+  }
+
+  /**
+   * Specify a function which fires every time someone has changed the value with
    * this Controller.
    *
    * @param {Function} fnc This function will be called whenever the value
-   * is modified via this Controller.
+   * has been modified via this Controller.
    * @returns {Controller} this
    */
   onChange(fnc) {
@@ -75,8 +105,8 @@ class Controller {
   }
 
   /**
-   * Specify that a function fire every time someone "finishes" changing
-   * the value wih this Controller. Useful for values that change
+   * Specify a function which fires every time someone "finishes" changing
+   * the value with this Controller. Useful for values that change
    * incrementally like numbers or strings.
    *
    * @param {Function} fnc This function will be called whenever
@@ -129,7 +159,7 @@ class Controller {
   setValue(newValue) {
     this.object[this.property] = newValue;
     this.__propagateChange(newValue);
-    this.updateDisplay();
+    this.updateDisplay(true);
 
     return this;
   }
@@ -148,15 +178,27 @@ class Controller {
    * with the object's current value.
    * @returns {Controller} this
    */
-  updateDisplay() {
+  updateDisplay(force) {
     return this;
   }
 
   /**
-   * @returns {Boolean} true if the value has deviated from initialValue
+   * @returns {boolean} true if the value has deviated from initialValue
    */
   isModified() {
     return this.initialValue !== this.getValue();
+  }
+
+  /**
+   * Set readonly mode
+   *
+   * @param {Number} ro
+   * @default false
+   * @returns {StringController} this
+   */
+  readonly(ro) {
+    this._readonly = ro;
+    return this;
   }
 }
 

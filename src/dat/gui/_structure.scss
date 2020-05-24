@@ -1,3 +1,22 @@
+/**
+ * dat.GUI JavaScript Controller Library
+ * http://code.google.com/p/dat-gui
+ *
+ * Copyright 2011-2020 Data Arts Team, Google Creative Lab
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
+// ▐▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▌
+// ▐ Triggering UTF8 file save hack ▌
+// ▐▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▌
+//
+// --------------------------------------------------------------
+
 $nest-margin: 4px;
 $row-height: 32px;
 
@@ -5,7 +24,6 @@ $button-height: 28px;
 $shadow: 0 2px 10px rgba(0,0,0,0.25);
 
 .dg {
-
   /** Clear list styles */
   ul {
     list-style: none;
@@ -22,6 +40,11 @@ $shadow: 0 2px 10px rgba(0,0,0,0.25);
     left: 0;
     right: 0;
     height: 0;
+    // we make sure the dat.gui sits in its own layer for repaint purposes:
+    // see http://benfrain.com/improving-css-performance-fixed-position-elements/
+    // Note that the backface style here comes from that article but is not
+    // really necessary any more now that we have our layer.
+    // Compare: https://developers.google.com/web/updates/2012/09/Stacking-Changes-Coming-to-position-fixed-elements?hl=en
     z-index: 0;
   }
 
@@ -31,24 +54,19 @@ $shadow: 0 2px 10px rgba(0,0,0,0.25);
   }
 
   &.main {
-
     @include transition(opacity, 0.1s, linear);
     box-shadow: $shadow;
 
     &.taller-than-window {
-
       overflow-y: auto;
 
       .close-button {
-
         opacity: 1;
 
         /* TODO, these are style notes */
         margin-top: -1px;
         border-top: 1px solid $border-color;
-
       }
-
     }
 
     ul.closed .close-button {
@@ -61,26 +79,29 @@ $shadow: 0 2px 10px rgba(0,0,0,0.25);
     }
 
     .close-button {
-      /*opacity: 0;*/
+      // opacity: 0;
       @include transition(opacity, 0.1s, linear);
+
       border: 0;
       box-shadow: $shadow;
-
       line-height: $button-height - 1;
       height: $button-height;
 
       /* TODO, these are style notes */
       cursor: pointer;
       text-align: center;
-      background-color: #000;
+      background-color: #000000;
+
       &.close-top {
         position: relative;
       }
+
       &.close-bottom {
         position: absolute;
       }
+
       &:hover {
-        background-color: #111;
+        background-color: #111111;
       }
 
       img {
@@ -88,23 +109,20 @@ $shadow: 0 2px 10px rgba(0,0,0,0.25);
         margin: 2px;
         vertical-align: middle;
       }
-
     }
-
   }
 
   /* Auto-placed GUI's */
   &.a {
-
     float: right;
     margin-right: 15px;
-    overflow-y:visible;
+    overflow-y: visible;
 
     &.has-save > ul {
-
       &.close-top {
         margin-top: 0;
       }
+
       &.close-bottom {
         margin-top: $row-height;
       }
@@ -121,12 +139,11 @@ $shadow: 0 2px 10px rgba(0,0,0,0.25);
       &.close-top {
         position: relative;
       }
+
       &.close-bottom {
         position: fixed;
       }
-
     }
-
   }
 
   li {
@@ -144,8 +161,7 @@ $shadow: 0 2px 10px rgba(0,0,0,0.25);
 
   li.folder {
     padding: 0;
-    border-left: $nest-margin solid rgba(0, 0, 0, 0);
-
+    border-left: $nest-margin solid rgba(0, 0, 0, 1);
   }
 
   /** Folder names */
@@ -179,6 +195,8 @@ $shadow: 0 2px 10px rgba(0,0,0,0.25);
     width: 40%;
     overflow: hidden;
     text-overflow: ellipsis;
+    text-overflow: "…" "…"; // https://developer.mozilla.org/en-US/docs/Web/CSS/text-overflow
+    white-space: nowrap; // otherwise the text will simply wrap and the text-overflow ellipsis will not be applied, but instead the text simply disappears (if only partially)
   }
 
   /** Controller-half (right) */
@@ -190,7 +208,9 @@ $shadow: 0 2px 10px rgba(0,0,0,0.25);
   }
 
   /** Controller placement */
-  .c input[type=text] {
+  .c input[type="text"],
+  .c input[type="number"],
+  .c canvas {
     border: 0;
     margin-top: 4px;
     padding: 3px;
@@ -199,10 +219,25 @@ $shadow: 0 2px 10px rgba(0,0,0,0.25);
   }
 
   /** Shorter number boxes when slider is present. */
-  .has-slider input[type=text] {
-    width: 30%;
-    /*display: none;*/
-    margin-left: 0;
+  .has-slider {
+    input[type="number"] {
+      width: 30%;
+
+      // display: none;
+      margin-left: 0;
+    }
+  }
+
+  /** Reduce margin and set height for plotter */
+  .c canvas {
+    padding: 0;
+    height: 53px;
+  }
+
+  /** Reduce margin and set height for plotter */
+  .c canvas {
+    padding: 0;
+    height: 53px;
   }
 
   .slider {
@@ -218,7 +253,7 @@ $shadow: 0 2px 10px rgba(0,0,0,0.25);
     height: 100%;
   }
 
-  .c input[type=checkbox] {
+  .c input[type="checkbox"] {
     margin-top: 7px;
   }
 
@@ -228,7 +263,7 @@ $shadow: 0 2px 10px rgba(0,0,0,0.25);
 
   /** Ensure the entire boolean and function row shows a hand */
   .cr.function,
-  .cr.function .property-name, /* Don't know why I need to be this explicit */
+  .cr.function .property-name,  // Don't know why I need to be this explicit 
   .cr.function *,
   .cr.boolean,
   .cr.boolean * {
@@ -254,35 +289,32 @@ $shadow: 0 2px 10px rgba(0,0,0,0.25);
   }
 
   li.save-row {
-
     padding: 0;
 
     .button {
       display: inline-block;
-      padding: 0px 6px;
+      padding: 0 6px;
     }
-
   }
 
   &.dialogue {
-    background-color: #222;
+    background-color: #222222;
     width: 460px;
     padding: 15px;
     font-size: 13px;
     line-height: 15px;
   }
-
 }
 
 /* TODO Separate style and structure */
 #dg-new-constructor {
   padding: 10px;
-  color: #222;
+  color: #222222;
   font-family: Monaco, monospace;
   font-size: 10px;
   border: 0;
   resize: none;
-  box-shadow: inset 1px 1px 1px #888;
+  box-shadow: inset 1px 1px 1px #888888;
   word-wrap: break-word;
   margin: 12px 0;
   display: block;
@@ -297,9 +329,10 @@ $shadow: 0 2px 10px rgba(0,0,0,0.25);
   font-size: 11px;
   line-height: 17px;
   border-radius: 3px;
-  background-color: #333;
+  background-color: #333333;
   padding: 8px;
   margin-top: 10px;
+
   code {
     font-size: 10px;
   }

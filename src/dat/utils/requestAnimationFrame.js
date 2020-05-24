@@ -1,8 +1,8 @@
 /**
- * dat-gui JavaScript Controller Library
+ * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2020 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -11,13 +11,19 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-function requestAnimationFrame(callback) {
+/* jshint unused: false */
+function requestAnimationFrame(callback, element) {
   setTimeout(callback, 1000 / 60);
 }
 
+/**
+ * requirejs version of Paul Irish's RequestAnimationFrame
+ * http://paulirish.com/2011/requestanimationframe-for-smart-animating/
+ */
+
 export default window.requestAnimationFrame ||
-    window.webkitRequestAnimationFrame ||
-    window.mozRequestAnimationFrame ||
-    window.oRequestAnimationFrame ||
-    window.msRequestAnimationFrame ||
-    requestAnimationFrame;
+  window.webkitRequestAnimationFrame ||
+  window.mozRequestAnimationFrame ||
+  window.oRequestAnimationFrame ||
+  window.msRequestAnimationFrame ||
+  requestAnimationFrame;

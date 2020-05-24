@@ -66,10 +66,10 @@ class NumberControllerSlider extends NumberController {
     function onMouseDrag(e) {
       // e.preventDefault();
 
-      onDrag(e.clientX);
+      onDrag(e);
     }
 
-    function onDrag(clientX) {
+    function onDrag(e) {
       const bgRect = _this.__background.getBoundingClientRect();
 
       if (!_this._readonly) {
@@ -115,7 +115,7 @@ class NumberControllerSlider extends NumberController {
 
       for (let i = 0; i < changed.length; i++) {
         if (changed[i].identifier === _this.__activeTouch.identifier) {
-          onDrag(changed[i].clientX);
+          onDrag(changed[i]);
         }
       }
     }

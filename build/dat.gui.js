@@ -1286,9 +1286,9 @@
         onMouseDrag(e);
       }
       function onMouseDrag(e) {
-        onDrag(e.clientX);
+        onDrag(e);
       }
-      function onDrag(clientX) {
+      function onDrag(e) {
         var bgRect = _this.__background.getBoundingClientRect();
         if (!_this._readonly) {
           _this.setValue(map(e.clientX, bgRect.left, bgRect.right, _this.__min, _this.__max));
@@ -1316,7 +1316,7 @@
         var changed = e.changedTouches;
         for (var i = 0; i < changed.length; i++) {
           if (changed[i].identifier === _this.__activeTouch.identifier) {
-            onDrag(changed[i].clientX);
+            onDrag(changed[i]);
           }
         }
       }
@@ -1401,7 +1401,6 @@
       dom.addClass(_this2.__button, "button");
       var tabSize = tabs * 2;
       _this2.__button.style.paddingLeft = tabSize.toString() + "em";
-      _this2.property = displayName;
       _this2.domElement.appendChild(_this2.__button);
       return _this2;
     }
@@ -2369,6 +2368,132 @@
     return VectorController;
   })(Controller);
 
+  var TextAreaController = (function (_Controller) {
+    _inheritsLoose(TextAreaController, _Controller);
+    function TextAreaController(object, property) {
+      var _this2;
+      _this2 = _Controller.call(this, object, property) || this;
+      var _this = _assertThisInitialized(_this2);
+      _this2.__input = document.createElement("textarea");
+      dom.bind(_this2.__input, "keyup", onChange);
+      dom.bind(_this2.__input, "change", onChange);
+      dom.bind(_this2.__input, "blur", onBlur);
+      function onChange() {
+        _this.setValue(_this.__input.value);
+      }
+      function onBlur() {
+        if (_this.__onFinishChange) {
+          _this.__onFinishChange.call(_this, _this.getValue());
+        }
+      }
+      _this2.updateDisplay();
+      _this2.domElement.appendChild(_this2.__input);
+      return _this2;
+    }
+    var _proto = TextAreaController.prototype;
+    _proto.updateDisplay = function updateDisplay() {
+      if (dom.isActive(this.__input)) {
+        return this;
+      }
+      this.__input.value = this.getValue();
+      return _Controller.prototype.updateDisplay.call(this);
+    };
+    return TextAreaController;
+  })(Controller);
+
+  var OptionController$1 = (function (_Controller) {
+    _inheritsLoose(OptionController, _Controller);
+    function OptionController(object, property, params, options) {
+      var _this2;
+      _this2 = _Controller.call(this, object, property, "option", options) || this;
+      var _this = _assertThisInitialized(_this2);
+      _this2.CUSTOM_FLAG = "";
+      params = params || {};
+      _this2.__select = document.createElement("select");
+      if (common.isArray(params)) {
+        var map = {};
+        common.each(params, function (element) {
+          map[element] = element;
+        });
+        params = map;
+      }
+      common.each(params, function (value, key) {
+        var opt = document.createElement("option");
+        opt.innerHTML = value;
+        opt.setAttribute("value", key);
+        _this.__select.appendChild(opt);
+      });
+      if (params.custom) {
+        var opt = document.createElement("option");
+        opt.innerHTML = params.custom.display || "Custom";
+        opt.setAttribute("value", _this.CUSTOM_FLAG);
+        _this.__select.appendChild(opt);
+        _this2.__custom_controller = params.custom.controller;
+      }
+      _this2.updateDisplay();
+      dom.bind(_this2.__select, "change", function () {
+        var value = this.options[this.selectedIndex].value;
+        if (value === _this.CUSTOM_FLAG) {
+          value = _this.__custom_controller.getValue();
+        }
+        _this.setValue(value);
+      });
+      if (_this2.__custom_controller) {
+        _this2.__custom_controller.onChange(function () {
+          var value = this.getValue();
+          _this.setValue(value);
+        });
+      }
+      _this2.domElement.appendChild(_this2.__select);
+      if (_this2.__custom_controller) {
+        _this2.domElement.appendChild(_this2.__custom_controller.el);
+      }
+      return _this2;
+    }
+    var _proto = OptionController.prototype;
+    _proto.setValue = function setValue(v) {
+      var toReturn = _Controller.prototype.setValue.call(this, v);
+      return toReturn;
+    };
+    _proto.updateDisplay = function updateDisplay() {
+      var value = this.getValue();
+      var custom = true;
+      if (value !== this.CUSTOM_FLAG) {
+        common.each(this.__select.options, function (option) {
+          if (value === option.value) {
+            custom = false;
+          }
+        });
+      }
+      this.__select.value = custom ? this.CUSTOM_FLAG : value;
+      if (this.__custom_controller) {
+        this.__custom_controller.el.style.display = custom ? "block" : "none";
+      }
+      return _Controller.prototype.updateDisplay.call(this);
+    };
+    return OptionController;
+  })(Controller);
+
+  var NullController = (function (_Controller) {
+    _inheritsLoose(NullController, _Controller);
+    function NullController(object, property, options) {
+      var _this2;
+      _this2 = _Controller.call(this, object, property, "null", options) || this;
+      var _this = _assertThisInitialized(_this2);
+      _this2.__prev = _this2.getValue();
+      _this2.__elem = document.createElement("em");
+      _this2.domElement.appendChild(_this2.__elem);
+      _this2.updateDisplay();
+      return _this2;
+    }
+    var _proto = NullController.prototype;
+    _proto.updateDisplay = function updateDisplay() {
+      this.__elem.innerText = "<null>";
+      return _Controller.prototype.updateDisplay.call(this);
+    };
+    return NullController;
+  })(Controller);
+
   var UndefinedController = (function (_Controller) {
     _inheritsLoose(UndefinedController, _Controller);
     function UndefinedController(object, property, options) {
@@ -2390,32 +2515,31 @@
   })(Controller);
 
   var ARR_SLICE$1 = Array.prototype.slice;
-  var ControllerFactory = function ControllerFactory(object, property) {
-    var initialValue = object[property];
-    if (
-      arguments.length <= 3 &&
-      arguments[2] != null &&
-      (Common.isArray(arguments[2]) || Common.isObject(arguments[2]))
+  var controllerFactory = function controllerFactory(object, property) {
+    for (
+      var _len = arguments.length, optionalArgs = new Array(_len > 2 ? _len - 2 : 0), _key = 2;
+      _key < _len;
+      _key++
     ) {
-      return new OptionController(object, property, arguments[2]);
+      optionalArgs[_key - 2] = arguments[_key];
+    }
+    var initialValue = object[property];
+    var optlist = optionalArgs[0];
+    if (optlist != null && (Common.isArray(optlist) || Common.isObject(optlist))) {
+      return new OptionController(object, property, optlist);
     }
     if (Common.isNumber(initialValue)) {
-      if (Common.isNumber(arguments[2]) && Common.isNumber(arguments[3])) {
-        if (Common.isNumber(arguments[4])) {
-          return new NumberControllerSlider(object, property, arguments[2], arguments[3], arguments[4]);
-        }
-        return new NumberControllerSlider(object, property, arguments[2], arguments[3]);
-      }
-      if (Common.isNumber(arguments[4])) {
-        return new NumberControllerBox(object, property, {
-          min: arguments[2],
-          max: arguments[3],
-          step: arguments[4],
-        });
+      var min = optionalArgs[0],
+        max = optionalArgs[1],
+        step = optionalArgs[2],
+        enumeration = optionalArgs[3];
+      if (Common.isNumber(min) && Common.isNumber(max)) {
+        return new NumberControllerSlider(object, property, min, max, step, enumeration);
       }
       return new NumberControllerBox(object, property, {
-        min: arguments[2],
-        max: arguments[3],
+        min: min,
+        max: max,
+        step: step,
       });
     }
     if (
@@ -2440,11 +2564,12 @@
       return new TabbedController(object, property, "", arguments[2] || 0, arguments[3] || "Object");
     }
     if (Common.isFunction(initialValue)) {
-      var opts = ARR_SLICE$1.call(arguments, 3);
+      var arg1 = optionalArgs[0];
+      var opts = ARR_SLICE$1.call(optionalArgs, 1);
       if (opts.length === 0) {
         opts = undefined;
       }
-      return new FunctionController(object, property, options_1, opts);
+      return new FunctionController(object, property, arg1, opts);
     }
     if (Common.isBoolean(initialValue)) {
       return new BooleanController(object, property);
@@ -2452,7 +2577,13 @@
     if (Common.isArray(initialValue)) {
       return new ArrayController(object, property);
     }
-    if (Common.isUndefined(initialValue)) {
+    if (Common.isObject(initialValue)) {
+      return new OptionController$1(object, property);
+    }
+    if (initialValue === null) {
+      return new NullController(object, property);
+    }
+    if (initialValue === undefined && property in object) {
       return new UndefinedController(object, property);
     }
     return null;
@@ -3067,39 +3198,6 @@
       this.drawEasingFunction(this.__func);
     };
     return EasingFunctionController;
-  })(Controller);
-
-  var TextAreaController = (function (_Controller) {
-    _inheritsLoose(TextAreaController, _Controller);
-    function TextAreaController(object, property) {
-      var _this2;
-      _this2 = _Controller.call(this, object, property) || this;
-      var _this = _assertThisInitialized(_this2);
-      _this2.__input = document.createElement("textarea");
-      dom.bind(_this2.__input, "keyup", onChange);
-      dom.bind(_this2.__input, "change", onChange);
-      dom.bind(_this2.__input, "blur", onBlur);
-      function onChange() {
-        _this.setValue(_this.__input.value);
-      }
-      function onBlur() {
-        if (_this.__onFinishChange) {
-          _this.__onFinishChange.call(_this, _this.getValue());
-        }
-      }
-      _this2.updateDisplay();
-      _this2.domElement.appendChild(_this2.__input);
-      return _this2;
-    }
-    var _proto = TextAreaController.prototype;
-    _proto.updateDisplay = function updateDisplay() {
-      if (dom.isActive(this.__input)) {
-        return this;
-      }
-      this.__input.value = this.getValue();
-      return _Controller.prototype.updateDisplay.call(this);
-    };
-    return TextAreaController;
   })(Controller);
 
   var GradientController = (function (_Controller) {
@@ -4312,7 +4410,7 @@
         object instanceof CustomController
           ? [property].concat(params.factoryArgs)
           : [object, property].concat(params.factoryArgs);
-      controller = ControllerFactory.apply(gui, factoryArgs);
+      controller = controllerFactory.apply(gui, factoryArgs);
     }
     if (!controller) {
       throw new Error(

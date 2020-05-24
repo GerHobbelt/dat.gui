@@ -24,10 +24,32 @@ import Controller from "./Controller";
  * @member dat.controllers
  */
 class CustomController extends Controller {
-  constructor(object, property) {
-    super(object, property);
+  /**
+   * Represents a custom controller.
+   * @param {Object} object The object to be manipulated
+   * @param {Function} [object.property] Returns an object with elements for adding into "property-name" class element.
+   * @param {string} property The name of the property to be manipulated
+   * @param {...Object} [params] Optional parameters
+   */
+  constructor(object, property, ...params) {
+    super(object, property, "custom");
 
-    object.constructor(this);
+    this.arguments = {
+      object: object,
+      property: property,
+      opts: params,
+    };
+    if (object.property) {
+      this.property = object.property(this);
+    }
+  }
+
+  set controller(newController) {
+    this._controller = newController;
+  }
+
+  get controller() {
+    return this._controller;
   }
 }
 

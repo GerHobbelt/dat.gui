@@ -30,7 +30,7 @@ import common from "../utils/common";
  */
 class ArrayController extends Controller {
   constructor(object, property) {
-    super(object, property);
+    super(object, property, "array");
 
     const _this = this;
 

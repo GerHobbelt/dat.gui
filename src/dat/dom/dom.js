@@ -208,27 +208,34 @@ const dom = {
   },
 
   /**
+   * Add a class name to a DOM element.
    *
-   * @param elem
-   * @param className
+   * @param elem       the DOM element to update
+   * @param {String} [className]   a class name. May be empty or null, in which case this function does nothing.
+   * @returns {dom}
    */
   addClass: function (elem, className) {
-    if (elem.className === undefined) {
-      elem.className = className;
-    } else if (elem.className !== className) {
-      const classes = elem.className.split(/ +/);
-      if (classes.indexOf(className) === -1) {
-        classes.push(className);
-        elem.className = classes.join(" ").replace(/^\s+/, "").replace(/\s+$/, "");
+    // only add className when there's anything to add:
+    if (className) {
+      if (elem.className === undefined) {
+        elem.className = className;
+      } else if (elem.className !== className) {
+        const classes = elem.className.split(/ +/);
+        if (classes.indexOf(className) === -1) {
+          classes.push(className);
+          elem.className = classes.join(" ").trim();
+        }
       }
     }
     return dom;
   },
 
   /**
+   * Remove one or all class names from a DOM element.
    *
-   * @param elem
-   * @param className
+   * @param elem       the DOM element to update
+   * @param {String} [className]  a class name.
+   * When `className` is empty / null / falsey, then *all* classes will be removed from the DOM element.
    */
   removeClass: function (elem, className) {
     if (className) {

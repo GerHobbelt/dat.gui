@@ -26,7 +26,7 @@ import dom from "../dom/dom";
  */
 class TabbedController extends Controller {
   constructor(object, property, text, tabs, displayName) {
-    super(object, property);
+    super(object, property, "tabbed");
 
     const _this = this;
 

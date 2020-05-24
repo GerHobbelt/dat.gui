@@ -26,7 +26,7 @@ import dom from "../dom/dom";
  */
 class FileController extends Controller {
   constructor(object, property) {
-    super(object, property);
+    super(object, property, "file");
 
     const _this = this;
 

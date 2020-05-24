@@ -27,15 +27,15 @@ import Plotter from "../utils/plotter";
  */
 class PlotterController extends Controller {
   constructor(object, property, params) {
-    super(object, property);
+    super(object, property, "plotter");
 
     params = params || {};
 
     /** The graph will be these many units high */
-    this.max = params.max || 3;
+    this.max = params.max || 3; // 10 was the other default (GUI.addPlotter)
 
     /** Refresh rate. Value of 0 disables auto-refresh */
-    this.period = params.period || 0;
+    this.period = typeof period === "number" ? period : period ? 500 : 0;
 
     /** Stores the current value for comparison during animation frame */
     this.prevValue = this.getValue();

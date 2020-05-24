@@ -23,16 +23,18 @@ import common from "../utils/common";
  *
  * @param {Object} object The object to be manipulated
  * @param {string} property The name of the property to be manipulated
- * @param {Object|string[]} options A map of labels to acceptable values, or
+ * @param {Object|string[]} params A map of labels to acceptable values, or
  * a list of acceptable string values.
  *
  * @member dat.controllers
  */
 class OptionController extends Controller {
-  constructor(object, property, options) {
-    super(object, property);
+  constructor(object, property, params) {
+    super(object, property, "option");
 
     const _this = this;
+
+    params = params || {};
 
     /**
      * The drop down menu
@@ -40,15 +42,15 @@ class OptionController extends Controller {
      */
     this.__select = document.createElement("select");
 
-    if (common.isArray(options)) {
+    if (common.isArray(params)) {
       const map = {};
-      common.each(options, function (element) {
+      common.each(params, function (element) {
         map[element] = element;
       });
-      options = map;
+      params = map;
     }
 
-    common.each(options, function (value, key) {
+    common.each(params, function (value, key) {
       const opt = document.createElement("option");
       opt.innerHTML = key;
       opt.setAttribute("value", value);
@@ -58,16 +60,10 @@ class OptionController extends Controller {
     // Acknowledge original value
     this.updateDisplay();
 
-    dom.bind(
-      this.__select,
-      "change",
-      function () {
-        const desiredValue = this.options[this.selectedIndex].value;
-        _this.setValue(desiredValue);
-      },
-      false,
-      true
-    );
+    dom.bind(this.__select, "change", function () {
+      const desiredValue = this.options[this.selectedIndex].value;
+      _this.setValue(desiredValue);
+    });
 
     this.domElement.appendChild(this.__select);
   }
@@ -78,22 +74,22 @@ class OptionController extends Controller {
     }
     const toReturn = super.setValue(v, disableOnChange);
 
-    if (this.__onFinishChange && !disableOnChange) {
-      this.__onFinishChange.call(this, this.getValue());
+    if (!disableOnChange) {
+    this.__propagateFinishChange(this.getValue());
     }
     return toReturn;
   }
 
-  updateDisplay() {
+  updateDisplay(force) {
     // prevent number from updating if user is trying to manually update
     //
     // Use the same solution from StringController.js to enable
     // editing <input>s while "listen()"ing
-    if (dom.isActive(this.__select) && !this.forceUpdateDisplay) {
+    if (!force && dom.isActive(this.__select) && !this.forceUpdateDisplay) {
       return this;
     }
     this.__select.value = this.getValue();
-    return super.updateDisplay();
+    return super.updateDisplay(force);
   }
 }
 

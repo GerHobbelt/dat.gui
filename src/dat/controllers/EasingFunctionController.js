@@ -17,7 +17,7 @@ import EasingFunction from "../easing/Easing";
 
 class EasingFunctionController extends Controller {
   constructor(object, property) {
-    super(object, property);
+    super(object, property, "easing");
 
     const _this = this;
     this.domElement = document.createElement("div");

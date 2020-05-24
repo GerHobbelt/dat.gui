@@ -39,9 +39,17 @@
           allFonts: ["Times", "Courier", "Verdana"],
           noiseStrength: 0,
           displayOutline: true,
-          explode: function (state) {},
+          explode: function (state) {
+            alert("poof!");
+          },
           fgcolor: "#f00",
           bgcolor: "#000" /* black */,
+          c1: "#f00",
+          c2: "#000" /* black */,
+          c3: "#f00",
+          c4: "#000" /* black */,
+          c5: "#f00",
+          c6: "#000" /* black */,
           regular_number: 5,
           regular_number2: -155,
           regular_number3: 0,
@@ -68,8 +76,16 @@
         gui.add(fizzyText, "explode").name("Explode!"); // Specify a custom name.
 
         // Colors
-        gui.addAs(fizzyText, "fgcolor", "color");
-        gui.addAs(fizzyText, "bgcolor", gui.findController("color"));
+        gui.addColor(fizzyText, "fgcolor");
+        gui.addColor(fizzyText, "bgcolor");
+
+        gui.addAs(fizzyText, "c1", "color");
+        gui.addAs(fizzyText, "c2", gui.findController("color"));
+
+        gui.addNgColor(fizzyText, "c3");
+        gui.addBgColor(fizzyText, "c4");
+        gui.addGtColor(fizzyText, "c5");
+        gui.addHSVColor(fizzyText, "c6");
 
         // Numbers without range
         gui.add(fizzyText, "regular_number").name("just a number...");

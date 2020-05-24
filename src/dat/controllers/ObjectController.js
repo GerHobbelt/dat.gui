@@ -22,16 +22,17 @@ import dom from "../dom/dom";
  *
  * @param {Object} object The object to be manipulated
  * @param {string} property The name of the property to be manipulated
- * @param {Object|string[]} options A map of labels to acceptable values, or
+ * @param {Object|string[]} params A map of labels to acceptable values, or
  * a list of acceptable string values.
  *
  * @member dat.controllers
  */
 class OptionController extends Controller {
-  constructor(object, property, params, options) {
-    super(object, property, "option", options);
+  constructor(object, property, params) {
+    super(object, property, "option");
 
     const _this = this;
+
     this.CUSTOM_FLAG = "";
 
     params = params || {};

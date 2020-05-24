@@ -23,20 +23,24 @@ import math from "./color/math";
 import interpret from "./color/interpret";
 
 import Controller from "./controllers/Controller";
+import ArrayController from "./controllers/ArrayController";
+import BgColorController from "./controllers/BgColorController";
 import BooleanController from "./controllers/BooleanController";
-import OptionController from "./controllers/OptionController";
-import StringController from "./controllers/StringController";
+import ColorController from "./controllers/ColorController";
+import CustomController from "./controllers/CustomController";
+import FileController from "./controllers/FileController";
+import FunctionController from "./controllers/FunctionController";
+import GtColorController from "./controllers/GtColorController";
+import HSVColorController from "./controllers/HSVColorController";
+import ImageController from "./controllers/ImageController";
+import NgColorController from "./controllers/NgColorController";
 import NumberController from "./controllers/NumberController";
 import NumberControllerBox from "./controllers/NumberControllerBox";
 import NumberControllerSlider from "./controllers/NumberControllerSlider";
-import FunctionController from "./controllers/FunctionController";
-import TabbedController from "./controllers/TabbedController";
-import ColorController from "./controllers/ColorController";
-import FileController from "./controllers/FileController";
+import OptionController from "./controllers/OptionController";
 import PlotterController from "./controllers/PlotterController";
-import CustomController from "./controllers/CustomController";
-import ImageController from "./controllers/ImageController";
-import ArrayController from "./controllers/ArrayController";
+import StringController from "./controllers/StringController";
+import TabbedController from "./controllers/TabbedController";
 
 import domImport from "./dom/dom";
 import GUIImport from "./gui/GUI";
@@ -59,20 +63,24 @@ export const color = {
  */
 export const controllers = {
   Controller: Controller,
+  ArrayController: ArrayController,
+  BgColorController: BgColorController,
   BooleanController: BooleanController,
-  OptionController: OptionController,
-  StringController: StringController,
+  ColorController: ColorController,
+  CustomController: CustomController,
+  FileController: FileController,
+  FunctionController: FunctionController,
+  GtColorController: GtColorController,
+  HSVColorController: HSVColorController,
+  ImageController: ImageController,
+  NgColorController: NgColorController,
   NumberController: NumberController,
   NumberControllerBox: NumberControllerBox,
   NumberControllerSlider: NumberControllerSlider,
-  FunctionController: FunctionController,
-  TabbedController: TabbedController,
-  ColorController: ColorController,
-  FileController: FileController,
+  OptionController: OptionController,
   PlotterController: PlotterController,
-  CustomController: CustomController,
-  ImageController: ImageController,
-  ArrayController: ArrayController,
+  StringController: StringController,
+  TabbedController: TabbedController,
 };
 
 /**
@@ -89,7 +97,7 @@ export const gui = { GUI: GUIImport };
 
 /**
  * [GUI description]
- * @type {[type]}
+ * @type {GUI}
  */
 export const GUI = GUIImport;
 

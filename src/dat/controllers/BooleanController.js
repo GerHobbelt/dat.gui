@@ -26,7 +26,7 @@ import dom from "../dom/dom";
  */
 class BooleanController extends Controller {
   constructor(object, property) {
-    super(object, property);
+    super(object, property, "boolean");
 
     const _this = this;
     this.__prev = this.getValue();
@@ -40,7 +40,7 @@ class BooleanController extends Controller {
       }
     }
 
-    dom.bind(this.__checkbox, "change", onChange, false, true);
+    dom.bind(this.__checkbox, "change", onChange);
 
     this.domElement.appendChild(this.__checkbox);
 
@@ -50,9 +50,9 @@ class BooleanController extends Controller {
 
   setValue(v, disableOnChange = false) {
     const toReturn = super.setValue(v, disableOnChange);
-    if (this.__onFinishChange && !disableOnChange) {
-      this.__onFinishChange.call(this, this.getValue());
-    }
+    if (!disableOnChange) {
+    this.__propagateFinishChange(this.getValue());
+
     this.__prev = this.getValue();
     return toReturn;
   }

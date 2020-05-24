@@ -42,7 +42,7 @@ function vec2pos(vec, min, max) {
  */
 class VectorController extends Controller {
   constructor(object, property, min = [0, 0], max = [1, 1]) {
-    super(object, property, { min: min, max: max });
+    super(object, property, "vector");
     this.__min = min;
     this.__max = max;
     this.__vec = this.getValue();
@@ -174,7 +174,5 @@ class VectorController extends Controller {
     this.__temp[1] = 1;
   }
 }
-
-const vendors = ["-moz-", "-o-", "-webkit-", "-ms-", ""];
 
 export default VectorController;

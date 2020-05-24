@@ -153,8 +153,10 @@ a.guidat-toggle:hover {
   background-color: #444444;
 }
 
-.guidat-controller input:focus {
+.guidat-controller input:focus,
+.guidat-controller.active input {
   background-color: #555555;
+  color: #FFFFFF;
 }
 
 .guidat-controller.number {

@@ -18,6 +18,12 @@
   background-color: #EEEEEE;
   padding: 0 0.5em;
   overflow: hidden;
+
+  // correct width for the padding above:
+  width:
+    calc(
+      70% - 1vw
+    ); // that's 100% - input.number width @ 30% - 2*0.5em padding of the slider itself
 }
 
 .slider-fg {
@@ -31,13 +37,13 @@
 
 .slider-fg::after {
   display: inline-block;
-  border-radius: 1em;
+  border-radius: 0.5em;
   background-color: #FFFFFF;
   border: 1px solid #AAAAAA;
   content: "";
   float: right;
   margin-right: -1em;
-  margin-top: -1px;
+  margin-top: -2px;
   height: 0.9em;
   width: 0.9em;
 }

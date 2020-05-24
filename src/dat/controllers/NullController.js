@@ -24,8 +24,8 @@ import dom from "../dom/dom";
  * @member dat.controllers
  */
 class NullController extends Controller {
-  constructor(object, property, options) {
-    super(object, property, "null", options);
+  constructor(object, property) {
+    super(object, property, "null");
 
     const _this = this;
     this.__prev = this.getValue();

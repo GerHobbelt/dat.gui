@@ -88,6 +88,8 @@ const hideableGuis = [];
  * @param {dat.gui.GUI} [params.parent] The GUI I'm nested in.
  * @param {Boolean} [params.closed] If true, starts closed
  * @param {Boolean} [params.closeOnTop] If true, close/open button shows on top of the GUI
+   * @param {String} [params.closeStr] close string
+   * @param {String} [params.openStr] open string
  */
 const GUI = function(pars) {
   const _this = this;
@@ -172,6 +174,14 @@ const GUI = function(pars) {
   } else {
     params.load = { preset: DEFAULT_DEFAULT_PRESET_NAME };
   }
+
+    if (common.isUndefined(params.closeStr)) {
+      params.closeStr = GUI.TEXT_CLOSED;
+    } 
+
+    if (common.isUndefined(params.openStr)) {
+      params.openStr = GUI.TEXT_OPEN;
+    }
 
   if (common.isUndefined(params.parent) && params.hideable) {
     hideableGuis.push(this);
@@ -309,7 +319,7 @@ const GUI = function(pars) {
           this.onResize();
 
           if (_this.__closeButton) {
-            _this.__closeButton.innerHTML = v ? GUI.TEXT_OPEN : GUI.TEXT_CLOSED;
+                _this.__closeButton.innerHTML = v ? params.openStr : params.closeStr;
           }
         }
       },
@@ -369,7 +379,7 @@ const GUI = function(pars) {
     }
 
     this.__closeButton = document.createElement('div');
-    this.__closeButton.innerHTML = GUI.TEXT_CLOSED;
+      this.__closeButton.innerHTML = params.closeStr;
     dom.addClass(this.__closeButton, GUI.CLASS_CLOSE_BUTTON);
     if (params.closeOnTop) {
       dom.addClass(this.__closeButton, GUI.CLASS_CLOSE_TOP);

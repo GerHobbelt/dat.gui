@@ -1,4 +1,3 @@
-@charset "UTF-8";
 /**
  * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
@@ -12,23 +11,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-.dg {
-  /** Clear list styles */
-  /* Auto-place container */
-  /* Auto-placed GUI's */
-  /* Line items that don't contain folders. */
-  /** Folder names */
-  /** Hides closed items */
-  /** Controller row */
-  /** Name-half (left) */
-  /** Controller-half (right) */
-  /** Controller placement */
-  /** Shorter number boxes when slider is present. */
-  /** Reduce margin and set height for plotter */
-  /** Reduce margin and set height for plotter */
-  /** Ensure the entire boolean and function row shows a hand */
-  /** allow overflow for color selector */
-}
+@charset "UTF-8";
 .dg ul {
   list-style: none;
   margin: 0;
@@ -45,43 +28,34 @@
   z-index: 0;
 }
 .dg:not(.ac) .main {
-  /** Exclude mains in ac so that we don't hide close button */
   overflow: hidden;
 }
 .dg.main {
-  -webkit-transition: opacity 0.1s linear;
-  -o-transition: opacity 0.1s linear;
-  -moz-transition: opacity 0.1s linear;
   transition: opacity 0.1s linear;
   box-sizing: border-box;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
 }
 .dg.main.taller-than-window .close-button {
   opacity: 1;
-  /* TODO, these are style notes */
   margin-top: -1px;
   border-top: 1px solid #454545;
 }
 .dg.main ul.closed .close-button {
   opacity: 1 !important;
 }
-.dg.main:hover .close-button,
-.dg.main .close-button.drag {
+.dg.main .close-button.drag,
+.dg.main:hover .close-button {
   opacity: 1;
 }
 .dg.main .close-button {
-  -webkit-transition: opacity 0.1s linear;
-  -o-transition: opacity 0.1s linear;
-  -moz-transition: opacity 0.1s linear;
   transition: opacity 0.1s linear;
   border: 0;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
   line-height: 27px;
   height: 28px;
-  /* TODO, these are style notes */
   cursor: pointer;
   text-align: center;
-  background-color: #000000;
+  background-color: #000;
 }
 .dg.main .close-button.close-top {
   position: relative;
@@ -90,7 +64,7 @@
   position: absolute;
 }
 .dg.main .close-button:hover {
-  background-color: #111111;
+  background-color: #111;
 }
 .dg.main .close-button img {
   display: inline-block;
@@ -113,7 +87,7 @@
 }
 .dg.a .save-row {
   top: 0;
-  z-index: 1002;
+  z-index: 2;
 }
 .dg.a .save-row.close-top {
   position: relative;
@@ -122,13 +96,7 @@
   position: fixed;
 }
 .dg li {
-  -webkit-transition: height 0.1s ease-out;
-  -o-transition: height 0.1s ease-out;
-  -moz-transition: height 0.1s ease-out;
   transition: height 0.1s ease-out;
-  -webkit-transition: overflow 0.1s linear;
-  -o-transition: overflow 0.1s linear;
-  -moz-transition: overflow 0.1s linear;
   transition: overflow 0.1s linear;
 }
 .dg li:not(.folder) {
@@ -139,10 +107,9 @@
 }
 .dg li.folder {
   padding: 0;
-  border-left: 4px solid black;
+  border-left: 4px solid #000;
 }
 .dg li.title {
-  cursor: pointer;
   margin-left: -4px;
 }
 .dg .closed li:not(.title),
@@ -174,22 +141,18 @@
   height: 125px;
   position: relative;
 }
-.dg .c input[type=text],
-.dg .c input[type=number],
-.dg .c canvas {
+.dg .c canvas,
+.dg .c input[type="number"],
+.dg .c input[type="text"] {
   border: 0;
   margin-top: 4px;
   padding: 3px;
   width: 100%;
   float: right;
 }
-.dg .has-slider input[type=number] {
+.dg .has-slider input[type="number"] {
   width: 30%;
   margin-left: 0;
-}
-.dg .c canvas {
-  padding: 0;
-  height: 53px;
 }
 .dg .c canvas {
   padding: 0;
@@ -206,17 +169,17 @@
 .dg .slider-fg {
   height: 100%;
 }
-.dg .c input[type=checkbox] {
+.dg .c input[type="checkbox"] {
   margin-top: 7px;
 }
 .dg .c select {
   margin-top: 5px;
 }
-.dg .cr.function,
-.dg .cr.function .property-name,
-.dg .cr.function *,
 .dg .cr.boolean,
-.dg .cr.boolean * {
+.dg .cr.boolean *,
+.dg .cr.function,
+.dg .cr.function *,
+.dg .cr.function .property-name {
   cursor: pointer;
 }
 .dg .cr.color {
@@ -227,7 +190,7 @@
   position: absolute;
   margin-left: -9px;
   margin-top: 23px;
-  z-index: 10;
+  z-index: 1;
 }
 .dg .c:hover .selector,
 .dg .selector.drag {
@@ -241,22 +204,20 @@
   padding: 0 6px;
 }
 .dg.dialogue {
-  background-color: #222222;
+  background-color: #222;
   width: 460px;
   padding: 15px;
   font-size: 13px;
   line-height: 15px;
 }
-
-/* TODO Separate style and structure */
 #dg-new-constructor {
   padding: 10px;
-  color: #222222;
+  color: #222;
   font-family: Monaco, monospace;
   font-size: 10px;
   border: 0;
   resize: none;
-  box-shadow: inset 1px 1px 1px #888888;
+  box-shadow: inset 1px 1px 1px #888;
   word-wrap: break-word;
   margin: 12px 0;
   display: block;
@@ -265,32 +226,25 @@
   height: 100px;
   position: relative;
 }
-
 #dg-local-explain {
   display: none;
   font-size: 11px;
   line-height: 17px;
   border-radius: 3px;
-  background-color: #333333;
+  background-color: #333;
   padding: 8px;
   margin-top: 10px;
 }
 #dg-local-explain code {
   font-size: 10px;
 }
-
 #dat-gui-save-locally {
   display: none;
 }
-
-/** Main type */
 .dg {
-  color: #EEEEEE;
+  color: #eee;
   font: 12px Roboto, Helvetica, sans-serif;
-  text-shadow: 0 -1px 0 #111111;
-  /** Auto place */
-  /* Controller row, <li> */
-  /** Controllers */
+  text-shadow: 0 -1px 0 #111;
 }
 .dg.main > ul {
   scrollbar-width: 6px;
@@ -303,7 +257,7 @@
 }
 .dg.main > ul::-webkit-scrollbar-thumb {
   border-radius: 3px;
-  background: gray;
+  background: grey;
 }
 .dg.main > ul::-webkit-scrollbar-track {
   background: silver;
@@ -313,17 +267,17 @@
   display: none;
 }
 .dg.main > ul {
-  scrollbar-face-color: gray;
+  scrollbar-face-color: grey;
   scrollbar-track-color: silver;
   scrollbar-width: thin;
 }
 .dg li:not(.folder) {
-  background: #333333;
+  background: #333;
   border-bottom: 1px solid #454545;
 }
 .dg li.save-row {
   line-height: 30px;
-  background: #666666;
+  background: #666;
   border: 0;
 }
 .dg li.save-row select {
@@ -337,126 +291,121 @@
   border-radius: 2px;
   font-size: 9px;
   line-height: 7px;
-  padding: 4px 4px 5px 4px;
+  padding: 4px 4px 5px;
   background: #4d4d4d;
-  color: #FFFFFF;
-  text-shadow: 0 1px 0 #333333;
-  box-shadow: 0 -1px 0 #333333;
+  color: #fff;
+  text-shadow: 0 1px 0 #333;
+  box-shadow: 0 -1px 0 #333;
   cursor: pointer;
 }
 .dg li.save-row .button.gears {
-  background: #4d4d4d url("https://icon.now.sh/settings/FFFFFF/12") center center no-repeat;
+  background: #4d4d4d url(https://icon.now.sh/settings/FFFFFF/12) 50% no-repeat;
   height: 7px;
   width: 8px;
 }
 .dg li.save-row .button:hover {
   background-color: #404040;
-  box-shadow: 0 -1px 0 #333333;
+  box-shadow: 0 -1px 0 #333;
 }
 .dg li.folder {
   border-bottom: 0;
 }
 .dg li.title {
   cursor: pointer;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 1px solid hsla(0, 0%, 100%, 0.2);
 }
-.dg li.title::before {
+.dg li.title:before {
   content: "▲︎ ";
   font-size: 65%;
   margin: 0 5px 0 2px;
   display: inline-block;
   vertical-align: middle;
 }
-.dg .closed li.title::before {
+.dg .closed li.title:before {
   content: "▶ ";
 }
 .dg .cr.boolean {
-  border-left: 3px solid #D32F2F;
+  border-left: 3px solid #d32f2f;
 }
-.dg .cr.color {
+.dg .cr.color,
+.dg .cr.image {
   border-left: 3px solid;
 }
 .dg .cr.image {
   position: relative;
   height: auto;
-  border-left: 3px solid;
 }
 .dg .cr.plotter {
   height: 58px;
 }
 .dg .cr.function {
-  border-left: 3px solid #FBC02D;
+  border-left: 3px solid #fbc02d;
 }
 .dg .cr.number {
-  border-left: 3px solid #1976D2;
+  border-left: 3px solid #1976d2;
 }
-.dg .cr.number input[type=number] {
-  color: #1976D2;
+.dg .cr.number input[type="number"] {
+  color: #1976d2;
 }
 .dg .cr.string {
-  border-left: 3px solid #388E3C;
+  border-left: 3px solid #388e3c;
 }
-.dg .cr.string input[type=text] {
-  color: #388E3C;
+.dg .cr.string input[type="text"] {
+  color: #388e3c;
 }
-.dg .cr.function:hover, .dg .cr.boolean:hover {
-  background: #111111;
+.dg .cr.boolean:hover,
+.dg .cr.function:hover {
+  background: #111;
 }
-.dg .c input[type=text],
-.dg .c input[type=number] {
+.dg .c input[type="number"],
+.dg .c input[type="text"] {
   background: #494949;
   outline: none;
 }
-.dg .c input[type=text]:hover,
-.dg .c input[type=number]:hover {
-  background: #555555;
+.dg .c input[type="number"]:hover,
+.dg .c input[type="text"]:hover {
+  background: #555;
 }
-.dg .c input[type=text]:focus,
-.dg .c input[type=number]:focus {
+.dg .c input[type="number"]:focus,
+.dg .c input[type="text"]:focus {
   background: #626262;
-  color: #FFFFFF;
+  color: #fff;
 }
 .dg .c .slider {
   background: #494949;
   cursor: ew-resize;
 }
 .dg .c .slider-fg {
-  background: #1976D2;
+  background: #1976d2;
   max-width: 100%;
 }
 .dg .c .slider:hover {
-  background: #555555;
+  background: #555;
 }
 .dg .c .slider:hover .slider-fg {
   background: #2083e4;
 }
-
-/* ====================================================================== */
-
 .slider {
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15);
   height: 1em;
   border-radius: 1em;
-  background-color: #EEEEEE;
+  background-color: #eee;
   padding: 0 0.5em;
   overflow: hidden;
-  width: calc( 70% - 1vw );
+  width: calc(70% - 1vw);
 }
-
 .slider-fg {
-  padding: 1px 0 2px 0;
-  background-color: #AAAAAA;
+  background-color: #aaa;
   height: 1em;
   margin-left: -0.5em;
-  padding-right: 0.5em;
+  padding: 1px 0.5em 2px 0;
   border-radius: 1em 0 0 1em;
 }
-
-.slider-fg::after {
+.slider-fg:after {
   display: inline-block;
   border-radius: 0.5em;
-  background-color: #FFFFFF;
-  border: 1px solid #AAAAAA;
+  background-color: #fff;
+  border: 1px solid #aaa;
   content: "";
   float: right;
   margin-right: -1em;

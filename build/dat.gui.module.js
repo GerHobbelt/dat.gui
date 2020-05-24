@@ -1641,14 +1641,6 @@ function hueGradient(elem) {
 var BgColorController = (function (_Controller) {
   _inheritsLoose(BgColorController, _Controller);
   var _proto = BgColorController.prototype;
-  _proto.setValue = function setValue(newValue) {
-    this.object[this.property] = newValue;
-    if (this.__onChange) {
-      this.__onChange.call(this, newValue);
-    }
-    this.updateDisplay();
-    return this;
-  };
   _proto.setValue2 = function setValue2(newValue) {
     this.value2 = newValue;
     if (this.object[this.property + "bg"]) {
@@ -1659,9 +1651,6 @@ var BgColorController = (function (_Controller) {
     }
     this.updateDisplay();
     return this;
-  };
-  _proto.getValue = function getValue() {
-    return this.object[this.property];
   };
   function BgColorController(object, property) {
     var _this2;
@@ -1675,7 +1664,6 @@ var BgColorController = (function (_Controller) {
     _this2.__temp = new Color(0);
     _this2.__temp2 = new Color(0);
     var _this = _assertThisInitialized(_this2);
-    _this2.domElement = document.createElement("div");
     dom.makeSelectable(_this2.domElement, false);
     _this2.__selector = document.createElement("div");
     _this2.__saturation_field = document.createElement("div");
@@ -2076,25 +2064,12 @@ function hueGradient$1(elem) {
 
 var NgColorController = (function (_Controller) {
   _inheritsLoose(NgColorController, _Controller);
-  var _proto = NgColorController.prototype;
-  _proto.setValue = function setValue(newValue) {
-    this.object[this.property] = newValue;
-    if (this.__onChange) {
-      this.__onChange.call(this, newValue);
-    }
-    this.updateDisplay();
-    return this;
-  };
-  _proto.getValue = function getValue() {
-    return this.object[this.property];
-  };
   function NgColorController(object, property) {
     var _this2;
     _this2 = _Controller.call(this, object, property) || this;
     _this2.__color = new Color(_this2.getValue());
     _this2.__temp = new Color(0);
     var _this = _assertThisInitialized(_this2);
-    _this2.domElement = document.createElement("div");
     dom.makeSelectable(_this2.domElement, false);
     _this2.__selector = document.createElement("div");
     _this2.__saturation_field = document.createElement("div");
@@ -2216,9 +2191,7 @@ var NgColorController = (function (_Controller) {
       onFinish();
     }
     function onFinish() {
-      if (_this.__onFinishChange) {
-        _this.__onFinishChange.call(_this, _this.__color.toOriginal());
-      }
+      _this.__propagateFinishChange(_this.__color.toOriginal());
     }
     _this2.__saturation_field.appendChild(valueField);
     _this2.__selector.appendChild(_this2.__field_knob);
@@ -2263,7 +2236,9 @@ var NgColorController = (function (_Controller) {
     }
     return _this2;
   }
-  _proto.updateDisplay = function updateDisplay() {
+  var _proto = NgColorController.prototype;
+  _proto.updateDisplay = function updateDisplay(force) {
+    if (!force && dom.isActive(this.__input)) return this;
     var i = interpret(this.getValue());
     if (i !== false) {
       var mismatch = false;
@@ -2332,14 +2307,6 @@ function hueGradient$2(elem) {
 var GtColorController = (function (_Controller) {
   _inheritsLoose(GtColorController, _Controller);
   var _proto = GtColorController.prototype;
-  _proto.setValue = function setValue(newValue) {
-    this.object[this.property] = newValue;
-    if (this.__onChange) {
-      this.__onChange.call(this, newValue);
-    }
-    this.updateDisplay();
-    return this;
-  };
   _proto.setValue2 = function setValue2(newValue) {
     this.value2 = newValue;
     if (this.object[this.property + "bg"]) {
@@ -2350,9 +2317,6 @@ var GtColorController = (function (_Controller) {
     }
     this.updateDisplay();
     return this;
-  };
-  _proto.getValue = function getValue() {
-    return this.object[this.property];
   };
   function GtColorController(object, property) {
     var _this2;
@@ -2366,7 +2330,6 @@ var GtColorController = (function (_Controller) {
     _this2.__temp = new Color(0);
     _this2.__temp2 = new Color(0);
     var _this = _assertThisInitialized(_this2);
-    _this2.domElement = document.createElement("div");
     dom.makeSelectable(_this2.domElement, false);
     _this2.__selector = document.createElement("div");
     _this2.__saturation_field = document.createElement("div");
@@ -3194,7 +3157,7 @@ var plotter = function plotter(fg, bg, type) {
   };
 };
 
-var PlotterController$1 = (function (_Controller) {
+var PlotterController = (function (_Controller) {
   _inheritsLoose(PlotterController, _Controller);
   function PlotterController(object, property, params) {
     var _this;
@@ -3362,6 +3325,69 @@ var controllerFactory = function controllerFactory(object, property) {
   }
   return null;
 };
+
+var ImageController = (function (_Controller) {
+  _inheritsLoose(ImageController, _Controller);
+  function ImageController(object, property) {
+    var _this2;
+    _this2 = _Controller.call(this, object, property) || this;
+    _this2.__fileReader = new FileReader();
+    var _this = _assertThisInitialized(_this2);
+    _this2.__image = document.createElement("img");
+    _this2.__imagePreview = document.createElement("img");
+    _this2.__input = document.createElement("input");
+    Common.extend(_this2.__imagePreview.style, {
+      display: "block",
+      width: "calc(100% + 5px)",
+      padding: "4px 0",
+      marginLeft: "-5px",
+    });
+    Common.extend(_this2.__input.style, {
+      position: "absolute",
+      top: "0",
+      left: "0",
+      width: "100%",
+      height: "100%",
+      opacity: "0",
+      cursor: "pointer",
+    });
+    dom.bind(_this2.__image, "load", imageLoaded);
+    dom.bind(_this2.__input, "change", fileUploaded);
+    dom.bind(_this2.__fileReader, "loadend", fileLoaded);
+    function imageLoaded() {
+      _this.__imagePreview.src = _this.__image.src;
+      if (_this.__onChange) {
+        _this.__onChange.call(_this, _this.__image);
+      }
+    }
+    function fileUploaded() {
+      var file = _this.__input.files[0];
+      if (!file) {
+        return;
+      }
+      _this.__fileReader.readAsDataURL(file);
+    }
+    function fileLoaded() {
+      _this.__image.src = _this.__fileReader.result;
+    }
+    _this2.__image.src = object[property];
+    _this2.__imagePreview.src = object[property];
+    _this2.__input.type = "file";
+    _this2.domElement.appendChild(_this2.__imagePreview);
+    _this2.domElement.appendChild(_this2.__input);
+    return _this2;
+  }
+  var _proto = ImageController.prototype;
+  _proto.updateDisplay = function updateDisplay() {
+    if (this.isModified()) {
+      var newValue = this.getValue();
+      this.__image.src = newValue;
+      this.initialValue = newValue;
+    }
+    return _Controller.prototype.updateDisplay.call(this);
+  };
+  return ImageController;
+})(Controller);
 
 function clipFunc(min, max) {
   return function (v) {
@@ -3986,7 +4012,7 @@ var CenteredDiv = (function () {
 var ARR_SLICE$2 = Array.prototype.slice;
 var CSS_NAMESPACE = "dg";
 var HIDE_KEY_CODE = 72;
-var CLOSE_BUTTON_HEIGHT = 20;
+var CLOSE_BUTTON_HEIGHT = 0;
 var DEFAULT_DEFAULT_PRESET_NAME = "Default";
 var SUPPORTS_LOCAL_STORAGE = (function () {
   try {
@@ -4016,6 +4042,10 @@ var GUI = (function () {
     this.__onChange = undefined;
     this.__onFinishChange = undefined;
     this.__listening = [];
+    var __resizeDebounced = Common.debounce(function () {
+      _this.onResize();
+    }, 50);
+    this.onResizeDebounced = __resizeDebounced;
     params = Common.defaults(params, {
       closeOnTop: false,
       autoPlace: true,
@@ -4126,7 +4156,7 @@ var GUI = (function () {
           } else {
             dom.removeClass(_this.__ul, GUI.CLASS_CLOSED);
           }
-          _this.onResize();
+          _this.onResizeDebounced();
           if (_this.__closeButton) {
             if (params.name) {
               _this.__closeButton.innerHTML = params.name;
@@ -4229,14 +4259,13 @@ var GUI = (function () {
         setWidth(_this, params.width);
       }
     }
-    function __resizeHandler() {
+    dom.bind(window, "resize", _this.onResizeDebounced);
+    dom.bind(this.__ul, "webkitTransitionEnd", _this.onResizeDebounced);
+    dom.bind(this.__ul, "transitionend", _this.onResizeDebounced);
+    dom.bind(this.__ul, "oTransitionEnd", _this.onResizeDebounced);
+    Common.defer(function () {
       _this.onResizeDebounced();
-    }
-    dom.bind(window, "resize", __resizeHandler);
-    dom.bind(this.__ul, "webkitTransitionEnd", __resizeHandler);
-    dom.bind(this.__ul, "transitionend", __resizeHandler);
-    dom.bind(this.__ul, "oTransitionEnd", __resizeHandler);
-    this.onResize();
+    });
     if (params.resizable) {
       addResizeHandle(this);
     }
@@ -4398,7 +4427,7 @@ var GUI = (function () {
     this.__controllers.splice(this.__controllers.indexOf(controller), 1);
     var _this = this;
     Common.defer(function () {
-      _this.onResize();
+      _this.onResizeDebounced();
     });
   };
   _proto.destroy = function destroy() {
@@ -4473,7 +4502,7 @@ var GUI = (function () {
       folder.removeFolder(subfolder);
     });
     Common.defer(function () {
-      _this.onResize();
+      _this.onResizeDebounced();
     });
   };
   _proto.open = function open() {
@@ -4494,11 +4523,10 @@ var GUI = (function () {
       var _dom$getOffset = dom.getOffset(root.__ul),
         top = _dom$getOffset.top;
       var h = 0;
-      Common.each(root.__ul.childNodes, function (node) {
-        if (!(root.autoPlace && node === root.__save_row)) {
-          h += dom.getHeight(node);
-        }
-      });
+      h = root.__ul.scrollHeight;
+      if (!CLOSE_BUTTON_HEIGHT) {
+        CLOSE_BUTTON_HEIGHT = dom.getHeight(root.__closeButton);
+      }
       if (window.innerHeight - top - CLOSE_BUTTON_HEIGHT < h) {
         dom.addClass(root.domElement, GUI.CLASS_TOO_TALL);
         root.__ul.style.height = window.innerHeight - top - CLOSE_BUTTON_HEIGHT + "px";
@@ -4645,9 +4673,6 @@ GUI.DEFAULT_WIDTH = 245;
 GUI.TEXT_CLOSED = '<img src="https://icon.now.sh/x/FFFFFF/10" />';
 GUI.TEXT_OPEN = '<img src="https://icon.now.sh/settings/FFFFFF/18" />';
 dom.bind(window, "keydown", GUI._keydownHandler, false);
-GUI.onResizeDebounced = Common.debounce(function () {
-  this.onResize();
-}, 50);
 function _add(gui, object, property, params) {
   var controller;
   if (object instanceof Controller) {
@@ -4666,7 +4691,7 @@ function _add(gui, object, property, params) {
     } else if (params.gtcolor) {
       controller = new GtColorController(object, property);
     } else if (params.hsvcolor) {
-      controller = new HsvColorController(object, property);
+      controller = new HSVColorController(object, property);
     } else if (params.easing) {
       controller = new EasingFunctionController(object, property);
     } else if (params.multiline) {
@@ -4733,11 +4758,14 @@ function addRow(gui, dom, liBefore) {
   } else {
     gui.__ul.appendChild(li);
   }
-  gui.onResize();
+  gui.onResizeDebounced();
   return li;
 }
 function removeListeners(gui) {
-  dom.unbind(window, "resize", gui.__resizeHandler);
+  dom.unbind(window, "resize", gui.onResizeDebounced);
+  dom.unbind(gui.__ul, "webkitTransitionEnd", gui.onResizeDebounced);
+  dom.unbind(gui.__ul, "transitionend", gui.onResizeDebounced);
+  dom.unbind(gui.__ul, "oTransitionEnd", gui.onResizeDebounced);
   if (gui.saveToLocalStorageIfPossible) {
     dom.unbind(window, "unload", gui.saveToLocalStorageIfPossible);
   }
@@ -4838,38 +4866,16 @@ function augmentController(gui, li, controller) {
     dom.bind(li, "mouseout", function () {
       dom.removeClass(controller.__button, "hover");
     });
-  } else if (controller instanceof ColorController) {
+  } else if (
+    controller instanceof ColorController ||
+    controller instanceof BgColorController ||
+    controller instanceof NgColorController ||
+    controller instanceof HSVColorController ||
+    controller instanceof GtColorController
+  ) {
     dom.addClass(li, "color");
     controller.updateDisplay = Common.compose(function (val) {
       li.style.borderLeftColor = controller.__color.toHexString();
-      return val;
-    }, controller.updateDisplay);
-    controller.updateDisplay();
-  } else if (controller instanceof BgColorController) {
-    dom.addClass(li, "color");
-    controller.updateDisplay = Common.compose(function (val) {
-      li.style.borderLeftColor = controller.__color.toString();
-      return val;
-    }, controller.updateDisplay);
-    controller.updateDisplay();
-  } else if (controller instanceof NgColorController) {
-    dom.addClass(li, "color");
-    controller.updateDisplay = Common.compose(function (val) {
-      li.style.borderLeftColor = controller.__color.toString();
-      return val;
-    }, controller.updateDisplay);
-    controller.updateDisplay();
-  } else if (controller instanceof HSVColorController) {
-    dom.addClass(li, "color");
-    controller.updateDisplay = Common.compose(function (val) {
-      li.style.borderLeftColor = controller.__color.toString();
-      return val;
-    }, controller.updateDisplay);
-    controller.updateDisplay();
-  } else if (controller instanceof GtColorController) {
-    dom.addClass(li, "color");
-    controller.updateDisplay = Common.compose(function (val) {
-      li.style.borderLeftColor = controller.__color.toString();
       return val;
     }, controller.updateDisplay);
     controller.updateDisplay();
@@ -5027,7 +5033,7 @@ function addResizeHandle(gui) {
   function drag(e) {
     e.preventDefault();
     gui.width += pmouseX - e.clientX;
-    gui.onResize();
+    gui.onResizeDebounced();
     pmouseX = e.clientX;
     return false;
   }
@@ -5104,7 +5110,7 @@ var controllers = {
   HSVColorController: HSVColorController,
   GtColorController: GtColorController,
   ArrayController: ArrayController,
-  PlotterController: PlotterController$1,
+  PlotterController: PlotterController,
   CustomController: CustomController,
 };
 var dom$1 = {

@@ -17,6 +17,9 @@ manipulate variables and fire functions on the fly.</p>
 ## Members
 
 <dl>
+<dt><a href="#CLOSE_BUTTON_HEIGHT">CLOSE_BUTTON_HEIGHT</a></dt>
+<dd><p>Caches the height of the Close Button.</p>
+</dd>
 <dt><a href="#autoPlaceVirgin">autoPlaceVirgin</a></dt>
 <dd><p>Have we yet to create an autoPlace GUI?</p>
 </dd>
@@ -33,9 +36,6 @@ manipulate variables and fire functions on the fly.</p>
 <dl>
 <dt><a href="#CSS_NAMESPACE">CSS_NAMESPACE</a></dt>
 <dd><p>Outer-most className for GUI&#39;s</p>
-</dd>
-<dt><a href="#CLOSE_BUTTON_HEIGHT">CLOSE_BUTTON_HEIGHT</a></dt>
-<dd><p>The only value shared between the JS and SCSS. Use caution.</p>
 </dd>
 <dt><a href="#CSS">CSS</a> : <code>String</code></dt>
 <dd><p>class name used to mark auto-placed items.</p>
@@ -61,6 +61,9 @@ manipulate variables and fire functions on the fly.
 * [GUI](#GUI)
     * [new GUI([params])](#new_GUI_new)
     * [.domElement](#GUI+domElement) : <code>DOMElement</code>
+    * [.__onChange](#GUI+__onChange)
+    * [.__onFinishChange](#GUI+__onFinishChange)
+    * [.onResizeDebounced](#GUI+onResizeDebounced)
     * [.parent](#GUI+parent) : [<code>GUI</code>](#GUI)
     * [.autoPlace](#GUI+autoPlace) : <code>Boolean</code>
     * [.closeOnTop](#GUI+closeOnTop) : <code>Boolean</code>
@@ -129,6 +132,25 @@ var folder1 = gui.addFolder('Flow Field');
 
 ### gui.domElement : <code>DOMElement</code>
 Outermost DOM Element
+
+**Kind**: instance property of [<code>GUI</code>](#GUI)  
+<a name="GUI+__onChange"></a>
+
+### gui.\_\_onChange
+Called on change of child elements.
+
+**Kind**: instance property of [<code>GUI</code>](#GUI)  
+<a name="GUI+__onFinishChange"></a>
+
+### gui.\_\_onFinishChange
+Called on finish change of child elements.
+
+**Kind**: instance property of [<code>GUI</code>](#GUI)  
+<a name="GUI+onResizeDebounced"></a>
+
+### gui.onResizeDebounced
+Debounced {onResize} handler. Use this instead of {onResize} directly to improve
+performance on mobile and other low power platforms.
 
 **Kind**: instance property of [<code>GUI</code>](#GUI)  
 <a name="GUI+parent"></a>
@@ -491,6 +513,12 @@ updateDisplay description
 
 **Kind**: instance method of [<code>GUI</code>](#GUI)  
 **Returns**: [<code>GUI</code>](#GUI) - description  
+<a name="CLOSE_BUTTON_HEIGHT"></a>
+
+## CLOSE\_BUTTON\_HEIGHT
+Caches the height of the Close Button.
+
+**Kind**: global variable  
 <a name="autoPlaceVirgin"></a>
 
 ## autoPlaceVirgin
@@ -513,12 +541,6 @@ Are we hiding the GUI's ?
 
 ## CSS\_NAMESPACE
 Outer-most className for GUI's
-
-**Kind**: global constant  
-<a name="CLOSE_BUTTON_HEIGHT"></a>
-
-## CLOSE\_BUTTON\_HEIGHT
-The only value shared between the JS and SCSS. Use caution.
 
 **Kind**: global constant  
 <a name="CSS"></a>

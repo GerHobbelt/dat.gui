@@ -1980,6 +1980,72 @@ var UndefinedController = (function (_Controller) {
   return UndefinedController;
 })(Controller);
 
+var ARR_SLICE$1 = Array.prototype.slice;
+var ControllerFactory = function ControllerFactory(
+  object,
+  property,
+  options_1,
+  options_2,
+  options_3,
+  options_4,
+  options_5,
+  options_6
+) {
+  var dyninfo = Common.setupDynamicProperty(object, property);
+  var initialValue = !dyninfo ? object[property] : dyninfo.getter.call(object);
+  if (Common.isArray(options_1) || Common.isObject(options_1)) {
+    return new OptionController$1(object, property, options_1);
+  }
+  if (Common.isNumber(initialValue)) {
+    if (Common.isNumber(options_1) && Common.isNumber(options_2)) {
+      return new NumberControllerSlider(
+        object,
+        property,
+        options_1,
+        options_2,
+        options_3,
+        options_4,
+        options_5,
+        options_6
+      );
+    }
+    return new NumberControllerBox(object, property, {
+      min: options_1,
+      max: options_2,
+      step: options_3,
+      minimumSaneStepSize: options_4,
+      maximumSaneStepSize: options_5,
+      mode: options_6,
+    });
+  }
+  if (Common.isImagePath(initialValue)) {
+    return new ImageController(object, property);
+  }
+  if (Common.isString(initialValue)) {
+    return new StringController$1(object, property);
+  }
+  if (Common.isFunction(initialValue)) {
+    var opts = ARR_SLICE$1.call(arguments, 3);
+    if (opts.length === 0) {
+      opts = undefined;
+    }
+    return new FunctionController(object, property, options_1, opts);
+  }
+  if (Common.isBoolean(initialValue)) {
+    return new BooleanController(object, property);
+  }
+  if (Common.isArray(initialValue) || Common.isObject(initialValue)) {
+    return new OptionController$2(object, property);
+  }
+  if (initialValue === null) {
+    return new NullController(object, property);
+  }
+  if (initialValue === undefined && property in object) {
+    return new UndefinedController(object, property);
+  }
+  return null;
+};
+
 function pos2vec(pos, min, max) {
   return [pos[0] * (max[0] - min[0]) + min[0], pos[1] * (max[1] - min[1]) + min[1]];
 }
@@ -2261,7 +2327,7 @@ var CenteredDiv = (function () {
   return CenteredDiv;
 })();
 
-var ARR_SLICE$1 = Array.prototype.slice;
+var ARR_SLICE$2 = Array.prototype.slice;
 var CSS_NAMESPACE = "dg";
 var HIDE_KEY_CODE = 72;
 var CLOSE_BUTTON_HEIGHT = 20;
@@ -2278,304 +2344,346 @@ var auto_place_virgin = true;
 var auto_place_container;
 var hide = false;
 var hideable_guis = [];
-var GUI = function GUI(params) {
-  var _this = this;
-  this.__typeControllers = {
-    color: ColorController,
-    option: OptionController,
-    numberSlider: NumberControllerSlider,
-    numberBox: NumberControllerBox,
-    number: NumberController,
-    string: StringController,
-    image: ImageController,
-    function: FunctionController,
-    boolean: BooleanController,
-    object: ObjectController,
-  };
-  this.domElement = document.createElement("div");
-  this.__ul = document.createElement("ul");
-  this.domElement.appendChild(this.__ul);
-  dom.addClass(this.domElement, CSS_NAMESPACE);
-  this.__folders = {};
-  this.__controllers = [];
-  this.__rememberedObjects = [];
-  this.__rememberedObjectIndecesToControllers = [];
-  this.__listening = [];
-  params = params || {};
-  params = Common.defaults(params, {
-    autoPlace: true,
-    width: GUI.DEFAULT_WIDTH,
-  });
-  params = Common.defaults(params, {
-    resizable: params.autoPlace,
-    hideable: params.autoPlace,
-  });
-  if (!Common.isUndefined(params.load)) {
+var GUI = (function () {
+  function GUI(params) {
+    var _this = this;
+    params = params || {};
+    this.__typeControllers = {
+      color: ColorController,
+      option: OptionController,
+      numberSlider: NumberControllerSlider,
+      numberBox: NumberControllerBox,
+      number: NumberController,
+      string: StringController,
+      image: ImageController,
+      function: FunctionController,
+      boolean: BooleanController,
+      object: ObjectController,
+    };
+    this.domElement = document.createElement("div");
+    this.__ul = document.createElement("ul");
+    this.domElement.appendChild(this.__ul);
+    dom.addClass(this.domElement, CSS_NAMESPACE);
+    this.__folders = {};
+    this.__controllers = [];
+    this.__rememberedObjects = [];
+    this.__rememberedObjectIndecesToControllers = [];
+    this.__listening = [];
+    params = Common.defaults(params, {
+      autoPlace: true,
+      width: GUI.DEFAULT_WIDTH,
+    });
+    params = Common.defaults(params, {
+      resizable: params.autoPlace,
+      hideable: params.autoPlace,
+    });
+    if (!Common.isUndefined(params.load)) {
+      if (params.preset) {
+        params.load.preset = params.preset;
+      }
+    }
+    if (Common.isUndefined(params.parent) && params.hideable) {
+      hideable_guis.push(this);
+    }
+    params.resizable = Common.isUndefined(params.parent) && params.resizable;
+    if (params.autoPlace && Common.isUndefined(params.scrollable)) {
+      params.scrollable = true;
+    }
+    function saveToLocalStorage() {
+      if (_this.useLocalStorage) {
+        var save_record = _this.getSaveObject();
+        localStorage.setItem(getLocalStorageHash(_this, "gui"), JSON.stringify(save_record));
+      }
+    }
+    Object.defineProperties(this, {
+      parent: {
+        get: function get() {
+          return params.parent;
+        },
+      },
+      scrollable: {
+        get: function get() {
+          return params.scrollable;
+        },
+      },
+      autoPlace: {
+        get: function get() {
+          return params.autoPlace;
+        },
+      },
+      preset: {
+        get: function get() {
+          if (_this.parent) {
+            return _this.getRoot().preset;
+          }
+          return params.load.preset;
+        },
+        set: function set(v) {
+          if (_this.parent) {
+            _this.getRoot().preset = v;
+          } else {
+            params.load.preset = v;
+          }
+          setPresetSelectIndex(_this);
+          _this.revert();
+          return _this;
+        },
+      },
+      width: {
+        get: function get() {
+          return params.width;
+        },
+        set: function set(v) {
+          params.width = v;
+          setWidth(_this, v);
+          return _this;
+        },
+      },
+      name: {
+        get: function get() {
+          return params.name || "";
+        },
+        set: function set(v) {
+          if (v !== params.name && _this.__folders[v] !== undefined) {
+            throw new Error("name collision: another sibling GUI folder has the same name");
+          }
+          params.name = v;
+          if (title_row_name) {
+            title_row_name.innerHTML = params.name;
+          }
+          return _this;
+        },
+      },
+      closed: {
+        get: function get() {
+          return params.closed;
+        },
+        set: function set(v) {
+          params.closed = v;
+          if (params.closed) {
+            dom.addClass(_this.__ul, GUI.CLASS_CLOSED);
+          } else {
+            dom.removeClass(_this.__ul, GUI.CLASS_CLOSED);
+          }
+          _this.onResize();
+          if (_this.__closeButton) {
+            _this.__closeButton.innerHTML = v ? GUI.TEXT_OPEN : GUI.TEXT_CLOSED;
+          }
+          return _this;
+        },
+      },
+      load: {
+        get: function get() {
+          return params.load;
+        },
+      },
+      useLocalStorage: {
+        get: function get() {
+          if (!SUPPORTS_LOCAL_STORAGE) {
+            return null;
+          }
+          var rv = localStorage.getItem(getLocalStorageHash(_this, "isLocal"));
+          if (rv === "0") {
+            return true;
+          }
+          return rv === "true";
+        },
+        set: function set(bool) {
+          dom.unbind(window, "unload", saveToLocalStorage);
+          if (SUPPORTS_LOCAL_STORAGE) {
+            dom.bind(window, "unload", saveToLocalStorage);
+            if (bool == null) {
+              bool = 0;
+            } else {
+              bool = !!bool;
+            }
+            localStorage.setItem(getLocalStorageHash(_this, "isLocal"), bool);
+          }
+          return _this;
+        },
+      },
+    });
+    if (Common.isUndefined(params.parent)) {
+      params.closed = false;
+      dom.addClass(this.domElement, GUI.CLASS_MAIN);
+      dom.makeSelectable(this.domElement, false);
+      if (SUPPORTS_LOCAL_STORAGE) {
+        var rv = this.useLocalStorage;
+        if (rv !== null) {
+          this.useLocalStorage = true;
+          var saved_gui = localStorage.getItem(getLocalStorageHash(this, "gui"));
+          if (saved_gui) {
+            params.load = Common.defaults(params.load || {}, JSON.parse(saved_gui));
+          }
+        }
+      }
+      this.__closeButton = document.createElement("div");
+      this.__closeButton.innerHTML = GUI.TEXT_CLOSED;
+      dom.addClass(this.__closeButton, GUI.CLASS_CLOSE_BUTTON);
+      this.domElement.appendChild(this.__closeButton);
+      dom.bind(this.__closeButton, "click", function () {
+        _this.closed = !_this.closed;
+      });
+    } else {
+      if (params.closed === undefined) {
+        params.closed = true;
+      }
+      var title_row_name = document.createTextNode(params.name);
+      dom.addClass(title_row_name, "controller-name");
+      var title_row = addRow(this, title_row_name);
+      var on_click_title = function on_click_title(e) {
+        e.preventDefault();
+        _this.closed = !_this.closed;
+        return false;
+      };
+      dom.addClass(this.__ul, GUI.CLASS_CLOSED);
+      dom.addClass(title_row, "title");
+      dom.bind(title_row, "click", on_click_title);
+      if (!params.closed) {
+        this.closed = false;
+      }
+    }
+    params.load = Common.defaults(params.load || {}, {
+      preset: DEFAULT_DEFAULT_PRESET_NAME,
+    });
     if (params.preset) {
       params.load.preset = params.preset;
     }
-  }
-  if (Common.isUndefined(params.parent) && params.hideable) {
-    hideable_guis.push(this);
-  }
-  params.resizable = Common.isUndefined(params.parent) && params.resizable;
-  if (params.autoPlace && Common.isUndefined(params.scrollable)) {
-    params.scrollable = true;
-  }
-  function saveToLocalStorage() {
-    if (_this.useLocalStorage) {
-      var save_record = _this.getSaveObject();
-      localStorage.setItem(getLocalStorageHash(_this, "gui"), JSON.stringify(save_record));
-    }
-  }
-  Object.defineProperties(this, {
-    parent: {
-      get: function get() {
-        return params.parent;
-      },
-    },
-    scrollable: {
-      get: function get() {
-        return params.scrollable;
-      },
-    },
-    autoPlace: {
-      get: function get() {
-        return params.autoPlace;
-      },
-    },
-    preset: {
-      get: function get() {
-        if (_this.parent) {
-          return _this.getRoot().preset;
+    if (params.autoPlace) {
+      if (Common.isUndefined(params.parent)) {
+        if (auto_place_virgin) {
+          auto_place_container = document.createElement("div");
+          dom.addClass(auto_place_container, CSS_NAMESPACE);
+          dom.addClass(auto_place_container, GUI.CLASS_AUTO_PLACE_CONTAINER);
+          document.body.appendChild(auto_place_container);
+          auto_place_virgin = false;
         }
-        return params.load.preset;
-      },
-      set: function set(v) {
-        if (_this.parent) {
-          _this.getRoot().preset = v;
-        } else {
-          params.load.preset = v;
-        }
-        setPresetSelectIndex(_this);
-        _this.revert();
-        return _this;
-      },
-    },
-    width: {
-      get: function get() {
-        return params.width;
-      },
-      set: function set(v) {
-        params.width = v;
-        setWidth(_this, v);
-        return _this;
-      },
-    },
-    name: {
-      get: function get() {
-        return params.name;
-      },
-      set: function set(v) {
-        if (v !== params.name && _this.__folders[v] !== undefined) {
-          throw new Error("name collision: another sibling GUI folder has the same name");
-        }
-        params.name = v;
-        if (title_row_name) {
-          title_row_name.innerHTML = params.name;
-        }
-        return _this;
-      },
-    },
-    closed: {
-      get: function get() {
-        return params.closed;
-      },
-      set: function set(v) {
-        params.closed = v;
-        if (params.closed) {
-          dom.addClass(_this.__ul, GUI.CLASS_CLOSED);
-        } else {
-          dom.removeClass(_this.__ul, GUI.CLASS_CLOSED);
-        }
-        _this.onResize();
-        if (_this.__closeButton) {
-          _this.__closeButton.innerHTML = v ? GUI.TEXT_OPEN : GUI.TEXT_CLOSED;
-        }
-        return _this;
-      },
-    },
-    load: {
-      get: function get() {
-        return params.load;
-      },
-    },
-    useLocalStorage: {
-      get: function get() {
-        if (!SUPPORTS_LOCAL_STORAGE) {
-          return null;
-        }
-        var rv = localStorage.getItem(getLocalStorageHash(_this, "isLocal"));
-        if (rv === "0") {
-          return true;
-        }
-        return rv === "true";
-      },
-      set: function set(bool) {
-        dom.unbind(window, "unload", saveToLocalStorage);
-        if (SUPPORTS_LOCAL_STORAGE) {
-          dom.bind(window, "unload", saveToLocalStorage);
-          if (bool == null) {
-            bool = 0;
-          } else {
-            bool = !!bool;
-          }
-          localStorage.setItem(getLocalStorageHash(_this, "isLocal"), bool);
-        }
-        return _this;
-      },
-    },
-  });
-  if (Common.isUndefined(params.parent)) {
-    params.closed = false;
-    dom.addClass(this.domElement, GUI.CLASS_MAIN);
-    dom.makeSelectable(this.domElement, false);
-    if (SUPPORTS_LOCAL_STORAGE) {
-      var rv = this.useLocalStorage;
-      if (rv !== null) {
-        this.useLocalStorage = true;
-        var saved_gui = localStorage.getItem(getLocalStorageHash(this, "gui"));
-        if (saved_gui) {
-          params.load = Common.defaults(params.load || {}, JSON.parse(saved_gui));
-        }
+        auto_place_container.appendChild(this.domElement);
+        dom.addClass(this.domElement, GUI.CLASS_AUTO_PLACE);
+      }
+      if (!this.parent) {
+        setWidth(this, params.width);
       }
     }
-    this.__closeButton = document.createElement("div");
-    this.__closeButton.innerHTML = GUI.TEXT_CLOSED;
-    dom.addClass(this.__closeButton, GUI.CLASS_CLOSE_BUTTON);
-    this.domElement.appendChild(this.__closeButton);
-    dom.bind(this.__closeButton, "click", function () {
-      _this.closed = !_this.closed;
-    });
-  } else {
-    if (params.closed === undefined) {
-      params.closed = true;
+    function onResizeHandler() {
+      _this.onResize();
     }
-    var title_row_name = document.createTextNode(params.name);
-    dom.addClass(title_row_name, "controller-name");
-    var title_row = addRow(this, title_row_name);
-    var on_click_title = function on_click_title(e) {
-      e.preventDefault();
-      _this.closed = !_this.closed;
-      return false;
+    dom.bind(window, "resize", onResizeHandler);
+    dom.bind(this.__ul, "webkitTransitionEnd", onResizeHandler);
+    dom.bind(this.__ul, "transitionend", onResizeHandler);
+    dom.bind(this.__ul, "oTransitionEnd", onResizeHandler);
+    onResizeHandler();
+    if (params.resizable) {
+      addResizeHandle(this);
+    }
+    this.saveToLocalStorageIfPossible = function () {
+      saveToLocalStorage();
+      return _this;
     };
-    dom.addClass(this.__ul, GUI.CLASS_CLOSED);
-    dom.addClass(title_row, "title");
-    dom.bind(title_row, "click", on_click_title);
-    if (!params.closed) {
-      this.closed = false;
+    function resetWidth() {
+      var root = _this.getRoot();
+      root.width += 1;
+      Common.defer(function () {
+        root.width -= 1;
+      });
+    }
+    if (!params.parent) {
+      resetWidth();
     }
   }
-  params.load = Common.defaults(params.load || {}, {
-    preset: DEFAULT_DEFAULT_PRESET_NAME,
-  });
-  if (params.preset) {
-    params.load.preset = params.preset;
-  }
-  if (params.autoPlace) {
-    if (Common.isUndefined(params.parent)) {
-      if (auto_place_virgin) {
-        auto_place_container = document.createElement("div");
-        dom.addClass(auto_place_container, CSS_NAMESPACE);
-        dom.addClass(auto_place_container, GUI.CLASS_AUTO_PLACE_CONTAINER);
-        document.body.appendChild(auto_place_container);
-        auto_place_virgin = false;
+  var _proto = GUI.prototype;
+  _proto.getControllerByName = function getControllerByName(name, recurse) {
+    var controllers = this.__controllers;
+    var i = controllers.length;
+    while (--i > -1) {
+      if (controllers[i].property === name) {
+        return controllers[i];
       }
-      auto_place_container.appendChild(this.domElement);
-      dom.addClass(this.domElement, GUI.CLASS_AUTO_PLACE);
     }
-    if (!this.parent) {
-      setWidth(this, params.width);
+    var folders = this.__folders;
+    var tryFI;
+    if (recurse) {
+      for (i in folders) {
+        tryFI = folders[i].getControllerByName(name, true);
+        if (tryFI != null) return tryFI;
+      }
     }
-  }
-  function onResizeHandler() {
-    _this.onResize();
-  }
-  dom.bind(window, "resize", onResizeHandler);
-  dom.bind(this.__ul, "webkitTransitionEnd", onResizeHandler);
-  dom.bind(this.__ul, "transitionend", onResizeHandler);
-  dom.bind(this.__ul, "oTransitionEnd", onResizeHandler);
-  onResizeHandler();
-  if (params.resizable) {
-    addResizeHandle(this);
-  }
-  this.saveToLocalStorageIfPossible = function () {
-    saveToLocalStorage();
-    return _this;
+    return null;
   };
-  function resetWidth() {
-    var root = _this.getRoot();
-    root.width += 1;
-    Common.defer(function () {
-      root.width -= 1;
+  _proto.getFolderByName = function getFolderByName(name) {
+    return this.__folders[name];
+  };
+  _proto.getAllControllers = function getAllControllers(recurse, myArray) {
+    if (recurse == undefined) recurse = true;
+    var i;
+    var arr = myArray != null ? myArray : [];
+    var controllers = this.__controllers;
+    for (i in controllers) {
+      arr.push(controllers[i]);
+    }
+    if (recurse) {
+      var folders = this.__folders;
+      for (i in folders) {
+        folders[i].getAllControllers(true, arr);
+      }
+    }
+    return arr;
+  };
+  _proto.getAllGUIs = function getAllGUIs(recurse, myArray) {
+    if (recurse == undefined) recurse = true;
+    var i;
+    var arr = myArray != null ? myArray : [this];
+    var folders = this.__folders;
+    for (i in folders) {
+      arr.push(folders[i]);
+    }
+    if (recurse) {
+      for (i in folders) {
+        folders[i].getAllGUIs(true, arr);
+      }
+    }
+    return arr;
+  };
+  _proto.toggleHide = function toggleHide() {
+    hide = !hide;
+    Common.each(hideable_guis, function (gui) {
+      gui.domElement.style.zIndex = hide ? -999 : 999;
+      gui.domElement.style.opacity = hide ? 0 : 1;
     });
-  }
-  if (!params.parent) {
-    resetWidth();
-  }
-};
-GUI.toggleHide = function () {
-  hide = !hide;
-  Common.each(hideable_guis, function (gui) {
-    gui.domElement.style.zIndex = hide ? -999 : 999;
-    gui.domElement.style.opacity = hide ? 0 : 1;
-  });
-};
-GUI.CLASS_AUTO_PLACE = "a";
-GUI.CLASS_AUTO_PLACE_CONTAINER = "ac";
-GUI.CLASS_MAIN = "main";
-GUI.CLASS_CONTROLLER_ROW = "cr";
-GUI.CLASS_TOO_TALL = "taller-than-window";
-GUI.CLASS_CLOSED = "closed";
-GUI.CLASS_CLOSE_BUTTON = "close-button";
-GUI.CLASS_DRAG = "drag";
-GUI.DEFAULT_WIDTH = 245;
-GUI.TEXT_CLOSED = "Close Controls";
-GUI.TEXT_OPEN = "Open Controls";
-dom.bind(
-  window,
-  "keydown",
-  function (e) {
-    if (document.activeElement.type !== "text" && (e.which === HIDE_KEY_CODE || e.keyCode === HIDE_KEY_CODE)) {
+  };
+  _proto._keydownHandler = function _keydownHandler(e) {
+    if (
+      document.activeElement &&
+      document.activeElement.type !== "text" &&
+      document.activeElement.nodeName.toString().toLowerCase() !== "textarea" &&
+      (e.which === HIDE_KEY_CODE || e.keyCode === HIDE_KEY_CODE)
+    ) {
       GUI.toggleHide();
     }
-  },
-  false
-);
-Common.extend(GUI.prototype, {
-  defineController: function defineController(controllerName, controllerTemplate) {
+  };
+  _proto.defineController = function defineController(controllerName, controllerTemplate) {
     this.__typeControllers[controllerName] = controllerTemplate;
-  },
-  findController: function findController(controllerName) {
+  };
+  _proto.findController = function findController(controllerName) {
     return this.__typeControllers[controllerName] || false;
-  },
-  add: function add(object, property) {
+  };
+  _proto.add = function add(object, property) {
     return _add(this, object, property, {
-      factoryArgs: ARR_SLICE$1.call(arguments, 2),
+      factoryArgs: ARR_SLICE$2.call(arguments, 2),
     });
-  },
-  addColor: function addColor(object, property) {
+  };
+  _proto.addColor = function addColor(object, property) {
     return _add(this, object, property, {
       controller: "color",
     });
-  },
-  addAs: function addAs(object, property, controller) {
+  };
+  _proto.addAs = function addAs(object, property, controller) {
     return _add(this, object, property, {
       controller: controller,
-      factoryArgs: ARR_SLICE$1.call(arguments, 3),
+      factoryArgs: ARR_SLICE$2.call(arguments, 3),
     });
-  },
-  remove: function remove(controller) {
+  };
+  _proto.remove = function remove(controller) {
     this.__ul.removeChild(controller.__li);
     this.__controllers.splice(this.__controllers.indexOf(controller), 1);
     var _this = this;
@@ -2583,13 +2691,13 @@ Common.extend(GUI.prototype, {
       _this.onResize();
     });
     return this;
-  },
-  destroy: function destroy() {
+  };
+  _proto.destroy = function destroy() {
     if (this.autoPlace) {
       auto_place_container.removeChild(this.domElement);
     }
-  },
-  addFolder: function addFolder(name) {
+  };
+  _proto.addFolder = function addFolder(name) {
     if (this.__folders[name] !== undefined) {
       throw new Error('You already have a folder in this GUI by the name "' + name + '"');
     }
@@ -2607,16 +2715,16 @@ Common.extend(GUI.prototype, {
     var li = addRow(this, gui.domElement);
     dom.addClass(li, "folder");
     return gui;
-  },
-  open: function open() {
+  };
+  _proto.open = function open() {
     this.closed = false;
     return this;
-  },
-  close: function close() {
+  };
+  _proto.close = function close() {
     this.closed = true;
     return this;
-  },
-  onResize: function onResize() {
+  };
+  _proto.onResize = function onResize() {
     var root = this.getRoot();
     if (root.scrollable) {
       var _dom$getOffset = dom.getOffset(root.__ul),
@@ -2643,8 +2751,8 @@ Common.extend(GUI.prototype, {
     if (root.__closeButton) {
       root.__closeButton.style.width = root.width + "px";
     }
-  },
-  remember: function remember() {
+  };
+  _proto.remember = function remember() {
     if (Common.isUndefined(SAVE_DIALOGUE)) {
       SAVE_DIALOGUE = new CenteredDiv();
       SAVE_DIALOGUE.domElement.innerHTML = saveDialogueContents;
@@ -2653,7 +2761,7 @@ Common.extend(GUI.prototype, {
       throw new Error("You can only call remember on a top level GUI.");
     }
     var _this = this;
-    Common.each(ARR_SLICE$1.call(arguments), function (object) {
+    Common.each(ARR_SLICE$2.call(arguments), function (object) {
       if (_this.__rememberedObjects.length === 0) {
         addSaveMenu(_this);
       }
@@ -2677,15 +2785,15 @@ Common.extend(GUI.prototype, {
       setWidth(this, this.width);
     }
     return this;
-  },
-  getRoot: function getRoot() {
+  };
+  _proto.getRoot = function getRoot() {
     var gui = this;
     while (gui.parent) {
       gui = gui.parent;
     }
     return gui;
-  },
-  getSaveObject: function getSaveObject() {
+  };
+  _proto.getSaveObject = function getSaveObject() {
     var toReturn = this.load;
     toReturn.closed = this.closed;
     if (this.__rememberedObjects.length > 0) {
@@ -2700,8 +2808,8 @@ Common.extend(GUI.prototype, {
       toReturn.folders[key] = element.getSaveObject();
     });
     return toReturn;
-  },
-  save: function save() {
+  };
+  _proto.save = function save() {
     if (!this.load.remembered) {
       this.load.remembered = {};
     }
@@ -2709,8 +2817,8 @@ Common.extend(GUI.prototype, {
     markPresetModified(this, false);
     this.saveToLocalStorageIfPossible();
     return this;
-  },
-  saveAs: function saveAs(presetName) {
+  };
+  _proto.saveAs = function saveAs(presetName) {
     if (!this.load.remembered) {
       this.load.remembered = {};
       this.load.remembered[DEFAULT_DEFAULT_PRESET_NAME] = getCurrentPreset(this, true);
@@ -2720,8 +2828,8 @@ Common.extend(GUI.prototype, {
     addPresetOption(this, presetName, true);
     this.saveToLocalStorageIfPossible();
     return this;
-  },
-  revert: function revert(gui) {
+  };
+  _proto.revert = function revert(gui) {
     Common.each(
       this.__controllers,
       function (controller) {
@@ -2740,26 +2848,39 @@ Common.extend(GUI.prototype, {
       markPresetModified(this.getRoot(), false);
     }
     return this;
-  },
-  resetLocalStorage: function resetLocalStorage() {
+  };
+  _proto.resetLocalStorage = function resetLocalStorage() {
     if (SUPPORTS_LOCAL_STORAGE) {
       localStorage.removeItem(getLocalStorageHash(this, "isLocal"));
       localStorage.removeItem(getLocalStorageHash(this, "gui"));
     }
     return this;
-  },
-  listen: function listen(controller) {
+  };
+  _proto.listen = function listen(controller) {
     var init = this.__listening.length === 0;
     this.__listening.push(controller);
     if (init) {
       updateDisplays(this.__listening);
     }
     return this;
-  },
-});
+  };
+  return GUI;
+})();
+GUI.CLASS_AUTO_PLACE = "a";
+GUI.CLASS_AUTO_PLACE_CONTAINER = "ac";
+GUI.CLASS_MAIN = "main";
+GUI.CLASS_CONTROLLER_ROW = "cr";
+GUI.CLASS_TOO_TALL = "taller-than-window";
+GUI.CLASS_CLOSED = "closed";
+GUI.CLASS_CLOSE_BUTTON = "close-button";
+GUI.CLASS_DRAG = "drag";
+GUI.DEFAULT_WIDTH = 245;
+GUI.TEXT_CLOSED = "Close Controls";
+GUI.TEXT_OPEN = "Open Controls";
+dom.bind(window, "keydown", GUI._keydownHandler);
 function _add(gui, object, property, params) {
   var factoryArgs = [object, property, params.controller, gui.__typeControllers].concat(params.factoryArgs);
-  var controller = controllerFactory.apply(gui, factoryArgs);
+  var controller = ControllerFactory.apply(gui, factoryArgs);
   if (!controller) {
     if (!(property in object)) {
       throw new Error("Object " + object + ' has no property "' + property + '"');
@@ -2858,7 +2979,7 @@ function augmentController(gui, li, controller) {
         var pc = controller[method];
         var pb = box[method];
         controller[method] = box[method] = function () {
-          var args = ARR_SLICE$1.call(arguments);
+          var args = ARR_SLICE$2.call(arguments);
           pc.apply(controller, args);
           return pb.apply(box, args);
         };
@@ -2987,7 +3108,7 @@ function addSaveMenu(gui) {
   }
   if (SUPPORTS_LOCAL_STORAGE) {
     var saveLocally = document.getElementById("dg-save-locally");
-    var explain = document.getElementById("dg-local-explain");
+    var _explain = document.getElementById("dg-local-explain");
     saveLocally.style.display = "block";
     var localStorageCheckBox = document.getElementById("dg-local-storage");
     if (localStorage.getItem(getLocalStorageHash(gui, "isLocal")) === "true") {

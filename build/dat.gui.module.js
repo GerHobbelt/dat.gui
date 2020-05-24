@@ -935,7 +935,7 @@ var OptionController = (function (_Controller) {
   return OptionController;
 })(Controller);
 
-var StringController = (function (_Controller) {
+var StringController$1 = (function (_Controller) {
   _inheritsLoose(StringController, _Controller);
   function StringController(object, property) {
     var _this2;
@@ -982,7 +982,7 @@ function numDecimals(x) {
   }
   return 0;
 }
-var NumberController = (function (_Controller) {
+var NumberController$1 = (function (_Controller) {
   _inheritsLoose(NumberController, _Controller);
   function NumberController(object, property, params) {
     var _this;
@@ -1119,7 +1119,7 @@ var NumberControllerBox = (function (_NumberController) {
     return _NumberController.prototype.step.apply(this, arguments);
   };
   return NumberControllerBox;
-})(NumberController);
+})(NumberController$1);
 
 function map(v, i1, i2, o1, o2) {
   return o1 + (o2 - o1) * ((v - i1) / (i2 - i1));
@@ -1211,7 +1211,7 @@ var NumberControllerSlider = (function (_NumberController) {
     return _NumberController.prototype.updateDisplay.call(this);
   };
   return NumberControllerSlider;
-})(NumberController);
+})(NumberController$1);
 
 var FunctionController = (function (_Controller) {
   _inheritsLoose(FunctionController, _Controller);
@@ -1651,7 +1651,7 @@ var Vec3Controller = (function (_NumberController) {
     return _NumberController.prototype.updateDisplay.call(this);
   };
   return Vec3Controller;
-})(NumberController);
+})(NumberController$1);
 function roundToDecimal$1(value, decimals) {
   var tenTo = Math.pow(10, decimals);
   return Math.round(value * tenTo) / tenTo;
@@ -1702,7 +1702,7 @@ var controllerFactory = function controllerFactory(object, property) {
     });
   }
   if (Common.isString(initialValue)) {
-    return new StringController(object, property);
+    return new StringController$1(object, property);
   }
   if (Common.isFunction(initialValue)) {
     var arg1 = optionalArgs[0];
@@ -2351,7 +2351,7 @@ var CLOSE_BUTTON_HEIGHT = 20;
 var DEFAULT_DEFAULT_PRESET_NAME = "Default";
 var SUPPORTS_LOCAL_STORAGE = (function () {
   try {
-    return "localStorage" in window && window.localStorage != null;
+    return "localStorage" in window && !!window.localStorage;
   } catch (e) {
     return false;
   }
@@ -2364,6 +2364,19 @@ var hideable_guis = [];
 var GUI = (function () {
   function GUI(params) {
     var _this = this;
+    params = params || {};
+    this.__typeControllers = {
+      color: ColorController,
+      option: OptionController,
+      numberSlider: NumberControllerSlider,
+      numberBox: NumberControllerBox,
+      number: NumberController,
+      string: StringController,
+      image: ImageController,
+      function: FunctionController,
+      boolean: BooleanController,
+      object: ObjectController,
+    };
     this.domElement = document.createElement("div");
     this.__ul = document.createElement("ul");
     this.domElement.appendChild(this.__ul);
@@ -2374,7 +2387,6 @@ var GUI = (function () {
     this.__rememberedObjects = [];
     this.__rememberedObjectIndecesToControllers = [];
     this.__listening = [];
-    params = params || {};
     params = Common.defaults(params, {
       autoPlace: true,
       width: GUI.DEFAULT_WIDTH,
@@ -2442,6 +2454,7 @@ var GUI = (function () {
         set: function set(v) {
           params.width = v;
           setWidth(_this, v);
+          return _this;
         },
       },
       name: {
@@ -2456,6 +2469,7 @@ var GUI = (function () {
           if (title_row_name) {
             title_row_name.innerHTML = params.name;
           }
+          return _this;
         },
       },
       closed: {
@@ -2473,6 +2487,7 @@ var GUI = (function () {
           if (_this.__closeButton) {
             _this.__closeButton.innerHTML = v ? GUI.TEXT_OPEN : GUI.TEXT_CLOSED;
           }
+          return _this;
         },
       },
       load: {
@@ -2494,6 +2509,7 @@ var GUI = (function () {
             }
             localStorage.setItem(getLocalStorageHash(_this, "isLocal"), bool);
           }
+          return _this;
         },
       },
     });
@@ -2558,14 +2574,14 @@ var GUI = (function () {
         setWidth(_this, params.width);
       }
     }
-    function __resizeHandler() {
+    function onResizeHandler() {
       _this.onResize();
     }
-    dom.bind(window, "resize", __resizeHandler);
-    dom.bind(this.__ul, "webkitTransitionEnd", __resizeHandler);
-    dom.bind(this.__ul, "transitionend", __resizeHandler);
-    dom.bind(this.__ul, "oTransitionEnd", __resizeHandler);
-    this.onResize();
+    dom.bind(window, "resize", onResizeHandler);
+    dom.bind(this.__ul, "webkitTransitionEnd", onResizeHandler);
+    dom.bind(this.__ul, "transitionend", onResizeHandler);
+    dom.bind(this.__ul, "oTransitionEnd", onResizeHandler);
+    onResizeHandler();
     if (params.resizable) {
       addResizeHandle(this);
     }
@@ -2574,7 +2590,10 @@ var GUI = (function () {
         localStorage.setItem(getLocalStorageHash(_this, "gui"), JSON.stringify(_this.getSaveObject()));
       }
     };
-    this.saveToLocalStorageIfPossible = saveToLocalStorage;
+    this.saveToLocalStorageIfPossible = function () {
+      saveToLocalStorage();
+      return _this;
+    };
     var root = _this.getRoot();
     function resetWidth() {
       var root = _this.getRoot();
@@ -2653,9 +2672,10 @@ var GUI = (function () {
   };
   _proto._keydownHandler = function _keydownHandler(e) {
     if (
+      document.activeElement &&
       document.activeElement.type !== "text" &&
       document.activeElement.nodeName.toString().toLowerCase() !== "textarea" &&
-      (e.which === HIDE_KEY_CODE || e.keyCode == HIDE_KEY_CODE)
+      (e.which === HIDE_KEY_CODE || e.keyCode === HIDE_KEY_CODE)
     ) {
       GUI.toggleHide();
     }
@@ -2705,6 +2725,7 @@ var GUI = (function () {
     Common.defer(function () {
       _this.onResize();
     });
+    return this;
   };
   _proto.destroy = function destroy() {
     if (this.autoPlace) {
@@ -2736,9 +2757,11 @@ var GUI = (function () {
   };
   _proto.open = function open() {
     this.closed = false;
+    return this;
   };
   _proto.close = function close() {
     this.closed = true;
+    return this;
   };
   _proto.onResize = function onResize() {
     var root = this.getRoot();
@@ -2788,6 +2811,7 @@ var GUI = (function () {
     if (this.autoPlace) {
       setWidth(this, this.width);
     }
+    return this;
   };
   _proto.getRoot = function getRoot() {
     var gui = this;
@@ -2819,6 +2843,7 @@ var GUI = (function () {
     this.load.remembered[this.preset] = getCurrentPreset(this);
     markPresetModified(this, false);
     this.saveToLocalStorageIfPossible();
+    return this;
   };
   _proto.saveAs = function saveAs(presetName) {
     if (!this.load.remembered) {
@@ -2829,6 +2854,7 @@ var GUI = (function () {
     this.preset = presetName;
     addPresetOption(this, presetName, true);
     this.saveToLocalStorageIfPossible();
+    return this;
   };
   _proto.revert = function revert(gui) {
     Common.each(
@@ -2848,13 +2874,15 @@ var GUI = (function () {
     if (!gui) {
       markPresetModified(this.getRoot(), false);
     }
+    return this;
   };
   _proto.listen = function listen(controller) {
-    var init = this.__listening.length == 0;
+    var init = this.__listening.length === 0;
     this.__listening.push(controller);
     if (init) {
       updateDisplays(this.__listening);
     }
+    return this;
   };
   return GUI;
 })();
@@ -2920,7 +2948,7 @@ function addRow(gui, dom, liBefore) {
     li.appendChild(dom);
   }
   if (liBefore) {
-    gui.__ul.insertBefore(li, params.before);
+    gui.__ul.insertBefore(li, liBefore);
   } else {
     gui.__ul.appendChild(li);
   }
@@ -3013,9 +3041,9 @@ function augmentController(gui, li, controller) {
     });
   } else if (controller instanceof ColorController) {
     dom.addClass(li, "color");
-    controller.updateDisplay = Common.compose(function (r) {
-      li.style.borderLeftColor = controller.__color.toString();
-      return r;
+    controller.updateDisplay = Common.compose(function (val) {
+      li.style.borderLeftColor = controller.__color.toHexString();
+      return val;
     }, controller.updateDisplay);
     controller.updateDisplay();
   } else if (controller instanceof EasingFunctionController) {
@@ -3025,11 +3053,11 @@ function augmentController(gui, li, controller) {
     }, controller.updateDisplay);
     controller.updateDisplay();
   }
-  controller.setValue = Common.compose(function (r) {
+  controller.setValue = Common.compose(function (val) {
     if (gui.getRoot().__preset_select && controller.isModified()) {
       markPresetModified(gui.getRoot(), true);
     }
-    return r;
+    return val;
   }, controller.setValue);
 }
 function recallSavedValue(gui, controller) {
@@ -3257,8 +3285,8 @@ var controllers = {
   Controller: Controller,
   BooleanController: BooleanController,
   OptionController: OptionController,
-  StringController: StringController,
-  NumberController: NumberController,
+  StringController: StringController$1,
+  NumberController: NumberController$1,
   NumberControllerBox: NumberControllerBox,
   NumberControllerSlider: NumberControllerSlider,
   FunctionController: FunctionController,

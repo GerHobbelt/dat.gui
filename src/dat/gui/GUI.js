@@ -48,7 +48,7 @@ const DEFAULT_DEFAULT_PRESET_NAME = "Default";
 
 const SUPPORTS_LOCAL_STORAGE = (function () {
   try {
-    return "localStorage" in window && window.localStorage != null;
+    return "localStorage" in window && !!window.localStorage;
   } catch (e) {
     return false;
   }
@@ -69,27 +69,56 @@ let hide = false;
 const hideable_guis = [];
 
 /**
- * @class A lightweight controller library for JavaScript. It allows you to easily
+ * A lightweight controller library for JavaScript. It allows you to easily
  * manipulate variables and fire functions on the fly.
- * @class
  *
- * @member dat.gui
+ * @typicalname gui
+ *
+ * @example
+ * // Creating a GUI with options.
+ * var gui = new dat.GUI({name: 'My GUI'});
+ *
+ * @example
+ * // Creating a GUI and a subfolder.
+ * var gui = new dat.GUI();
+ * var folder1 = gui.addFolder('Flow Field');
  *
  * @param {Object} [params]
  * @param {String} [params.name] The name of this GUI.
- * @param {Object} [params.load] JSON object representing the saved state of
- * this GUI.
- * @param {Boolean} [params.auto=true]
- * @param {dat.gui.GUI} [params.parent] The GUI I'm nested in.
- * @param {Boolean} [params.closed] If true, starts closed
+ * @param {Object} [params.load] JSON object representing the saved state of this GUI.
+ * @param {Object} [params.object] Providing your object will create a controller for each property automatically
+ * @param {GUI} [params.parent] The GUI I'm nested in.
+ * @param {Boolean} [params.autoPlace=true]
+ * @param {Boolean} [params.hideable=true] If true, GUI is shown/hidden by <kbd>h</kbd> keypress.
+ * @param {Boolean} [params.closed=false] If true, starts closed
+ * @param {Boolean} [params.closeOnTop=false] If true, close/open button shows on top of the GUI
  */
 class GUI {
   constructor(params) {
     const _this = this;
 
+    params = params || {};
+
+    this.__typeControllers = {
+      color: ColorController,
+      option: OptionController,
+      numberSlider: NumberControllerSlider,
+      numberBox: NumberControllerBox,
+      number: NumberController,
+      string: StringController,
+      image: ImageController,
+      function: FunctionController,
+      boolean: BooleanController,
+      object: ObjectController,
+      // WARNING: never add the Null and Undefined controllers to the standard lookup list as this will break the ControllerFactory internals:
+      //
+      // 'null': NullController,
+      // 'undefined': UndefinedController
+    };
+
     /**
      * Outermost DOM Element
-     * @type DOMElement
+     * @type {DOMElement}
      */
     this.domElement = document.createElement("div");
     this.__ul = document.createElement("ul");
@@ -140,8 +169,6 @@ class GUI {
 
     this.__listening = [];
 
-    params = params || {};
-
     // Default parameters
     params = common.defaults(params, {
       autoPlace: true,
@@ -185,12 +212,11 @@ class GUI {
 
     Object.defineProperties(
       this,
-
-      /** @lends dat.gui.GUI.prototype */
+      /** @lends GUI.prototype */
       {
         /**
          * The parent <code>GUI</code>
-         * @type dat.gui.GUI
+         * @type GUI
          */
         parent: {
           get: function () {
@@ -248,6 +274,7 @@ class GUI {
           set: function (v) {
             params.width = v;
             setWidth(_this, v);
+            return _this;
           },
         },
 
@@ -271,6 +298,7 @@ class GUI {
             if (title_row_name) {
               title_row_name.innerHTML = params.name;
             }
+            return _this;
           },
         },
 
@@ -290,13 +318,14 @@ class GUI {
               dom.removeClass(_this.__ul, GUI.CLASS_CLOSED);
             }
             // For browsers that aren't going to respect the CSS transition,
-            // Lets just check our height against the window height right off
+            // Let's just check our height against the window height right off
             // the bat.
             _this.onResize();
 
             if (_this.__closeButton) {
               _this.__closeButton.innerHTML = v ? GUI.TEXT_OPEN : GUI.TEXT_CLOSED;
             }
+            return _this;
           },
         },
 
@@ -329,6 +358,7 @@ class GUI {
               }
               localStorage.setItem(getLocalStorageHash(_this, "isLocal"), bool);
             }
+            return _this;
           },
         },
       }
@@ -419,15 +449,15 @@ class GUI {
       }
     }
 
-    function __resizeHandler() {
+    function onResizeHandler() {
       _this.onResize();
     }
 
-    dom.bind(window, "resize", __resizeHandler);
-    dom.bind(this.__ul, "webkitTransitionEnd", __resizeHandler);
-    dom.bind(this.__ul, "transitionend", __resizeHandler);
-    dom.bind(this.__ul, "oTransitionEnd", __resizeHandler);
-    this.onResize();
+    dom.bind(window, "resize", onResizeHandler);
+    dom.bind(this.__ul, "webkitTransitionEnd", onResizeHandler);
+    dom.bind(this.__ul, "transitionend", onResizeHandler);
+    dom.bind(this.__ul, "oTransitionEnd", onResizeHandler);
+    onResizeHandler();
 
     if (params.resizable) {
       addResizeHandle(this);
@@ -440,7 +470,10 @@ class GUI {
     };
 
     // expose this method publicly
-    this.saveToLocalStorageIfPossible = saveToLocalStorage;
+    this.saveToLocalStorageIfPossible = function () {
+      saveToLocalStorage();
+      return _this;
+    };
 
     const root = _this.getRoot();
 
@@ -504,11 +537,12 @@ class GUI {
     return arr;
   }
 
-  /*
-   *  Gets this current GUI (usually) and all sub-folder GUIs under this GUI as an array of {name/gui} pairs. The "this" current gui uses empty string.
-   *  @param  recurse (optional) By default, it will recurse multiple levels deep. Set to false to only scan current level from current GUI.
-   *  @param  myArray (optional) Supply an existing array to use instead.  If supplied, will not push current GUI into array, only the subfolder GUIs.
-   *  @return   The array of {name/gui} value pairs
+  /**
+   * Gets this current GUI (usually) and all sub-folder GUIs under this GUI as an array of {name/gui} pairs. The "this" current gui uses empty string.
+   *
+   * @param  recurse (optional) By default, it will recurse multiple levels deep. Set to false to only scan current level from current GUI.
+   * @param  myArray (optional) Supply an existing array to use instead.  If supplied, will not push current GUI into array, only the subfolder GUIs.
+   * @return   The array of {name/gui} value pairs
    */
   getAllGUIs(recurse, myArray) {
     if (recurse == undefined) recurse = true;
@@ -538,9 +572,10 @@ class GUI {
 
   _keydownHandler(e) {
     if (
+      document.activeElement &&
       document.activeElement.type !== "text" &&
       document.activeElement.nodeName.toString().toLowerCase() !== "textarea" &&
-      (e.which === HIDE_KEY_CODE || e.keyCode == HIDE_KEY_CODE)
+      (e.which === HIDE_KEY_CODE || e.keyCode === HIDE_KEY_CODE)
     ) {
       GUI.toggleHide();
     }
@@ -550,7 +585,6 @@ class GUI {
    * @param object
    * @param property
    * @returns {dat.controllers.Controller} The new controller that was added.
-   * @instance
    */
   add(object, property, ...factoryArgs) {
     return add(this, object, property, { factoryArgs });
@@ -560,7 +594,6 @@ class GUI {
    * @param object
    * @param property
    * @returns {dat.controllers.ColorController} The new controller that was added.
-   * @instance
    */
   addColor(object, property) {
     return add(this, object, property, {
@@ -572,7 +605,6 @@ class GUI {
    * @param object
    * @param property
    * @returns {dat.controllers.TextAreaController} The new controller that was added.
-   * @instance
    */
   addTextArea(object, property) {
     return add(this, object, property, {
@@ -584,7 +616,6 @@ class GUI {
    * @param object
    * @param property
    * @returns {dat.controllers.EasingFunctionController} The new controller that was added.
-   * @instance
    */
   addEasingFunction(object, property) {
     return add(this, object, property, {
@@ -596,7 +627,6 @@ class GUI {
    * @param object
    * @param property
    * @returns {dat.controllers.HifiColorController} The new controller that was added.
-   * @instance
    */
   addHifiColor(object, property) {
     return add(this, object, property, {
@@ -608,7 +638,6 @@ class GUI {
    * @param object
    * @param property
    * @returns {dat.controllers.Vec3Controller} The new controller that was added.
-   * @instance
    */
   addVec3(object, property) {
     return add(this, object, property, {
@@ -620,7 +649,6 @@ class GUI {
    * @param object
    * @param property
    * @returns {dat.controllers.QuatController} The new controller that was added.
-   * @instance
    */
   addQuat(object, property) {
     return add(this, object, property, {
@@ -629,8 +657,8 @@ class GUI {
   }
 
   /**
-   * @param controller
-   * @instance
+   * Removes the given controller from the GUI.
+   * @param {Controller} controller
    */
   remove(controller) {
     // TODO listening?
@@ -640,12 +668,12 @@ class GUI {
     common.defer(function () {
       _this.onResize();
     });
+    return this;
   }
 
   /**
    * Removes the root GUI from the document and unbinds all event listeners.
    * For subfolders, use `gui.removeFolder(folder)` instead.
-   * @instance
    */
   destroy() {
     if (this.autoPlace) {
@@ -659,7 +687,6 @@ class GUI {
    * @returns {dat.gui.GUI} The new folder.
    * @throws {Error} if this GUI already has a folder by the specified
    * name
-   * @instance
    */
   addFolder(name) {
     // We have to prevent collisions on names in order to have a key
@@ -679,7 +706,6 @@ class GUI {
     new_gui_params.autoPlace = this.autoPlace;
 
     // Do we have saved appearance data for this folder?
-
     if (
       // Anything loaded?
       this.load &&
@@ -713,6 +739,7 @@ class GUI {
    */
   open() {
     this.closed = false;
+    return this;
   }
 
   /**
@@ -720,6 +747,7 @@ class GUI {
    */
   close() {
     this.closed = true;
+    return this;
   }
 
   onResize() {
@@ -762,9 +790,8 @@ class GUI {
    *
    * @param {...Object} objects
    * @throws {Error} if not called on a top level GUI.
-   * @instance
    */
-  remember() {
+  remember(/* ...args */) {
     if (common.isUndefined(SAVE_DIALOGUE)) {
       SAVE_DIALOGUE = new CenteredDiv();
       SAVE_DIALOGUE.domElement.innerHTML = saveDialogueContents;
@@ -789,11 +816,11 @@ class GUI {
       // Set save row width
       setWidth(this, this.width);
     }
+    return this;
   }
 
   /**
-   * @returns {dat.gui.GUI} the topmost parent GUI of a nested GUI.
-   * @instance
+   * @returns {GUI} the topmost parent GUI of a nested GUI.
    */
   getRoot() {
     let gui = this;
@@ -806,7 +833,6 @@ class GUI {
   /**
    * @returns {Object} a JSON object representing the current state of
    * this GUI as well as its remembered properties.
-   * @instance
    */
   getSaveObject() {
     const toReturn = this.load;
@@ -832,6 +858,11 @@ class GUI {
     return toReturn;
   }
 
+  /**
+   * TODO:
+   * [save description]
+   * @return {GUI} [description]
+   */
   save() {
     if (!this.load.remembered) {
       this.load.remembered = {};
@@ -840,8 +871,15 @@ class GUI {
     this.load.remembered[this.preset] = getCurrentPreset(this);
     markPresetModified(this, false);
     this.saveToLocalStorageIfPossible();
+    return this;
   }
 
+  /**
+   * TODO:
+   * [saveAs description]
+   * @param  {String} presetName  [description]
+   * @return {GUI}    [description]
+   */
   saveAs(presetName) {
     if (!this.load.remembered) {
       // Retain default values upon first save
@@ -853,8 +891,15 @@ class GUI {
     this.preset = presetName;
     addPresetOption(this, presetName, true);
     this.saveToLocalStorageIfPossible();
+    return this;
   }
 
+  /**
+   * TODO:
+   * [revert description]
+   * @param  {GUI} gui [description]
+   * @return {GUI}     [description]
+   */
   revert(gui) {
     common.each(
       this.__controllers,
@@ -876,14 +921,22 @@ class GUI {
     if (!gui) {
       markPresetModified(this.getRoot(), false);
     }
+    return this;
   }
 
+  /**
+   * TODO:
+   * listen description
+   * @param  {Controller} controller [description]
+   * @return {GUI}            [description]
+   */
   listen(controller) {
-    const init = this.__listening.length == 0;
+    const init = this.__listening.length === 0;
     this.__listening.push(controller);
     if (init) {
       updateDisplays(this.__listening);
     }
+    return this;
   }
 }
 
@@ -971,8 +1024,9 @@ function addRow(gui, dom, liBefore) {
   if (dom) {
     li.appendChild(dom);
   }
+
   if (liBefore) {
-    gui.__ul.insertBefore(li, params.before);
+    gui.__ul.insertBefore(li, liBefore);
   } else {
     gui.__ul.appendChild(li);
   }
@@ -1106,9 +1160,9 @@ function augmentController(gui, li, controller) {
     });
   } else if (controller instanceof ColorController) {
     dom.addClass(li, "color");
-    controller.updateDisplay = common.compose(function (r) {
-      li.style.borderLeftColor = controller.__color.toString();
-      return r;
+    controller.updateDisplay = common.compose(function (val) {
+      li.style.borderLeftColor = controller.__color.toHexString();
+      return val;
     }, controller.updateDisplay);
 
     controller.updateDisplay();
@@ -1124,12 +1178,12 @@ function augmentController(gui, li, controller) {
     controller.updateDisplay();
   }
 
-  controller.setValue = common.compose(function (r) {
+  controller.setValue = common.compose(function (val) {
     if (gui.getRoot().__preset_select && controller.isModified()) {
       markPresetModified(gui.getRoot(), true);
     }
 
-    return r;
+    return val;
   }, controller.setValue);
 }
 
@@ -1390,7 +1444,7 @@ function getCurrentPreset(gui, useInitialValues) {
   common.each(gui.__rememberedObjects, function (val, index) {
     const saved_values = {};
 
-    // The controllers I've made for thcommon.isObject by property
+    // The controllers I've made for this object by property
     const controller_map = gui.__rememberedObjectIndecesToControllers[index];
 
     // Remember each value for each property

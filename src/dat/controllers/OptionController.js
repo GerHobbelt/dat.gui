@@ -75,7 +75,7 @@ class OptionController extends Controller {
 
     dom.bind(this.__select, "change", function () {
       let desiredValue = this.options[this.selectedIndex].value;
-      if (value === _this.CUSTOM_FLAG) {
+      if (desiredValue === _this.CUSTOM_FLAG) {
         desiredValue = _this.__custom_controller.getValue();
       }
       _this.setValue(desiredValue);

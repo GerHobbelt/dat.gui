@@ -13,6 +13,7 @@
 
 import Controller from "./Controller";
 import dom from "../dom/dom";
+import common from "../utils/common";
 
 /**
  * @class Provides a GUI interface to fire a specified method, a property of an object.

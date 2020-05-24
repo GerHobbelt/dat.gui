@@ -622,7 +622,7 @@ Object.defineProperty(Color.prototype, "hex", {
 
 var Controller = (function () {
   function Controller(object, property, type, options) {
-    this.__dyninfo = common.setupDynamicProperty(object, property);
+    this.__dyninfo = Common.setupDynamicProperty(object, property);
     this.initialValue = !this.__dyninfo ? object[property] : this.__dyninfo.getter.call(object);
     this.domElement = document.createElement("div");
     this.object = object;
@@ -984,7 +984,7 @@ var BooleanController = (function (_Controller) {
   return BooleanController;
 })(Controller);
 
-var OptionController$1 = (function (_Controller) {
+var OptionController = (function (_Controller) {
   _inheritsLoose(OptionController, _Controller);
   function OptionController(object, property, params, options) {
     var _this2;
@@ -1018,7 +1018,7 @@ var OptionController$1 = (function (_Controller) {
     _this2.updateDisplay();
     dom.bind(_this2.__select, "change", function () {
       var desiredValue = this.options[this.selectedIndex].value;
-      if (value === _this.CUSTOM_FLAG) {
+      if (desiredValue === _this.CUSTOM_FLAG) {
         desiredValue = _this.__custom_controller.getValue();
       }
       _this.setValue(desiredValue);
@@ -1065,7 +1065,7 @@ var OptionController$1 = (function (_Controller) {
   return OptionController;
 })(Controller);
 
-var StringController$1 = (function (_Controller) {
+var StringController = (function (_Controller) {
   _inheritsLoose(StringController, _Controller);
   function StringController(object, property, options) {
     var _this2;
@@ -1124,7 +1124,7 @@ function guestimateImpliedStep(initialValue, userSpecifiedStep, minimumSaneStepS
   }
   return Math.max(minimumSaneStepSize, Math.min(maximumSaneStepSize, v));
 }
-var NumberController$1 = (function (_Controller) {
+var NumberController = (function (_Controller) {
   _inheritsLoose(NumberController, _Controller);
   function NumberController(object, property, params, options) {
     var _this;
@@ -1305,7 +1305,7 @@ var NumberControllerBox = (function (_NumberController) {
     return _NumberController.prototype.updateDisplay.call(this);
   };
   return NumberControllerBox;
-})(NumberController$1);
+})(NumberController);
 
 function map(v, i1, i2, o1, o2) {
   return o1 + (o2 - o1) * ((v - i1) / (i2 - i1));
@@ -1382,13 +1382,13 @@ var NumberControllerSlider = (function (_NumberController) {
     return _NumberController.prototype.updateDisplay.call(this);
   };
   return NumberControllerSlider;
-})(NumberController$1);
+})(NumberController);
 
 var FunctionController = (function (_Controller) {
   _inheritsLoose(FunctionController, _Controller);
   function FunctionController(object, property, text, user_data) {
     var _this2;
-    if (!common.isUndefined(user_data) && !common.isArray(user_data)) {
+    if (!Common.isUndefined(user_data) && !Common.isArray(user_data)) {
       user_data = [user_data];
     }
     _this2 = _Controller.call(this, object, property) || this;
@@ -1407,7 +1407,7 @@ var FunctionController = (function (_Controller) {
   }
   var _proto = FunctionController.prototype;
   _proto.fire = function fire(user_data, silent) {
-    if (!common.isUndefined(user_data) && !common.isArray(user_data)) {
+    if (!Common.isUndefined(user_data) && !Common.isArray(user_data)) {
       user_data = [user_data];
     }
     var msg = {
@@ -1867,7 +1867,7 @@ var ImageController = (function (_Controller) {
 var saveDialogueContents =
   '<div id="dg-save" class="dg dialogue">\n  Here\'s the new load parameter for your <code>GUI</code>\'s constructor:\n\n  <textarea id="dg-new-constructor"></textarea>\n\n  <div id="dg-save-locally">\n    <input id="dg-local-storage" type="checkbox">\n    Automatically save values to <code>localStorage</code> on exit.\n\n    <div id="dg-local-explain">\n      The values saved to <code>localStorage</code> will override those passed to <code>dat.GUI</code>\'s constructor.\n      This makes it easier to work incrementally, but <code>localStorage</code> is fragile, and your friends may not see\n      the same values you do.\n    </div>\n  </div>\n</div>\n';
 
-var OptionController$2 = (function (_Controller) {
+var OptionController$1 = (function (_Controller) {
   _inheritsLoose(OptionController, _Controller);
   function OptionController(object, property, params, options) {
     var _this2;
@@ -1994,7 +1994,7 @@ var ControllerFactory = function ControllerFactory(
   var dyninfo = Common.setupDynamicProperty(object, property);
   var initialValue = !dyninfo ? object[property] : dyninfo.getter.call(object);
   if (Common.isArray(options_1) || Common.isObject(options_1)) {
-    return new OptionController$1(object, property, options_1);
+    return new OptionController(object, property, options_1);
   }
   if (Common.isNumber(initialValue)) {
     if (Common.isNumber(options_1) && Common.isNumber(options_2)) {
@@ -2022,7 +2022,7 @@ var ControllerFactory = function ControllerFactory(
     return new ImageController(object, property);
   }
   if (Common.isString(initialValue)) {
-    return new StringController$1(object, property);
+    return new StringController(object, property);
   }
   if (Common.isFunction(initialValue)) {
     var opts = ARR_SLICE$1.call(arguments, 3);
@@ -2035,7 +2035,7 @@ var ControllerFactory = function ControllerFactory(
     return new BooleanController(object, property);
   }
   if (Common.isArray(initialValue) || Common.isObject(initialValue)) {
-    return new OptionController$2(object, property);
+    return new OptionController$1(object, property);
   }
   if (initialValue === null) {
     return new NullController(object, property);
@@ -2045,6 +2045,87 @@ var ControllerFactory = function ControllerFactory(
   }
   return null;
 };
+
+var NumberControllerAnimator = (function (_NumberController) {
+  _inheritsLoose(NumberControllerAnimator, _NumberController);
+  function NumberControllerAnimator(object, property, params) {
+    var _this2;
+    _this2 = _NumberController.call(this, object, property, params) || this;
+    var _this = _assertThisInitialized(_this2);
+    dom.addClass(_this2.domElement, "button-container");
+    _this2.__animationMode = null;
+    _this2.__sineButton = document.createElement("button");
+    dom.addClass(_this2.__sineButton, "sine-button");
+    _this2.__sawButton = document.createElement("button");
+    dom.addClass(_this2.__sawButton, "saw-button");
+    dom.bind(_this2.__sawButton, "click", toggleSaw);
+    dom.bind(_this2.__sineButton, "click", toggleSine);
+    function toggleSaw(e) {
+      e.stopPropagation();
+      e.preventDefault();
+      if (_this.__animationMode === "saw") {
+        stopAnimating();
+        dom.removeClass(_this.__sawButton, "saw-button--activated");
+      } else {
+        if (_this.__animationMode === "sine") {
+          dom.removeClass(_this.__sineButton, "sine-button--activated");
+        }
+        _this.__animationMode = "saw";
+        dom.addClass(_this.__sawButton, "saw-button--activated");
+        animate();
+      }
+    }
+    function toggleSine(e) {
+      e.stopPropagation();
+      e.preventDefault();
+      if (_this.__animationMode === "sine") {
+        stopAnimating();
+        dom.removeClass(_this.__sineButton, "sine-button--activated");
+      } else {
+        if (_this.__animationMode === "saw") {
+          dom.removeClass(_this.__sawButton, "saw-button--activated");
+        }
+        _this.__animationMode = "sine";
+        dom.addClass(_this.__sineButton, "sine-button--activated");
+        animate();
+      }
+    }
+    function animate() {
+      if (_this.__animationMode === null) return;
+      var percent;
+      if (_this.__animationMode === "sine") {
+        percent = Math.sin(Date.now() / 1000) / 2 + 0.5;
+      } else if (_this.__animationMode === "saw") {
+        percent = (Date.now() / 2000) % 1;
+      }
+      if (_this.__min !== undefined && _this.__max !== undefined) {
+        _this.setValue((_this.__max - _this.__min) * percent + _this.__min);
+      } else {
+        _this.setValue(percent);
+      }
+      requestAnimationFrame(animate);
+    }
+    function stopAnimating() {
+      _this.__animationMode = null;
+    }
+    _this2.updateDisplay();
+    _this2.domElement.appendChild(_this2.__sawButton);
+    _this2.domElement.appendChild(_this2.__sineButton);
+    return _this2;
+  }
+  return NumberControllerAnimator;
+})(NumberController);
+
+function requestAnimationFrame$1(callback, element) {
+  setTimeout(callback, 1000 / 60);
+}
+var requestAnimationFrame$2 =
+  window.requestAnimationFrame ||
+  window.webkitRequestAnimationFrame ||
+  window.mozRequestAnimationFrame ||
+  window.oRequestAnimationFrame ||
+  window.msRequestAnimationFrame ||
+  requestAnimationFrame$1;
 
 function pos2vec(pos, min, max) {
   return [pos[0] * (max[0] - min[0]) + min[0], pos[1] * (max[1] - min[1]) + min[1]];
@@ -2178,87 +2259,6 @@ var VectorController = (function (_Controller) {
   return VectorController;
 })(Controller);
 
-var NumberControllerAnimator = (function (_NumberController) {
-  _inheritsLoose(NumberControllerAnimator, _NumberController);
-  function NumberControllerAnimator(object, property, params) {
-    var _this2;
-    _this2 = _NumberController.call(this, object, property, params) || this;
-    var _this = _assertThisInitialized(_this2);
-    dom.addClass(_this2.domElement, "button-container");
-    _this2.__animationMode = null;
-    _this2.__sineButton = document.createElement("button");
-    dom.addClass(_this2.__sineButton, "sine-button");
-    _this2.__sawButton = document.createElement("button");
-    dom.addClass(_this2.__sawButton, "saw-button");
-    dom.bind(_this2.__sawButton, "click", toggleSaw);
-    dom.bind(_this2.__sineButton, "click", toggleSine);
-    function toggleSaw(e) {
-      e.stopPropagation();
-      e.preventDefault();
-      if (_this.__animationMode === "saw") {
-        stopAnimating();
-        dom.removeClass(_this.__sawButton, "saw-button--activated");
-      } else {
-        if (_this.__animationMode === "sine") {
-          dom.removeClass(_this.__sineButton, "sine-button--activated");
-        }
-        _this.__animationMode = "saw";
-        dom.addClass(_this.__sawButton, "saw-button--activated");
-        animate();
-      }
-    }
-    function toggleSine(e) {
-      e.stopPropagation();
-      e.preventDefault();
-      if (_this.__animationMode === "sine") {
-        stopAnimating();
-        dom.removeClass(_this.__sineButton, "sine-button--activated");
-      } else {
-        if (_this.__animationMode === "saw") {
-          dom.removeClass(_this.__sawButton, "saw-button--activated");
-        }
-        _this.__animationMode = "sine";
-        dom.addClass(_this.__sineButton, "sine-button--activated");
-        animate();
-      }
-    }
-    function animate() {
-      if (_this.__animationMode === null) return;
-      var percent;
-      if (_this.__animationMode === "sine") {
-        percent = Math.sin(Date.now() / 1000) / 2 + 0.5;
-      } else if (_this.__animationMode === "saw") {
-        percent = (Date.now() / 2000) % 1;
-      }
-      if (_this.__min !== undefined && _this.__max !== undefined) {
-        _this.setValue((_this.__max - _this.__min) * percent + _this.__min);
-      } else {
-        _this.setValue(percent);
-      }
-      requestAnimationFrame(animate);
-    }
-    function stopAnimating() {
-      _this.__animationMode = null;
-    }
-    _this2.updateDisplay();
-    _this2.domElement.appendChild(_this2.__sawButton);
-    _this2.domElement.appendChild(_this2.__sineButton);
-    return _this2;
-  }
-  return NumberControllerAnimator;
-})(NumberController$1);
-
-function requestAnimationFrame$1(callback, element) {
-  setTimeout(callback, 1000 / 60);
-}
-var requestAnimationFrame$2 =
-  window.requestAnimationFrame ||
-  window.webkitRequestAnimationFrame ||
-  window.mozRequestAnimationFrame ||
-  window.oRequestAnimationFrame ||
-  window.msRequestAnimationFrame ||
-  requestAnimationFrame$1;
-
 var CenteredDiv = (function () {
   function CenteredDiv() {
     this.backgroundElement = document.createElement("div");
@@ -2358,7 +2358,7 @@ var GUI = (function () {
       image: ImageController,
       function: FunctionController,
       boolean: BooleanController,
-      object: ObjectController,
+      object: OptionController$1,
     };
     this.domElement = document.createElement("div");
     this.__ul = document.createElement("ul");
@@ -3243,9 +3243,9 @@ var color = {
 var controllers = {
   Controller: Controller,
   BooleanController: BooleanController,
-  OptionController: OptionController$1,
-  StringController: StringController$1,
-  NumberController: NumberController$1,
+  OptionController: OptionController,
+  StringController: StringController,
+  NumberController: NumberController,
   NumberControllerBox: NumberControllerBox,
   NumberControllerSlider: NumberControllerSlider,
   FunctionController: FunctionController,

@@ -11,6 +11,8 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
+import common from "../utils/common";
+
 /**
  * @class An "abstract" class that represents a given property of an object.
  *

@@ -33,12 +33,12 @@ import styleSheet from './style.scss'; // CSS to embed in build
 
 css.inject(styleSheet);
 
-/** Outer-most className for GUI's */
+/** @ignore Outer-most className for GUI's */
 const CSS_NAMESPACE = 'dg';
 
 const HIDE_KEY_CODE = 72;
 
-/** The only value shared between the JS and SCSS. Use caution. */
+/** @ignore The only value shared between the JS and SCSS. Use caution. */
 const CLOSE_BUTTON_HEIGHT = 20;
 
 const DEFAULT_DEFAULT_PRESET_NAME = 'Default';
@@ -53,24 +53,32 @@ const SUPPORTS_LOCAL_STORAGE = (function() {
 
 let SAVE_DIALOGUE;
 
-/** Have we yet to create an autoPlace GUI? */
+/** @ignore Have we yet to create an autoPlace GUI? */
 let autoPlaceVirgin = true;
 
-/** Fixed position div that auto place GUI's go inside */
+/** @ignore Fixed position div that auto place GUI's go inside */
 let autoPlaceContainer;
 
-/** Are we hiding the GUI's ? */
+/** @ignore Are we hiding the GUI's ? */
 let hide = false;
 
-/** GUI's which should be hidden */
+/** @private GUI's which should be hidden */
 const hideableGuis = [];
 
 /**
- * A lightweight controller library for JavaScript. It allows you to easily
+ * @class A lightweight controller library for JavaScript. It allows you to easily
  * manipulate variables and fire functions on the fly.
- * @class
  *
- * @member dat.gui
+ * @typicalname gui
+ *
+ * @example
+ * // Creating a GUI with options.
+ * var gui = new dat.GUI({name: 'My GUI'});
+ *
+ * @example
+ * // Creating a GUI and a subfolder.
+ * var gui = new dat.GUI();
+ * var folder1 = gui.addFolder('Flow Field');
  *
  * @param {Object} [params]
  * @param {String} [params.name] The name of this GUI.
@@ -88,7 +96,7 @@ const GUI = function(pars) {
 
   /**
    * Outermost DOM Element
-   * @type DOMElement
+   * @type {DOMElement}
    */
   this.domElement = document.createElement('div');
   this.__ul = document.createElement('ul');
@@ -186,7 +194,7 @@ const GUI = function(pars) {
   let saveToLocalStorage;
 
   Object.defineProperties(this,
-    /** @lends dat.gui.GUI.prototype */
+    /** @lends GUI.prototype */
     {
       /**
        * The parent <code>GUI</code>
@@ -494,14 +502,31 @@ dom.bind(window, 'keydown', GUI._keydownHandler, false);
 common.extend(
   GUI.prototype,
 
-  /** @lends dat.gui.GUI */
+  /** @lends GUI.prototype */
   {
 
     /**
-     * @param object
-     * @param property
-     * @returns {dat.controllers.Controller} The new controller that was added.
+     * Adds a new {@link Controller} to the GUI. The type of controller created
+     * is inferred from the initial value of <code>object[property]</code>. For
+     * color properties, see {@link addColor}.
+     *
+     * @param {Object} object The object to be manipulated
+     * @param {String} property The name of the property to be manipulated
+     * @param {Number} [min] Minimum allowed value
+     * @param {Number} [max] Maximum allowed value
+     * @param {Number} [step] Increment by which to change value
+     * @returns {Controller} The controller that was added to the GUI.
      * @instance
+     *
+     * @example
+     * // Add a string controller.
+     * var person = {name: 'Sam'};
+     * gui.add(person, 'name');
+     *
+     * @example
+     * // Add a number controller slider.
+     * var person = {age: 45};
+     * gui.add(person, 'age', 0, 100);
      */
     add: function(object, property) {
       return add(
@@ -515,10 +540,24 @@ common.extend(
     },
 
     /**
+     * Adds a new color controller to the GUI.
+     *
      * @param object
      * @param property
-     * @returns {dat.controllers.ColorController} The new controller that was added.
+     * @returns {Controller} The controller that was added to the GUI.
      * @instance
+     *
+     * @example
+     * var palette = {
+     *   color1: '#FF0000', // CSS string
+     *   color2: [ 0, 128, 255 ], // RGB array
+     *   color3: [ 0, 128, 255, 0.3 ], // RGB with alpha
+     *   color4: { h: 350, s: 0.9, v: 0.3 } // Hue, saturation, value
+     * };
+     * gui.addColor(palette, 'color1');
+     * gui.addColor(palette, 'color2');
+     * gui.addColor(palette, 'color3');
+     * gui.addColor(palette, 'color4');
      */
     addColor: function(object, property) {
       return add(
@@ -572,7 +611,8 @@ common.extend(
     },
 
     /**
-     * @param controller
+     * Removes the given controller from the GUI.
+     * @param {Controller} controller
      * @instance
      */
     remove: function(controller) {
@@ -585,6 +625,10 @@ common.extend(
       });
     },
 
+    /**
+     * Removes the GUI from the document and unbinds all event listeners.
+     * @instance
+     */
     destroy: function() {
       if (this.autoPlace) {
         autoPlaceContainer.removeChild(this.domElement);
@@ -634,6 +678,7 @@ common.extend(
 
 
     /**
+     * Creates a new subfolder GUI instance.
      * @param name
      * @returns {dat.gui.GUI} The new folder.
      * @throws {Error} if this GUI already has a folder by the specified
@@ -674,10 +719,39 @@ common.extend(
       return gui;
     },
 
+    /**
+     * Removes a subfolder GUI instance.
+     * {dat.gui.GUI} folder The folder to remove.
+     * @instance
+     */
+    removeFolder: function(folder) {
+      this.__ul.removeChild(folder.domElement.parentElement);
+
+      delete this.__folders[folder.name];
+
+      // Do we have saved appearance data for this folder?
+      if (this.load && // Anything loaded?
+          this.load.folders && // Was my parent a dead-end?
+          this.load.folders[folder.name]) {
+          delete this.load.folders[folder.name];
+      }
+
+      const _this = this;
+      common.defer(function() {
+        _this.onResize();
+      });
+    },
+
+    /**
+     * Opens the GUI.
+     */
     open: function() {
       this.closed = false;
     },
 
+    /**
+     * Closes the GUI.
+     */
     close: function() {
       this.closed = true;
     },
@@ -723,9 +797,10 @@ common.extend(
      * the GUI grows. When remembering new objects, append them to the end
      * of the list.
      *
-     * @param {Object...} objects
+     * @param {...Object} objects
      * @throws {Error} if not called on a top level GUI.
      * @instance
+     * @ignore
      */
     remember: function() {
       if (common.isUndefined(SAVE_DIALOGUE)) {
@@ -864,6 +939,8 @@ common.extend(
  * @param gui
  * @param [newDom] If specified, inserts the dom content in the new row
  * @param [liBefore] If specified, places the new row before another row
+ *
+ * @ignore
  */
 function addRow(gui, newDom, liBefore) {
   const li = document.createElement('li');

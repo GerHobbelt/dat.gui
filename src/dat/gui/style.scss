@@ -54,9 +54,9 @@ $input-color: lighten($background-color, 8.5%);
 }
 
 @mixin gears() {
-  background: 
-  $button-color 
-  url('https://icon.now.sh/settings/FFFFFF/12') center center no-repeat;
+  background:
+    $button-color url("https://icon.now.sh/settings/FFFFFF/12") center
+    center no-repeat;
   height: 7px;
   width: 8px;
 }
@@ -109,8 +109,8 @@ $input-color: lighten($background-color, 8.5%);
       }
 
       .button {
-
         text-transform: uppercase;
+
         &.gears {
           @include gears;
         }
@@ -132,7 +132,7 @@ $input-color: lighten($background-color, 8.5%);
       cursor: pointer;
       border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 
-      &:before {
+      &::before {
         content: "▲︎ ";
         font-size: 65%;
         margin: 0 5px 0 2px;
@@ -143,7 +143,7 @@ $input-color: lighten($background-color, 8.5%);
   }
 
   .closed li.title {
-    &:before {
+    &::before {
       content: "▶ ";
     }
   }

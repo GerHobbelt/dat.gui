@@ -31,10 +31,10 @@ import NumberControllerBox from "./controllers/NumberControllerBox";
 import NumberControllerSlider from "./controllers/NumberControllerSlider";
 import FunctionController from "./controllers/FunctionController";
 import ColorController from "./controllers/ColorController";
-import BgColorController from './controllers/BgColorController';
-import NgColorController from './controllers/NgColorController';
-import GtColorController from './controllers/GtColorController';
-import HSVColorController from './controllers/HSVColorController';
+import BgColorController from "./controllers/BgColorController";
+import NgColorController from "./controllers/NgColorController";
+import GtColorController from "./controllers/GtColorController";
+import HSVColorController from "./controllers/HSVColorController";
 import ArrayController from "./controllers/ArrayController";
 import PlotterController from "./controllers/PlotterController";
 import CustomController from "./controllers/CustomController";
@@ -67,11 +67,11 @@ export const controllers = {
   NumberControllerBox: NumberControllerBox,
   NumberControllerSlider: NumberControllerSlider,
   FunctionController: FunctionController,
-    ColorController: ColorController,
-    BgColorController: BgColorController,
-    NgColorController: NgColorController,
-    HSVColorController: HSVColorController,
-    GtColorController: GtColorController,
+  ColorController: ColorController,
+  BgColorController: BgColorController,
+  NgColorController: NgColorController,
+  HSVColorController: HSVColorController,
+  GtColorController: GtColorController,
   ArrayController: ArrayController,
   PlotterController: PlotterController,
   CustomController: CustomController,

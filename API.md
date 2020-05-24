@@ -111,6 +111,8 @@ manipulate variables and fire functions on the fly.
 | [params.hideable] | <code>Boolean</code> | <code>true</code> | If true, GUI is shown/hidden by <kbd>h</kbd> keypress. |
 | [params.closed] | <code>Boolean</code> | <code>false</code> | If true, starts closed |
 | [params.closeOnTop] | <code>Boolean</code> | <code>false</code> | If true, close/open button shows on top of the GUI |
+| [params.closeStr] | <code>String</code> |  | close string |
+| [params.openStr] | <code>String</code> |  | open string |
 
 **Example**  
 ```js

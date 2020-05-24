@@ -99,25 +99,24 @@ const INTERPRETATIONS = [
       },
 
       RGBA_ARRAY: {
-        read: function(original) {
+        read: function (original) {
           const test = original.match(/^\[\s*(\d+),\s*(\d+),\s*(\d+),\s*(\d*\.{0,1}\d*)/);
           if (test === null) {
             return false;
           }
 
           return {
-            space: 'RGB',
+            space: "RGB",
             r: parseFloat(test[1]),
             g: parseFloat(test[2]),
             b: parseFloat(test[3]),
-            a: parseFloat(test[4])
+            a: parseFloat(test[4]),
           };
         },
 
-        write: toString
+        write: toString,
       },
     },
-
   },
 
   // Numbers

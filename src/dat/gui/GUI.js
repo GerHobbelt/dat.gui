@@ -20,10 +20,10 @@ import FunctionController from "../controllers/FunctionController";
 import NumberControllerBox from "../controllers/NumberControllerBox";
 import NumberControllerSlider from "../controllers/NumberControllerSlider";
 import ColorController from "../controllers/ColorController";
-import BgColorController from '../controllers/BgColorController';
-import NgColorController from '../controllers/NgColorController';
-import HSVColorController from '../controllers/HSVColorController';
-import GtColorController from '../controllers/GtColorController';
+import BgColorController from "../controllers/BgColorController";
+import NgColorController from "../controllers/NgColorController";
+import HSVColorController from "../controllers/HSVColorController";
+import GtColorController from "../controllers/GtColorController";
 import EasingFunctionController from "../controllers/EasingFunctionController";
 import TextAreaController from "../controllers/TextAreaController";
 import UndefinedController from "../controllers/UndefinedController";
@@ -95,8 +95,8 @@ const hideableGuis = [];
  * @param {Boolean} [params.hideable=true] If true, GUI is shown/hidden by <kbd>h</kbd> keypress.
  * @param {Boolean} [params.closed=false] If true, starts closed
  * @param {Boolean} [params.closeOnTop=false] If true, close/open button shows on top of the GUI
-   * @param {String} [params.closeStr] close string
-   * @param {String} [params.openStr] open string
+ * @param {String} [params.closeStr] close string
+ * @param {String} [params.openStr] open string
  */
 class GUI {
   constructor(params) {
@@ -155,17 +155,15 @@ class GUI {
      */
     this.__rememberedObjectIndecesToControllers = [];
 
+    /*
+     * Called on change of child elements.
+     */
+    this.__onChange = undefined;
 
-  /*
-   * Called on change of child elements.
-   */
-  this.__onChange = undefined;
-
-  /*
-   * Called on finish change of child elements.
-   */
-  this.__onFinishChange = undefined;
-
+    /*
+     * Called on finish change of child elements.
+     */
+    this.__onFinishChange = undefined;
 
     this.__listening = [];
 
@@ -187,12 +185,12 @@ class GUI {
         params.load.preset = params.preset;
       }
     } else {
-    params.load = { preset: DEFAULT_DEFAULT_PRESET_NAME };
-  }
+      params.load = { preset: DEFAULT_DEFAULT_PRESET_NAME };
+    }
 
     if (common.isUndefined(params.closeStr)) {
       params.closeStr = GUI.TEXT_CLOSED;
-    } 
+    }
 
     if (common.isUndefined(params.openStr)) {
       params.openStr = GUI.TEXT_OPEN;
@@ -408,7 +406,7 @@ class GUI {
       if (params.name) {
         this.__closeButton.innerHTML = params.name;
       } else {
-      this.__closeButton.innerHTML = params.closeStr;
+        this.__closeButton.innerHTML = params.closeStr;
       }
       this.closed = params.closed || false;
       dom.addClass(this.__closeButton, GUI.CLASS_CLOSE_BUTTON);
@@ -669,6 +667,30 @@ class GUI {
     });
   }
 
+  addBgColor(object, property) {
+    return add(this, object, property, {
+      bgcolor: true,
+    });
+  }
+
+  addNgColor(object, property) {
+    return add(this, object, property, {
+      ngcolor: true,
+    });
+  }
+
+  addGtColor(object, property) {
+    return add(this, object, property, {
+      gtcolor: true,
+    });
+  }
+
+  addHSVColor(object, property) {
+    return add(this, object, property, {
+      hsvcolor: true,
+    });
+  }
+
   /**
    * @param object
    * @param property
@@ -737,46 +759,6 @@ class GUI {
       image: true,
     });
   }
-    addBgColor(object, property) {
-      return addbg(
-        this,
-        object,
-        property,
-        {
-          color: true
-        }
-      );
-    }
-    addNgColor(object, property) {
-      return addng(
-        this,
-        object,
-        property,
-        {
-          color: true
-        }
-      );
-    }
-    addGtColor(object, property) {
-      return addgt(
-        this,
-        object,
-        property,
-        {
-          color: true
-        }
-      );
-    }
-    addHSVColor(object, property) {
-      return addhsv(
-        this,
-        object,
-        property,
-        {
-          color: true
-        }
-      );
-    }
 
   /**
    * Removes the given controller from the GUI.
@@ -818,40 +800,35 @@ class GUI {
     removeListeners(this);
   }
 
+  onChange(f) {
+    this.__onChange = f;
+    return this;
+  }
 
-    onChange(f) {
-      this.__onChange = f;
-      return this;
+  onFinishChange(f) {
+    this.__onFinishChange = f;
+    return this;
+  }
+
+  __propagateChange() {
+    if (this.__onChange) {
+      this.__onChange.call(this);
     }
 
+    if (this.parent) {
+      this.parent.__propagateChange();
+    }
+  }
 
-    onFinishChange(f) {
-      this.__onFinishChange = f;
-      return this;
+  __propagateFinishChange() {
+    if (this.__onFinishChange) {
+      this.__onFinishChange.call(this);
     }
 
-
-    __propagateChange() {
-      if (this.__onChange) {
-        this.__onChange.call(this);
-      }
-
-      if (this.parent) {
-        this.parent.__propagateChange();
-      }
+    if (this.parent) {
+      this.parent.__propagateFinishChange();
     }
-
-
-    __propagateFinishChange() {
-      if (this.__onFinishChange) {
-        this.__onFinishChange.call(this);
-      }
-
-      if (this.parent) {
-        this.parent.__propagateFinishChange();
-      }
-    }
-
+  }
 
   /**
    * Creates a new subfolder GUI instance.
@@ -900,8 +877,7 @@ class GUI {
     const li = addRow(this, gui.domElement);
     dom.addClass(li, "folder");
     return gui;
-    },
-
+  }
 
   /**
    * Removes a subfolder GUI instance.
@@ -1226,6 +1202,14 @@ function add(gui, object, property, params) {
 
     if (params.color) {
       controller = new ColorController(object, property);
+    } else if (params.bgcolor) {
+      controller = new BgColorController(object, property);
+    } else if (params.ngcolor) {
+      controller = new NgColorController(object, property);
+    } else if (params.gtcolor) {
+      controller = new GtColorController(object, property);
+    } else if (params.hsvcolor) {
+      controller = new HsvColorController(object, property);
     } else if (params.easing) {
       controller = new EasingFunctionController(object, property);
     } else if (params.multiline) {
@@ -1477,32 +1461,32 @@ function augmentController(gui, li, controller) {
 
     controller.updateDisplay();
   } else if (controller instanceof BgColorController) {
-    dom.addClass(li, 'color');
-    controller.updateDisplay = common.compose(function(val) {
+    dom.addClass(li, "color");
+    controller.updateDisplay = common.compose(function (val) {
       li.style.borderLeftColor = controller.__color.toString();
       return val;
     }, controller.updateDisplay);
 
     controller.updateDisplay();
   } else if (controller instanceof NgColorController) {
-    dom.addClass(li, 'color');
-    controller.updateDisplay = common.compose(function(val) {
+    dom.addClass(li, "color");
+    controller.updateDisplay = common.compose(function (val) {
       li.style.borderLeftColor = controller.__color.toString();
       return val;
     }, controller.updateDisplay);
 
     controller.updateDisplay();
   } else if (controller instanceof HSVColorController) {
-    dom.addClass(li, 'color');
-    controller.updateDisplay = common.compose(function(val) {
+    dom.addClass(li, "color");
+    controller.updateDisplay = common.compose(function (val) {
       li.style.borderLeftColor = controller.__color.toString();
       return val;
     }, controller.updateDisplay);
 
     controller.updateDisplay();
   } else if (controller instanceof GtColorController) {
-    dom.addClass(li, 'color');
-    controller.updateDisplay = common.compose(function(val) {
+    dom.addClass(li, "color");
+    controller.updateDisplay = common.compose(function (val) {
       li.style.borderLeftColor = controller.__color.toString();
       return val;
     }, controller.updateDisplay);
@@ -1577,264 +1561,19 @@ function recallSavedValue(gui, controller) {
   }
 }
 
-var _generatedUIDs = {};
+const _generatedUIDs = new Map();
 
-function _generateUIDWithCollisionChecking() {
+function generateUIDWithCollisionChecking() {
   while (true) {
-    var uid = ("0000" + ((Math.random() * Math.pow(36, 4)) | 0).toString(36)).slice(-4);
-    if (!_generatedUIDs.hasOwnProperty(uid)) {
-      _generatedUIDs[uid] = true;
-      return uid;
+    const uid = ("0000" + ((Math.random() * Math.pow(36, 4)) | 0).toString(36)).slice(-4);
+    if (!(uid in _generatedUIDs)) {
+      // check that the ID is not yet in the DOM: **generate a globally unique ID**
+      if (!document.getElementById(uid)) {
+        _generatedUIDs[uid] = true;
+        return uid;
+      }
     }
   }
-}
-
-function addbg(gui, object, property, params) {
-  if (object[property] === undefined) {
-    throw new Error(`Object "${object}" has no property "${property}"`);
-  }
-
-  let controller;
-
-  if (params.color) {
-    controller = new BgColorController(object, property);
-  } else {
-    const factoryArgs = [object, property].concat(params.factoryArgs);
-    controller = ControllerFactory.apply(gui, factoryArgs);
-  }
-
-  if (params.before instanceof Controller) {
-    params.before = params.before.__li;
-  }
-
-  recallSavedValue(gui, controller);
-
-  dom.addClass(controller.domElement, 'c');
-
-  var formControlId = _generateUIDWithCollisionChecking();
-  
-  const name = document.createElement('label');
-  dom.addClass(name, 'property-name');
-  name.innerHTML = controller.property;
-  name.htmlFor = formControlId;
-
-  const container = document.createElement('div');
-  container.appendChild(name);
-  container.appendChild(controller.domElement);
-
-  const li = addRow(gui, container, params.before);
-
-  dom.addClass(li, GUI.CLASS_CONTROLLER_ROW);
-  if (controller instanceof ColorController) {
-    dom.addClass(li, 'color');
-  } else if (controller instanceof BgColorController) {
-    dom.addClass(li, 'color');
-  } else {
-    dom.addClass(li, typeof controller.getValue());
-  }
-
-  augmentController(gui, li, controller);
-
-  gui.__controllers.push(controller);
-
-  return controller;
-}
-function addng(gui, object, property, params) {
-  if (object[property] === undefined) {
-    throw new Error(`Object "${object}" has no property "${property}"`);
-  }
-
-  let controller;
-
-  if (params.color) {
-    controller = new NgColorController(object, property);
-  } else {
-    const factoryArgs = [object, property].concat(params.factoryArgs);
-    controller = ControllerFactory.apply(gui, factoryArgs);
-  }
-
-  if (params.before instanceof Controller) {
-    params.before = params.before.__li;
-  }
-
-  recallSavedValue(gui, controller);
-
-  dom.addClass(controller.domElement, 'c');
-
-  const name = document.createElement('span');
-  dom.addClass(name, 'property-name');
-  name.innerHTML = controller.property;
-
-  const container = document.createElement('div');
-  container.appendChild(name);
-  container.appendChild(controller.domElement);
-
-  const li = addRow(gui, container, params.before);
-
-  dom.addClass(li, GUI.CLASS_CONTROLLER_ROW);
-  if (controller instanceof ColorController) {
-    dom.addClass(li, 'color');
-  } else if (controller instanceof NgColorController) {
-    dom.addClass(li, 'color');
-  } else {
-    dom.addClass(li, typeof controller.getValue());
-  }
-
-  augmentController(gui, li, controller);
-
-  gui.__controllers.push(controller);
-
-  return controller;
-}
-function addgt(gui, object, property, params) {
-  if (object[property] === undefined) {
-    throw new Error(`Object "${object}" has no property "${property}"`);
-  }
-
-  let controller;
-
-  if (params.color) {
-    controller = new GtColorController(object, property);
-  } else {
-    const factoryArgs = [object, property].concat(params.factoryArgs);
-    controller = ControllerFactory.apply(gui, factoryArgs);
-  }
-
-  if (params.before instanceof Controller) {
-    params.before = params.before.__li;
-  }
-
-  recallSavedValue(gui, controller);
-
-  dom.addClass(controller.domElement, 'c');
-
-  const name = document.createElement('span');
-  dom.addClass(name, 'property-name');
-  name.innerHTML = controller.property;
-
-  const container = document.createElement('div');
-  container.appendChild(name);
-  container.appendChild(controller.domElement);
-
-  const li = addRow(gui, container, params.before);
-
-  dom.addClass(li, GUI.CLASS_CONTROLLER_ROW);
-  if (controller instanceof ColorController) {
-    dom.addClass(li, 'color');
-  } else if (controller instanceof NgColorController) {
-    dom.addClass(li, 'color');
-  } else {
-    dom.addClass(li, typeof controller.getValue());
-  }
-
-  augmentController(gui, li, controller);
-
-  gui.__controllers.push(controller);
-
-  return controller;
-}
-function addhsv(gui, object, property, params) {
-  if (object[property] === undefined) {
-    throw new Error(`Object "${object}" has no property "${property}"`);
-  }
-
-  let controller;
-
-  if (params.color) {
-    controller = new HSVColorController(object, property);
-  } else {
-    const factoryArgs = [object, property].concat(params.factoryArgs);
-    controller = ControllerFactory.apply(gui, factoryArgs);
-  }
-
-  if (params.before instanceof Controller) {
-    params.before = params.before.__li;
-  }
-
-  recallSavedValue(gui, controller);
-
-  dom.addClass(controller.domElement, 'c');
-
-  const name = document.createElement('span');
-  dom.addClass(name, 'property-name');
-  name.innerHTML = controller.property;
-
-  const container = document.createElement('div');
-  container.appendChild(name);
-  container.appendChild(controller.domElement);
-
-  const li = addRow(gui, container, params.before);
-
-  dom.addClass(li, GUI.CLASS_CONTROLLER_ROW);
-  if (controller instanceof ColorController) {
-    dom.addClass(li, 'color');
-  } else if (controller instanceof HSVColorController) {
-    dom.addClass(li, 'color');
-  } else {
-    dom.addClass(li, typeof controller.getValue());
-  }
-
-  augmentController(gui, li, controller);
-
-  gui.__controllers.push(controller);
-
-  return controller;
-}
-
-function add(gui, object, property, params) {
-  if (object[property] === undefined) {
-    throw new Error(`Object "${object}" has no property "${property}"`);
-  }
-
-  let controller;
-
-  if (params.color) {
-    controller = new ColorController(object, property);
-  } else {
-    const factoryArgs = [object, property].concat(params.factoryArgs);
-    controller = ControllerFactory.apply(gui, factoryArgs);
-  }
-
-  if (params.before instanceof Controller) {
-    params.before = params.before.__li;
-  }
-
-  controller.parent = gui;
-
-  recallSavedValue(gui, controller);
-
-  dom.addClass(controller.domElement, 'c');
-
-  const name = document.createElement('span');
-  dom.addClass(name, 'property-name');
-  name.innerHTML = controller.property;
-
-  const container = document.createElement('div');
-  container.appendChild(name);
-  container.appendChild(controller.domElement);
-
-  const li = addRow(gui, container, params.before);
-
-  dom.addClass(li, GUI.CLASS_CONTROLLER_ROW);
-  if (controller instanceof ColorController) {
-    dom.addClass(li, 'color');
-  } else if (controller instanceof BgColorController) {
-    dom.addClass(li, 'color');
-  } else {
-    dom.addClass(li, typeof controller.getValue());
-  }
-
-  augmentController(gui, li, controller);
-
-  gui.__controllers.push(controller);
-
-  var formControl = container.querySelectorAll('select, input')[0];
-  if (formControl != undefined)
-  {
-	formControl.id = formControlId;
-  }
-
-  return controller;
 }
 
 function getLocalStorageHash(gui, key) {

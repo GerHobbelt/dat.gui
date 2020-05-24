@@ -892,38 +892,29 @@
           ok(c5_changed, "OptionController");
         });
 
+        test("GUIOnChange", function () {
+          const gui = new dat.GUI({ autoPlace: false });
+          const f = gui.addFolder("f1");
 
-    test("GUIOnChange", function() {
+          const c = f.add({ x: 5 }, "x");
 
-      var gui = new dat.GUI({ autoPlace: false });
-      var f = gui.addFolder('f1');
+          let changed = false;
+          let finishChanged = false;
 
-      var c = f.add({ x: 5 }, 'x');
+          gui.onChange(function () {
+            changed = true;
+          });
 
+          gui.onFinishChange(function () {
+            finishChanged = true;
+          });
 
-      var changed = false;
-      var finishChanged = false;
+          c.setValue(123);
+          c.__propagateFinishChange(123);
 
-      gui.onChange(function() {
-
-        changed = true;
-
-      });
-
-      gui.onFinishChange(function() {
-
-        finishChanged = true;
-
-      });
-
-
-      c.setValue(123);
-      c.__propagateFinishChange(123);
-
-      ok(changed, "GUI onChange fires as it should.");
-      ok(finishChanged, "GUI onFinishChange fires as is should.");
-
-    });
+          ok(changed, "GUI onChange fires as it should.");
+          ok(finishChanged, "GUI onFinishChange fires as is should.");
+        });
 
         test("onFinishChange", function () {
           const object = initObject();

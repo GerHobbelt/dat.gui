@@ -47,7 +47,6 @@ class Controller {
      */
     this.parent = undefined;
 
-
     /**
      * Readonly field
      * @type {Object}
@@ -134,7 +133,6 @@ class Controller {
     }
   }
 
-
   /**
    * Fires onChange function if it exists and propagates message to parent.
    *
@@ -149,7 +147,6 @@ class Controller {
       this.parent.__propagateChange();
     }
   }
-
 
   /**
    * Change the value of <code>object[property]</code>

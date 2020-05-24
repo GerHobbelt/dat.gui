@@ -1,68 +1,84 @@
+/**
+ * dat.GUI JavaScript Controller Library
+ * http://code.google.com/p/dat-gui
+ *
+ * Copyright 2011-2020 Data Arts Team, Google Creative Lab
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 /* Light theme for dat.gui
  * via https://github.com/liabru/dat-gui-light-theme
  */
 .dg.main.taller-than-window .close-button {
-    border-top: 1px solid #ddd;
+  border-top: 1px solid #DDDDDD;
 }
 
 .dg.main .close-button {
-    background-color: #ccc;
+  background-color: #CCCCCC;
 }
- 
+
 .dg.main .close-button:hover {
-    background-color: #ddd;
+  background-color: #DDDDDD;
 }
 
 .dg {
-    color: #555;
-    text-shadow: none !important;
+  color: #555555;
+  text-shadow: none !important;
 }
 
 .dg.main::-webkit-scrollbar {
-    background: #fafafa;
+  background: #FAFAFA;
 }
 
 .dg.main::-webkit-scrollbar-thumb {
-    background: #bbb;
+  background: #BBBBBB;
 }
- 
+
 .dg li:not(.folder) {
-    background: #fafafa;
-    border-bottom: 1px solid #ddd;
+  background: #FAFAFA;
+  border-bottom: 1px solid #DDDDDD;
 }
- 
+
 .dg li.save-row .button {
-    text-shadow: none !important;
+  text-shadow: none !important;
 }
 
 .dg li.title {
-    background: #e8e8e8 url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlI+hKgFxoCgAOw==) 6px 10px no-repeat;
+  background:
+    #E8E8E8
+    url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlI+hKgFxoCgAOw==)
+    6px 10px no-repeat;
 }
 
-.dg .cr.function:hover,.dg .cr.boolean:hover {
-    background: #fff;
+.dg .cr.function:hover,
+.dg .cr.boolean:hover {
+  background: #FFFFFF;
 }
- 
-.dg .c input[type=text] {
-    background: #e9e9e9;
+
+.dg .c input[type="text"] {
+  background: #E9E9E9;
 }
- 
-.dg .c input[type=text]:hover {
-    background: #eee;
+
+.dg .c input[type="text"]:hover {
+  background: #EEEEEE;
 }
- 
-.dg .c input[type=text]:focus {
-    background: #eee;
-    color: #555;
+
+.dg .c input[type="text"]:focus {
+  background: #EEEEEE;
+  color: #555555;
 }
- 
+
 .dg .c .slider {
-    background: #e9e9e9;
+  background: #E9E9E9;
 }
 
 .dg .c .slider:hover {
-    background: #eee;
+  background: #EEEEEE;
 }
 
 /* end theme */
-

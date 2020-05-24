@@ -1538,6 +1538,49 @@ var UndefinedController = (function (_Controller) {
   return UndefinedController;
 })(Controller);
 
+var ARR_SLICE$1 = Array.prototype.slice;
+var ControllerFactory = function ControllerFactory(object, property) {
+  var initialValue = object[property];
+  if (Common.isArray(arguments[2]) || Common.isObject(arguments[2])) {
+    return new OptionController(object, property, arguments[2]);
+  }
+  if (Common.isNumber(initialValue)) {
+    if (Common.isNumber(arguments[2]) && Common.isNumber(arguments[3])) {
+      return new NumberControllerSlider(object, property, arguments[2], arguments[3]);
+    }
+    return new NumberControllerBox(object, property, {
+      min: arguments[2],
+      max: arguments[3],
+    });
+  }
+  if (
+    (Common.isArray(initialValue) && initialValue.length >= 3 && initialValue.length <= 4) ||
+    (Common.isObject(initialValue) && initialValue.h && initialValue.s && initialValue.v) ||
+    (Common.isString(initialValue) &&
+      initialValue[0] === "#" &&
+      (initialValue.length === 4 || initialValue.length === 7))
+  ) {
+    return new ColorController(object, property);
+  }
+  if (Common.isString(initialValue)) {
+    return new StringController(object, property);
+  }
+  if (Common.isFunction(initialValue)) {
+    var opts = ARR_SLICE$1.call(arguments, 3);
+    if (opts.length === 0) {
+      opts = undefined;
+    }
+    return new FunctionController(object, property, options_1, opts);
+  }
+  if (Common.isBoolean(initialValue)) {
+    return new BooleanController(object, property);
+  }
+  if (Common.isUndefined(initialValue)) {
+    return new UndefinedController(object, property);
+  }
+  return null;
+};
+
 function requestAnimationFrame(callback, element) {
   setTimeout(callback, 1000 / 60);
 }
@@ -1617,7 +1660,7 @@ var CenteredDiv = (function () {
   return CenteredDiv;
 })();
 
-var ARR_SLICE$1 = Array.prototype.slice;
+var ARR_SLICE$2 = Array.prototype.slice;
 var CSS_NAMESPACE = "dg";
 var HIDE_KEY_CODE = 72;
 var CLOSE_BUTTON_HEIGHT = 20;
@@ -1637,6 +1680,7 @@ var hideable_guis = [];
 var GUI = (function () {
   function GUI(params) {
     var _this = this;
+    params = params || {};
     this.domElement = document.createElement("div");
     this.__ul = document.createElement("ul");
     this.domElement.appendChild(this.__ul);
@@ -1646,7 +1690,6 @@ var GUI = (function () {
     this.__rememberedObjects = [];
     this.__rememberedObjectIndecesToControllers = [];
     this.__listening = [];
-    params = params || {};
     params = Common.defaults(params, {
       autoPlace: true,
       width: GUI.DEFAULT_WIDTH,
@@ -1718,7 +1761,7 @@ var GUI = (function () {
       },
       name: {
         get: function get() {
-          return params.name;
+          return params.name || "";
         },
         set: function set(v) {
           if (v !== params.name && _this.__folders[v] !== undefined) {
@@ -1854,6 +1897,58 @@ var GUI = (function () {
     }
   }
   var _proto = GUI.prototype;
+  _proto.getControllerByName = function getControllerByName(name, recurse) {
+    var controllers = this.__controllers;
+    var i = controllers.length;
+    while (--i > -1) {
+      if (controllers[i].property === name) {
+        return controllers[i];
+      }
+    }
+    var folders = this.__folders;
+    var tryFI;
+    if (recurse) {
+      for (i in folders) {
+        tryFI = folders[i].getControllerByName(name, true);
+        if (tryFI != null) return tryFI;
+      }
+    }
+    return null;
+  };
+  _proto.getFolderByName = function getFolderByName(name) {
+    return this.__folders[name];
+  };
+  _proto.getAllControllers = function getAllControllers(recurse, myArray) {
+    if (recurse == undefined) recurse = true;
+    var i;
+    var arr = myArray != null ? myArray : [];
+    var controllers = this.__controllers;
+    for (i in controllers) {
+      arr.push(controllers[i]);
+    }
+    if (recurse) {
+      var folders = this.__folders;
+      for (i in folders) {
+        folders[i].getAllControllers(true, arr);
+      }
+    }
+    return arr;
+  };
+  _proto.getAllGUIs = function getAllGUIs(recurse, myArray) {
+    if (recurse == undefined) recurse = true;
+    var i;
+    var arr = myArray != null ? myArray : [this];
+    var folders = this.__folders;
+    for (i in folders) {
+      arr.push(folders[i]);
+    }
+    if (recurse) {
+      for (i in folders) {
+        folders[i].getAllGUIs(true, arr);
+      }
+    }
+    return arr;
+  };
   _proto.toggleHide = function toggleHide() {
     hide = !hide;
     Common.each(hideable_guis, function (gui) {
@@ -1862,7 +1957,12 @@ var GUI = (function () {
     });
   };
   _proto._keydownHandler = function _keydownHandler(e) {
-    if (document.activeElement.type !== "text" && (e.which === HIDE_KEY_CODE || e.keyCode == HIDE_KEY_CODE)) {
+    if (
+      document.activeElement &&
+      document.activeElement.type !== "text" &&
+      document.activeElement.nodeName.toString().toLowerCase() !== "textarea" &&
+      (e.which === HIDE_KEY_CODE || e.keyCode === HIDE_KEY_CODE)
+    ) {
       GUI.toggleHide();
     }
   };
@@ -1953,7 +2053,7 @@ var GUI = (function () {
       throw new Error("You can only call remember on a top level GUI.");
     }
     var _this = this;
-    Common.each(ARR_SLICE$1.call(arguments), function (object) {
+    Common.each(ARR_SLICE$2.call(arguments), function (object) {
       if (_this.__rememberedObjects.length === 0) {
         addSaveMenu(_this);
       }
@@ -1964,6 +2064,7 @@ var GUI = (function () {
     if (this.autoPlace) {
       setWidth(this, this.width);
     }
+    return this;
   };
   _proto.getRoot = function getRoot() {
     var gui = this;
@@ -1995,6 +2096,7 @@ var GUI = (function () {
     this.load.remembered[this.preset] = getCurrentPreset(this);
     markPresetModified(this, false);
     this.saveToLocalStorageIfPossible();
+    return this;
   };
   _proto.saveAs = function saveAs(presetName) {
     if (!this.load.remembered) {
@@ -2005,6 +2107,7 @@ var GUI = (function () {
     this.preset = presetName;
     addPresetOption(this, presetName, true);
     this.saveToLocalStorageIfPossible();
+    return this;
   };
   _proto.revert = function revert(gui) {
     Common.each(
@@ -2026,11 +2129,12 @@ var GUI = (function () {
     }
   };
   _proto.listen = function listen(controller) {
-    var init = this.__listening.length == 0;
+    var init = this.__listening.length === 0;
     this.__listening.push(controller);
     if (init) {
       updateDisplays(this.__listening);
     }
+    return this;
   };
   _proto.updateDisplay = function updateDisplay() {
     for (var c in this.__controllers) {
@@ -2062,7 +2166,7 @@ function _add(gui, object, property, params) {
     controller = new ColorController(object, property);
   } else {
     var factoryArgs = [object, property].concat(params.factoryArgs);
-    controller = controllerFactory.apply(gui, factoryArgs);
+    controller = ControllerFactory.apply(gui, factoryArgs);
   }
   if (!controller) {
     throw new Error(
@@ -2097,7 +2201,7 @@ function addRow(gui, dom, liBefore) {
     li.appendChild(dom);
   }
   if (liBefore) {
-    gui.__ul.insertBefore(li, params.before);
+    gui.__ul.insertBefore(li, liBefore);
   } else {
     gui.__ul.appendChild(li);
   }
@@ -2143,11 +2247,11 @@ function augmentController(gui, li, controller) {
       max: controller.__max,
       step: controller.__step,
     });
-    Common.each(["updateDisplay", "onChange", "onFinishChange"], function (method) {
+    Common.each(["updateDisplay", "onChange", "onFinishChange", "step", "min", "max"], function (method) {
       var pc = controller[method];
       var pb = box[method];
       controller[method] = box[method] = function () {
-        var args = ARR_SLICE$1.call(arguments);
+        var args = ARR_SLICE$2.call(arguments);
         pc.apply(controller, args);
         return pb.apply(box, args);
       };
@@ -2200,11 +2304,11 @@ function augmentController(gui, li, controller) {
       });
     };
   }
-  controller.setValue = Common.compose(function (r) {
+  controller.setValue = Common.compose(function (val) {
     if (gui.getRoot().__preset_select && controller.isModified()) {
       markPresetModified(gui.getRoot(), true);
     }
-    return r;
+    return val;
   }, controller.setValue);
 }
 function recallSavedValue(gui, controller) {

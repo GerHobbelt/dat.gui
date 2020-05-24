@@ -116,7 +116,7 @@
 }
 .dg li.folder {
   padding: 0;
-  border-left: 4px solid rgba(0, 0, 0, 0);
+  border-left: 4px solid transparent;
 }
 .dg li.title {
   cursor: pointer;

@@ -33,4 +33,5 @@ rules: {
 	no-redeclare: 1,
 	indent: 1,
 	prefer-spread: 1,
+	no-debugger: 1,
 }}

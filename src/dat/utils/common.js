@@ -14,6 +14,9 @@
 const ARR_EACH = Array.prototype.forEach;
 const ARR_SLICE = Array.prototype.slice;
 
+// cache supportsPassive check result:
+let supportsPassive;
+
 /**
  * Band-aid methods for things that should be a lot easier in JavaScript.
  * Implementation and structure inspired by underscore.js
@@ -136,7 +139,13 @@ const Common = {
   },
 
   isNaN: function (obj) {
-    return isNaN(obj);
+    //
+    // See for the difference between `isNan()` and `Number.isNaN()`:
+    // - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/isNaN#Description
+    // - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isNaN
+    //
+    return Number.isNaN(obj);
+    // return obj !== obj;
   },
 
   // isArray: Array.isArray || function(obj) {
@@ -150,7 +159,8 @@ const Common = {
   },
 
   isNumber: function (obj) {
-    return obj === obj + 0;
+    return obj === +obj;
+    // return obj === obj + 0;
   },
 
   isFiniteNumber: function (obj) {
@@ -158,7 +168,7 @@ const Common = {
   },
 
   isString: function (obj) {
-    return obj === obj + "";
+    return typeof obj === "string";
   },
 
   isBoolean: function (obj) {
@@ -167,6 +177,55 @@ const Common = {
 
   isFunction: function (obj) {
     return obj instanceof Function;
+  },
+
+  isAsyncFunction: function (obj) {
+    return Object.prototype.toString.call(obj) === "[object AsyncFunction]";
+  },
+
+  supportsPassive: function () {
+    if (supportsPassive !== false && supportsPassive !== true) {
+      try {
+        supportsPassive = false;
+        const opts = Object.defineProperty({}, "passive", {
+          get: function () {
+            supportsPassive = true;
+            return false; // make lint happy: return a value
+          },
+        });
+        window.addEventListener("testPassive", null, opts);
+        window.removeEventListener("testPassive", null, opts);
+      } catch (e) {
+        supportsPassive = false;
+      }
+    }
+    return supportsPassive;
+  },
+
+  isImagePath: function (obj) {
+    return typeof obj === "string" && obj.search(/\.(gif|jpg|jpeg|png)$/) > -1;
+  },
+
+  setupDynamicProperty: function (object, property) {
+    // when the property is not available directly, we may have to get at it via getter/setter functions:
+    if (!(property in object)) {
+      const ucProperty = property.charAt(0).toUpperCase() + property.slice(1);
+      const getter = object["get" + ucProperty];
+      const setter = object["set" + ucProperty];
+      if (typeof getter === "function" && typeof setter === "function") {
+        return {
+          getter: getter,
+          setter: setter,
+        };
+      }
+      // or it's a read-only property?
+      if (typeof getter === "function") {
+        return {
+          getter: getter,
+        };
+      }
+    }
+    return false;
   },
 };
 

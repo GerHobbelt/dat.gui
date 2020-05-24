@@ -58,6 +58,7 @@ function colorToString(color, forceCSSHex) {
 }
 
 var ARR_SLICE = Array.prototype.slice;
+var _supportsPassive;
 var Common = {
   BREAK: {},
   extend: function extend(target) {
@@ -150,17 +151,9 @@ var Common = {
   isNull: function isNull(obj) {
     return obj === null;
   },
-  isNaN: (function (_isNaN) {
-    function isNaN(_x) {
-      return _isNaN.apply(this, arguments);
-    }
-    isNaN.toString = function () {
-      return _isNaN.toString();
-    };
-    return isNaN;
-  })(function (obj) {
-    return isNaN(obj);
-  }),
+  isNaN: function isNaN(obj) {
+    return Number.isNaN(obj);
+  },
   isArray: function isArray(obj) {
     return obj != null && obj.length >= 0 && typeof obj === "object";
   },
@@ -168,19 +161,62 @@ var Common = {
     return obj === Object(obj);
   },
   isNumber: function isNumber(obj) {
-    return obj === obj + 0;
+    return obj === +obj;
   },
   isFiniteNumber: function isFiniteNumber(obj) {
     return obj === +obj && isFinite(obj);
   },
   isString: function isString(obj) {
-    return obj === obj + "";
+    return typeof obj === "string";
   },
   isBoolean: function isBoolean(obj) {
     return obj === false || obj === true;
   },
   isFunction: function isFunction(obj) {
     return obj instanceof Function;
+  },
+  isAsyncFunction: function isAsyncFunction(obj) {
+    return Object.prototype.toString.call(obj) === "[object AsyncFunction]";
+  },
+  supportsPassive: function supportsPassive() {
+    if (_supportsPassive !== false && _supportsPassive !== true) {
+      try {
+        _supportsPassive = false;
+        var opts = Object.defineProperty({}, "passive", {
+          get: function get() {
+            _supportsPassive = true;
+            return false;
+          },
+        });
+        window.addEventListener("testPassive", null, opts);
+        window.removeEventListener("testPassive", null, opts);
+      } catch (e) {
+        _supportsPassive = false;
+      }
+    }
+    return _supportsPassive;
+  },
+  isImagePath: function isImagePath(obj) {
+    return typeof obj === "string" && obj.search(/\.(gif|jpg|jpeg|png)$/) > -1;
+  },
+  setupDynamicProperty: function setupDynamicProperty(object, property) {
+    if (!(property in object)) {
+      var ucProperty = property.charAt(0).toUpperCase() + property.slice(1);
+      var getter = object["get" + ucProperty];
+      var setter = object["set" + ucProperty];
+      if (typeof getter === "function" && typeof setter === "function") {
+        return {
+          getter: getter,
+          setter: setter,
+        };
+      }
+      if (typeof getter === "function") {
+        return {
+          getter: getter,
+        };
+      }
+    }
+    return false;
   },
 };
 
@@ -241,6 +277,22 @@ var INTERPRETATIONS = [
       CSS_RGBA: {
         read: function read(original) {
           var test = original.match(/^rgba\(\s*(.+)\s*,\s*(.+)\s*,\s*(.+)\s*,\s*(.+)\s*\)/);
+          if (test === null) {
+            return false;
+          }
+          return {
+            space: "RGB",
+            r: parseFloat(test[1]),
+            g: parseFloat(test[2]),
+            b: parseFloat(test[3]),
+            a: parseFloat(test[4]),
+          };
+        },
+        write: colorToString,
+      },
+      RGBA_ARRAY: {
+        read: function read(original) {
+          var test = original.match(/^\[\s*(\d+),\s*(\d+),\s*(\d+),\s*(\d*\.{0,1}\d*)/);
           if (test === null) {
             return false;
           }
@@ -606,44 +658,6 @@ Object.defineProperty(Color.prototype, "hex", {
   },
 });
 
-var Controller = (function () {
-  function Controller(object, property) {
-    this.initialValue = object[property];
-    this.domElement = document.createElement("div");
-    this.object = object;
-    this.property = property;
-    this.__onChange = undefined;
-    this.__onFinishChange = undefined;
-  }
-  var _proto = Controller.prototype;
-  _proto.onChange = function onChange(fnc) {
-    this.__onChange = fnc;
-    return this;
-  };
-  _proto.onFinishChange = function onFinishChange(fnc) {
-    this.__onFinishChange = fnc;
-    return this;
-  };
-  _proto.setValue = function setValue(newValue) {
-    this.object[this.property] = newValue;
-    if (this.__onChange) {
-      this.__onChange.call(this, newValue);
-    }
-    this.updateDisplay();
-    return this;
-  };
-  _proto.getValue = function getValue() {
-    return this.object[this.property];
-  };
-  _proto.updateDisplay = function updateDisplay() {
-    return this;
-  };
-  _proto.isModified = function isModified() {
-    return this.initialValue !== this.getValue();
-  };
-  return Controller;
-})();
-
 function _defineProperties(target, props) {
   for (var i = 0; i < props.length; i++) {
     var descriptor = props[i];
@@ -666,6 +680,47 @@ function _inheritsLoose(subClass, superClass) {
   subClass.__proto__ = superClass;
 }
 
+function _setPrototypeOf(o, p) {
+  _setPrototypeOf =
+    Object.setPrototypeOf ||
+    function _setPrototypeOf(o, p) {
+      o.__proto__ = p;
+      return o;
+    };
+
+  return _setPrototypeOf(o, p);
+}
+
+function _isNativeReflectConstruct() {
+  if (typeof Reflect === "undefined" || !Reflect.construct) return false;
+  if (Reflect.construct.sham) return false;
+  if (typeof Proxy === "function") return true;
+
+  try {
+    Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+function _construct(Parent, args, Class) {
+  if (_isNativeReflectConstruct()) {
+    _construct = Reflect.construct;
+  } else {
+    _construct = function _construct(Parent, args, Class) {
+      var a = [null];
+      a.push.apply(a, args);
+      var Constructor = Function.bind.apply(Parent, a);
+      var instance = new Constructor();
+      if (Class) _setPrototypeOf(instance, Class.prototype);
+      return instance;
+    };
+  }
+
+  return _construct.apply(null, arguments);
+}
+
 function _assertThisInitialized(self) {
   if (self === void 0) {
     throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
@@ -673,6 +728,189 @@ function _assertThisInitialized(self) {
 
   return self;
 }
+
+var Controller = (function () {
+  function Controller(object, property, type) {
+    this.__dyninfo = Common.setupDynamicProperty(object, property);
+    this.initialValue = !this.__dyninfo ? object[property] : this.__dyninfo.getter.call(object);
+    this.domElement = document.createElement("div");
+    this.object = object;
+    this.property = property;
+    this.name = type;
+    this._readonly = false;
+    this.__gui = undefined;
+    this.__li = undefined;
+    this.__onChange = undefined;
+    this.__onBeforeChange = undefined;
+    this.__onFinishChange = undefined;
+    this.__transformInput = function (x) {
+      return x;
+    };
+    this.__transformOutput = function (x) {
+      return x;
+    };
+    this.forceUpdateDisplay = false;
+  }
+  var _proto = Controller.prototype;
+  _proto.hide = function hide() {
+    this.domElement.parentNode.parentNode.style.display = "none";
+    return this;
+  };
+  _proto.show = function show() {
+    this.domElement.parentNode.parentNode.style.display = "";
+    return this;
+  };
+  _proto.onChange = function onChange(fnc) {
+    this.__onChange = fnc;
+    return this;
+  };
+  _proto.onBeforeChange = function onBeforeChange(fnc) {
+    this.__onBeforeChange = fnc;
+    return this;
+  };
+  _proto.onFinishChange = function onFinishChange(fnc) {
+    this.__onFinishChange = fnc;
+    return this;
+  };
+  _proto.fireChange = function fireChange(event_info) {
+    if (this.__onChange) {
+      this.__onChange(this.getValue(), event_info);
+    }
+    return this;
+  };
+  _proto.fireBeforeChange = function fireBeforeChange(event_info) {
+    if (this.__onBeforeChange) {
+      return this.__onBeforeChange(this.getValue(), event_info);
+    }
+    return false;
+  };
+  _proto.fireFinishChange = function fireFinishChange(event_info) {
+    if (this.__onFinishChange) {
+      this.__onFinishChange(this.getValue(), event_info);
+    }
+    return this;
+  };
+  _proto.__propagateFinishChange = function __propagateFinishChange(val) {
+    if (this.__onFinishChange) {
+      this.__onFinishChange.call(this, val);
+    }
+    if (this.parent) {
+      this.parent.__propagateFinishChange();
+    }
+  };
+  _proto.__propagateChange = function __propagateChange(val) {
+    if (this.__onChange) {
+      this.__onChange.call(this, val);
+    }
+    if (this.parent) {
+      this.parent.__propagateChange();
+    }
+  };
+  _proto.__setValue = function __setValue(newValue) {
+    if (!this.__dyninfo) {
+      this.object[this.property] = newValue;
+    } else if (this.__dyninfo.setter) {
+      this.__dyninfo.setter.call(this.object, newValue);
+    } else {
+      throw new Error(
+        "Cannot modify the read-only " + (this.__dyninfo ? "dynamic " : "") + 'property "' + this.property + '"'
+      );
+    }
+    return this;
+  };
+  _proto.setValue = function setValue(newValue, silent) {
+    if (silent === void 0) {
+      silent = false;
+    }
+    var __newValue = this.__transformOutput(newValue);
+    var readonly = this.getReadonly();
+    var oldValue = this.getValue();
+    var changed = oldValue !== __newValue;
+    var msg = {
+      newValue: __newValue,
+      oldValue: oldValue,
+      isChange: changed,
+      silent: silent,
+      noGo: readonly,
+      eventSource: "setValue",
+    };
+    if (!silent) {
+      msg.noGo = this.fireBeforeChange(msg);
+    }
+    if (!msg.noGo) {
+      this.__setValue(msg.newValue);
+    }
+    if (!msg.silent) {
+      this.fireChange(msg);
+      this.__propagateChange(__newValue, oldValue);
+    }
+    this.updateDisplay();
+    return this;
+  };
+  _proto.getValue = function getValue() {
+    return this.__transformInput(
+      !this.__dyninfo ? this.object[this.property] : this.__dyninfo.getter.call(this.object)
+    );
+  };
+  _proto.updateDisplay = function updateDisplay(force) {
+    return this;
+  };
+  _proto.isModified = function isModified() {
+    return this.initialValue !== this.getValue();
+  };
+  _proto.transform = function transform(transformInput, transformOutput) {
+    if (transformInput === void 0) {
+      transformInput = function transformInput(x) {
+        return x;
+      };
+    }
+    if (transformOutput === void 0) {
+      transformOutput = function transformOutput(x) {
+        return x;
+      };
+    }
+    this.__transformInput = transformInput;
+    this.__transformOutput = transformOutput;
+    this.updateDisplay();
+    return this;
+  };
+  _proto.getReadonly = function getReadonly() {
+    if (this.__dyninfo && !this.__dyninfo.setter) {
+      return true;
+    }
+    return this._readonly;
+  };
+  _proto.setReadonly = function setReadonly(ro) {
+    var oldRo = this._readonly;
+    this._readonly = !!ro;
+    if (oldRo !== this._readonly) {
+      this.updateDisplay();
+    }
+  };
+  _proto.borderColor = function borderColor(color) {
+    this.__li.style.borderLeftColor = color;
+    return this;
+  };
+  _proto.borderWidth = function borderWidth(px) {
+    this.__li.style.borderLeftWidth = px + "px";
+    return this;
+  };
+  _createClass(Controller, [
+    {
+      key: "parent",
+      get: function get() {
+        return this.__gui;
+      },
+    },
+    {
+      key: "domLiElement",
+      get: function get() {
+        return this.__li;
+      },
+    },
+  ]);
+  return Controller;
+})();
 
 var EVENT_MAP = {
   HTMLEvents: ["change"],
@@ -790,10 +1028,17 @@ var dom = {
     Common.defaults(evt, aux);
     elem.dispatchEvent(evt);
   },
-  bind: function bind(elem, event, func, bool) {
+  bind: function bind(elem, event, func, bool, passive) {
     bool = bool || false;
+    passive = passive || true;
     if (elem.addEventListener) {
-      elem.addEventListener(event, func, bool);
+      var listenerArg = Common.supportsPassive()
+        ? {
+            capture: bool,
+            passive: passive,
+          }
+        : bool;
+      elem.addEventListener(event, func, listenerArg);
     } else if (elem.attachEvent) {
       elem.attachEvent("on" + event, func);
     }
@@ -809,13 +1054,15 @@ var dom = {
     return dom;
   },
   addClass: function addClass(elem, className) {
-    if (elem.className === undefined) {
-      elem.className = className;
-    } else if (elem.className !== className) {
-      var classes = elem.className.split(/ +/);
-      if (classes.indexOf(className) === -1) {
-        classes.push(className);
-        elem.className = classes.join(" ").replace(/^\s+/, "").replace(/\s+$/, "");
+    if (className) {
+      if (elem.className === undefined) {
+        elem.className = className;
+      } else if (elem.className !== className) {
+        var classes = elem.className.split(/ +/);
+        if (classes.indexOf(className) === -1) {
+          classes.push(className);
+          elem.className = classes.join(" ").trim();
+        }
       }
     }
     return dom;
@@ -880,11 +1127,485 @@ var dom = {
   },
 };
 
+var ArrayController = (function (_Controller) {
+  _inheritsLoose(ArrayController, _Controller);
+  function ArrayController(object, property) {
+    var _this2;
+    _this2 = _Controller.call(this, object, property, "array") || this;
+    var _this = _assertThisInitialized(_this2);
+    _this2.__input = document.createElement("input");
+    _this2.__input.setAttribute("type", "text");
+    dom.bind(_this2.__input, "keyup", onChange);
+    dom.bind(_this2.__input, "change", onChange);
+    dom.bind(_this2.__input, "blur", onBlur);
+    dom.bind(_this2.__input, "keydown", function (e) {
+      if (e.keyCode === 13) {
+        this.blur();
+      }
+    });
+    function onChange() {
+      var arr = _this.__input.value.replace(/^\s*|\s*$/g, "").split(/\s*,\s*/);
+      for (var i = 0; i < arr.length; i++) {
+        var value = arr[i];
+        if (!isNaN(value)) {
+          arr[i] = +value;
+        } else if (value === "true") {
+          arr[i] = true;
+        } else if (value === "false") {
+          arr[i] = false;
+        }
+      }
+      _this.setValue(arr);
+    }
+    function onBlur() {
+      if (_this.__onFinishChange) {
+        _this.__onFinishChange.call(_this, _this.getValue());
+      }
+    }
+    _this2.updateDisplay();
+    _this2.domElement.appendChild(_this2.__input);
+    return _this2;
+  }
+  var _proto = ArrayController.prototype;
+  _proto.updateDisplay = function updateDisplay() {
+    if (dom.isActive(this.__input)) {
+      return this;
+    }
+    this.__input.value = this.getValue();
+    return _Controller.prototype.updateDisplay.call(this);
+  };
+  return ArrayController;
+})(Controller);
+
+var BgColorController = (function (_Controller) {
+  _inheritsLoose(BgColorController, _Controller);
+  var _proto = BgColorController.prototype;
+  _proto.setValue2 = function setValue2(newValue) {
+    this.value2 = newValue;
+    if (this.object[this.property + "bg"]) {
+      this.object[this.property + "bg"] = this.value2;
+    }
+    if (this.__onChange) {
+      this.__onChange.call(this, newValue);
+    }
+    this.updateDisplay();
+    return this;
+  };
+  function BgColorController(object, property) {
+    var _this2;
+    _this2 = _Controller.call(this, object, property, "bgcolor") || this;
+    _this2.__color = new Color(_this2.getValue());
+    _this2.value2 = "#FFee00";
+    if (_this2.object[_this2.property + "bg"]) {
+      _this2.value2 = _this2.object[_this2.property + "bg"];
+    }
+    _this2.__color2 = new Color(_this2.value2);
+    _this2.__temp = new Color(0);
+    _this2.__temp2 = new Color(0);
+    var _this = _assertThisInitialized(_this2);
+    dom.makeSelectable(_this2.domElement, false);
+    _this2.__selector = document.createElement("div");
+    _this2.__saturation_field = document.createElement("div");
+    _this2.__saturation_field.className = "saturation-field";
+    _this2.__saturation_field2 = document.createElement("div");
+    _this2.__saturation_field2.className = "saturation-field";
+    _this2.__field_knob = document.createElement("div");
+    _this2.__field_knob.className = "field-knob";
+    _this2.__field_knob_border = "2px solid ";
+    _this2.__field_knob2 = document.createElement("div");
+    _this2.__field_knob2.className = "field-knob";
+    _this2.__field_knob_border2 = "2px solid ";
+    _this2.__hue_knob = document.createElement("div");
+    _this2.__hue_knob.className = "hue-knob";
+    _this2.__hue_knob2 = document.createElement("div");
+    _this2.__hue_knob2.className = "hue-knob";
+    _this2.__hue_field = document.createElement("div");
+    _this2.__hue_field.className = "hue-field";
+    _this2.__hue_field2 = document.createElement("div");
+    _this2.__hue_field2.className = "hue-field";
+    _this2.__input = document.createElement("input");
+    _this2.__input.type = "text";
+    _this2.__input_textShadow = "0 1px 1px ";
+    _this2.__input2 = document.createElement("input");
+    _this2.__input2.type = "text";
+    _this2.__input_textShadow2 = "0 1px 1px ";
+    dom.bind(_this2.__input, "keydown", function (e) {
+      if (e.keyCode === 13) {
+        onBlur.call(this);
+      }
+    });
+    dom.bind(_this2.__input2, "keydown", function (e) {
+      if (e.keyCode === 13) {
+        onBlur2.call(this);
+      }
+    });
+    dom.bind(_this2.__input, "blur", onBlur);
+    dom.bind(_this2.__input2, "blur", onBlur2);
+    var valueField = document.createElement("div");
+    var valueField2 = document.createElement("div");
+    Common.extend(_this2.__selector.style, {
+      width: "200px",
+      height: "102px",
+      marginTop: "22px",
+      backgroundColor: "#222",
+      boxShadow: "0px 1px 3px rgba(0,0,0,0.3)",
+    });
+    Common.extend(_this2.__field_knob.style, {
+      position: "absolute",
+      width: "12px",
+      height: "12px",
+      border: _this2.__field_knob_border + (_this2.__color.v < 0.5 ? "#fff" : "#000"),
+      boxShadow: "0px 1px 3px rgba(0,0,0,0.5)",
+      borderRadius: "12px",
+      zIndex: 1,
+    });
+    Common.extend(_this2.__field_knob2.style, {
+      position: "absolute",
+      left: "100",
+      width: "12px",
+      height: "12px",
+      border: _this2.__field_knob_border2 + (_this2.__color2.v < 0.5 ? "#fff" : "#000"),
+      boxShadow: "0px 1px 3px rgba(0,0,0,0.5)",
+      borderRadius: "12px",
+      zIndex: 1,
+    });
+    Common.extend(_this2.__hue_knob.style, {
+      position: "absolute",
+      width: "15px",
+      height: "2px",
+      left: "-15px",
+      borderRight: "4px solid #fff",
+      zIndex: 1,
+    });
+    Common.extend(_this2.__hue_knob2.style, {
+      position: "absolute",
+      width: "15px",
+      height: "2px",
+      left: "9px",
+      borderRight: "4px solid #fff",
+      zIndex: 1,
+    });
+    Common.extend(_this2.__saturation_field.style, {
+      width: "100px",
+      height: "100px",
+      border: "1px solid #555",
+      marginRight: "3px",
+      display: "inline-block",
+      cursor: "pointer",
+    });
+    Common.extend(_this2.__saturation_field2.style, {
+      left: "100px",
+      width: "100px",
+      height: "100px",
+      border: "1px solid #555",
+      marginRight: "3px",
+      display: "inline-block",
+      position: "absolute",
+      top: "22px",
+      cursor: "pointer",
+    });
+    Common.extend(valueField.style, {
+      width: "100%",
+      height: "100%",
+      background: "none",
+    });
+    Common.extend(valueField2.style, {
+      width: "100%",
+      height: "100%",
+      background: "none",
+    });
+    linearGradient(valueField, "top", "rgba(0,0,0,0)", "#000");
+    linearGradient(valueField2, "top", "rgba(0,0,0,0)", "#000");
+    Common.extend(_this2.__hue_field.style, {
+      width: "20px",
+      height: "100px",
+      border: "1px solid #555",
+      cursor: "ns-resize",
+      position: "absolute",
+      top: "3px",
+      marginTop: "19px",
+      left: "-20px",
+    });
+    Common.extend(_this2.__hue_field2.style, {
+      width: "20px",
+      height: "100px",
+      border: "1px solid #555",
+      cursor: "ns-resize",
+      position: "absolute",
+      top: "3px",
+      marginTop: "19px",
+      left: "200px",
+    });
+    hueGradient(_this2.__hue_field);
+    hueGradient(_this2.__hue_field2);
+    Common.extend(_this2.__input.style, {
+      outline: "none",
+      textAlign: "center",
+      color: "#fff",
+      border: 0,
+      left: "-20px",
+      position: "absolute",
+      fontWeight: "bold",
+      width: "120px",
+      textShadow: _this2.__input_textShadow + "rgba(0,0,0,0.7)",
+    });
+    Common.extend(_this2.__input2.style, {
+      outline: "none",
+      textAlign: "center",
+      color: "#fff",
+      border: 0,
+      left: "100px",
+      position: "absolute",
+      fontWeight: "bold",
+      width: "120px",
+      textShadow: _this2.__input_textShadow + "rgba(0,0,0,0.7)",
+    });
+    dom.bind(_this2.__saturation_field, "mousedown", fieldDown);
+    dom.bind(_this2.__saturation_field2, "mousedown", fieldDown2);
+    dom.bind(_this2.__field_knob, "mousedown", fieldDown);
+    dom.bind(_this2.__field_knob2, "mousedown", fieldDown2);
+    dom.bind(_this2.__hue_field, "mousedown", function (e) {
+      setH(e);
+      dom.bind(window, "mousemove", setH);
+      dom.bind(window, "mouseup", fieldUpH);
+    });
+    dom.bind(_this2.__hue_field2, "mousedown", function (e) {
+      setH2(e);
+      dom.bind(window, "mousemove", setH2);
+      dom.bind(window, "mouseup", fieldUpH2);
+    });
+    function fieldDown(e) {
+      setSV(e);
+      dom.bind(window, "mousemove", setSV);
+      dom.bind(window, "mouseup", fieldUpSV);
+    }
+    function fieldDown2(e) {
+      setSV2(e);
+      dom.bind(window, "mousemove", setSV2);
+      dom.bind(window, "mouseup", fieldUpSV2);
+    }
+    function fieldUpSV() {
+      dom.unbind(window, "mousemove", setSV);
+      dom.unbind(window, "mouseup", fieldUpSV);
+      onFinish();
+    }
+    function fieldUpSV2() {
+      dom.unbind(window, "mousemove", setSV2);
+      dom.unbind(window, "mouseup", fieldUpSV2);
+      onFinish2();
+    }
+    function onBlur() {
+      var i = interpret(this.value);
+      if (i !== false) {
+        _this.__color.__state = i;
+        _this.setValue(_this.__color.toOriginal());
+      } else {
+        this.value = _this.__color.toString();
+      }
+    }
+    function onBlur2() {
+      var i = interpret(this.value);
+      if (i !== false) {
+        _this.__color2.__state = i;
+        _this.setValue2(_this.__color2.toOriginal());
+      } else {
+        this.value = _this.__color2.toString();
+      }
+    }
+    function fieldUpH() {
+      dom.unbind(window, "mousemove", setH);
+      dom.unbind(window, "mouseup", fieldUpH);
+      onFinish();
+    }
+    function fieldUpH2() {
+      dom.unbind(window, "mousemove", setH2);
+      dom.unbind(window, "mouseup", fieldUpH2);
+      onFinish2();
+    }
+    function onFinish() {
+      if (_this.__onFinishChange) {
+        _this.__onFinishChange.call(_this, _this.__color2.toOriginal());
+      }
+    }
+    function onFinish2() {
+      if (_this.__onFinishChange) {
+        _this.__onFinishChange.call(_this, _this.__color.toOriginal());
+      }
+    }
+    _this2.__saturation_field.appendChild(valueField);
+    _this2.__selector.appendChild(_this2.__field_knob);
+    _this2.__selector.appendChild(_this2.__field_knob2);
+    _this2.__selector.appendChild(_this2.__saturation_field);
+    _this2.__saturation_field2.appendChild(valueField2);
+    _this2.__selector.appendChild(_this2.__saturation_field2);
+    _this2.__selector.appendChild(_this2.__hue_field);
+    _this2.__hue_field.appendChild(_this2.__hue_knob);
+    _this2.__hue_field2.appendChild(_this2.__hue_knob2);
+    _this2.__selector.appendChild(_this2.__hue_field2);
+    _this2.domElement.appendChild(_this2.__input2);
+    _this2.domElement.appendChild(_this2.__input);
+    _this2.domElement.appendChild(_this2.__selector);
+    _this2.updateDisplay();
+    function setSV2(e) {
+      e.preventDefault();
+      var fieldRect = _this.__saturation_field2.getBoundingClientRect();
+      var s = (e.clientX - fieldRect.left) / (fieldRect.right - fieldRect.left);
+      var v = 1 - (e.clientY - fieldRect.top) / (fieldRect.bottom - fieldRect.top);
+      if (v > 1) {
+        v = 1;
+      } else if (v < 0) {
+        v = 0;
+      }
+      if (s > 1) {
+        s = 1;
+      } else if (s < 0) {
+        s = 0;
+      }
+      _this.__color2.v = v;
+      _this.__color2.s = s;
+      _this.setValue2(_this.__color2.toOriginal());
+      return false;
+    }
+    function setSV(e) {
+      e.preventDefault();
+      var fieldRect = _this.__saturation_field.getBoundingClientRect();
+      var s = (e.clientX - fieldRect.left) / (fieldRect.right - fieldRect.left);
+      var v = 1 - (e.clientY - fieldRect.top) / (fieldRect.bottom - fieldRect.top);
+      if (v > 1) {
+        v = 1;
+      } else if (v < 0) {
+        v = 0;
+      }
+      if (s > 1) {
+        s = 1;
+      } else if (s < 0) {
+        s = 0;
+      }
+      _this.__color.v = v;
+      _this.__color.s = s;
+      _this.setValue(_this.__color.toOriginal());
+      return false;
+    }
+    function setH2(e) {
+      e.preventDefault();
+      var fieldRect = _this.__hue_field2.getBoundingClientRect();
+      var h = 1 - (e.clientY - fieldRect.top) / (fieldRect.bottom - fieldRect.top);
+      if (h > 1) {
+        h = 1;
+      } else if (h < 0) {
+        h = 0;
+      }
+      _this.__color2.h = h * 360;
+      _this.setValue2(_this.__color2.toOriginal());
+      return false;
+    }
+    function setH(e) {
+      e.preventDefault();
+      var fieldRect = _this.__hue_field.getBoundingClientRect();
+      var h = 1 - (e.clientY - fieldRect.top) / (fieldRect.bottom - fieldRect.top);
+      if (h > 1) {
+        h = 1;
+      } else if (h < 0) {
+        h = 0;
+      }
+      _this.__color.h = h * 360;
+      _this.setValue(_this.__color.toOriginal());
+      return false;
+    }
+    return _this2;
+  }
+  _proto.updateDisplay = function updateDisplay(force) {
+    if (!force && dom.isActive(this.__input)) return this;
+    var i = interpret(this.getValue());
+    if (i !== false) {
+      var mismatch = false;
+      Common.each(
+        Color.COMPONENTS,
+        function (component) {
+          if (
+            !Common.isUndefined(i[component]) &&
+            !Common.isUndefined(this.__color.__state[component]) &&
+            i[component] !== this.__color.__state[component]
+          ) {
+            mismatch = true;
+            return Common.BREAK;
+          }
+        },
+        this
+      );
+      if (mismatch) {
+        Common.extend(this.__color.__state, i);
+      }
+    }
+    Common.extend(this.__temp.__state, this.__color.__state);
+    Common.extend(this.__temp2.__state, this.__color2.__state);
+    this.__temp.a = 1;
+    this.__temp2.a = 1;
+    var flip = this.__color.v < 0.5 || this.__color.s > 0.5 ? 255 : 0;
+    var _flip = 255 - flip;
+    var flip2 = this.__color2.v < 0.5 || this.__color2.s > 0.5 ? 255 : 0;
+    var _flip2 = 255 - flip2;
+    Common.extend(this.__field_knob.style, {
+      marginLeft: 100 * this.__color.s - 7 + "px",
+      marginTop: 100 * (1 - this.__color.v) - 7 + "px",
+      backgroundColor: this.__temp.toHexString(),
+      border: this.__field_knob_border + "rgb(" + flip + "," + flip + "," + flip + ")",
+    });
+    Common.extend(this.__field_knob2.style, {
+      marginLeft: 100 * this.__color2.s - 7 + "px",
+      marginTop: 100 * (1 - this.__color2.v) - 7 + "px",
+      backgroundColor: this.__temp2.toHexString(),
+      border: this.__field_knob_border2 + "rgb(" + flip2 + "," + flip2 + "," + flip2 + ")",
+    });
+    this.__hue_knob.style.marginTop = (1 - this.__color.h / 360) * 100 + "px";
+    this.__hue_knob2.style.marginTop = (1 - this.__color2.h / 360) * 100 + "px";
+    this.__temp.s = 1;
+    this.__temp.v = 1;
+    this.__temp2.s = 1;
+    this.__temp2.v = 1;
+    linearGradient(this.__saturation_field, "left", "#fff", this.__temp.toHexString());
+    linearGradient(this.__saturation_field2, "left", "#fff", this.__temp2.toHexString());
+    this.__input.value = this.__color.toString();
+    this.__input2.value = this.__color2.toString();
+    Common.extend(this.__input.style, {
+      backgroundColor: this.__color.toHexString(),
+      color: "rgb(" + flip + "," + flip + "," + flip + ")",
+      textShadow: this.__input_textShadow + "rgba(" + _flip + "," + _flip + "," + _flip + ",.7)",
+    });
+    Common.extend(this.__input2.style, {
+      backgroundColor: this.__color2.toHexString(),
+      color: "rgb(" + flip2 + "," + flip2 + "," + flip2 + ")",
+      textShadow: this.__input_textShadow + "rgba(" + _flip2 + "," + _flip2 + "," + _flip2 + ",.7)",
+    });
+  };
+  return BgColorController;
+})(Controller);
+var vendors = ["-moz-", "-o-", "-webkit-", "-ms-", ""];
+function linearGradient(elem, x, a, b) {
+  elem.style.background = "";
+  Common.each(vendors, function (vendor) {
+    elem.style.cssText += "background: " + vendor + "linear-gradient(" + x + ", " + a + " 0%, " + b + " 100%); ";
+  });
+}
+function hueGradient(elem) {
+  elem.style.background = "";
+  elem.style.cssText +=
+    "background: -moz-linear-gradient(top,  #ff0000 0%, #ff00ff 17%, #0000ff 34%, #00ffff 50%, #00ff00 67%, #ffff00 84%, #ff0000 100%);";
+  elem.style.cssText +=
+    "background: -webkit-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
+  elem.style.cssText +=
+    "background: -o-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
+  elem.style.cssText +=
+    "background: -ms-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
+  elem.style.cssText +=
+    "background: linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
+}
+
 var BooleanController = (function (_Controller) {
   _inheritsLoose(BooleanController, _Controller);
   function BooleanController(object, property) {
     var _this2;
-    _this2 = _Controller.call(this, object, property) || this;
+    _this2 = _Controller.call(this, object, property, "boolean") || this;
     var _this = _assertThisInitialized(_this2);
     _this2.__prev = _this2.getValue();
     _this2.__checkbox = document.createElement("input");
@@ -892,7 +1613,7 @@ var BooleanController = (function (_Controller) {
     function onChange() {
       _this.setValue(!_this.__prev);
     }
-    dom.bind(_this2.__checkbox, "change", onChange, false);
+    dom.bind(_this2.__checkbox, "change", onChange);
     _this2.domElement.appendChild(_this2.__checkbox);
     _this2.updateDisplay();
     return _this2;
@@ -900,9 +1621,7 @@ var BooleanController = (function (_Controller) {
   var _proto = BooleanController.prototype;
   _proto.setValue = function setValue(v) {
     var toReturn = _Controller.prototype.setValue.call(this, v);
-    if (this.__onFinishChange) {
-      this.__onFinishChange.call(this, this.getValue());
-    }
+    this.__propagateFinishChange(this.getValue());
     this.__prev = this.getValue();
     return toReturn;
   };
@@ -920,331 +1639,11 @@ var BooleanController = (function (_Controller) {
   return BooleanController;
 })(Controller);
 
-var OptionController = (function (_Controller) {
-  _inheritsLoose(OptionController, _Controller);
-  function OptionController(object, property, options) {
-    var _this2;
-    _this2 = _Controller.call(this, object, property) || this;
-    var _this = _assertThisInitialized(_this2);
-    _this2.__select = document.createElement("select");
-    if (Common.isArray(options)) {
-      var map = {};
-      Common.each(options, function (element) {
-        map[element] = element;
-      });
-      options = map;
-    }
-    Common.each(options, function (value, key) {
-      var opt = document.createElement("option");
-      opt.innerHTML = key;
-      opt.setAttribute("value", value);
-      _this.__select.appendChild(opt);
-    });
-    _this2.updateDisplay();
-    dom.bind(_this2.__select, "change", function () {
-      var desiredValue = this.options[this.selectedIndex].value;
-      _this.setValue(desiredValue);
-    });
-    _this2.domElement.appendChild(_this2.__select);
-    return _this2;
-  }
-  var _proto = OptionController.prototype;
-  _proto.setValue = function setValue(v) {
-    var toReturn = _Controller.prototype.setValue.call(this, v);
-    if (this.__onFinishChange) {
-      this.__onFinishChange.call(this, this.getValue());
-    }
-    return toReturn;
-  };
-  _proto.updateDisplay = function updateDisplay() {
-    if (dom.isActive(this.__select)) {
-      return this;
-    }
-    this.__select.value = this.getValue();
-    return _Controller.prototype.updateDisplay.call(this);
-  };
-  return OptionController;
-})(Controller);
-
-var StringController = (function (_Controller) {
-  _inheritsLoose(StringController, _Controller);
-  function StringController(object, property) {
-    var _this2;
-    _this2 = _Controller.call(this, object, property) || this;
-    var _this = _assertThisInitialized(_this2);
-    function onChange() {
-      _this.setValue(_this.__input.value);
-    }
-    function onBlur() {
-      if (_this.__onFinishChange) {
-        _this.__onFinishChange.call(_this, _this.getValue());
-      }
-    }
-    function onKeyDown(e) {
-      if (e.keyCode === 13) {
-        this.blur();
-      }
-    }
-    _this2.__input = document.createElement("input");
-    _this2.__input.setAttribute("type", "text");
-    dom.bind(_this2.__input, "keyup", onChange);
-    dom.bind(_this2.__input, "change", onChange);
-    dom.bind(_this2.__input, "blur", onBlur);
-    dom.bind(_this2.__input, "keydown", onKeyDown);
-    _this2.updateDisplay();
-    _this2.domElement.appendChild(_this2.__input);
-    return _this2;
-  }
-  var _proto = StringController.prototype;
-  _proto.updateDisplay = function updateDisplay() {
-    if (dom.isActive(this.__input)) {
-      return this;
-    }
-    this.__input.value = this.getValue();
-    return _Controller.prototype.updateDisplay.call(this);
-  };
-  return StringController;
-})(Controller);
-
-function numDecimals(x) {
-  var _x = x.toString();
-  if (_x.indexOf(".") > -1) {
-    return _x.length - _x.indexOf(".") - 1;
-  }
-  return 0;
-}
-var NumberController = (function (_Controller) {
-  _inheritsLoose(NumberController, _Controller);
-  function NumberController(object, property, params) {
-    var _this;
-    _this = _Controller.call(this, object, property) || this;
-    params = params || {};
-    _this.__min = params.min;
-    _this.__max = params.max;
-    _this.__step = params.step;
-    if (Common.isUndefined(_this.__step)) {
-      if (_this.initialValue === 0) {
-        _this.__impliedStep = 1;
-      } else {
-        _this.__impliedStep = Math.pow(10, Math.floor(Math.log(Math.abs(_this.initialValue)) / Math.LN10)) / 10;
-      }
-    } else {
-      _this.__impliedStep = _this.__step;
-    }
-    _this.__precision = numDecimals(_this.__impliedStep);
-    return _this;
-  }
-  var _proto = NumberController.prototype;
-  _proto.setValue = function setValue(v) {
-    if (this.__min != null && v < this.__min) {
-      v = this.__min;
-    } else if (this.__max != null && v > this.__max) {
-      v = this.__max;
-    }
-    if (this.__step != null && v % this.__step !== 0) {
-      v = Math.round(v / this.__step) * this.__step;
-    }
-    return _Controller.prototype.setValue.call(this, v);
-  };
-  _proto.min = function min(minValue) {
-    this.__min = minValue;
-    return this;
-  };
-  _proto.max = function max(maxValue) {
-    this.__max = maxValue;
-    return this;
-  };
-  _proto.step = function step(stepValue) {
-    this.__step = stepValue;
-    this.__impliedStep = stepValue;
-    this.__precision = numDecimals(stepValue);
-    return this;
-  };
-  return NumberController;
-})(Controller);
-
-function roundToDecimal(value, decimals) {
-  var tenTo = Math.pow(10, decimals);
-  return Math.round(value * tenTo) / tenTo;
-}
-var NumberControllerBox = (function (_NumberController) {
-  _inheritsLoose(NumberControllerBox, _NumberController);
-  function NumberControllerBox(object, property, params) {
-    var _this2;
-    _this2 = _NumberController.call(this, object, property, params) || this;
-    params = params || {};
-    _this2.__truncationSuspended = false;
-    var _this = _assertThisInitialized(_this2);
-    var prevY;
-    function onKeyDown(e) {
-      if (e.keyCode === 13) {
-        _this.__truncationSuspended = true;
-        this.blur();
-        _this.__truncationSuspended = false;
-        onFinish();
-      }
-    }
-    function onChange(e) {
-      var attempted = parseFloat(_this.__input.value);
-      if (!Common.isNaN(attempted)) {
-        _this.setValue(attempted);
-      }
-    }
-    function onFinish() {
-      if (_this.__onFinishChange) {
-        _this.__onFinishChange.call(_this, _this.getValue());
-      }
-    }
-    function onBlur() {
-      onFinish();
-    }
-    function onMouseDrag(e) {
-      var diff = prevY - e.clientY;
-      _this.setValue(_this.getValue() + diff * _this.__impliedStep);
-      prevY = e.clientY;
-    }
-    function onMouseUp(e) {
-      dom.unbind(window, "mousemove", onMouseDrag);
-      dom.unbind(window, "mouseup", onMouseUp);
-      onFinish();
-    }
-    function onMouseDown(e) {
-      dom.bind(window, "mousemove", onMouseDrag);
-      dom.bind(window, "mouseup", onMouseUp);
-      prevY = e.clientY;
-    }
-    _this2.__input = document.createElement("input");
-    _this2.__input.setAttribute("type", "text");
-    dom.bind(_this2.__input, "change", onChange);
-    dom.bind(_this2.__input, "blur", onBlur);
-    dom.bind(_this2.__input, "mousedown", onMouseDown);
-    dom.bind(_this2.__input, "keydown", onKeyDown);
-    _this2.updateDisplay();
-    _this2.domElement.appendChild(_this2.__input);
-    return _this2;
-  }
-  var _proto = NumberControllerBox.prototype;
-  _proto.updateDisplay = function updateDisplay() {
-    if (dom.isActive(this.__input)) {
-      return this;
-    }
-    this.__input.value = this.__truncationSuspended
-      ? this.getValue()
-      : roundToDecimal(this.getValue(), this.__precision);
-    return _NumberController.prototype.updateDisplay.call(this);
-  };
-  return NumberControllerBox;
-})(NumberController);
-
-function map(v, i1, i2, o1, o2) {
-  return o1 + (o2 - o1) * ((v - i1) / (i2 - i1));
-}
-var NumberControllerSlider = (function (_NumberController) {
-  _inheritsLoose(NumberControllerSlider, _NumberController);
-  function NumberControllerSlider(object, property, min, max, step) {
-    var _this2;
-    _this2 =
-      _NumberController.call(this, object, property, {
-        min: min,
-        max: max,
-        step: step,
-      }) || this;
-    var _this = _assertThisInitialized(_this2);
-    _this2.__background = document.createElement("div");
-    _this2.__foreground = document.createElement("div");
-    dom.bind(_this2.__background, "mousedown", onMouseDown);
-    dom.bind(_this2.__background, "touchstart", onTouchStart);
-    dom.addClass(_this2.__background, "slider");
-    dom.addClass(_this2.__foreground, "slider-fg");
-    function onMouseDown(e) {
-      document.activeElement.blur();
-      dom.bind(window, "mousemove", onMouseDrag);
-      dom.bind(window, "mouseup", onMouseUp);
-      onMouseDrag(e);
-    }
-    function onMouseDrag(e) {
-      e.preventDefault();
-      var bgRect = _this.__background.getBoundingClientRect();
-      _this.setValue(map(e.clientX, bgRect.left, bgRect.right, _this.__min, _this.__max));
-      return false;
-    }
-    function onMouseUp(e) {
-      dom.unbind(window, "mousemove", onMouseDrag);
-      dom.unbind(window, "mouseup", onMouseUp);
-      if (_this.__onFinishChange) {
-        _this.__onFinishChange.call(_this, _this.getValue());
-      }
-    }
-    function onTouchStart(e) {
-      if (e.touches.length !== 1) {
-        return;
-      }
-      dom.bind(window, "touchmove", onTouchMove);
-      dom.bind(window, "touchend", onTouchEnd);
-      onTouchMove(e);
-    }
-    function onTouchMove(e) {
-      var clientX = e.touches[0].clientX;
-      var bgRect = _this.__background.getBoundingClientRect();
-      _this.setValue(map(clientX, bgRect.left, bgRect.right, _this.__min, _this.__max));
-    }
-    function onTouchEnd() {
-      dom.unbind(window, "touchmove", onTouchMove);
-      dom.unbind(window, "touchend", onTouchEnd);
-      if (_this.__onFinishChange) {
-        _this.__onFinishChange.call(_this, _this.getValue());
-      }
-    }
-    _this2.updateDisplay();
-    _this2.__background.appendChild(_this2.__foreground);
-    _this2.domElement.appendChild(_this2.__background);
-    return _this2;
-  }
-  var _proto = NumberControllerSlider.prototype;
-  _proto.updateDisplay = function updateDisplay() {
-    var value = this.getValue();
-    var pct = (value - this.__min) / (this.__max - this.__min);
-    this.__foreground.style.width = pct * 100 + "%";
-    return _NumberController.prototype.updateDisplay.call(this);
-  };
-  return NumberControllerSlider;
-})(NumberController);
-
-var FunctionController = (function (_Controller) {
-  _inheritsLoose(FunctionController, _Controller);
-  function FunctionController(object, property, text) {
-    var _this2;
-    _this2 = _Controller.call(this, object, property) || this;
-    var _this = _assertThisInitialized(_this2);
-    _this2.__button = document.createElement("div");
-    _this2.__button.innerHTML = text === undefined ? "Fire" : text;
-    dom.bind(_this2.__button, "click", function (e) {
-      e.preventDefault();
-      _this.fire();
-      return false;
-    });
-    dom.addClass(_this2.__button, "button");
-    _this2.domElement.appendChild(_this2.__button);
-    return _this2;
-  }
-  var _proto = FunctionController.prototype;
-  _proto.fire = function fire() {
-    if (this.__onChange) {
-      this.__onChange.call(this);
-    }
-    this.getValue().call(this.object);
-    if (this.__onFinishChange) {
-      this.__onFinishChange.call(this, this.getValue());
-    }
-  };
-  return FunctionController;
-})(Controller);
-
 var ColorController = (function (_Controller) {
   _inheritsLoose(ColorController, _Controller);
   function ColorController(object, property) {
     var _this2;
-    _this2 = _Controller.call(this, object, property) || this;
+    _this2 = _Controller.call(this, object, property, "color") || this;
     _this2.__color = new Color(_this2.getValue());
     _this2.__temp = new Color(0);
     var _this = _assertThisInitialized(_this2);
@@ -1316,7 +1715,7 @@ var ColorController = (function (_Controller) {
       height: "100%",
       background: "none",
     });
-    linearGradient(valueField, "top", "rgba(0,0,0,0)", "#000");
+    linearGradient$1(valueField, "top", "rgba(0,0,0,0)", "#000");
     Common.extend(_this2.__hue_field.style, {
       width: "15px",
       height: "100px",
@@ -1326,7 +1725,7 @@ var ColorController = (function (_Controller) {
       top: "3px",
       right: "3px",
     });
-    hueGradient(_this2.__hue_field);
+    hueGradient$1(_this2.__hue_field);
     Common.extend(_this2.__input.style, {
       outline: "none",
       textAlign: "center",
@@ -1378,14 +1777,13 @@ var ColorController = (function (_Controller) {
       if (i !== false) {
         _this.__color.__state = i;
         _this.setValue(_this.__color.toOriginal());
+        onFinish();
       } else {
         this.value = _this.__color.toString();
       }
     }
     function onFinish() {
-      if (_this.__onFinishChange) {
-        _this.__onFinishChange.call(_this, _this.__color.toOriginal());
-      }
+      _this.__propagateFinishChange(_this.__color.toOriginal());
     }
     _this2.__saturation_field.appendChild(valueField);
     _this2.__selector.appendChild(_this2.__field_knob);
@@ -1440,7 +1838,8 @@ var ColorController = (function (_Controller) {
     return _this2;
   }
   var _proto = ColorController.prototype;
-  _proto.updateDisplay = function updateDisplay() {
+  _proto.updateDisplay = function updateDisplay(force) {
+    if (!force && dom.isActive(this.__input)) return this;
     var i = interpret(this.getValue());
     if (i !== false) {
       var mismatch = false;
@@ -1475,7 +1874,7 @@ var ColorController = (function (_Controller) {
     this.__hue_knob.style.marginTop = (1 - this.__color.h / 360) * 100 + "px";
     this.__temp.s = 1;
     this.__temp.v = 1;
-    linearGradient(this.__saturation_field, "left", "#fff", this.__temp.toHexString());
+    linearGradient$1(this.__saturation_field, "left", "#fff", this.__temp.toHexString());
     this.__input.value = this.__color.toString();
     Common.extend(this.__input.style, {
       backgroundColor: this.__color.toHexString(),
@@ -1489,14 +1888,14 @@ var ColorController = (function (_Controller) {
   };
   return ColorController;
 })(Controller);
-var vendors = ["-moz-", "-o-", "-webkit-", "-ms-", ""];
-function linearGradient(elem, x, a, b) {
+var vendors$1 = ["-moz-", "-o-", "-webkit-", "-ms-", ""];
+function linearGradient$1(elem, x, a, b) {
   elem.style.background = "";
-  Common.each(vendors, function (vendor) {
+  Common.each(vendors$1, function (vendor) {
     elem.style.cssText += "background: " + vendor + "linear-gradient(" + x + ", " + a + " 0%, " + b + " 100%); ";
   });
 }
-function hueGradient(elem) {
+function hueGradient$1(elem) {
   elem.style.background = "";
   elem.style.cssText +=
     "background: -moz-linear-gradient(top,  #ff0000 0%, #ff00ff 17%, #0000ff 34%, #00ffff 50%, #00ff00 67%, #ffff00 84%, #ff0000 100%);";
@@ -1514,13 +1913,18 @@ var CustomController = (function (_Controller) {
   _inheritsLoose(CustomController, _Controller);
   function CustomController(object, property) {
     var _this;
-    _this = _Controller.call(this, object, property) || this;
+    _this = _Controller.call(this, object, property, "custom") || this;
+    for (var _len = arguments.length, params = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
+      params[_key - 2] = arguments[_key];
+    }
     _this.arguments = {
       object: object,
       property: property,
-      opts: Array.prototype.slice.call(arguments, 2),
+      opts: params,
     };
-    if (object.property) _this.property = object.property(_assertThisInitialized(_this));
+    if (object.property) {
+      _this.property = object.property(_assertThisInitialized(_this));
+    }
     return _this;
   }
   _createClass(CustomController, [
@@ -1537,14 +1941,1756 @@ var CustomController = (function (_Controller) {
   return CustomController;
 })(Controller);
 
+var FileController = (function (_Controller) {
+  _inheritsLoose(FileController, _Controller);
+  function FileController(object, property) {
+    var _this2;
+    _this2 = _Controller.call(this, object, property, "file") || this;
+    var _this = _assertThisInitialized(_this2);
+    function onChange(e) {
+      var fileReader = new FileReader();
+      fileReader.addEventListener("load", function (file) {
+        _this.fire(fileReader.result);
+      });
+      var file = e.target.files[0];
+      fileReader.readAsDataURL(file);
+    }
+    _this2.__input = document.createElement("input");
+    _this2.__input.setAttribute("type", "file");
+    dom.bind(_this2.__input, "change", onChange);
+    _this2.domElement.appendChild(_this2.__input);
+    return _this2;
+  }
+  var _proto = FileController.prototype;
+  _proto.fire = function fire(dataURL) {
+    if (this.__onChange) {
+      this.__onChange.call(this, dataURL);
+    }
+    this.getValue().call(this.object, dataURL);
+    if (this.__onFinishChange) {
+      this.__onFinishChange.call(this, dataURL);
+    }
+  };
+  return FileController;
+})(Controller);
+
+var FunctionController = (function (_Controller) {
+  _inheritsLoose(FunctionController, _Controller);
+  function FunctionController(object, property, text, user_data) {
+    var _this2;
+    _this2 = _Controller.call(this, object, property, "function") || this;
+    var _this = _assertThisInitialized(_this2);
+    if (!Common.isUndefined(user_data) && !Common.isArray(user_data)) {
+      user_data = [user_data];
+    }
+    _this2.__button = document.createElement("div");
+    _this2.__button.innerHTML = text === undefined ? "Fire" : text;
+    dom.bind(_this2.__button, "click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      _this.fire(user_data);
+      var liNode = _this.__button.parentElement.parentElement.parentElement;
+      dom.addClass(liNode, "function--active");
+      setTimeout(function () {
+        dom.removeClass(liNode, "function--active");
+      }, 100);
+      return false;
+    });
+    dom.addClass(_this2.__button, "button");
+    _this2.domElement.appendChild(_this2.__button);
+    return _this2;
+  }
+  var _proto = FunctionController.prototype;
+  _proto.fire = function fire(user_data, silent) {
+    if (!Common.isUndefined(user_data) && !Common.isArray(user_data)) {
+      user_data = [user_data];
+    }
+    var msg = {
+      userData: user_data,
+      silent: silent,
+      noGo: false,
+      eventSource: "fire",
+    };
+    if (!silent) {
+      msg.noGo = this.fireBeforeChange(msg);
+      this.__propagateChange(this.getValue());
+    }
+    if (!msg.noGo) {
+      this.getValue().apply(this.object, user_data);
+    }
+    if (!silent) {
+      this.fireChange(msg);
+      this.fireFinishChange(msg);
+      this.__propagateFinishChange(this.getValue());
+    }
+    this.updateDisplay();
+    return this;
+  };
+  return FunctionController;
+})(Controller);
+
+var GtColorController = (function (_Controller) {
+  _inheritsLoose(GtColorController, _Controller);
+  var _proto = GtColorController.prototype;
+  _proto.setValue2 = function setValue2(newValue) {
+    this.value2 = newValue;
+    if (this.object[this.property + "bg"]) {
+      this.object[this.property + "bg"] = this.value2;
+    }
+    if (this.__onChange) {
+      this.__onChange.call(this, newValue);
+    }
+    this.updateDisplay();
+    return this;
+  };
+  function GtColorController(object, property) {
+    var _this2;
+    _this2 = _Controller.call(this, object, property, "gtcolor") || this;
+    _this2.__color = new Color(_this2.getValue());
+    _this2.value2 = "#FFee00";
+    if (_this2.object[_this2.property + "bg"]) {
+      _this2.value2 = _this2.object[_this2.property + "bg"];
+    }
+    _this2.__color2 = new Color(_this2.value2);
+    _this2.__temp = new Color(0);
+    _this2.__temp2 = new Color(0);
+    var _this = _assertThisInitialized(_this2);
+    dom.makeSelectable(_this2.domElement, false);
+    _this2.__selector = document.createElement("div");
+    _this2.__saturation_field = document.createElement("div");
+    _this2.__saturation_field.className = "saturation-field";
+    _this2.__saturation_field2 = document.createElement("div");
+    _this2.__saturation_field2.className = "saturation-field";
+    _this2.__field_knob = document.createElement("div");
+    _this2.__field_knob.className = "field-knob";
+    _this2.__field_knob_border = "2px solid ";
+    _this2.__field_knob2 = document.createElement("div");
+    _this2.__field_knob2.className = "field-knob";
+    _this2.__field_knob_border2 = "2px solid ";
+    _this2.__hue_knob = document.createElement("div");
+    _this2.__hue_knob.className = "hue-knob";
+    _this2.__hue_knob2 = document.createElement("div");
+    _this2.__hue_knob2.className = "hue-knob";
+    _this2.__hue_field = document.createElement("div");
+    _this2.__hue_field.className = "hue-field";
+    _this2.__hue_field2 = document.createElement("div");
+    _this2.__hue_field2.className = "hue-field";
+    _this2.__input = document.createElement("input");
+    _this2.__input.type = "text";
+    _this2.__input_textShadow = "0 1px 1px ";
+    _this2.__input2 = document.createElement("input");
+    _this2.__input2.type = "text";
+    _this2.__input_textShadow2 = "0 1px 1px ";
+    dom.bind(_this2.__input, "keydown", function (e) {
+      if (e.keyCode === 13) {
+        onBlur.call(this);
+      }
+    });
+    dom.bind(_this2.__input2, "keydown", function (e) {
+      if (e.keyCode === 13) {
+        onBlur2.call(this);
+      }
+    });
+    dom.bind(_this2.__input, "blur", onBlur);
+    dom.bind(_this2.__input2, "blur", onBlur2);
+    var valueField = document.createElement("div");
+    var valueField2 = document.createElement("div");
+    Common.extend(_this2.__selector.style, {
+      width: "200px",
+      height: "102px",
+      marginTop: "22px",
+      backgroundColor: "#222",
+      boxShadow: "0px 1px 3px rgba(0,0,0,0.3)",
+    });
+    Common.extend(_this2.__field_knob.style, {
+      position: "absolute",
+      width: "12px",
+      height: "12px",
+      border: _this2.__field_knob_border + (_this2.__color.v < 0.5 ? "#fff" : "#000"),
+      boxShadow: "0px 1px 3px rgba(0,0,0,0.5)",
+      borderRadius: "12px",
+      zIndex: 1,
+    });
+    Common.extend(_this2.__field_knob2.style, {
+      position: "absolute",
+      left: "100",
+      width: "12px",
+      height: "12px",
+      border: _this2.__field_knob_border2 + (_this2.__color2.v < 0.5 ? "#fff" : "#000"),
+      boxShadow: "0px 1px 3px rgba(0,0,0,0.5)",
+      borderRadius: "12px",
+      zIndex: 1,
+    });
+    Common.extend(_this2.__hue_knob.style, {
+      position: "absolute",
+      width: "15px",
+      height: "2px",
+      left: "-15px",
+      borderRight: "4px solid #fff",
+      zIndex: 1,
+    });
+    Common.extend(_this2.__hue_knob2.style, {
+      position: "absolute",
+      width: "15px",
+      height: "2px",
+      left: "9px",
+      borderRight: "4px solid #fff",
+      zIndex: 1,
+    });
+    Common.extend(_this2.__saturation_field.style, {
+      width: "100px",
+      height: "100px",
+      border: "1px solid #555",
+      marginRight: "3px",
+      display: "inline-block",
+      cursor: "pointer",
+    });
+    Common.extend(_this2.__saturation_field2.style, {
+      left: "100px",
+      width: "100px",
+      height: "100px",
+      border: "1px solid #555",
+      marginRight: "3px",
+      display: "inline-block",
+      position: "absolute",
+      top: "22px",
+      cursor: "pointer",
+    });
+    Common.extend(valueField.style, {
+      width: "100%",
+      height: "100%",
+      background: "none",
+    });
+    Common.extend(valueField2.style, {
+      width: "100%",
+      height: "100%",
+      background: "none",
+    });
+    linearGradient$2(valueField, "top", "rgba(0,0,0,0)", "#000");
+    linearGradient$2(valueField2, "top", "rgba(0,0,0,0)", "#000");
+    Common.extend(_this2.__hue_field.style, {
+      width: "20px",
+      height: "100px",
+      border: "1px solid #555",
+      cursor: "ns-resize",
+      position: "absolute",
+      top: "3px",
+      marginTop: "19px",
+      left: "-20px",
+    });
+    Common.extend(_this2.__hue_field2.style, {
+      width: "20px",
+      height: "100px",
+      border: "1px solid #555",
+      cursor: "ns-resize",
+      position: "absolute",
+      top: "3px",
+      marginTop: "19px",
+      left: "200px",
+    });
+    hueGradient$2(_this2.__hue_field);
+    hueGradient$2(_this2.__hue_field2);
+    Common.extend(_this2.__input.style, {
+      outline: "none",
+      textAlign: "center",
+      color: "#fff",
+      border: 0,
+      left: "-20px",
+      position: "absolute",
+      fontWeight: "bold",
+      width: "120px",
+      textShadow: _this2.__input_textShadow + "rgba(0,0,0,0.7)",
+    });
+    Common.extend(_this2.__input2.style, {
+      outline: "none",
+      textAlign: "center",
+      color: "#fff",
+      border: 0,
+      left: "100px",
+      position: "absolute",
+      fontWeight: "bold",
+      width: "120px",
+      textShadow: _this2.__input_textShadow + "rgba(0,0,0,0.7)",
+    });
+    dom.bind(_this2.__saturation_field, "mousedown", fieldDown);
+    dom.bind(_this2.__saturation_field2, "mousedown", fieldDown2);
+    dom.bind(_this2.__field_knob, "mousedown", fieldDown);
+    dom.bind(_this2.__field_knob2, "mousedown", fieldDown2);
+    dom.bind(_this2.__hue_field, "mousedown", function (e) {
+      setH(e);
+      dom.bind(window, "mousemove", setH);
+      dom.bind(window, "mouseup", fieldUpH);
+    });
+    dom.bind(_this2.__hue_field2, "mousedown", function (e) {
+      setH2(e);
+      dom.bind(window, "mousemove", setH2);
+      dom.bind(window, "mouseup", fieldUpH2);
+    });
+    function fieldDown(e) {
+      setSV(e);
+      dom.bind(window, "mousemove", setSV);
+      dom.bind(window, "mouseup", fieldUpSV);
+    }
+    function fieldDown2(e) {
+      setSV2(e);
+      dom.bind(window, "mousemove", setSV2);
+      dom.bind(window, "mouseup", fieldUpSV2);
+    }
+    function fieldUpSV() {
+      dom.unbind(window, "mousemove", setSV);
+      dom.unbind(window, "mouseup", fieldUpSV);
+      onFinish();
+    }
+    function fieldUpSV2() {
+      dom.unbind(window, "mousemove", setSV2);
+      dom.unbind(window, "mouseup", fieldUpSV2);
+      onFinish2();
+    }
+    function onBlur() {
+      var i = interpret(this.value);
+      if (i !== false) {
+        _this.__color.__state = i;
+        _this.setValue(_this.__color.toOriginal());
+      } else {
+        this.value = _this.__color.toString();
+      }
+    }
+    function onBlur2() {
+      var i = interpret(this.value);
+      if (i !== false) {
+        _this.__color2.__state = i;
+        _this.setValue2(_this.__color2.toOriginal());
+      } else {
+        this.value = _this.__color2.toString();
+      }
+    }
+    function fieldUpH() {
+      dom.unbind(window, "mousemove", setH);
+      dom.unbind(window, "mouseup", fieldUpH);
+      onFinish();
+    }
+    function fieldUpH2() {
+      dom.unbind(window, "mousemove", setH2);
+      dom.unbind(window, "mouseup", fieldUpH2);
+      onFinish2();
+    }
+    function onFinish() {
+      if (_this.__onFinishChange) {
+        _this.__onFinishChange.call(_this, _this.__color2.toOriginal());
+      }
+    }
+    function onFinish2() {
+      if (_this.__onFinishChange) {
+        _this.__onFinishChange.call(_this, _this.__color.toOriginal());
+      }
+    }
+    _this2.__saturation_field.appendChild(valueField);
+    _this2.__selector.appendChild(_this2.__field_knob);
+    _this2.__selector.appendChild(_this2.__field_knob2);
+    _this2.__selector.appendChild(_this2.__saturation_field);
+    _this2.__saturation_field2.appendChild(valueField2);
+    _this2.__selector.appendChild(_this2.__saturation_field2);
+    _this2.__selector.appendChild(_this2.__hue_field);
+    _this2.__hue_field.appendChild(_this2.__hue_knob);
+    _this2.__hue_field2.appendChild(_this2.__hue_knob2);
+    _this2.__selector.appendChild(_this2.__hue_field2);
+    _this2.domElement.appendChild(_this2.__input2);
+    _this2.domElement.appendChild(_this2.__input);
+    _this2.domElement.appendChild(_this2.__selector);
+    _this2.updateDisplay();
+    function setSV2(e) {
+      e.preventDefault();
+      var fieldRect = _this.__saturation_field2.getBoundingClientRect();
+      var s = (e.clientX - fieldRect.left) / (fieldRect.right - fieldRect.left);
+      var v = 1 - (e.clientY - fieldRect.top) / (fieldRect.bottom - fieldRect.top);
+      if (v > 1) {
+        v = 1;
+      } else if (v < 0) {
+        v = 0;
+      }
+      if (s > 1) {
+        s = 1;
+      } else if (s < 0) {
+        s = 0;
+      }
+      _this.__color2.v = v;
+      _this.__color2.s = s;
+      _this.setValue2(_this.__color2.toOriginal());
+      return false;
+    }
+    function setSV(e) {
+      e.preventDefault();
+      var fieldRect = _this.__saturation_field.getBoundingClientRect();
+      var s = (e.clientX - fieldRect.left) / (fieldRect.right - fieldRect.left);
+      var v = 1 - (e.clientY - fieldRect.top) / (fieldRect.bottom - fieldRect.top);
+      if (v > 1) {
+        v = 1;
+      } else if (v < 0) {
+        v = 0;
+      }
+      if (s > 1) {
+        s = 1;
+      } else if (s < 0) {
+        s = 0;
+      }
+      _this.__color.v = v;
+      _this.__color.s = s;
+      _this.setValue(_this.__color.toOriginal());
+      return false;
+    }
+    function setH2(e) {
+      e.preventDefault();
+      var fieldRect = _this.__hue_field2.getBoundingClientRect();
+      var h = 1 - (e.clientY - fieldRect.top) / (fieldRect.bottom - fieldRect.top);
+      if (h > 1) {
+        h = 1;
+      } else if (h < 0) {
+        h = 0;
+      }
+      _this.__color2.h = h * 360;
+      _this.setValue2(_this.__color2.toOriginal());
+      return false;
+    }
+    function setH(e) {
+      e.preventDefault();
+      var fieldRect = _this.__hue_field.getBoundingClientRect();
+      var h = 1 - (e.clientY - fieldRect.top) / (fieldRect.bottom - fieldRect.top);
+      if (h > 1) {
+        h = 1;
+      } else if (h < 0) {
+        h = 0;
+      }
+      _this.__color.h = h * 360;
+      _this.setValue(_this.__color.toOriginal());
+      return false;
+    }
+    return _this2;
+  }
+  _proto.updateDisplay = function updateDisplay(force) {
+    if (!force && dom.isActive(this.__input)) return this;
+    var i = interpret(this.getValue());
+    if (i !== false) {
+      var mismatch = false;
+      Common.each(
+        Color.COMPONENTS,
+        function (component) {
+          if (
+            !Common.isUndefined(i[component]) &&
+            !Common.isUndefined(this.__color.__state[component]) &&
+            i[component] !== this.__color.__state[component]
+          ) {
+            mismatch = true;
+            return Common.BREAK;
+          }
+        },
+        this
+      );
+      if (mismatch) {
+        Common.extend(this.__color.__state, i);
+      }
+    }
+    Common.extend(this.__temp.__state, this.__color.__state);
+    Common.extend(this.__temp2.__state, this.__color2.__state);
+    this.__temp.a = 1;
+    this.__temp2.a = 1;
+    var flip = this.__color.v < 0.5 || this.__color.s > 0.5 ? 255 : 0;
+    var _flip = 255 - flip;
+    var flip2 = this.__color2.v < 0.5 || this.__color2.s > 0.5 ? 255 : 0;
+    var _flip2 = 255 - flip2;
+    Common.extend(this.__field_knob.style, {
+      marginLeft: 100 * this.__color.s - 7 + "px",
+      marginTop: 100 * (1 - this.__color.v) - 7 + "px",
+      backgroundColor: this.__temp.toHexString(),
+      border: this.__field_knob_border + "rgb(" + flip + "," + flip + "," + flip + ")",
+    });
+    Common.extend(this.__field_knob2.style, {
+      marginLeft: 100 * this.__color2.s - 7 + "px",
+      marginTop: 100 * (1 - this.__color2.v) - 7 + "px",
+      backgroundColor: this.__temp2.toHexString(),
+      border: this.__field_knob_border2 + "rgb(" + flip2 + "," + flip2 + "," + flip2 + ")",
+    });
+    this.__hue_knob.style.marginTop = (1 - this.__color.h / 360) * 100 + "px";
+    this.__hue_knob2.style.marginTop = (1 - this.__color2.h / 360) * 100 + "px";
+    this.__temp.s = 1;
+    this.__temp.v = 1;
+    this.__temp2.s = 1;
+    this.__temp2.v = 1;
+    linearGradient$2(this.__saturation_field, "left", "#fff", this.__temp.toHexString());
+    linearGradient$2(this.__saturation_field2, "left", "#fff", this.__temp2.toHexString());
+    this.__input.value = this.__color.toString();
+    this.__input2.value = this.__color2.toString();
+    Common.extend(this.__input.style, {
+      backgroundColor: this.__color.toHexString(),
+      color: "rgb(" + flip + "," + flip + "," + flip + ")",
+      textShadow: this.__input_textShadow + "rgba(" + _flip + "," + _flip + "," + _flip + ",.7)",
+    });
+    Common.extend(this.__input2.style, {
+      backgroundColor: this.__color2.toHexString(),
+      color: "rgb(" + flip2 + "," + flip2 + "," + flip2 + ")",
+      textShadow: this.__input_textShadow + "rgba(" + _flip2 + "," + _flip2 + "," + _flip2 + ",.7)",
+    });
+  };
+  return GtColorController;
+})(Controller);
+var vendors$2 = ["-moz-", "-o-", "-webkit-", "-ms-", ""];
+function linearGradient$2(elem, x, a, b) {
+  elem.style.background = "";
+  Common.each(vendors$2, function (vendor) {
+    elem.style.cssText += "background: " + vendor + "linear-gradient(" + x + ", " + a + " 0%, " + b + " 100%); ";
+  });
+}
+function hueGradient$2(elem) {
+  elem.style.background = "";
+  elem.style.cssText +=
+    "background: -moz-linear-gradient(top,  #ff0000 0%, #ff00ff 17%, #0000ff 34%, #00ffff 50%, #00ff00 67%, #ffff00 84%, #ff0000 100%);";
+  elem.style.cssText +=
+    "background: -webkit-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
+  elem.style.cssText +=
+    "background: -o-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
+  elem.style.cssText +=
+    "background: -ms-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
+  elem.style.cssText +=
+    "background: linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
+}
+
+var HSVColorController = (function (_Controller) {
+  _inheritsLoose(HSVColorController, _Controller);
+  function HSVColorController(object, property) {
+    var _this2;
+    _this2 = _Controller.call(this, object, property, "hsvcolor") || this;
+    _this2.__color = new Color(_this2.getValue());
+    _this2.__temp = new Color(0);
+    _this2.__temp2 = new Color(0);
+    var _this = _assertThisInitialized(_this2);
+    dom.makeSelectable(_this2.domElement, false);
+    _this2.__selector = document.createElement("div");
+    _this2.__field_knob = document.createElement("div");
+    _this2.__field_knob.className = "field-knob";
+    _this2.__field_knob_border = "2px solid ";
+    _this2.__field_knob2 = document.createElement("div");
+    _this2.__field_knob2.className = "field-knob";
+    _this2.__field_knob_border2 = "2px solid ";
+    _this2.__field_knob3 = document.createElement("div");
+    _this2.__field_knob3.className = "field-knob";
+    _this2.__field_knob_border3 = "2px solid ";
+    _this2.__hsv_field = document.createElement("div");
+    _this2.__hsv_field.className = "hue-field";
+    _this2.__hsv_field2 = document.createElement("div");
+    _this2.__hsv_field2.className = "hue-field";
+    _this2.__hsv_field3 = document.createElement("div");
+    _this2.__hsv_field3.className = "hue-field";
+    _this2.__hsv_fieldLabel = document.createElement("Label");
+    _this2.__hsv_fieldLabel.innerHTML = "H:";
+    _this2.__hsv_fieldLabel2 = document.createElement("Label");
+    _this2.__hsv_fieldLabel2.innerHTML = "S:";
+    _this2.__hsv_fieldLabel3 = document.createElement("Label");
+    _this2.__hsv_fieldLabel3.innerHTML = "V:";
+    _this2.__input = document.createElement("input");
+    _this2.__input.type = "text";
+    _this2.__input_textShadow = "0 1px 1px ";
+    dom.bind(_this2.__input, "keydown", function (e) {
+      if (e.keyCode === 13) {
+        onBlur.call(this);
+      }
+    });
+    dom.bind(_this2.__input, "blur", onBlur);
+    var valueField = document.createElement("div");
+    Common.extend(_this2.__selector.style, {
+      width: "256px",
+      height: "10px",
+      marginTop: "22px",
+      backgroundColor: "#222",
+      boxShadow: "0px 1px 3px rgba(0,0,0,0.3)",
+    });
+    Common.extend(_this2.__field_knob.style, {
+      position: "absolute",
+      width: "12px",
+      height: "12px",
+      border: _this2.__field_knob_border + (_this2.__color.v < 0.5 ? "#fff" : "#000"),
+      boxShadow: "0px 1px 3px rgba(0,0,0,0.5)",
+      borderRadius: "12px",
+      top: "-2",
+      zIndex: 1,
+    });
+    Common.extend(_this2.__field_knob2.style, {
+      position: "absolute",
+      width: "12px",
+      height: "12px",
+      border: _this2.__field_knob_border + (_this2.__color.v < 0.5 ? "#fff" : "#000"),
+      boxShadow: "0px 1px 3px rgba(0,0,0,0.5)",
+      borderRadius: "12px",
+      top: "-2",
+      zIndex: 1,
+    });
+    Common.extend(_this2.__field_knob3.style, {
+      position: "absolute",
+      width: "12px",
+      height: "12px",
+      border: _this2.__field_knob_border + (_this2.__color.v < 0.5 ? "#fff" : "#000"),
+      boxShadow: "0px 1px 3px rgba(0,0,0,0.5)",
+      borderRadius: "12px",
+      top: "-2",
+      zIndex: 1,
+    });
+    Common.extend(valueField.style, {
+      width: "100%",
+      height: "100%",
+      background: "none",
+    });
+    Common.extend(_this2.__hsv_field.style, {
+      width: "256px",
+      height: "20px",
+      border: "1px solid #555",
+      position: "absolute",
+      top: "30px",
+      left: "0px",
+    });
+    Common.extend(_this2.__hsv_field2.style, {
+      width: "256px",
+      height: "20px",
+      border: "1px solid #555",
+      position: "absolute",
+      top: "55px",
+      left: "0px",
+    });
+    Common.extend(_this2.__hsv_field3.style, {
+      width: "256px",
+      height: "20px",
+      border: "1px solid #555",
+      position: "absolute",
+      top: "80px",
+      left: "0px",
+    });
+    hueGradient$3(_this2.__hsv_field);
+    hueGradient$3(_this2.__hsv_field2);
+    hueGradient$3(_this2.__hsv_field3);
+    Common.extend(_this2.__input.style, {
+      outline: "none",
+      textAlign: "center",
+      color: "#fff",
+      border: 0,
+      left: "0px",
+      position: "absolute",
+      fontWeight: "bold",
+      width: "256px",
+      textShadow: _this2.__input_textShadow + "rgba(0,0,0,0.7)",
+    });
+    Common.extend(_this2.__hsv_fieldLabel.style, {
+      outline: "none",
+      textAlign: "left",
+      color: "#fff",
+      border: 0,
+      left: "-70px",
+      position: "absolute",
+      font: "bold 12px Courier",
+      width: "50px",
+      textShadow: _this2.__input_textShadow + "rgba(0,0,0,0.7)",
+    });
+    Common.extend(_this2.__hsv_fieldLabel2.style, {
+      outline: "none",
+      textAlign: "left",
+      color: "#fff",
+      border: 0,
+      left: "-70px",
+      position: "absolute",
+      font: "bold 12px Courier",
+      width: "50px",
+      textShadow: _this2.__input_textShadow + "rgba(0,0,0,0.7)",
+    });
+    Common.extend(_this2.__hsv_fieldLabel3.style, {
+      outline: "none",
+      textAlign: "left",
+      color: "#fff",
+      border: 0,
+      left: "-70px",
+      position: "absolute",
+      font: "bold 12px Courier",
+      width: "50px",
+      textShadow: _this2.__input_textShadow + "rgba(0,0,0,0.7)",
+    });
+    dom.bind(_this2.__hsv_field, "mousedown", function (e) {
+      setH(e);
+      dom.bind(window, "mousemove", setH);
+      dom.bind(window, "mouseup", fieldUpH);
+    });
+    dom.bind(_this2.__hsv_field2, "mousedown", function (e) {
+      setS(e);
+      dom.bind(window, "mousemove", setS);
+      dom.bind(window, "mouseup", fieldUpS);
+    });
+    dom.bind(_this2.__hsv_field3, "mousedown", function (e) {
+      setV(e);
+      dom.bind(window, "mousemove", setV);
+      dom.bind(window, "mouseup", fieldUpV);
+    });
+    function fieldUpH() {
+      dom.unbind(window, "mousemove", setH);
+      dom.unbind(window, "mouseup", fieldUpH);
+      onFinish();
+    }
+    function fieldUpS() {
+      dom.unbind(window, "mousemove", setS);
+      dom.unbind(window, "mouseup", fieldUpS);
+      onFinish();
+    }
+    function fieldUpV() {
+      dom.unbind(window, "mousemove", setV);
+      dom.unbind(window, "mouseup", fieldUpV);
+      onFinish();
+    }
+    function onBlur() {
+      var i = interpret(this.value);
+      if (i !== false) {
+        _this.__color.__state = i;
+        _this.setValue(_this.__color.toOriginal());
+      } else {
+        this.value = _this.__color.toString();
+      }
+    }
+    function onFinish() {
+      if (_this.__onFinishChange) {
+        _this.__onFinishChange.call(_this, _this.__color.toOriginal());
+      }
+    }
+    Common.extend(_this2.domElement.style, {
+      height: "100px",
+    });
+    _this2.__hsv_field.appendChild(_this2.__field_knob);
+    _this2.__hsv_field2.appendChild(_this2.__field_knob2);
+    _this2.__hsv_field3.appendChild(_this2.__field_knob3);
+    _this2.__selector.appendChild(_this2.__hsv_field);
+    _this2.__selector.appendChild(_this2.__hsv_field2);
+    _this2.__selector.appendChild(_this2.__hsv_field3);
+    _this2.__hsv_field.appendChild(_this2.__hsv_fieldLabel);
+    _this2.__hsv_field2.appendChild(_this2.__hsv_fieldLabel2);
+    _this2.__hsv_field3.appendChild(_this2.__hsv_fieldLabel3);
+    _this2.domElement.appendChild(_this2.__input);
+    _this2.domElement.appendChild(_this2.__selector);
+    _this2.updateDisplay();
+    function setS(e) {
+      var fieldRect = _this.__hsv_field.getBoundingClientRect();
+      var s = (e.clientX - fieldRect.left) / (fieldRect.right - fieldRect.left);
+      e.preventDefault();
+      _this.__color.s = Math.min(Math.max(s, 0), 1);
+      _this.setValue(_this.__color.toOriginal());
+      return false;
+    }
+    function setV(e) {
+      var fieldRect = _this.__hsv_field.getBoundingClientRect();
+      var v = (e.clientX - fieldRect.left) / (fieldRect.right - fieldRect.left);
+      e.preventDefault();
+      _this.__color.v = Math.min(Math.max(v, 0), 1);
+      _this.setValue(_this.__color.toOriginal());
+      return false;
+    }
+    function setH(e) {
+      var fieldRect = _this.__hsv_field.getBoundingClientRect();
+      var h = (e.clientX - fieldRect.left) / (fieldRect.right - fieldRect.left);
+      e.preventDefault();
+      _this.__color.h = Math.min(Math.max(h, 0), 1) * 360;
+      _this.setValue(_this.__color.toOriginal());
+      return false;
+    }
+    return _this2;
+  }
+  var _proto = HSVColorController.prototype;
+  _proto.updateDisplay = function updateDisplay(force) {
+    if (!force && dom.isActive(this.__input)) return this;
+    var i = interpret(this.getValue());
+    if (i !== false) {
+      var mismatch = false;
+      Common.each(
+        Color.COMPONENTS,
+        function (component) {
+          if (
+            !Common.isUndefined(i[component]) &&
+            !Common.isUndefined(this.__color.__state[component]) &&
+            i[component] !== this.__color.__state[component]
+          ) {
+            mismatch = true;
+            return Common.BREAK;
+          }
+        },
+        this
+      );
+      if (mismatch) {
+        Common.extend(this.__color.__state, i);
+      }
+    }
+    Common.extend(this.__temp.__state, this.__color.__state);
+    this.__temp.a = 1;
+    this.__temp2.a = 1;
+    var flip = this.__color.v < 0.5 || this.__color.s > 0.5 ? 255 : 0;
+    var _flip = 255 - flip;
+    Common.extend(this.__field_knob.style, {
+      marginLeft: parseInt((this.__color.h / 360) * 256 - 7, 10) + "px",
+      marginTop: "5px",
+      border: this.__field_knob_border + "rgb(255,255,255)",
+    });
+    Common.extend(this.__field_knob2.style, {
+      marginLeft: 256 * this.__color.s - 7 + "px",
+      marginTop: "5px",
+      border: this.__field_knob_border + "rgb(" + flip + "," + flip + "," + flip + ")",
+    });
+    Common.extend(this.__field_knob3.style, {
+      marginLeft: 256 * this.__color.v - 7 + "px",
+      marginTop: "5px",
+      border: this.__field_knob_border + "rgb(" + flip + "," + flip + "," + flip + ")",
+    });
+    this.__hsv_fieldLabel.innerHTML = "H: " + parseInt(this.__color.h, 10);
+    this.__hsv_fieldLabel2.innerHTML = "S: " + parseInt(this.__color.s * 100, 10);
+    this.__hsv_fieldLabel3.innerHTML = "V: " + parseInt(this.__color.v * 100, 10);
+    this.__temp.h = this.__color.h;
+    this.__temp.v = this.__color.v;
+    this.__temp.s = 1;
+    this.__temp2.s = this.__color.s;
+    this.__temp2.h = this.__color.h;
+    this.__temp2.v = 1;
+    linearGradient$3(this.__hsv_field2, "left", "#fff", this.__temp.toHexString());
+    linearGradient$3(this.__hsv_field3, "left", "#000", this.__temp2.toHexString());
+    this.__input.value = this.__color.toString();
+    Common.extend(this.__input.style, {
+      backgroundColor: this.__color.toHexString(),
+      color: "rgb(" + flip + "," + flip + "," + flip + ")",
+      textShadow: this.__input_textShadow + "rgba(" + _flip + "," + _flip + "," + _flip + ",.7)",
+    });
+  };
+  return HSVColorController;
+})(Controller);
+var vendors$3 = ["-moz-", "-o-", "-webkit-", "-ms-", ""];
+function linearGradient$3(elem, x, a, b) {
+  elem.style.background = "";
+  Common.each(vendors$3, function (vendor) {
+    elem.style.cssText += "background: " + vendor + "linear-gradient(" + x + ", " + a + " 0%, " + b + " 100%); ";
+  });
+}
+function hueGradient$3(elem) {
+  elem.style.background = "";
+  elem.style.cssText +=
+    "background: -moz-linear-gradient(right,  #ff0000 0%, #ff00ff 17%, #0000ff 34%, #00ffff 50%, #00ff00 67%, #ffff00 84%, #ff0000 100%);";
+  elem.style.cssText +=
+    "background: -webkit-linear-gradient(right,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
+  elem.style.cssText +=
+    "background: -o-linear-gradient(right,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
+  elem.style.cssText +=
+    "background: -ms-linear-gradient(right,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
+  elem.style.cssText +=
+    "background: linear-gradient(right,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
+}
+
+var ImageController$1 = (function (_Controller) {
+  _inheritsLoose(ImageController, _Controller);
+  function ImageController(object, property) {
+    var _this2;
+    _this2 = _Controller.call(this, object, property, "image") || this;
+    var _this = _assertThisInitialized(_this2);
+    _this2.__input = document.createElement("input");
+    _this2.__input.setAttribute("type", "file");
+    _this2.__input.style.display = "none";
+    _this2.__label = document.createElement("label");
+    _this2.__label.innerText = _this2.getValue();
+    _this2.__label.appendChild(_this2.__input);
+    _this2.__previewImage = document.createElement("img");
+    dom.addClass(_this2.__previewImage, "GUI-preview-image");
+    dom.addClass(_this2.__label, "GUI-label-image");
+    function onChange() {
+      var file = _this.__input.files[0];
+      var url = URL.createObjectURL(file);
+      _this.__previewImage.src = url;
+      _this.setValue(url);
+    }
+    dom.bind(_this2.__input, "change", onChange);
+    _this2.updateDisplay();
+    _this2.domElement.appendChild(_this2.__previewImage);
+    _this2.domElement.appendChild(_this2.__label);
+    return _this2;
+  }
+  var _proto = ImageController.prototype;
+  _proto.updateDisplay = function updateDisplay() {
+    this.__previewImage.src = this.getValue();
+    return _Controller.prototype.updateDisplay.call(this);
+  };
+  return ImageController;
+})(Controller);
+
+var NgColorController = (function (_Controller) {
+  _inheritsLoose(NgColorController, _Controller);
+  function NgColorController(object, property) {
+    var _this2;
+    _this2 = _Controller.call(this, object, property, "ngcolor") || this;
+    _this2.__color = new Color(_this2.getValue());
+    _this2.__temp = new Color(0);
+    var _this = _assertThisInitialized(_this2);
+    dom.makeSelectable(_this2.domElement, false);
+    _this2.__selector = document.createElement("div");
+    _this2.__saturation_field = document.createElement("div");
+    _this2.__saturation_field.className = "saturation-field";
+    _this2.__field_knob = document.createElement("div");
+    _this2.__field_knob.className = "field-knob";
+    _this2.__field_knob_border = "2px solid ";
+    _this2.__hue_knob = document.createElement("div");
+    _this2.__hue_knob.className = "hue-knob";
+    _this2.__hue_field = document.createElement("div");
+    _this2.__hue_field.className = "hue-field";
+    _this2.__input = document.createElement("input");
+    _this2.__input.type = "text";
+    _this2.__input_textShadow = "0 1px 1px ";
+    dom.bind(_this2.__input, "keydown", function (e) {
+      if (e.keyCode === 13) {
+        onBlur.call(this);
+      }
+    });
+    dom.bind(_this2.__input, "blur", onBlur);
+    dom.bind(_this2.__selector, "mousedown", function () {
+      dom.addClass(this, "drag").bind(window, "mouseup", function () {
+        dom.removeClass(_this.__selector, "drag");
+      });
+    });
+    var valueField = document.createElement("div");
+    Common.extend(_this2.__selector.style, {
+      width: "120px",
+      height: "102px",
+      marginTop: "22px",
+      padding: "3px",
+      backgroundColor: "#222",
+      boxShadow: "0px 1px 3px rgba(0,0,0,0.3)",
+    });
+    Common.extend(_this2.__field_knob.style, {
+      position: "absolute",
+      width: "12px",
+      height: "12px",
+      border: _this2.__field_knob_border + (_this2.__color.v < 0.5 ? "#fff" : "#000"),
+      boxShadow: "0px 1px 3px rgba(0,0,0,0.5)",
+      borderRadius: "12px",
+      zIndex: 1,
+    });
+    Common.extend(_this2.__hue_knob.style, {
+      position: "absolute",
+      width: "15px",
+      height: "2px",
+      left: "9px",
+      borderRight: "4px solid #fff",
+      zIndex: 1,
+    });
+    Common.extend(_this2.__saturation_field.style, {
+      width: "100px",
+      height: "100px",
+      border: "1px solid #555",
+      marginRight: "3px",
+      display: "inline-block",
+      position: "absolute",
+      top: "22px",
+      cursor: "pointer",
+    });
+    Common.extend(valueField.style, {
+      width: "100%",
+      height: "100%",
+      background: "none",
+    });
+    linearGradient$4(valueField, "top", "rgba(0,0,0,0)", "#000");
+    Common.extend(_this2.__hue_field.style, {
+      width: "20px",
+      height: "100px",
+      border: "1px solid #555",
+      cursor: "ns-resize",
+      position: "absolute",
+      top: "3px",
+      marginTop: "19px",
+      left: "100px",
+    });
+    hueGradient$4(_this2.__hue_field);
+    Common.extend(_this2.__input.style, {
+      outline: "none",
+      textAlign: "center",
+      color: "#fff",
+      border: 0,
+      left: "0",
+      position: "absolute",
+      width: "120px",
+      fontWeight: "bold",
+      textShadow: _this2.__input_textShadow + "rgba(0,0,0,0.7)",
+    });
+    dom.bind(_this2.__saturation_field, "mousedown", fieldDown);
+    dom.bind(_this2.__field_knob, "mousedown", fieldDown);
+    dom.bind(_this2.__hue_field, "mousedown", function (e) {
+      setH(e);
+      dom.bind(window, "mousemove", setH);
+      dom.bind(window, "mouseup", fieldUpH);
+    });
+    function fieldDown(e) {
+      setSV(e);
+      dom.bind(window, "mousemove", setSV);
+      dom.bind(window, "mouseup", fieldUpSV);
+    }
+    function fieldUpSV() {
+      dom.unbind(window, "mousemove", setSV);
+      dom.unbind(window, "mouseup", fieldUpSV);
+      onFinish();
+    }
+    function onBlur() {
+      var i = interpret(this.value);
+      if (i !== false) {
+        _this.__color.__state = i;
+        _this.setValue(_this.__color.toOriginal());
+      } else {
+        this.value = _this.__color.toString();
+      }
+    }
+    function fieldUpH() {
+      dom.unbind(window, "mousemove", setH);
+      dom.unbind(window, "mouseup", fieldUpH);
+      onFinish();
+    }
+    function onFinish() {
+      _this.__propagateFinishChange(_this.__color.toOriginal());
+    }
+    _this2.__saturation_field.appendChild(valueField);
+    _this2.__selector.appendChild(_this2.__field_knob);
+    _this2.__selector.appendChild(_this2.__saturation_field);
+    _this2.__selector.appendChild(_this2.__hue_field);
+    _this2.__hue_field.appendChild(_this2.__hue_knob);
+    _this2.domElement.appendChild(_this2.__input);
+    _this2.domElement.appendChild(_this2.__selector);
+    _this2.updateDisplay();
+    function setSV(e) {
+      e.preventDefault();
+      var fieldRect = _this.__saturation_field.getBoundingClientRect();
+      var s = (e.clientX - fieldRect.left) / (fieldRect.right - fieldRect.left);
+      var v = 1 - (e.clientY - fieldRect.top) / (fieldRect.bottom - fieldRect.top);
+      if (v > 1) {
+        v = 1;
+      } else if (v < 0) {
+        v = 0;
+      }
+      if (s > 1) {
+        s = 1;
+      } else if (s < 0) {
+        s = 0;
+      }
+      _this.__color.v = v;
+      _this.__color.s = s;
+      _this.setValue(_this.__color.toOriginal());
+      return false;
+    }
+    function setH(e) {
+      e.preventDefault();
+      var fieldRect = _this.__hue_field.getBoundingClientRect();
+      var h = 1 - (e.clientY - fieldRect.top) / (fieldRect.bottom - fieldRect.top);
+      if (h > 1) {
+        h = 1;
+      } else if (h < 0) {
+        h = 0;
+      }
+      _this.__color.h = h * 360;
+      _this.setValue(_this.__color.toOriginal());
+      return false;
+    }
+    return _this2;
+  }
+  var _proto = NgColorController.prototype;
+  _proto.updateDisplay = function updateDisplay(force) {
+    if (!force && dom.isActive(this.__input)) return this;
+    var i = interpret(this.getValue());
+    if (i !== false) {
+      var mismatch = false;
+      Common.each(
+        Color.COMPONENTS,
+        function (component) {
+          if (
+            !Common.isUndefined(i[component]) &&
+            !Common.isUndefined(this.__color.__state[component]) &&
+            i[component] !== this.__color.__state[component]
+          ) {
+            mismatch = true;
+            return Common.BREAK;
+          }
+        },
+        this
+      );
+      if (mismatch) {
+        Common.extend(this.__color.__state, i);
+      }
+    }
+    Common.extend(this.__temp.__state, this.__color.__state);
+    this.__temp.a = 1;
+    var flip = this.__color.v < 0.5 || this.__color.s > 0.5 ? 255 : 0;
+    var _flip = 255 - flip;
+    Common.extend(this.__field_knob.style, {
+      marginLeft: 100 * this.__color.s - 7 + "px",
+      marginTop: 100 * (1 - this.__color.v) - 7 + "px",
+      backgroundColor: this.__temp.toHexString(),
+      border: this.__field_knob_border + "rgb(" + flip + "," + flip + "," + flip + ")",
+    });
+    this.__hue_knob.style.marginTop = (1 - this.__color.h / 360) * 100 + "px";
+    this.__temp.s = 1;
+    this.__temp.v = 1;
+    linearGradient$4(this.__saturation_field, "left", "#fff", this.__temp.toHexString());
+    this.__input.value = this.__color.toString();
+    Common.extend(this.__input.style, {
+      backgroundColor: this.__color.toHexString(),
+      color: "rgb(" + flip + "," + flip + "," + flip + ")",
+      textShadow: this.__input_textShadow + "rgba(" + _flip + "," + _flip + "," + _flip + ",.7)",
+    });
+  };
+  return NgColorController;
+})(Controller);
+var vendors$4 = ["-moz-", "-o-", "-webkit-", "-ms-", ""];
+function linearGradient$4(elem, x, a, b) {
+  elem.style.background = "";
+  Common.each(vendors$4, function (vendor) {
+    elem.style.cssText += "background: " + vendor + "linear-gradient(" + x + ", " + a + " 0%, " + b + " 100%); ";
+  });
+}
+function hueGradient$4(elem) {
+  elem.style.background = "";
+  elem.style.cssText +=
+    "background: -moz-linear-gradient(top,  #ff0000 0%, #ff00ff 17%, #0000ff 34%, #00ffff 50%, #00ff00 67%, #ffff00 84%, #ff0000 100%);";
+  elem.style.cssText +=
+    "background: -webkit-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
+  elem.style.cssText +=
+    "background: -o-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
+  elem.style.cssText +=
+    "background: -ms-linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
+  elem.style.cssText +=
+    "background: linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
+}
+
+function numDecimals(x) {
+  var _x = x.toString();
+  if (_x.indexOf(".") > -1) {
+    var prec = _x.length - _x.indexOf(".") - 1;
+    return Math.min(prec, 9);
+  }
+  return 0;
+}
+function guestimateImpliedStep(initialValue, userSpecifiedStep, minimumSaneStepSize, maximumSaneStepSize) {
+  if (Common.isFiniteNumber(userSpecifiedStep)) {
+    return userSpecifiedStep;
+  }
+  var v;
+  if (!initialValue) {
+    v = 1;
+  } else {
+    v = Math.pow(10, Math.floor(Math.log(Math.abs(initialValue)) / Math.LN10) - 1);
+  }
+  return Math.max(minimumSaneStepSize, Math.min(maximumSaneStepSize, v));
+}
+var NumberController = (function (_Controller) {
+  _inheritsLoose(NumberController, _Controller);
+  function NumberController(object, property, params) {
+    var _this;
+    _this = _Controller.call(this, object, property, "number") || this;
+    if (typeof _this.getValue() !== "number") {
+      throw new Error("Provided value is not a number");
+    }
+    params = params || {};
+    _this.__min = Common.isFiniteNumber(params.min) ? params.min : undefined;
+    _this.__max = Common.isFiniteNumber(params.max) ? params.max : undefined;
+    _this.__step = Common.isFiniteNumber(params.step) ? params.step : undefined;
+    _this.__minimumSaneStepSize = params.minimumSaneStepSize || 1e-9;
+    _this.__maximumSaneStepSize = params.maximumSaneStepSize || 1e12;
+    _this.__mode = params.mode || "linear";
+    _this.__impliedStep = guestimateImpliedStep(
+      _this.initialValue,
+      _this.__step,
+      _this.__minimumSaneStepSize,
+      _this.__maximumSaneStepSize
+    );
+    _this.__precision = numDecimals(_this.__impliedStep);
+    return _this;
+  }
+  var _proto = NumberController.prototype;
+  _proto.setValue = function setValue(v) {
+    if (this.__min != null && v < this.__min) {
+      v = this.__min;
+    } else if (this.__max != null && v > this.__max) {
+      v = this.__max;
+    }
+    if (this.__step != null && v % this.__step !== 0) {
+      v = Math.round(v / this.__step) * this.__step;
+    }
+    if (this.__mode !== "linear") {
+      var old_step = this.__impliedStep;
+      this.__impliedStep = guestimateImpliedStep(
+        v,
+        this.__step,
+        this.__minimumSaneStepSize,
+        this.__maximumSaneStepSize
+      );
+      if (old_step !== this.__impliedStep) {
+        this.__precision = numDecimals(this.__impliedStep);
+        console.log("number controller: new step = ", this.__impliedStep, ", precision: ", this.__precision);
+      }
+    }
+    return _Controller.prototype.setValue.call(this, v);
+  };
+  _proto.min = function min(minValue) {
+    this.__min = Common.isFiniteNumber(minValue) ? minValue : undefined;
+    return this;
+  };
+  _proto.max = function max(maxValue) {
+    this.__max = Common.isFiniteNumber(maxValue) ? maxValue : undefined;
+    return this;
+  };
+  _proto.step = function step(stepValue) {
+    this.__step = Common.isFiniteNumber(stepValue) ? stepValue : undefined;
+    this.__impliedStep = guestimateImpliedStep(
+      this.getValue(),
+      this.__step,
+      this.__minimumSaneStepSize,
+      this.__maximumSaneStepSize
+    );
+    this.__precision = numDecimals(this.__impliedStep);
+    return this;
+  };
+  _proto.mode = function mode(m) {
+    this.__mode = m || "linear";
+    return this;
+  };
+  _proto.getMetaInfo = function getMetaInfo() {
+    return {
+      min: this.__min,
+      max: this.__max,
+      step: this.__step,
+      minimumSaneStepSize: this.__minimumSaneStepSize,
+      maximumSaneStepSize: this.__maximumSaneStepSize,
+      mode: this.__mode,
+      impliedStep: this.__impliedStep,
+      precision: this.__precision,
+    };
+  };
+  return NumberController;
+})(Controller);
+
+function roundToDecimal(value, decimals) {
+  var tenTo = Math.pow(10, decimals);
+  return Math.round(value * tenTo) / tenTo;
+}
+var NumberControllerBox = (function (_NumberController) {
+  _inheritsLoose(NumberControllerBox, _NumberController);
+  function NumberControllerBox(object, property, params) {
+    var _this2;
+    _this2 = _NumberController.call(this, object, property, params) || this;
+    params = params || {};
+    _this2.__suffix = params.suffix || "";
+    _this2.__truncationSuspended = false;
+    var _this = _assertThisInitialized(_this2);
+    _this2.__suspendUpdate = false;
+    var prevY;
+    function onKeyDown(e) {
+      switch (e.keyCode) {
+        case 13:
+          _this.__truncationSuspended = true;
+          this.blur();
+          _this.__truncationSuspended = false;
+          onFinish();
+          break;
+        case 38:
+          _this.setValue(_this.getValue() + _this.__impliedStep);
+          break;
+        case 40:
+          _this.setValue(_this.getValue() - _this.__impliedStep);
+          break;
+      }
+    }
+    function onChange(e) {
+      var value = _this.__input.value;
+      if (params && _this.__suffix) {
+        value = value.replace(_this.__suffix, "");
+      }
+      var attempted = parseFloat(value);
+      if (!Common.isNaN(attempted)) {
+        _this.setValue(attempted);
+      }
+    }
+    function onFinish() {
+      _this.__propagateFinishChange(_this.getValue());
+    }
+    function onFocus() {
+      this.__suspendUpdate = true;
+    }
+    function onBlur() {
+      this.__suspendUpdate = false;
+      onFinish();
+    }
+    function onMouseDrag(e) {
+      var diff = prevY - e.clientY;
+      _this.setValue(_this.getValue() + diff * _this.__impliedStep);
+      prevY = e.clientY;
+    }
+    function onMouseUp(e) {
+      dom.unbind(window, "mousemove", onMouseDrag);
+      dom.unbind(window, "mouseup", onMouseUp);
+      onFinish();
+    }
+    function onMouseDown(e) {
+      dom.bind(window, "mousemove", onMouseDrag);
+      dom.bind(window, "mouseup", onMouseUp);
+      prevY = e.clientY;
+    }
+    function onWheel(e) {
+      e.preventDefault();
+      var direction = -e.deltaY >> 10 || 1;
+      _this.setValue(_this.getValue() + direction * _this.__impliedStep);
+    }
+    _this2.__input = document.createElement("input");
+    _this2.__input.setAttribute("type", "number");
+    dom.bind(_this2.__input, "focus", onFocus);
+    dom.bind(_this2.__input, "change", onChange);
+    dom.bind(_this2.__input, "blur", onBlur);
+    dom.bind(_this2.__input, "mousedown", onMouseDown);
+    dom.bind(_this2.__input, "wheel", onWheel);
+    dom.bind(_this2.__input, "keydown", onKeyDown);
+    _this2.updateDisplay();
+    _this2.domElement.appendChild(_this2.__input);
+    return _this2;
+  }
+  var _proto = NumberControllerBox.prototype;
+  _proto.updateDisplay = function updateDisplay(force) {
+    if (!force && dom.isActive(this.__input)) {
+      return this;
+    }
+    if (this.__suspendUpdate) return;
+    this.__input.value = this.__truncationSuspended
+      ? this.getValue()
+      : roundToDecimal(this.getValue(), this.__precision) + this.__suffix;
+    return _NumberController.prototype.updateDisplay.call(this);
+  };
+  _proto.step = function step(v) {
+    if (this.__input.getAttribute("type") !== "number") {
+      this.__input.setAttribute("type", "number");
+    }
+    this.__input.setAttribute("step", v);
+    return _NumberController.prototype.step.apply(this, arguments);
+  };
+  return NumberControllerBox;
+})(NumberController);
+
+function map(v, i1, i2, o1, o2) {
+  return o1 + (o2 - o1) * ((v - i1) / (i2 - i1));
+}
+var NumberControllerSlider = (function (_NumberController) {
+  _inheritsLoose(NumberControllerSlider, _NumberController);
+  function NumberControllerSlider(object, property, min, max, step) {
+    var _this2;
+    _this2 =
+      _NumberController.call(this, object, property, {
+        min: min,
+        max: max,
+        step: step,
+      }) || this;
+    var _this = _assertThisInitialized(_this2);
+    _this2.__background = document.createElement("div");
+    _this2.__foreground = document.createElement("div");
+    dom.bind(_this2.__background, "mousedown", onMouseDown);
+    dom.bind(_this2.__background, "touchstart", onTouchStart);
+    dom.bind(_this2.__background, "wheel", onWheel);
+    dom.addClass(_this2.__background, "slider");
+    dom.addClass(_this2.__foreground, "slider-fg");
+    function onMouseDown(e) {
+      document.activeElement.blur();
+      dom.bind(window, "mousemove", onMouseDrag);
+      dom.bind(window, "mouseup", onMouseUp);
+      onMouseDrag(e);
+    }
+    function onMouseDrag(e) {
+      e.preventDefault();
+      onDrag(e);
+    }
+    function onDrag(e) {
+      var bgRect = _this.__background.getBoundingClientRect();
+      _this.setValue(map(e.clientX, bgRect.left, bgRect.right, _this.__min, _this.__max));
+      return false;
+    }
+    function onMouseUp(e) {
+      dom.unbind(window, "mousemove", onMouseDrag);
+      dom.unbind(window, "mouseup", onMouseUp);
+      _this.__propagateFinishChange(_this.getValue());
+    }
+    function onTouchStart(e) {
+      if (e.touches.length !== 1) {
+        return;
+      }
+      dom.bind(window, "touchmove", onTouchMove);
+      dom.bind(window, "touchend", onTouchEnd);
+      onTouchMove(e);
+    }
+    function onTouchMove(e) {
+      var clientX = e.touches[0].clientX;
+      var bgRect = _this.__background.getBoundingClientRect();
+      _this.setValue(map(clientX, bgRect.left, bgRect.right, _this.__min, _this.__max));
+    }
+    function onTouchEnd() {
+      dom.unbind(window, "touchmove", onTouchMove);
+      dom.unbind(window, "touchend", onTouchEnd);
+      if (_this.__onFinishChange) {
+        _this.__onFinishChange.call(_this, _this.getValue());
+      }
+    }
+    function onWheel(e) {
+      e.preventDefault();
+      var direction = -e.deltaY >> 10 || 1;
+      _this.setValue(_this.getValue() + direction * _this.__impliedStep);
+    }
+    _this2.updateDisplay();
+    _this2.__background.appendChild(_this2.__foreground);
+    _this2.domElement.appendChild(_this2.__background);
+    return _this2;
+  }
+  var _proto = NumberControllerSlider.prototype;
+  _proto.updateDisplay = function updateDisplay() {
+    if (this.__input === document.activeElement) {
+      return this;
+    }
+    var value = this.getValue();
+    var pct = (value - this.__min) / (this.__max - this.__min);
+    this.__foreground.style.width = pct * 100 + "%";
+    return _NumberController.prototype.updateDisplay.call(this);
+  };
+  return NumberControllerSlider;
+})(NumberController);
+
+var OptionController = (function (_Controller) {
+  _inheritsLoose(OptionController, _Controller);
+  function OptionController(object, property, params) {
+    var _this2;
+    _this2 = _Controller.call(this, object, property, "option") || this;
+    var _this = _assertThisInitialized(_this2);
+    params = params || {};
+    _this2.__select = document.createElement("select");
+    if (Common.isArray(params)) {
+      var map = {};
+      Common.each(params, function (element) {
+        map[element] = element;
+      });
+      params = map;
+    }
+    Common.each(params, function (value, key) {
+      var opt = document.createElement("option");
+      opt.innerHTML = key;
+      opt.setAttribute("value", value);
+      _this.__select.appendChild(opt);
+    });
+    _this2.updateDisplay();
+    dom.bind(_this2.__select, "change", function () {
+      var desiredValue = this.options[this.selectedIndex].value;
+      _this.setValue(desiredValue);
+    });
+    _this2.domElement.appendChild(_this2.__select);
+    return _this2;
+  }
+  var _proto = OptionController.prototype;
+  _proto.setValue = function setValue(v) {
+    if (this._readonly) {
+      return this.getValue();
+    }
+    var toReturn = _Controller.prototype.setValue.call(this, v);
+    this.__propagateFinishChange(this.getValue());
+    return toReturn;
+  };
+  _proto.updateDisplay = function updateDisplay(force) {
+    if (!force && dom.isActive(this.__select) && !this.forceUpdateDisplay) {
+      return this;
+    }
+    this.__select.value = this.getValue();
+    return _Controller.prototype.updateDisplay.call(this, force);
+  };
+  return OptionController;
+})(Controller);
+
+var plotter = function plotter(fg, bg, type) {
+  var round = Math.round;
+  var PR = round(window.devicePixelRatio || 1);
+  var WIDTH = 160 * PR;
+  var HEIGHT = 60 * PR;
+  var GRAPH_X = 3 * PR;
+  var GRAPH_Y = 3 * PR;
+  var GRAPH_WIDTH = 154 * PR;
+  var GRAPH_HEIGHT = 54 * PR;
+  var canvas = document.createElement("canvas");
+  canvas.width = WIDTH;
+  canvas.height = HEIGHT;
+  var context = canvas.getContext("2d");
+  context.font = "bold " + 9 * PR + "px Helvetica,Arial,sans-serif";
+  context.textBaseline = "top";
+  context.fillStyle = bg;
+  context.fillRect(0, 0, WIDTH, HEIGHT);
+  context.fillStyle = fg;
+  context.fillRect(GRAPH_X, GRAPH_Y, GRAPH_WIDTH, GRAPH_HEIGHT);
+  context.fillStyle = bg;
+  context.globalAlpha = 0.9;
+  context.fillRect(GRAPH_X, GRAPH_Y, GRAPH_WIDTH, GRAPH_HEIGHT);
+  return {
+    dom: canvas,
+    update: function update(value, maxValue) {
+      context.globalAlpha = 1;
+      context.fillStyle = fg;
+      context.drawImage(
+        canvas,
+        GRAPH_X + PR,
+        GRAPH_Y,
+        GRAPH_WIDTH - PR,
+        GRAPH_HEIGHT,
+        GRAPH_X,
+        GRAPH_Y,
+        GRAPH_WIDTH - PR,
+        GRAPH_HEIGHT
+      );
+      context.fillRect(GRAPH_X + GRAPH_WIDTH - PR, GRAPH_Y, PR, GRAPH_HEIGHT);
+      context.fillStyle = bg;
+      context.globalAlpha = 0.9;
+      context.fillRect(GRAPH_X + GRAPH_WIDTH - PR, GRAPH_Y, PR, round((1 - value / maxValue) * GRAPH_HEIGHT));
+      if (type === "line") {
+        context.fillRect(
+          GRAPH_X + GRAPH_WIDTH - PR,
+          round((1 - value / maxValue) * GRAPH_HEIGHT) + PR + 3,
+          PR,
+          round((value / maxValue) * GRAPH_HEIGHT)
+        );
+      }
+    },
+  };
+};
+
+var PlotterController = (function (_Controller) {
+  _inheritsLoose(PlotterController, _Controller);
+  function PlotterController(object, property, params) {
+    var _this;
+    _this = _Controller.call(this, object, property, "plotter") || this;
+    params = params || {};
+    _this.max = params.max || 3;
+    _this.period = typeof period === "number" ? period : period ? 500 : 0;
+    _this.prevValue = _this.getValue();
+    _this.lastUpdate = Date.now();
+    _this.__panel = new plotter(params.fgColor || "#fff", params.bgColor || "#000", params.type || "line");
+    _this.domElement.appendChild(_this.__panel.dom);
+    return _this;
+  }
+  var _proto = PlotterController.prototype;
+  _proto.updateDisplay = function updateDisplay() {
+    var value = this.getValue();
+    if (this.period < 1 && value !== this.prevValue) {
+      this.__panel.update(value, this.max);
+    } else if (Date.now() - this.lastUpdate > this.period) {
+      this.__panel.update(value, this.max);
+      this.lastUpdate = Date.now() * 2 - this.lastUpdate - this.period;
+    }
+    this.prevValue = value;
+    return _Controller.prototype.updateDisplay.call(this);
+  };
+  return PlotterController;
+})(Controller);
+
+var StringController = (function (_Controller) {
+  _inheritsLoose(StringController, _Controller);
+  function StringController(object, property) {
+    var _this2;
+    _this2 = _Controller.call(this, object, property, "string") || this;
+    var _this = _assertThisInitialized(_this2);
+    function onChange() {
+      _this.setValue(_this.__input.value);
+    }
+    function onBlur() {
+      _this.__propagateFinishChange(_this.getValue());
+    }
+    function onKeyDown(e) {
+      if (e.keyCode === 13) {
+        this.blur();
+      }
+    }
+    _this2.__input = document.createElement("input");
+    _this2.__input.setAttribute("type", "text");
+    dom.bind(_this2.__input, "keyup", onChange);
+    dom.bind(_this2.__input, "change", onChange);
+    dom.bind(_this2.__input, "blur", onBlur);
+    dom.bind(_this2.__input, "keydown", onKeyDown);
+    _this2.updateDisplay();
+    _this2.domElement.appendChild(_this2.__input);
+    return _this2;
+  }
+  var _proto = StringController.prototype;
+  _proto.updateDisplay = function updateDisplay() {
+    if (dom.isActive(this.__input)) {
+      return this;
+    }
+    this.__input.value = this.getValue();
+    this.__input.disabled = this.getReadonly();
+    return _Controller.prototype.updateDisplay.call(this);
+  };
+  return StringController;
+})(Controller);
+
+var TabbedController = (function (_Controller) {
+  _inheritsLoose(TabbedController, _Controller);
+  function TabbedController(object, property, text, tabs, displayName) {
+    var _this2;
+    _this2 = _Controller.call(this, object, property, "tabbed") || this;
+    var _this = _assertThisInitialized(_this2);
+    _this2.__button = document.createElement("div");
+    _this2.__button.innerHTML = text === undefined ? "Fire" : text;
+    dom.bind(_this2.__button, "click", function (e) {
+      e.preventDefault();
+      _this.fire();
+      return false;
+    });
+    dom.addClass(_this2.__button, "button");
+    var tabSize = tabs * 2;
+    _this2.__button.style.paddingLeft = tabSize.toString() + "em";
+    _this2.property = displayName;
+    _this2.domElement.appendChild(_this2.__button);
+    return _this2;
+  }
+  var _proto = TabbedController.prototype;
+  _proto.fire = function fire() {
+    if (this.__onChange) {
+      this.__onChange.call(this);
+    }
+    this.getValue().call(this.object);
+    if (this.__onFinishChange) {
+      this.__onFinishChange.call(this, this.getValue());
+    }
+  };
+  return TabbedController;
+})(Controller);
+
 var saveDialogueContents =
   '<div id="dg-save" class="dg dialogue">\n  Here\'s the new load parameter for your <code>GUI</code>\'s constructor:\n\n  <textarea id="dg-new-constructor"></textarea>\n\n  <div id="dg-save-locally">\n    <input id="dg-local-storage" type="checkbox">\n    Automatically save values to <code>localStorage</code> on exit.\n\n    <div id="dg-local-explain">\n      The values saved to <code>localStorage</code> will override those passed to <code>dat.GUI</code>\'s constructor.\n      This makes it easier to work incrementally, but <code>localStorage</code> is fragile, and your friends may not see\n      the same values you do.\n    </div>\n  </div>\n</div>\n';
 
+var TextAreaController = (function (_Controller) {
+  _inheritsLoose(TextAreaController, _Controller);
+  function TextAreaController(object, property, params) {
+    var _this2;
+    _this2 = _Controller.call(this, object, property, "textarea") || this;
+    var _this = _assertThisInitialized(_this2);
+    _this2.__input = document.createElement("textarea");
+    if (params.styles) {
+      Common.extend(_this2.__input.style, params.styles);
+    }
+    dom.addClass(_this2.__input, params.className);
+    dom.bind(_this2.__input, "keyup", onChange);
+    dom.bind(_this2.__input, "change", onChange);
+    dom.bind(_this2.__input, "blur", onBlur);
+    function onChange() {
+      _this.setValue(_this.__input.value);
+    }
+    function onBlur() {
+      if (_this.__onFinishChange) {
+        _this.__onFinishChange.call(_this, _this.getValue());
+      }
+    }
+    _this2.updateDisplay();
+    _this2.domElement.appendChild(_this2.__input);
+    return _this2;
+  }
+  var _proto = TextAreaController.prototype;
+  _proto.updateDisplay = function updateDisplay() {
+    if (dom.isActive(this.__input)) {
+      return this;
+    }
+    this.__input.value = this.getValue();
+    return _Controller.prototype.updateDisplay.call(this);
+  };
+  return TextAreaController;
+})(Controller);
+
+var OptionController$1 = (function (_Controller) {
+  _inheritsLoose(OptionController, _Controller);
+  function OptionController(object, property, params) {
+    var _this2;
+    _this2 = _Controller.call(this, object, property, "option") || this;
+    var _this = _assertThisInitialized(_this2);
+    _this2.CUSTOM_FLAG = "";
+    params = params || {};
+    _this2.__select = document.createElement("select");
+    if (common.isArray(params)) {
+      var map = {};
+      common.each(params, function (element) {
+        map[element] = element;
+      });
+      params = map;
+    }
+    common.each(params, function (value, key) {
+      var opt = document.createElement("option");
+      opt.innerHTML = value;
+      opt.setAttribute("value", key);
+      _this.__select.appendChild(opt);
+    });
+    if (params.custom) {
+      var opt = document.createElement("option");
+      opt.innerHTML = params.custom.display || "Custom";
+      opt.setAttribute("value", _this.CUSTOM_FLAG);
+      _this.__select.appendChild(opt);
+      _this2.__custom_controller = params.custom.controller;
+    }
+    _this2.updateDisplay();
+    dom.bind(_this2.__select, "change", function () {
+      var value = this.options[this.selectedIndex].value;
+      if (value === _this.CUSTOM_FLAG) {
+        value = _this.__custom_controller.getValue();
+      }
+      _this.setValue(value);
+    });
+    if (_this2.__custom_controller) {
+      _this2.__custom_controller.onChange(function () {
+        var value = this.getValue();
+        _this.setValue(value);
+      });
+    }
+    _this2.domElement.appendChild(_this2.__select);
+    if (_this2.__custom_controller) {
+      _this2.domElement.appendChild(_this2.__custom_controller.el);
+    }
+    return _this2;
+  }
+  var _proto = OptionController.prototype;
+  _proto.setValue = function setValue(v) {
+    var toReturn = _Controller.prototype.setValue.call(this, v);
+    return toReturn;
+  };
+  _proto.updateDisplay = function updateDisplay() {
+    var value = this.getValue();
+    var custom = true;
+    if (value !== this.CUSTOM_FLAG) {
+      common.each(this.__select.options, function (option) {
+        if (value === option.value) {
+          custom = false;
+        }
+      });
+    }
+    this.__select.value = custom ? this.CUSTOM_FLAG : value;
+    if (this.__custom_controller) {
+      this.__custom_controller.el.style.display = custom ? "block" : "none";
+    }
+    return _Controller.prototype.updateDisplay.call(this);
+  };
+  return OptionController;
+})(Controller);
+
+var NullController = (function (_Controller) {
+  _inheritsLoose(NullController, _Controller);
+  function NullController(object, property) {
+    var _this2;
+    _this2 = _Controller.call(this, object, property, "null") || this;
+    var _this = _assertThisInitialized(_this2);
+    _this2.__prev = _this2.getValue();
+    _this2.__elem = document.createElement("em");
+    _this2.domElement.appendChild(_this2.__elem);
+    _this2.updateDisplay();
+    return _this2;
+  }
+  var _proto = NullController.prototype;
+  _proto.updateDisplay = function updateDisplay() {
+    this.__elem.innerText = "<null>";
+    return _Controller.prototype.updateDisplay.call(this);
+  };
+  return NullController;
+})(Controller);
+
 var UndefinedController = (function (_Controller) {
   _inheritsLoose(UndefinedController, _Controller);
-  function UndefinedController(object, property, options) {
+  function UndefinedController(object, property) {
     var _this2;
-    _this2 = _Controller.call(this, object, property, "undefined", options) || this;
+    _this2 = _Controller.call(this, object, property, "undefined") || this;
     var _this = _assertThisInitialized(_this2);
     _this2.__prev = _this2.getValue();
     _this2.__elem = document.createElement("em");
@@ -1562,27 +3708,54 @@ var UndefinedController = (function (_Controller) {
 
 var ARR_SLICE$1 = Array.prototype.slice;
 var controllerFactory = function controllerFactory(object, property) {
-  var initialValue = object[property];
+  var dyninfo = Common.setupDynamicProperty(object, property);
+  var initialValue = !dyninfo ? object[property] : dyninfo.getter.call(object);
   for (var _len = arguments.length, optionalArgs = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
     optionalArgs[_key - 2] = arguments[_key];
   }
   var optlist = optionalArgs[0];
-  if (Common.isArray(optlist) || Common.isObject(optlist)) {
+  if (optlist != null && (Common.isArray(optlist) || Common.isObject(optlist))) {
     return new OptionController(object, property, optlist);
   }
   if (Common.isNumber(initialValue)) {
     var min = optionalArgs[0],
       max = optionalArgs[1],
       step = optionalArgs[2],
-      enumeration = optionalArgs[3];
+      minimumSaneStepSize = optionalArgs[3],
+      maximumSaneStepSize = optionalArgs[4],
+      mode = optionalArgs[5];
     if (Common.isNumber(min) && Common.isNumber(max)) {
-      return new NumberControllerSlider(object, property, min, max, step, enumeration);
+      return new NumberControllerSlider(
+        object,
+        property,
+        min,
+        max,
+        step,
+        minimumSaneStepSize,
+        maximumSaneStepSize,
+        mode
+      );
     }
     return new NumberControllerBox(object, property, {
       min: min,
       max: max,
       step: step,
+      minimumSaneStepSize: minimumSaneStepSize,
+      maximumSaneStepSize: maximumSaneStepSize,
+      mode: mode,
     });
+  }
+  if (
+    (Common.isArray(initialValue) && initialValue.length >= 3 && initialValue.length <= 4) ||
+    (Common.isObject(initialValue) && initialValue.h && initialValue.s && initialValue.v) ||
+    (Common.isString(initialValue) &&
+      initialValue[0] === "#" &&
+      (initialValue.length === 4 || initialValue.length === 7))
+  ) {
+    return new ColorController(object, property);
+  }
+  if (Common.isImagePath(initialValue)) {
+    return new ImageController(object, property);
   }
   if (Common.isString(initialValue)) {
     return new StringController(object, property);
@@ -1598,7 +3771,16 @@ var controllerFactory = function controllerFactory(object, property) {
   if (Common.isBoolean(initialValue)) {
     return new BooleanController(object, property);
   }
-  if (Common.isUndefined(initialValue)) {
+  if (Common.isArray(initialValue)) {
+    return new ArrayController(object, property);
+  }
+  if (Common.isObject(initialValue)) {
+    return new OptionController$1(object, property);
+  }
+  if (initialValue === null) {
+    return new NullController(object, property);
+  }
+  if (initialValue === undefined && property in object) {
     return new UndefinedController(object, property);
   }
   return null;
@@ -1890,7 +4072,7 @@ var EasingFunctionController = (function (_Controller) {
   _inheritsLoose(EasingFunctionController, _Controller);
   function EasingFunctionController(object, property) {
     var _this2;
-    _this2 = _Controller.call(this, object, property) || this;
+    _this2 = _Controller.call(this, object, property, "easing") || this;
     var _this = _assertThisInitialized(_this2);
     _this2.domElement = document.createElement("div");
     dom.makeSelectable(_this2.domElement, false);
@@ -2145,49 +4327,313 @@ var EasingFunctionController = (function (_Controller) {
   return EasingFunctionController;
 })(Controller);
 
-var TextAreaController = (function (_Controller) {
-  _inheritsLoose(TextAreaController, _Controller);
-  function TextAreaController(object, property) {
+var GradientController = (function (_Controller) {
+  _inheritsLoose(GradientController, _Controller);
+  function GradientController(object, property, params) {
     var _this2;
-    _this2 = _Controller.call(this, object, property) || this;
+    _this2 = _Controller.call(this, object, property, "gradient") || this;
     var _this = _assertThisInitialized(_this2);
-    _this2.__input = document.createElement("textarea");
-    dom.bind(_this2.__input, "keyup", onChange);
-    dom.bind(_this2.__input, "change", onChange);
+    _this2.domElement = document.createElement("div");
+    dom.makeSelectable(_this2.domElement, false);
+    _this2.__selector = document.createElement("div");
+    _this2.__selector.className = "selector";
+    _this2.__saturation_field = document.createElement("div");
+    _this2.__saturation_field.className = "saturation-field";
+    _this2.__input = document.createElement("input");
+    _this2.__input.type = "text";
+    _this2.__input_textShadow = "1px 1px 2px";
+    dom.bind(_this2.__input, "keydown", function (e) {
+      if (e.keyCode === 13) {
+        onBlur.call(this);
+      }
+    });
     dom.bind(_this2.__input, "blur", onBlur);
-    function onChange() {
-      _this.setValue(_this.__input.value);
-    }
     function onBlur() {
+      var value = JSON.parse(this.value);
+      _this.setValue(value);
+    }
+    dom.bind(_this2.__selector, "mousedown", function () {
+      dom.addClass(this, "drag").bind(window, "mouseup", function () {
+        dom.removeClass(_this.__selector, "drag");
+      });
+    });
+    var valueField = document.createElement("div");
+    Common.extend(_this2.__selector.style, {
+      width: "150px",
+      padding: "0px",
+      lineHeight: "18px",
+      backgroundColor: "#222",
+      boxShadow: "0px 1px 3px rgba(0,0,0,0.3)",
+    });
+    for (var i = 0; i < params.length; i++) {
+      var item = document.createElement("canvas");
+      item.value = params[i];
+      item.width = 150;
+      item.height = 18;
+      var context = item.getContext("2d");
+      var grd = context.createLinearGradient(0, 0, 150, 0);
+      for (var key in params[i]) {
+        grd.addColorStop(key, params[i][key]);
+      }
+      dom.bind(item, "click", function () {
+        _this.setValue(this.value);
+        _this.updateDisplay();
+        onFinish();
+      });
+      context.fillStyle = grd;
+      context.fillRect(0, 0, item.width, item.height);
+      Common.extend(item.style, {
+        width: "150px",
+      });
+      _this2.__saturation_field.appendChild(item);
+    }
+    _this2.__selector.appendChild(_this2.__saturation_field);
+    _this2.domElement.appendChild(_this2.__input);
+    _this2.domElement.appendChild(_this2.__selector);
+    function onFinish() {
       if (_this.__onFinishChange) {
         _this.__onFinishChange.call(_this, _this.getValue());
       }
     }
     _this2.updateDisplay();
-    _this2.domElement.appendChild(_this2.__input);
     return _this2;
   }
-  var _proto = TextAreaController.prototype;
+  var _proto = GradientController.prototype;
   _proto.updateDisplay = function updateDisplay() {
-    if (dom.isActive(this.__input)) {
-      return this;
+    var value = this.getValue();
+    var arr = [];
+    for (var key in value) {
+      arr.push({
+        percent: key,
+        color: value[key],
+      });
     }
-    this.__input.value = this.getValue();
-    return _Controller.prototype.updateDisplay.call(this);
+    arr.sort(function (a, b) {
+      return a.percent - b.percent;
+    });
+    this.__input.value = JSON.stringify(value);
+    var backgroundColor = "-webkit-linear-gradient(left";
+    for (var i = 0; i < arr.length; i++) {
+      backgroundColor += ", " + arr[i].color + " " + arr[i].percent * 100 + "%";
+    }
+    backgroundColor += ")";
+    Common.extend(this.__input.style, {
+      background: backgroundColor,
+      color: "#fff",
+      textShadow: this.__input_textShadow + " #000",
+    });
   };
-  return TextAreaController;
+  return GradientController;
 })(Controller);
 
-function requestAnimationFrame(callback, element) {
+var NumberControllerAnimator = (function (_NumberController) {
+  _inheritsLoose(NumberControllerAnimator, _NumberController);
+  function NumberControllerAnimator(object, property, params) {
+    var _this2;
+    _this2 = _NumberController.call(this, object, property, params) || this;
+    var _this = _assertThisInitialized(_this2);
+    dom.addClass(_this2.domElement, "button-container");
+    _this2.__animationMode = null;
+    _this2.__sineButton = document.createElement("button");
+    dom.addClass(_this2.__sineButton, "sine-button");
+    _this2.__sawButton = document.createElement("button");
+    dom.addClass(_this2.__sawButton, "saw-button");
+    dom.bind(_this2.__sawButton, "click", toggleSaw);
+    dom.bind(_this2.__sineButton, "click", toggleSine);
+    function toggleSaw(e) {
+      e.stopPropagation();
+      e.preventDefault();
+      if (_this.__animationMode === "saw") {
+        stopAnimating();
+        dom.removeClass(_this.__sawButton, "saw-button--activated");
+      } else {
+        if (_this.__animationMode === "sine") {
+          dom.removeClass(_this.__sineButton, "sine-button--activated");
+        }
+        _this.__animationMode = "saw";
+        dom.addClass(_this.__sawButton, "saw-button--activated");
+        animate();
+      }
+    }
+    function toggleSine(e) {
+      e.stopPropagation();
+      e.preventDefault();
+      if (_this.__animationMode === "sine") {
+        stopAnimating();
+        dom.removeClass(_this.__sineButton, "sine-button--activated");
+      } else {
+        if (_this.__animationMode === "saw") {
+          dom.removeClass(_this.__sawButton, "saw-button--activated");
+        }
+        _this.__animationMode = "sine";
+        dom.addClass(_this.__sineButton, "sine-button--activated");
+        animate();
+      }
+    }
+    function animate() {
+      if (_this.__animationMode === null) return;
+      var percent;
+      if (_this.__animationMode === "sine") {
+        percent = Math.sin(Date.now() / 1000) / 2 + 0.5;
+      } else if (_this.__animationMode === "saw") {
+        percent = (Date.now() / 2000) % 1;
+      }
+      if (_this.__min !== undefined && _this.__max !== undefined) {
+        _this.setValue((_this.__max - _this.__min) * percent + _this.__min);
+      } else {
+        _this.setValue(percent);
+      }
+      requestAnimationFrame(animate);
+    }
+    function stopAnimating() {
+      _this.__animationMode = null;
+    }
+    _this2.updateDisplay();
+    _this2.domElement.appendChild(_this2.__sawButton);
+    _this2.domElement.appendChild(_this2.__sineButton);
+    return _this2;
+  }
+  return NumberControllerAnimator;
+})(NumberController);
+
+function pos2vec(pos, min, max) {
+  return [pos[0] * (max[0] - min[0]) + min[0], pos[1] * (max[1] - min[1]) + min[1]];
+}
+function vec2pos(vec, min, max) {
+  return [(vec[0] - min[0]) / (max[0] - min[0]), (vec[1] - min[1]) / (max[1] - min[1])];
+}
+var VectorController = (function (_Controller) {
+  _inheritsLoose(VectorController, _Controller);
+  function VectorController(object, property, min, max) {
+    var _this2;
+    if (min === void 0) {
+      min = [0, 0];
+    }
+    if (max === void 0) {
+      max = [1, 1];
+    }
+    _this2 = _Controller.call(this, object, property, "vector") || this;
+    _this2.__min = min;
+    _this2.__max = max;
+    _this2.__vec = _this2.getValue();
+    _this2.__temp = [0, 0];
+    var _this = _assertThisInitialized(_this2);
+    _this2.domElement = document.createElement("div");
+    dom.makeSelectable(_this2.domElement, false);
+    _this2.__selector = document.createElement("div");
+    _this2.__selector.className = "vector-selector";
+    _this2.__pos_field = document.createElement("div");
+    _this2.__pos_field.className = "saturation-field";
+    _this2.__field_knob = document.createElement("div");
+    _this2.__field_knob.className = "field-knob";
+    dom.bind(_this2.__selector, "mousedown", function () {
+      dom.addClass(this, "drag").bind(window, "mouseup", function () {
+        dom.removeClass(_this.__selector, "drag");
+      });
+    });
+    dom.bind(_this2.__selector, "touchstart", function () {
+      dom.addClass(this, "drag").bind(window, "touchend", function () {
+        dom.removeClass(_this.__selector, "drag");
+      });
+    });
+    Common.extend(_this2.__selector.style, {
+      width: "52px",
+      height: "52px",
+      padding: "3px",
+      backgroundColor: "#222",
+      boxShadow: "0px 1px 3px rgba(0,0,0,0.3)",
+    });
+    Common.extend(_this2.__field_knob.style, {
+      position: "absolute",
+      width: "12px",
+      height: "12px",
+      borderRadius: "12px",
+      zIndex: 1,
+    });
+    Common.extend(_this2.__pos_field.style, {
+      width: "50px",
+      height: "50px",
+      marginRight: "3px",
+      display: "inline-block",
+      cursor: "pointer",
+    });
+    dom.bind(_this2.__pos_field, "mousedown", fieldDown);
+    dom.bind(_this2.__pos_field, "touchstart", fieldDown);
+    dom.bind(_this2.__field_knob, "mousedown", fieldDown);
+    dom.bind(_this2.__field_knob, "touchstart", fieldDown);
+    function fieldDown(e) {
+      setSV(e);
+      dom.bind(window, "mousemove", setSV);
+      dom.bind(window, "touchmove", setSV);
+      dom.bind(window, "mouseup", fieldUpSV);
+      dom.bind(window, "touchend", fieldUpSV);
+    }
+    function fieldUpSV() {
+      dom.unbind(window, "mousemove", setSV);
+      dom.unbind(window, "touchmove", setSV);
+      dom.unbind(window, "mouseup", fieldUpSV);
+      dom.unbind(window, "touchend", fieldUpSV);
+      onFinish();
+    }
+    function onFinish() {
+      if (_this.__onFinishChange) {
+        _this.__onFinishChange.call(_this, _this.__vec);
+      }
+    }
+    _this2.__selector.appendChild(_this2.__field_knob);
+    _this2.__selector.appendChild(_this2.__pos_field);
+    _this2.domElement.appendChild(_this2.__selector);
+    _this2.updateDisplay();
+    function setSV(e) {
+      if (e.type.indexOf("touch") === -1) {
+        e.preventDefault();
+      }
+      var fieldRect = _this.__pos_field.getBoundingClientRect();
+      var _ref = (e.touches && e.touches[0]) || e,
+        clientX = _ref.clientX,
+        clientY = _ref.clientY;
+      var x = (clientX - fieldRect.left) / (fieldRect.right - fieldRect.left);
+      var y = 1 - (clientY - fieldRect.top) / (fieldRect.bottom - fieldRect.top);
+      if (x > 1) {
+        x = 1;
+      } else if (x < 0) {
+        x = 0;
+      }
+      if (y > 1) {
+        y = 1;
+      } else if (y < 0) {
+        y = 0;
+      }
+      _this.__vec = pos2vec([x, y], _this.__min, _this.__max);
+      _this.setValue(_this.__vec);
+      return false;
+    }
+    return _this2;
+  }
+  var _proto = VectorController.prototype;
+  _proto.updateDisplay = function updateDisplay() {
+    this.__vec = this.getValue();
+    var offset = vec2pos(this.__vec, this.__min, this.__max);
+    Common.extend(this.__field_knob.style, {
+      marginLeft: 50 * offset[0] - 7 + "px",
+      marginTop: 50 * (1 - offset[1]) - 7 + "px",
+    });
+    this.__temp[0] = 1;
+    this.__temp[1] = 1;
+  };
+  return VectorController;
+})(Controller);
+
+function requestAnimationFrame$1(callback, element) {
   setTimeout(callback, 1000 / 60);
 }
-var requestAnimationFrame$1 =
+var requestAnimationFrame$2 =
   window.requestAnimationFrame ||
   window.webkitRequestAnimationFrame ||
   window.mozRequestAnimationFrame ||
   window.oRequestAnimationFrame ||
   window.msRequestAnimationFrame ||
-  requestAnimationFrame;
+  requestAnimationFrame$1;
 
 var CenteredDiv = (function () {
   function CenteredDiv() {
@@ -2260,7 +4706,7 @@ var CenteredDiv = (function () {
 var ARR_SLICE$2 = Array.prototype.slice;
 var CSS_NAMESPACE = "dg";
 var HIDE_KEY_CODE = 72;
-var CLOSE_BUTTON_HEIGHT = 20;
+var CLOSE_BUTTON_HEIGHT = 0;
 var DEFAULT_DEFAULT_PRESET_NAME = "Default";
 var SUPPORTS_LOCAL_STORAGE = (function () {
   try {
@@ -2278,19 +4724,48 @@ var GUI = (function () {
   function GUI(params) {
     var _this = this;
     params = params || {};
+    this.__typeControllers = {
+      bgcolor: BgColorController,
+      boolean: BooleanController,
+      color: ColorController,
+      easing: EasingFunctionController,
+      file: FileController,
+      function: FunctionController,
+      gradient: GradientController,
+      gtcolor: GtColorController,
+      hsvcolor: HSVColorController,
+      image: ImageController$1,
+      multiline: TextAreaController,
+      ngcolor: NgColorController,
+      number: NumberController,
+      numberBox: NumberControllerBox,
+      numberSlider: NumberControllerSlider,
+      object: OptionController$1,
+      option: OptionController,
+      plotter: PlotterController,
+      string: StringController,
+    };
     this.domElement = document.createElement("div");
     this.__ul = document.createElement("ul");
     this.domElement.appendChild(this.__ul);
     dom.addClass(this.domElement, CSS_NAMESPACE);
     this.__folders = {};
     this.__controllers = [];
+    this.__onClosedChange = null;
     this.__rememberedObjects = [];
     this.__rememberedObjectIndecesToControllers = [];
+    this.__onChange = undefined;
+    this.__onFinishChange = undefined;
     this.__listening = [];
+    var __resizeDebounced = Common.debounce(function () {
+      _this.onResize();
+    }, 50);
+    this.onResizeDebounced = __resizeDebounced;
     params = Common.defaults(params, {
       closeOnTop: false,
       autoPlace: true,
       width: GUI.DEFAULT_WIDTH,
+      showCloseButton: true,
     });
     params = Common.defaults(params, {
       resizable: params.autoPlace,
@@ -2305,6 +4780,12 @@ var GUI = (function () {
         preset: DEFAULT_DEFAULT_PRESET_NAME,
       };
     }
+    if (Common.isUndefined(params.closeStr)) {
+      params.closeStr = GUI.TEXT_CLOSED;
+    }
+    if (Common.isUndefined(params.openStr)) {
+      params.openStr = GUI.TEXT_OPEN;
+    }
     if (Common.isUndefined(params.parent) && params.hideable) {
       hideableGuis.push(this);
     }
@@ -2313,10 +4794,30 @@ var GUI = (function () {
       params.scrollable = true;
     }
     var useLocalStorage =
-      SUPPORTS_LOCAL_STORAGE && localStorage.getItem(getLocalStorageHash(this, "isLocal")) === "true";
+      SUPPORTS_LOCAL_STORAGE && window.localStorage.getItem(getLocalStorageHash(this, "isLocal")) === "true";
     var saveToLocalStorage;
     var titleRow;
     Object.defineProperties(this, {
+      lightTheme: {
+        set: function set(v) {
+          params.lightTheme = v;
+          if (v) dom.addClass(_this.domElement, GUI.CLASS_LIGHT_THEME);
+          else dom.removeClass(_this.domElement, GUI.CLASS_LIGHT_THEME);
+        },
+        get: function get() {
+          return params.lightTheme;
+        },
+      },
+      showCloseButton: {
+        set: function set(v) {
+          params.showCloseButton = v;
+          if (v) dom.removeClass(_this.__closeButton, GUI.CLASS_DISPLAY_NONE);
+          else dom.addClass(_this.__closeButton, GUI.CLASS_DISPLAY_NONE);
+        },
+        get: function get() {
+          return params.showCloseButton;
+        },
+      },
       parent: {
         get: function get() {
           return params.parent;
@@ -2350,8 +4851,9 @@ var GUI = (function () {
           } else {
             params.load.preset = v;
           }
-          setPresetSelectIndex(this);
+          setPresetSelectIndex(_this);
           _this.revert();
+          return _this;
         },
       },
       width: {
@@ -2373,10 +4875,27 @@ var GUI = (function () {
             throw new Error("name collision: another sibling GUI folder has the same name");
           }
           params.name = v;
+          if (_this.__closeButton) {
+            _this.__closeButton.innerHTML = params.name;
+          }
           if (titleRow) {
             titleRow.innerHTML = params.name;
           }
-          return _this;
+        },
+      },
+      title: {
+        get: function get() {
+          return params.title;
+        },
+        set: function set(v) {
+          params.title = v;
+          if (titleRow) {
+            if (Common.isString(params.title)) {
+              titleRow.setAttribute("title", params.title);
+            } else {
+              titleRow.removeAttribute("title");
+            }
+          }
         },
       },
       closed: {
@@ -2390,9 +4909,13 @@ var GUI = (function () {
           } else {
             dom.removeClass(_this.__ul, GUI.CLASS_CLOSED);
           }
-          _this.onResize();
+          _this.onResizeDebounced();
           if (_this.__closeButton) {
-            _this.__closeButton.innerHTML = v ? GUI.TEXT_OPEN : GUI.TEXT_CLOSED;
+            if (params.name) {
+              _this.__closeButton.innerHTML = params.name;
+            } else {
+              _this.__closeButton.innerHTML = v ? params.openStr : params.closeStr;
+            }
           }
           return _this;
         },
@@ -2410,31 +4933,38 @@ var GUI = (function () {
           if (SUPPORTS_LOCAL_STORAGE) {
             useLocalStorage = bool;
             if (bool) {
-              dom.bind(window, "unload", saveToLocalStorage);
+              dom.bind(window, "unload", _this.saveToLocalStorageIfPossible);
             } else {
-              dom.unbind(window, "unload", saveToLocalStorage);
+              dom.unbind(window, "unload", _this.saveToLocalStorageIfPossible);
             }
-            localStorage.setItem(getLocalStorageHash(_this, "isLocal"), bool);
+            window.localStorage.setItem(getLocalStorageHash(_this, "isLocal"), bool);
           }
           return _this;
         },
       },
     });
     if (Common.isUndefined(params.parent)) {
-      this.closed = params.closed || false;
       dom.addClass(this.domElement, GUI.CLASS_MAIN);
       dom.makeSelectable(this.domElement, false);
+      if (params.lightTheme) {
+        dom.addClass(this.domElement, GUI.CLASS_LIGHT_THEME);
+      }
       if (SUPPORTS_LOCAL_STORAGE) {
         if (useLocalStorage) {
           _this.useLocalStorage = true;
-          var savedGui = localStorage.getItem(getLocalStorageHash(this, "gui"));
+          var savedGui = window.localStorage.getItem(getLocalStorageHash(this, "gui"));
           if (savedGui) {
             params.load = JSON.parse(savedGui);
           }
         }
       }
       this.__closeButton = document.createElement("div");
-      this.__closeButton.innerHTML = GUI.TEXT_CLOSED;
+      if (params.name) {
+        this.__closeButton.innerHTML = params.name;
+      } else {
+        this.__closeButton.innerHTML = params.closeStr;
+      }
+      this.closed = params.closed || false;
       dom.addClass(this.__closeButton, GUI.CLASS_CLOSE_BUTTON);
       if (params.closeOnTop) {
         dom.addClass(this.__closeButton, GUI.CLASS_CLOSE_TOP);
@@ -2443,8 +4973,14 @@ var GUI = (function () {
         dom.addClass(this.__closeButton, GUI.CLASS_CLOSE_BOTTOM);
         this.domElement.appendChild(this.__closeButton);
       }
+      if (!params.showCloseButton) {
+        dom.addClass(this.__closeButton, GUI.CLASS_DISPLAY_NONE);
+      }
       dom.bind(this.__closeButton, "click", function () {
         _this.closed = !_this.closed;
+        if (_this.__onClosedChange) {
+          _this.__onClosedChange.call(_this, _this.closed);
+        }
       });
     } else {
       if (params.closed === undefined) {
@@ -2453,9 +4989,15 @@ var GUI = (function () {
       var titleRowName = document.createTextNode(params.name);
       dom.addClass(titleRowName, "controller-name");
       titleRow = addRow(_this, titleRowName);
+      if (Common.isString(params.title)) {
+        titleRow.setAttribute("title", params.title);
+      }
       var onClickTitle = function onClickTitle(e) {
         e.preventDefault();
         _this.closed = !_this.closed;
+        if (_this.__onClosedChange) {
+          _this.__onClosedChange.call(_this, _this.closed);
+        }
         return false;
       };
       dom.addClass(this.__ul, GUI.CLASS_CLOSED);
@@ -2481,20 +5023,19 @@ var GUI = (function () {
         setWidth(_this, params.width);
       }
     }
-    function onResizeHandler() {
+    dom.bind(window, "resize", _this.onResizeDebounced);
+    dom.bind(this.__ul, "webkitTransitionEnd", _this.onResizeDebounced);
+    dom.bind(this.__ul, "transitionend", _this.onResizeDebounced);
+    dom.bind(this.__ul, "oTransitionEnd", _this.onResizeDebounced);
+    Common.defer(function () {
       _this.onResizeDebounced();
-    }
-    dom.bind(window, "resize", onResizeHandler);
-    dom.bind(this.__ul, "webkitTransitionEnd", onResizeHandler);
-    dom.bind(this.__ul, "transitionend", onResizeHandler);
-    dom.bind(this.__ul, "oTransitionEnd", onResizeHandler);
-    onResizeHandler();
+    });
     if (params.resizable) {
       addResizeHandle(this);
     }
     saveToLocalStorage = function saveToLocalStorage() {
-      if (SUPPORTS_LOCAL_STORAGE && localStorage.getItem(getLocalStorageHash(_this, "isLocal")) === "true") {
-        localStorage.setItem(getLocalStorageHash(_this, "gui"), JSON.stringify(_this.getSaveObject()));
+      if (SUPPORTS_LOCAL_STORAGE && window.localStorage.getItem(getLocalStorageHash(_this, "isLocal")) === "true") {
+        window.localStorage.setItem(getLocalStorageHash(_this, "gui"), JSON.stringify(_this.getSaveObject()));
       }
     };
     this.saveToLocalStorageIfPossible = function () {
@@ -2511,21 +5052,29 @@ var GUI = (function () {
     if (!params.parent) {
       resetWidth();
     }
+    if (Common.isObject(params.object)) {
+      Common.each(params.object, function (property, propertyName) {
+        debugger;
+        _this.add(params.object, propertyName);
+      });
+    }
   }
   var _proto = GUI.prototype;
+  _proto.onClosedChange = function onClosedChange(fnc) {
+    this.__onClosedChange = fnc;
+    return this;
+  };
   _proto.getControllerByName = function getControllerByName(name, recurse) {
     var controllers = this.__controllers;
-    var i = controllers.length;
-    while (--i > -1) {
+    for (var i in controllers) {
       if (controllers[i].property === name) {
         return controllers[i];
       }
     }
     var folders = this.__folders;
-    var tryFI;
     if (recurse) {
-      for (i in folders) {
-        tryFI = folders[i].getControllerByName(name, true);
+      for (var _i in folders) {
+        var tryFI = folders[_i].getControllerByName(name, true);
         if (tryFI != null) return tryFI;
       }
     }
@@ -2581,6 +5130,12 @@ var GUI = (function () {
       GUI.toggleHide();
     }
   };
+  _proto.defineController = function defineController(controllerName, controllerTemplate) {
+    this.__typeControllers[controllerName] = controllerTemplate;
+  };
+  _proto.findController = function findController(controllerName) {
+    return this.__typeControllers[controllerName] || false;
+  };
   _proto.add = function add(object, property) {
     for (var _len = arguments.length, factoryArgs = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
       factoryArgs[_key - 2] = arguments[_key];
@@ -2589,14 +5144,46 @@ var GUI = (function () {
       factoryArgs: factoryArgs,
     });
   };
-  _proto.addColor = function addColor(object, property) {
+  _proto.addColor = function addColor(object, property, params) {
     return _add(this, object, property, {
       color: true,
+      factoryArgs: [params],
     });
   };
-  _proto.addTextArea = function addTextArea(object, property) {
+  _proto.addBgColor = function addBgColor(object, property, params) {
+    return _add(this, object, property, {
+      bgcolor: true,
+      factoryArgs: [params],
+    });
+  };
+  _proto.addNgColor = function addNgColor(object, property, params) {
+    return _add(this, object, property, {
+      ngcolor: true,
+      factoryArgs: [params],
+    });
+  };
+  _proto.addGtColor = function addGtColor(object, property, params) {
+    return _add(this, object, property, {
+      gtcolor: true,
+      factoryArgs: [params],
+    });
+  };
+  _proto.addHSVColor = function addHSVColor(object, property, params) {
+    return _add(this, object, property, {
+      hsvcolor: true,
+      factoryArgs: [params],
+    });
+  };
+  _proto.addVector = function addVector(object, property, min, max) {
+    return _add(this, object, property, {
+      vector: true,
+      factoryArgs: [min, max],
+    });
+  };
+  _proto.addTextArea = function addTextArea(object, property, params) {
     return _add(this, object, property, {
       multiline: true,
+      factoryArgs: [params],
     });
   };
   _proto.addEasingFunction = function addEasingFunction(object, property) {
@@ -2604,13 +5191,80 @@ var GUI = (function () {
       easing: true,
     });
   };
+  _proto.addPlotter = function addPlotter(object, property, max, period, type, fgColor, bgColor) {
+    return _add(this, object, property, {
+      plotter: true,
+      max: max,
+      period: period,
+      type: type,
+      fgColor: fgColor,
+      bgColor: bgColor,
+    });
+  };
+  _proto.addFile = function addFile(object, property) {
+    return _add(this, object, property, {
+      file: true,
+    });
+  };
+  _proto.addImage = function addImage(object, property) {
+    return _add(this, object, property, {
+      image: true,
+    });
+  };
+  _proto.addCustomController = function addCustomController(object, property) {
+    for (
+      var _len2 = arguments.length, factoryArgs = new Array(_len2 > 2 ? _len2 - 2 : 0), _key2 = 2;
+      _key2 < _len2;
+      _key2++
+    ) {
+      factoryArgs[_key2 - 2] = arguments[_key2];
+    }
+    return _add(this, object, property, {
+      custom: true,
+      factoryArgs: factoryArgs,
+    });
+  };
+  _proto.addGradient = function addGradient(object, property) {
+    for (
+      var _len3 = arguments.length, factoryArgs = new Array(_len3 > 2 ? _len3 - 2 : 0), _key3 = 2;
+      _key3 < _len3;
+      _key3++
+    ) {
+      factoryArgs[_key3 - 2] = arguments[_key3];
+    }
+    return _add(this, object, property, {
+      gradient: true,
+      factoryArgs: factoryArgs,
+    });
+  };
+  _proto.addAs = function addAs(object, property, controller) {
+    for (
+      var _len4 = arguments.length, factoryArgs = new Array(_len4 > 3 ? _len4 - 3 : 0), _key4 = 3;
+      _key4 < _len4;
+      _key4++
+    ) {
+      factoryArgs[_key4 - 3] = arguments[_key4];
+    }
+    return _add(this, object, property, {
+      controller: controller,
+      factoryArgs: factoryArgs,
+    });
+  };
   _proto.remove = function remove(controller) {
+    var lIndex = this.__listening.indexOf(controller);
+    if (lIndex !== -1) {
+      this.__listening.splice(lIndex, 1);
+    }
+    if (controller.destruct) {
+      controller.destruct();
+    }
     this.__ul.removeChild(controller.__li);
     this.__controllers.splice(this.__controllers.indexOf(controller), 1);
     var _this = this;
     Common.defer(function () {
-      _this.onResize();
+      _this.onResizeDebounced();
     });
+    return this;
   };
   _proto.destroy = function destroy() {
     if (this.parent) {
@@ -2629,13 +5283,38 @@ var GUI = (function () {
     dom.unbind(window, "keydown", GUI._keydownHandler, false);
     removeListeners(this);
   };
-  _proto.addFolder = function addFolder(name) {
+  _proto.onChange = function onChange(f) {
+    this.__onChange = f;
+    return this;
+  };
+  _proto.onFinishChange = function onFinishChange(f) {
+    this.__onFinishChange = f;
+    return this;
+  };
+  _proto.__propagateChange = function __propagateChange() {
+    if (this.__onChange) {
+      this.__onChange.call(this);
+    }
+    if (this.parent) {
+      this.parent.__propagateChange();
+    }
+  };
+  _proto.__propagateFinishChange = function __propagateFinishChange() {
+    if (this.__onFinishChange) {
+      this.__onFinishChange.call(this);
+    }
+    if (this.parent) {
+      this.parent.__propagateFinishChange();
+    }
+  };
+  _proto.addFolder = function addFolder(name, title) {
     if (this.__folders[name] !== undefined) {
       throw new Error('You already have a folder in this GUI by the name "' + name + '"');
     }
     var newGuiParams = {
       name: name,
       parent: this,
+      title: title,
     };
     newGuiParams.autoPlace = this.autoPlace;
     if (this.load && this.load.folders && this.load.folders[name]) {
@@ -2648,7 +5327,13 @@ var GUI = (function () {
     dom.addClass(li, "folder");
     return gui;
   };
-  _proto.removeFolder = function removeFolder(folder) {
+  _proto.removeFolder = function removeFolder(name) {
+    var folder = this.__folders[name];
+    if (!folder) {
+      console.error('There is no folder in this GUI by the name "' + name + '"');
+      return;
+    }
+    folder.close();
     this.__ul.removeChild(folder.domElement.parentElement);
     delete this.__folders[folder.name];
     if (this.load && this.load.folders && this.load.folders[folder.name]) {
@@ -2660,20 +5345,27 @@ var GUI = (function () {
       folder.removeFolder(subfolder);
     });
     Common.defer(function () {
-      _this.onResize();
+      _this.onResizeDebounced();
     });
   };
   _proto.open = function open() {
     this.closed = false;
+    return this;
   };
   _proto.close = function close() {
     this.closed = true;
+    return this;
   };
   _proto.hide = function hide() {
     this.domElement.style.display = "none";
+    return this;
   };
   _proto.show = function show() {
     this.domElement.style.display = "";
+  };
+  _proto.onFinishRevert = function onFinishRevert(fn) {
+    this.__onFinishRevert = fn;
+    return this;
   };
   _proto.onResize = function onResize() {
     var root = this.getRoot();
@@ -2681,11 +5373,10 @@ var GUI = (function () {
       var _dom$getOffset = dom.getOffset(root.__ul),
         top = _dom$getOffset.top;
       var h = 0;
-      Common.each(root.__ul.childNodes, function (node) {
-        if (!(root.autoPlace && node === root.__save_row)) {
-          h += dom.getHeight(node);
-        }
-      });
+      h = root.__ul.scrollHeight;
+      if (!CLOSE_BUTTON_HEIGHT && root.__closeButton) {
+        CLOSE_BUTTON_HEIGHT = dom.getHeight(root.__closeButton);
+      }
       if (window.innerHeight - top - CLOSE_BUTTON_HEIGHT < h) {
         dom.addClass(root.domElement, GUI.CLASS_TOO_TALL);
         root.__ul.style.height = window.innerHeight - top - CLOSE_BUTTON_HEIGHT + "px";
@@ -2769,26 +5460,33 @@ var GUI = (function () {
     return this;
   };
   _proto.revert = function revert(gui) {
-    Common.each(
-      this.__controllers,
-      function (controller) {
-        if (!this.getRoot().load.remembered) {
-          controller.setValue(controller.initialValue);
-        } else {
-          recallSavedValue(gui || this.getRoot(), controller);
-        }
-        if (controller.__onFinishChange) {
-          controller.__onFinishChange.call(controller, controller.getValue());
-        }
-      },
-      this
-    );
-    Common.each(this.__folders, function (folder) {
+    var _this = this.getRoot();
+    Common.each(gui.__controllers, function (controller) {
+      if (!_this.load.remembered) {
+        controller.setValue(controller.initialValue, true);
+      } else {
+        recallSavedValue(_this, controller);
+      }
+      controller.__propagateFinishChange(controller.getValue());
+    });
+    Common.each(gui.__folders, function (folder) {
       folder.revert(folder);
     });
     if (!gui) {
       markPresetModified(this.getRoot(), false);
     }
+    if (_this === this && _this.__onFinishRevert) {
+      _this.__onFinishRevert.call(_this);
+    }
+    return this;
+  };
+  _proto.deleteSave = function deleteSave() {
+    if (this.preset === DEFAULT_DEFAULT_PRESET_NAME || !confirm('Delete preset "' + this.preset + '". Are you sure?')) {
+      return;
+    }
+    delete this.load.remembered[this.preset];
+    this.preset = removeCurrentPresetOption(this);
+    this.saveToLocalStorageIfPossible();
     return this;
   };
   _proto.listen = function listen(controller) {
@@ -2820,39 +5518,80 @@ GUI.CLASS_CLOSE_BUTTON = "close-button";
 GUI.CLASS_CLOSE_TOP = "close-top";
 GUI.CLASS_CLOSE_BOTTOM = "close-bottom";
 GUI.CLASS_DRAG = "drag";
+GUI.CLASS_DISPLAY_NONE = "display-none";
+GUI.CLASS_LIGHT_THEME = "light-theme";
 GUI.DEFAULT_WIDTH = 245;
-GUI.TEXT_CLOSED = "Close Controls";
-GUI.TEXT_OPEN = "Open Controls";
+GUI.TEXT_CLOSED = '<img src="https://icon.now.sh/x/FFFFFF/10" />';
+GUI.TEXT_OPEN = '<img src="https://icon.now.sh/settings/FFFFFF/18" />';
 dom.bind(window, "keydown", GUI._keydownHandler, false);
-GUI.onResizeDebounced = Common.debounce(function () {
-  this.onResize();
-}, 50);
 function _add(gui, object, property, params) {
-  var customObject;
-  if (object.arguments) {
-    customObject = object;
-    object = customObject.arguments.object;
-    property = customObject.arguments.property;
-    params = {
-      factoryArgs: customObject.arguments.opts,
-    };
-  }
-  if (customObject === undefined && !(property in object)) {
-    throw new Error('Object "' + object + '" has no property "' + property + '"');
-  }
   var controller;
-  if (params.color) {
-    controller = new ColorController(object, property);
-  } else if (customObject !== undefined && typeof customObject.property === "string") {
-    controller = customObject;
+  var customObject;
+  if (object instanceof Controller) {
+    controller = object;
+    params = property || {};
+    property = undefined;
   } else {
-    var factoryArgs = [object, property].concat(params.factoryArgs);
-    controller = controllerFactory.apply(gui, factoryArgs);
+    if (object.arguments) {
+      customObject = object;
+      object = customObject.arguments.object;
+      property = customObject.arguments.property;
+      params = {
+        factoryArgs: customObject.arguments.opts,
+      };
+    }
+    if (!(property in object)) {
+      throw new Error('Object "' + object + '" has no property "' + property + '"');
+    }
+    var FoundController = gui.findController(params.controller);
+    if (FoundController) {
+      controller = _construct(FoundController, [object, property].concat(params.factoryArgs));
+    } else if (params.color) {
+      controller = _construct(ColorController, [object, property].concat(params.factoryArgs));
+    } else if (customObject !== undefined && typeof customObject.property === "string") {
+      controller = customObject;
+    } else if (params.bgcolor) {
+      controller = _construct(BgColorController, [object, property].concat(params.factoryArgs));
+    } else if (params.ngcolor) {
+      controller = _construct(NgColorController, [object, property].concat(params.factoryArgs));
+    } else if (params.gtcolor) {
+      controller = _construct(GtColorController, [object, property].concat(params.factoryArgs));
+    } else if (params.hsvcolor) {
+      controller = _construct(HSVColorController, [object, property].concat(params.factoryArgs));
+    } else if (params.easing) {
+      controller = _construct(EasingFunctionController, [object, property].concat(params.factoryArgs));
+    } else if (params.multiline) {
+      controller = _construct(TextAreaController, [object, property].concat(params.factoryArgs));
+    } else if (params.gradient) {
+      controller = _construct(GradientController, [object, property].concat(params.factoryArgs));
+    } else if (params.image) {
+      controller = _construct(ImageController$1, [object, property].concat(params.factoryArgs));
+    } else if (params.plotter) {
+      controller = _construct(PlotterController, [object, property].concat(params.factoryArgs));
+      gui.listen(controller);
+    } else if (params.file) {
+      controller = _construct(FileController, [object, property].concat(params.factoryArgs));
+    } else if (params.vector) {
+      controller = _construct(VectorController, [object, property].concat(params.factoryArgs));
+    } else if (params.custom) {
+      controller = _construct(CustomController, [object, property].concat(params.factoryArgs));
+    } else {
+      controller = controllerFactory.apply(void 0, [object, property].concat(params.factoryArgs));
+    }
+    if (controller === null) {
+      controller = customObject;
+    } else if (customObject != null) {
+      customObject.controller = controller;
+    }
   }
-  if (controller === null) {
-    controller = customObject;
-  } else if (customObject !== undefined) {
-    customObject.controller = controller;
+  if (!controller) {
+    throw new Error(
+      "Object " +
+        object +
+        ' has a (probably null-ed) property "' +
+        property +
+        '" for which you did not explicitly specify a suitable controller'
+    );
   }
   if (params.before instanceof Controller) {
     params.before = params.before.__li;
@@ -2873,8 +5612,20 @@ function _add(gui, object, property, params) {
   container.appendChild(controller.domElement);
   var li = addRow(gui, container, params.before);
   dom.addClass(li, GUI.CLASS_CONTROLLER_ROW);
+  dom.addClass(li, controller.name);
+  if (object.className) {
+    dom.addClass(li, object.className);
+  }
   if (controller instanceof ColorController) {
     dom.addClass(li, "color");
+  } else if (controller instanceof PlotterController) {
+    dom.addClass(li, "plotter");
+  } else if (controller instanceof FileController) {
+    dom.addClass(li, "file");
+  } else if (controller instanceof ImageController$1) {
+    dom.addClass(li, "image");
+  } else if (controller instanceof VectorController) {
+    dom.addClass(li, "vector");
   } else {
     dom.addClass(li, typeof controller.getValue());
   }
@@ -2892,11 +5643,14 @@ function addRow(gui, dom, liBefore) {
   } else {
     gui.__ul.appendChild(li);
   }
-  gui.onResize();
+  gui.onResizeDebounced();
   return li;
 }
 function removeListeners(gui) {
-  dom.unbind(window, "resize", gui.__resizeHandler);
+  dom.unbind(window, "resize", gui.onResizeDebounced);
+  dom.unbind(gui.__ul, "webkitTransitionEnd", gui.onResizeDebounced);
+  dom.unbind(gui.__ul, "transitionend", gui.onResizeDebounced);
+  dom.unbind(gui.__ul, "oTransitionEnd", gui.onResizeDebounced);
   if (gui.saveToLocalStorageIfPossible) {
     dom.unbind(window, "unload", gui.saveToLocalStorageIfPossible);
   }
@@ -2919,7 +5673,7 @@ function augmentController(gui, li, controller) {
         controller.remove();
         return _add(gui, controller.object, controller.property, {
           before: nextSibling,
-          factoryArgs: [Common.toArray(arguments)],
+          factoryArgs: Common.toArray(arguments),
         });
       }
       if (Common.isArray(_options) || Common.isObject(_options)) {
@@ -2930,12 +5684,22 @@ function augmentController(gui, li, controller) {
           factoryArgs: [_options],
         });
       }
+      return null;
     },
     name: function name(_name) {
       controller.__li.firstElementChild.firstElementChild.innerHTML = _name;
       return controller;
     },
-    listen: function listen() {
+    title: function title(v) {
+      if (Common.isString(v)) {
+        controller.__li.setAttribute("title", v);
+      } else {
+        controller.__li.removeAttribute("title");
+      }
+      return controller;
+    },
+    listen: function listen(forceUpdateDisplay) {
+      controller.forceUpdateDisplay = !!forceUpdateDisplay;
       controller.__gui.listen(controller);
       return controller;
     },
@@ -2950,15 +5714,18 @@ function augmentController(gui, li, controller) {
       max: controller.__max,
       step: controller.__step,
     });
-    Common.each(["updateDisplay", "onChange", "onFinishChange", "step", "min", "max"], function (method) {
-      var pc = controller[method];
-      var pb = box[method];
-      controller[method] = box[method] = function () {
-        var args = ARR_SLICE$2.call(arguments);
-        pc.apply(controller, args);
-        return pb.apply(box, args);
-      };
-    });
+    Common.each(
+      ["updateDisplay", "onChange", "onFinishChange", "setValue", "min", "max", "step", "mode", "setReadonly"],
+      function (method) {
+        var pc = controller[method];
+        var pb = box[method];
+        controller[method] = box[method] = function () {
+          var args = ARR_SLICE$2.call(arguments);
+          pc.apply(controller, args);
+          return pb.apply(box, args);
+        };
+      }
+    );
     dom.addClass(li, "has-slider");
     controller.domElement.insertBefore(box.domElement, controller.domElement.firstElementChild);
   } else if (controller instanceof NumberControllerBox) {
@@ -2969,7 +5736,14 @@ function augmentController(gui, li, controller) {
         controller.remove();
         var newController = _add(gui, controller.object, controller.property, {
           before: controller.__li.nextElementSibling,
-          factoryArgs: [controller.__min, controller.__max, controller.__step],
+          factoryArgs: [
+            controller.__min,
+            controller.__max,
+            controller.__step,
+            controller.__minimumSaneStepSize,
+            controller.__maximumSaneStepSize,
+            controller.__mode,
+          ],
         });
         newController.name(oldName);
         if (wasListening) newController.listen();
@@ -2986,7 +5760,7 @@ function augmentController(gui, li, controller) {
     dom.bind(controller.__checkbox, "click", function (e) {
       e.stopPropagation();
     });
-  } else if (controller instanceof FunctionController) {
+  } else if (controller instanceof FunctionController || controller instanceof TabbedController) {
     dom.bind(li, "click", function () {
       dom.fakeEvent(controller.__button, "click");
     });
@@ -2996,13 +5770,27 @@ function augmentController(gui, li, controller) {
     dom.bind(li, "mouseout", function () {
       dom.removeClass(controller.__button, "hover");
     });
-  } else if (controller instanceof ColorController) {
+  } else if (
+    controller instanceof ColorController ||
+    controller instanceof BgColorController ||
+    controller instanceof NgColorController ||
+    controller instanceof HSVColorController ||
+    controller instanceof GtColorController
+  ) {
     dom.addClass(li, "color");
     controller.updateDisplay = Common.compose(function (val) {
-      li.style.borderLeftColor = controller.__color.toString();
+      li.style.borderLeftColor = controller.__color.toHexString();
       return val;
     }, controller.updateDisplay);
     controller.updateDisplay();
+  } else if (controller instanceof ArrayController) {
+    dom.addClass(li, "array");
+    controller.updateDisplay = Common.compose(function (val) {
+      li.style.height = (controller.__inputs.length + 1) * 26 + "px";
+    }, controller.updateDisplay);
+    controller.updateDisplay();
+  } else if (controller instanceof GradientController) {
+    li.style.borderLeft = "3px solid #2FA1D6";
   }
   controller.setValue = Common.compose(function (val) {
     if (gui.getRoot().__preset_select && controller.isModified()) {
@@ -3040,7 +5828,8 @@ function recallSavedValue(gui, controller) {
   }
 }
 function getLocalStorageHash(gui, key) {
-  return document.location.href + "." + key;
+  var namespace = window.localStorage.getItem("dat.gui.namespace") || document.location.href;
+  return "dat.gui." + namespace + "." + key;
 }
 function addPresetOption(gui, name, setSelected) {
   var opt = document.createElement("option");
@@ -3050,6 +5839,10 @@ function addPresetOption(gui, name, setSelected) {
   if (setSelected) {
     gui.__preset_select.selectedIndex = gui.__preset_select.length - 1;
   }
+}
+function removeCurrentPresetOption(gui) {
+  gui.__preset_select.removeChild(gui.__preset_select.options[gui.__preset_select.selectedIndex]);
+  return gui.__preset_select.options[gui.__preset_select.selectedIndex].value;
 }
 function showHideExplain(gui, explain) {
   explain.style.display = gui.useLocalStorage ? "block" : "none";
@@ -3074,6 +5867,10 @@ function addSaveMenu(gui) {
   button3.innerHTML = "Revert";
   dom.addClass(button3, "button");
   dom.addClass(button3, "revert");
+  var button4 = document.createElement("span");
+  button4.innerHTML = "Delete";
+  dom.addClass(button4, "button");
+  dom.addClass(button4, "delete");
   var select = (gui.__preset_select = document.createElement("select"));
   if (gui.load && gui.load.remembered) {
     Common.each(gui.load.remembered, function (value, key) {
@@ -3093,12 +5890,13 @@ function addSaveMenu(gui) {
   div.appendChild(button);
   div.appendChild(button2);
   div.appendChild(button3);
+  div.appendChild(button4);
   if (SUPPORTS_LOCAL_STORAGE) {
     var explain = document.getElementById("dg-local-explain");
     var localStorageCheckBox = document.getElementById("dg-local-storage");
     var saveLocally = document.getElementById("dg-save-locally");
     saveLocally.style.display = "block";
-    if (localStorage.getItem(getLocalStorageHash(gui, "isLocal")) === "true") {
+    if (window.localStorage.getItem(getLocalStorageHash(gui, "isLocal")) === "true") {
       localStorageCheckBox.setAttribute("checked", "checked");
     }
     showHideExplain(gui, explain);
@@ -3131,9 +5929,23 @@ function addSaveMenu(gui) {
   dom.bind(button3, "click", function () {
     gui.revert();
   });
+  dom.bind(button4, "click", function () {
+    if (gui.preset === DEFAULT_DEFAULT_PRESET_NAME) {
+      alert("Default preset can't be deleted.");
+      return;
+    }
+    if (!confirm('Are you sure you want to delete preset "' + gui.preset + '"?')) {
+      return;
+    }
+    gui.deleteSave();
+  });
 }
 function addResizeHandle(gui) {
   var pmouseX;
+  if (gui.parent) {
+    debugger;
+    return;
+  }
   gui.__resize_handle = document.createElement("div");
   Common.extend(gui.__resize_handle.style, {
     width: "6px",
@@ -3145,7 +5957,7 @@ function addResizeHandle(gui) {
   function drag(e) {
     e.preventDefault();
     gui.width += pmouseX - e.clientX;
-    gui.onResize();
+    gui.onResizeDebounced();
     pmouseX = e.clientX;
     return false;
   }
@@ -3163,7 +5975,9 @@ function addResizeHandle(gui) {
     return false;
   }
   dom.bind(gui.__resize_handle, "mousedown", dragStart);
-  dom.bind(gui.__closeButton, "mousedown", dragStart);
+  if (gui.__closeButton) {
+    dom.bind(gui.__closeButton, "mousedown", dragStart);
+  }
   gui.domElement.insertBefore(gui.__resize_handle, gui.domElement.firstElementChild);
 }
 function setWidth(gui, w) {
@@ -3196,7 +6010,7 @@ function setPresetSelectIndex(gui) {
 }
 function updateDisplays(controllerArray) {
   if (controllerArray.length !== 0) {
-    requestAnimationFrame$1(function () {
+    requestAnimationFrame$2(function () {
       updateDisplays(controllerArray);
     });
   }
@@ -3212,15 +6026,24 @@ var color = {
 };
 var controllers = {
   Controller: Controller,
+  ArrayController: ArrayController,
+  BgColorController: BgColorController,
   BooleanController: BooleanController,
-  OptionController: OptionController,
-  StringController: StringController,
+  ColorController: ColorController,
+  CustomController: CustomController,
+  FileController: FileController,
+  FunctionController: FunctionController,
+  GtColorController: GtColorController,
+  HSVColorController: HSVColorController,
+  ImageController: ImageController$1,
+  NgColorController: NgColorController,
   NumberController: NumberController,
   NumberControllerBox: NumberControllerBox,
   NumberControllerSlider: NumberControllerSlider,
-  FunctionController: FunctionController,
-  ColorController: ColorController,
-  CustomController: CustomController,
+  OptionController: OptionController,
+  PlotterController: PlotterController,
+  StringController: StringController,
+  TabbedController: TabbedController,
 };
 var dom$1 = {
   dom: dom,

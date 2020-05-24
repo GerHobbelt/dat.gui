@@ -15,7 +15,10 @@ import Controller from "./Controller";
 import dom from "../dom/dom";
 
 /**
- * @class Provides a controller to represent an UNDEFINED-valued property of an object.
+ * @class Provides a *disabled* text input indicating the value of the property
+ *        is undefined. Calling reset() on the controller will remove and re-add it.
+ *        It is intended to be used as a placeholder, where the gui is built before
+ *        some required variable has been initialized.
  *
  * @extends dat.controllers.Controller
  *
@@ -25,8 +28,8 @@ import dom from "../dom/dom";
  * @member dat.controllers
  */
 class UndefinedController extends Controller {
-  constructor(object, property, options) {
-    super(object, property, "undefined", options);
+  constructor(object, property) {
+    super(object, property, "undefined");
 
     const _this = this;
     this.__prev = this.getValue();

@@ -49,6 +49,7 @@ class NumberControllerSlider extends NumberController {
 
     dom.bind(this.__background, "mousedown", onMouseDown);
     dom.bind(this.__background, "touchstart", onTouchStart);
+    dom.bind(this.__background, "wheel", onWheel);
 
     dom.addClass(this.__background, "slider");
     dom.addClass(this.__foreground, "slider-fg");
@@ -65,6 +66,10 @@ class NumberControllerSlider extends NumberController {
     function onMouseDrag(e) {
       e.preventDefault();
 
+      onDrag(e);
+    }
+
+    function onDrag(e) {
       const bgRect = _this.__background.getBoundingClientRect();
 
       _this.setValue(map(e.clientX, bgRect.left, bgRect.right, _this.__min, _this.__max));
@@ -75,9 +80,8 @@ class NumberControllerSlider extends NumberController {
     function onMouseUp(e) {
       dom.unbind(window, "mousemove", onMouseDrag);
       dom.unbind(window, "mouseup", onMouseUp);
-      if (_this.__onFinishChange) {
-        _this.__onFinishChange.call(_this, _this.getValue());
-      }
+
+      _this.__propagateFinishChange(_this.getValue());
     }
 
     function onTouchStart(e) {
@@ -104,6 +108,12 @@ class NumberControllerSlider extends NumberController {
       }
     }
 
+    function onWheel(e) {
+      e.preventDefault();
+      const direction = -e.deltaY >> 10 || 1;
+      _this.setValue(_this.getValue() + direction * _this.__impliedStep);
+    }
+
     this.updateDisplay();
 
     this.__background.appendChild(this.__foreground);
@@ -111,6 +121,9 @@ class NumberControllerSlider extends NumberController {
   }
 
   updateDisplay() {
+    if (this.__input === document.activeElement) {
+      return this;
+    }
     const value = this.getValue();
     const pct = (value - this.__min) / (this.__max - this.__min);
     this.__foreground.style.width = pct * 100 + "%";

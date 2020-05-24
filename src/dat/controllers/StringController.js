@@ -26,7 +26,7 @@ import dom from "../dom/dom";
  */
 class StringController extends Controller {
   constructor(object, property) {
-    super(object, property);
+    super(object, property, "string");
 
     const _this = this;
 
@@ -35,9 +35,7 @@ class StringController extends Controller {
     }
 
     function onBlur() {
-      if (_this.__onFinishChange) {
-        _this.__onFinishChange.call(_this, _this.getValue());
-      }
+      _this.__propagateFinishChange(_this.getValue());
     }
 
     function onKeyDown(e) {
@@ -70,6 +68,7 @@ class StringController extends Controller {
       return this;
     }
     this.__input.value = this.getValue();
+    this.__input.disabled = this.getReadonly();
     return super.updateDisplay();
   }
 }

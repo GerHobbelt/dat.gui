@@ -97,6 +97,25 @@ const INTERPRETATIONS = [
 
         write: toString,
       },
+
+      RGBA_ARRAY: {
+        read: function (original) {
+          const test = original.match(/^\[\s*(\d+),\s*(\d+),\s*(\d+),\s*(\d*\.{0,1}\d*)/);
+          if (test === null) {
+            return false;
+          }
+
+          return {
+            space: "RGB",
+            r: parseFloat(test[1]),
+            g: parseFloat(test[2]),
+            b: parseFloat(test[3]),
+            a: parseFloat(test[4]),
+          };
+        },
+
+        write: toString,
+      },
     },
   },
 

@@ -27,7 +27,7 @@ import common from "../utils/common";
  */
 class ColorController extends Controller {
   constructor(object, property) {
-    super(object, property);
+    super(object, property, "color");
 
     this.__color = new Color(this.getValue());
     this.__temp = new Color(0);
@@ -204,6 +204,7 @@ class ColorController extends Controller {
       if (i !== false) {
         _this.__color.__state = i;
         _this.setValue(_this.__color.toOriginal());
+        onFinish();
       } else {
         this.value = _this.__color.toString();
       }
@@ -211,9 +212,7 @@ class ColorController extends Controller {
     }
 
     function onFinish() {
-      if (_this.__onFinishChange) {
-        _this.__onFinishChange.call(_this, _this.__color.toOriginal());
-      }
+      _this.__propagateFinishChange(_this.__color.toOriginal());
     }
 
     this.__saturation_field.appendChild(valueField);
@@ -280,7 +279,8 @@ class ColorController extends Controller {
     }
   }
 
-  updateDisplay() {
+  updateDisplay(force) {
+    if (!force && dom.isActive(this.__input)) return this;
     const i = interpret(this.getValue());
 
     if (i !== false) {

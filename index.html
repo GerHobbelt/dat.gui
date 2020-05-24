@@ -42,6 +42,10 @@
           explode: function (state) {},
           fgcolor: "#f00",
           bgcolor: "#000" /* black */,
+          c1: "#f00",
+          c2: "#000" /* black */,
+          c3: "#f00",
+          c4: "#000" /* black */,
           regular_number: 5,
           regular_number2: -155,
           regular_number3: 0,
@@ -70,6 +74,11 @@
         // Colors
         gui.addColor(fizzyText, "fgcolor");
         gui.addColor(fizzyText, "bgcolor");
+
+        gui.addNgColor(fizzyText, "c1");
+        gui.addBgColor(fizzyText, "c2");
+        gui.addGtColor(fizzyText, "c3");
+        gui.addHSVColor(fizzyText, "c4");
 
         // Numbers without range
         gui.add(fizzyText, "regular_number").name("just a number...");

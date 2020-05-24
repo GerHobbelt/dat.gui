@@ -21,7 +21,7 @@ import common from "../utils/common";
  * @class Provides a text input to alter the array property of an object.
  *        Automatically converts strings to numbers and boolean values if appropriate.
  *
- * @extends dat.controllers.Controller
+ * @extends Controller
  *
  * @param {Object} object The object to be manipulated
  * @param {string} property The name of the property to be manipulated
@@ -30,7 +30,7 @@ import common from "../utils/common";
  */
 class ArrayController extends Controller {
   constructor(object, property) {
-    super(object, property);
+    super(object, property, "array");
 
     const _this = this;
 

@@ -39,7 +39,7 @@ class BgColorController extends Controller {
   }
 
   constructor(object, property) {
-    super(object, property);
+    super(object, property, "bgcolor");
 
     this.__color = new Color(this.getValue());
     this.value2 = "#FFee00";

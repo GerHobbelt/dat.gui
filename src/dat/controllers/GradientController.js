@@ -27,7 +27,7 @@ import common from "../utils/common";
  */
 class GradientController extends Controller {
   constructor(object, property, params) {
-    super(object, property);
+    super(object, property, "gradient");
 
     const _this = this;
 

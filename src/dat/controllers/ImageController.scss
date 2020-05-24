@@ -11,8 +11,22 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-@import "./gui/style.scss"; // CSS to embed in build
+.GUI-preview-image {
+  float: left;
+  padding: 0.4em;
+  max-width: 2em;
+  max-height: 2em;
+}
 
-// CSS for the various controllers
-@import "./controllers/NumberControllerSlider.scss";
-@import "./controllers/ImageController.scss";
+.GUI-label-image {
+  color: rgb(214, 214, 245);
+  text-decoration: underline;
+  display: block;
+  background-color: #3C3C3C;
+  width: 100%;
+  cursor: pointer;
+}
+
+.GUI-label-image:hover {
+  background: #3C3C3C;
+}

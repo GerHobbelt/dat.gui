@@ -54,6 +54,7 @@ $input-color: lighten($background-color, 8.5%);
 }
 
 @mixin gears() {
+  // url(assets/gears.png)
   background:
     $button-color url("https://icon.now.sh/settings/FFFFFF/12") center
     center no-repeat;
@@ -184,7 +185,8 @@ $input-color: lighten($background-color, 8.5%);
       border-left: 3px solid $boolean-color;
     }
 
-    &.color {
+    &.color,
+    &.vector {
       border-left: 3px solid;
     }
 
@@ -200,6 +202,21 @@ $input-color: lighten($background-color, 8.5%);
 
     &.function {
       border-left: 3px solid $function-color;
+
+      .button {
+        //@include button;
+
+        margin: 3px 0;
+        padding: 2px 3px;
+        border: 2px solid darken($function-color, 15%);
+        line-height: 18px;
+        background: lighten($function-color, 10%);
+        border-radius: 2px;
+      }
+    }
+
+    &.file {
+      border-left: 3px solid $file-color;
     }
 
     &.number {
@@ -215,6 +232,14 @@ $input-color: lighten($background-color, 8.5%);
 
       input[type="text"] {
         color: $string-color;
+      }
+    }
+
+    &.array {
+      border-left: 3px solid $array-color;
+
+      input[type="text"] {
+        color: $array-color;
       }
     }
 

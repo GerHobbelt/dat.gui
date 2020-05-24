@@ -27,7 +27,7 @@ import common from "../utils/common";
  */
 class ColorController extends Controller {
   constructor(object, property) {
-    super(object, property);
+    super(object, property, "color");
 
     this.__color = new Color(this.getValue());
     this.__temp = new Color(0);
@@ -61,50 +61,26 @@ class ColorController extends Controller {
 
     /* jshint unused: false */
 
-    dom.bind(
-      this.__input,
-      "keydown",
-      function (e) {
-        if (e.keyCode === 13) {
-          // on enter
-          onBlur.call(this);
-        }
-      },
-      false,
-      true
-    );
+    dom.bind(this.__input, "keydown", function (e) {
+      if (e.keyCode === 13) {
+        // on enter
+        onBlur.call(this);
+      }
+    });
 
-    dom.bind(this.__input, "blur", onBlur, false, true);
+    dom.bind(this.__input, "blur", onBlur);
 
-    dom.bind(
-      this.__selector,
-      "mousedown",
-      function (e) {
-        dom.addClass(this, "drag").bind(window, "mouseup", function (e) {
-          dom.removeClass(_this.__selector, "drag");
-        });
-      },
-      false,
-      true
-    );
+    dom.bind(this.__selector, "mousedown", function (e) {
+      dom.addClass(this, "drag").bind(window, "mouseup", function (e) {
+        dom.removeClass(_this.__selector, "drag");
+      });
+    });
 
-    dom.bind(
-      this.__selector,
-      "touchstart",
-      function (/* e */) {
-        dom.addClass(this, "drag").bind(
-          window,
-          "touchend",
-          function (/* e */) {
-            dom.removeClass(_this.__selector, "drag");
-          },
-          false,
-          true
-        );
-      },
-      false,
-      true
-    );
+    dom.bind(this.__selector, "touchstart", function (e) {
+      dom.addClass(this, "drag").bind(window, "touchend", function (e) {
+        dom.removeClass(_this.__selector, "drag");
+      });
+    });
 
     /* jshint unused: true */
 
@@ -181,29 +157,29 @@ class ColorController extends Controller {
         .join(", "),
     });
 
-    dom.bind(this.__saturation_field, "mousedown", fieldDown);
-    dom.bind(this.__saturation_field, "touchstart", fieldDown);
+    dom.bind(this.__saturation_field, "mousedown", fieldDown, false, false);
+    dom.bind(this.__saturation_field, "touchstart", fieldDown, false, false);
 
-    dom.bind(this.__field_knob, "mousedown", fieldDown);
-    dom.bind(this.__field_knob, "touchstart", fieldDown);
+    dom.bind(this.__field_knob, "mousedown", fieldDown, false, false);
+    dom.bind(this.__field_knob, "touchstart", fieldDown, false, false);
 
-    dom.bind(this.__hue_field, "mousedown", fieldDownH);
-    dom.bind(this.__hue_field, "touchstart", fieldDownH);
+    dom.bind(this.__hue_field, "mousedown", fieldDownH, false, false);
+    dom.bind(this.__hue_field, "touchstart", fieldDownH, false, false);
 
     function fieldDown(e) {
       setSV(e);
-      dom.bind(window, "mousemove", setSV);
-      dom.bind(window, "touchmove", setSV);
-      dom.bind(window, "mouseup", fieldUpSV, false, true);
-      dom.bind(window, "touchend", fieldUpSV, false, true);
+      dom.bind(window, "mousemove", setSV, false, false);
+      dom.bind(window, "touchmove", setSV, false, false);
+      dom.bind(window, "mouseup", fieldUpSV);
+      dom.bind(window, "touchend", fieldUpSV);
     }
 
     function fieldDownH(e) {
       setH(e);
-      dom.bind(window, "mousemove", setH);
-      dom.bind(window, "touchmove", setH);
-      dom.bind(window, "mouseup", fieldUpH, false, true);
-      dom.bind(window, "touchend", fieldUpH, false, true);
+      dom.bind(window, "mousemove", setH, false, false);
+      dom.bind(window, "touchmove", setH, false, false);
+      dom.bind(window, "mouseup", fieldUpH);
+      dom.bind(window, "touchend", fieldUpH);
     }
 
     function fieldUpSV() {

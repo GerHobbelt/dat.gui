@@ -26,7 +26,7 @@ import dom from "../dom/dom";
  */
 class StringController extends Controller {
   constructor(object, property) {
-    super(object, property);
+    super(object, property, "string");
 
     const _this = this;
 
@@ -51,10 +51,10 @@ class StringController extends Controller {
     this.__input = document.createElement("input");
     this.__input.setAttribute("type", "text");
 
-    dom.bind(this.__input, "keyup", onChange, false, true);
-    dom.bind(this.__input, "change", onChange, false, true);
-    dom.bind(this.__input, "blur", onBlur, false, true);
-    dom.bind(this.__input, "keydown", onKeyDown, false, true);
+    dom.bind(this.__input, "keyup", onChange);
+    dom.bind(this.__input, "change", onChange);
+    dom.bind(this.__input, "blur", onBlur);
+    dom.bind(this.__input, "keydown", onKeyDown);
 
     this.updateDisplay();
 
@@ -70,6 +70,7 @@ class StringController extends Controller {
       return this;
     }
     this.__input.value = this.getValue();
+    this.__input.disabled = this.getReadonly();
     return super.updateDisplay();
   }
 }

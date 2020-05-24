@@ -13,6 +13,7 @@
 
 import Controller from "./Controller";
 import dom from "../dom/dom";
+import common from "../utils/common";
 
 /**
  * @class Provides a text area to alter the text property of an object.
@@ -21,17 +22,26 @@ import dom from "../dom/dom";
  *
  * @param {Object} object The object to be manipulated
  * @param {string} property The name of the property to be manipulated
+ * @param {Object} [params] optional parameters for the controller.
+ * @param {String} params.className The class name to add to the textarea DOM element for this control.
+ * @param {Object|Set} params.styles A set of styles to apply to the textarea DOM element for this control.
  *
  * @member dat.controllers
  */
 class TextAreaController extends Controller {
-  constructor(object, property) {
-    super(object, property);
+  constructor(object, property, params) {
+    super(object, property, "textarea");
 
     const _this = this;
 
     this.__input = document.createElement("textarea");
     // this.__input.setAttribute('type', 'text');
+
+    // apply custom styling of the textarea?
+    if (params.styles) {
+      common.extend(this.__input.style, params.styles);
+    }
+    dom.addClass(this.__input, params.className);
 
     dom.bind(this.__input, "keyup", onChange);
     dom.bind(this.__input, "change", onChange);

@@ -27,7 +27,7 @@ import common from "../utils/common";
  */
 class HSVColorController extends Controller {
   constructor(object, property) {
-    super(object, property);
+    super(object, property, "hsvcolor");
 
     this.__color = new Color(this.getValue());
     this.__temp = new Color(0);

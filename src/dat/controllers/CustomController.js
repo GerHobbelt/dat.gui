@@ -29,17 +29,19 @@ class CustomController extends Controller {
    * @param {Object} object The object to be manipulated
    * @param {Function} [object.property] Returns an object with elements for adding into "property-name" class element.
    * @param {string} property The name of the property to be manipulated
-   * @param {Object} [params] Optional parameters
+   * @param {...Object} [params] Optional parameters
    */
-  constructor(object, property) {
-    super(object, property);
+  constructor(object, property, ...params) {
+    super(object, property, "custom");
 
     this.arguments = {
       object: object,
       property: property,
-      opts: Array.prototype.slice.call(arguments, 2),
+      opts: params,
     };
-    if (object.property) this.property = object.property(this);
+    if (object.property) {
+      this.property = object.property(this);
+    }
   }
 
   set controller(newController) {

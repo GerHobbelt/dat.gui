@@ -28,8 +28,8 @@ import dom from "../dom/dom";
  * @member dat.controllers
  */
 class UndefinedController extends Controller {
-  constructor(object, property, options) {
-    super(object, property, "undefined", options);
+  constructor(object, property) {
+    super(object, property, "undefined");
 
     const _this = this;
     this.__prev = this.getValue();

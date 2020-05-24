@@ -39,7 +39,7 @@ class GtColorController extends Controller {
   }
 
   constructor(object, property) {
-    super(object, property);
+    super(object, property, "gtcolor");
 
     this.__color = new Color(this.getValue());
     this.value2 = "#FFee00";

@@ -32,6 +32,10 @@
           alert("Bang!");
         },
 
+        explode2: function () {
+          alert("Boing!");
+        },
+
         color0: "#ffae23", // CSS string
         color1: [0, 128, 255], // RGB array
         color2: [0, 128, 255, 0.3], // RGB with alpha
@@ -77,16 +81,19 @@
         console.log("finish change");
       });
 
+      gui.add(obj, "explode2");
+
       const controller = gui.add(obj, "explode").borderColor("red").borderWidth(10);
       console.log(controller.__li.style);
 
-      gui.add(obj, "maxSize", -10, 10, 0.05);
+      // gui.add(obj, "maxSize", -10, 10, 0.05);
       // gui
       //  .add(obj, "maxSize")
       //  .min(-10)
       //  .max(10)
       //  .step(0.25);
-      gui.add(obj, "height").step(10); // Increment amount
+      gui.add(obj, "maxSize").min(-10).max(10).step(0.25);
+      gui.add(obj, "height").step(5); // Increment amount
 
       // Choose from accepted values
       gui.add(obj, "type", ["one", "two", "three"]);

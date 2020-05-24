@@ -45,7 +45,7 @@ const DEFAULT_DEFAULT_PRESET_NAME = 'Default';
 
 const SUPPORTS_LOCAL_STORAGE = (function() {
   try {
-    return 'localStorage' in window && window.localStorage !== null;
+    return !!window.localStorage;
   } catch (e) {
     return false;
   }
@@ -84,10 +84,11 @@ const hideableGuis = [];
  * @param {String} [params.name] The name of this GUI.
  * @param {Object} [params.load] JSON object representing the saved state of
  * this GUI.
- * @param {Boolean} [params.auto=true]
  * @param {dat.gui.GUI} [params.parent] The GUI I'm nested in.
- * @param {Boolean} [params.closed] If true, starts closed
- * @param {Boolean} [params.closeOnTop] If true, close/open button shows on top of the GUI
+ * @param {Boolean} [params.autoPlace=true]
+ * @param {Boolean} [params.hideable=true] If true, GUI is shown/hidden by <kbd>h</kbd> keypress.
+ * @param {Boolean} [params.closed=false] If true, starts closed
+ * @param {Boolean} [params.closeOnTop=false] If true, close/open button shows on top of the GUI
    * @param {String} [params.closeStr] close string
    * @param {String} [params.openStr] open string
  */
@@ -202,6 +203,7 @@ const GUI = function(pars) {
     localStorage.getItem(getLocalStorageHash(this, 'isLocal')) === 'true';
 
   let saveToLocalStorage;
+  let titleRow;
 
   Object.defineProperties(this,
     /** @lends GUI.prototype */
@@ -292,8 +294,8 @@ const GUI = function(pars) {
         set: function(v) {
           // TODO Check for collisions among sibling folders
           params.name = v;
-          if (titleRowName) {
-            titleRowName.innerHTML = params.name;
+          if (titleRow) {
+            titleRow.innerHTML = params.name;
           }
         }
       },
@@ -360,7 +362,7 @@ const GUI = function(pars) {
 
   // Are we a root level GUI?
   if (common.isUndefined(params.parent)) {
-    params.closed = false;
+    this.closed = params.closed || false;
 
     dom.addClass(this.domElement, GUI.CLASS_MAIN);
     dom.makeSelectable(this.domElement, false);
@@ -401,7 +403,7 @@ const GUI = function(pars) {
     const titleRowName = document.createTextNode(params.name);
     dom.addClass(titleRowName, 'controller-name');
 
-    const titleRow = addRow(_this, titleRowName);
+    titleRow = addRow(_this, titleRowName);
 
     const onClickTitle = function(e) {
       e.preventDefault();
@@ -636,20 +638,30 @@ common.extend(
     },
 
     /**
-     * Removes the GUI from the document and unbinds all event listeners.
+     * Removes the root GUI from the document and unbinds all event listeners.
+     * For subfolders, use `gui.removeFolder(folder)` instead.
      * @instance
      */
     destroy: function() {
+      if (this.parent) {
+        throw new Error(
+          'Only the root GUI should be removed with .destroy(). ' +
+          'For subfolders, use gui.removeFolder(folder) instead.'
+        );
+      }
+
       if (this.autoPlace) {
         autoPlaceContainer.removeChild(this.domElement);
       }
 
-      dom.unbind(window, 'keydown', GUI._keydownHandler, false);
-      dom.unbind(window, 'resize', this.__resizeHandler);
+      const _this = this;
+      common.each(this.__folders, function(subfolder) {
+        _this.removeFolder(subfolder);
+      });
 
-      if (this.saveToLocalStorageIfPossible) {
-        dom.unbind(window, 'unload', this.saveToLocalStorageIfPossible);
-      }
+      dom.unbind(window, 'keydown', GUI._keydownHandler, false);
+
+      removeListeners(this);
     },
 
 
@@ -753,6 +765,36 @@ common.extend(
     },
 
     /**
+     * Removes a subfolder GUI instance.
+     * @param {dat.gui.GUI} folder The folder to remove.
+     * @instance
+     */
+    removeFolder: function(folder) {
+      this.__ul.removeChild(folder.domElement.parentElement);
+
+      delete this.__folders[folder.name];
+
+      // Do we have saved appearance data for this folder?
+      if (this.load && // Anything loaded?
+        this.load.folders && // Was my parent a dead-end?
+        this.load.folders[folder.name]) {
+        delete this.load.folders[folder.name];
+      }
+
+      removeListeners(folder);
+
+      const _this = this;
+
+      common.each(folder.__folders, function(subfolder) {
+        folder.removeFolder(subfolder);
+      });
+
+      common.defer(function() {
+        _this.onResize();
+      });
+    },
+
+    /**
      * Opens the GUI.
      */
     open: function() {
@@ -764,6 +806,20 @@ common.extend(
      */
     close: function() {
       this.closed = true;
+    },
+
+    /**
+    * Hides the GUI.
+    */
+    hide: function() {
+      this.domElement.style.display = 'none';
+    },
+
+    /**
+    * Shows the GUI.
+    */
+    show: function() {
+      this.domElement.style.display = '';
     },
 
 
@@ -967,10 +1023,17 @@ function addRow(gui, newDom, liBefore) {
   return li;
 }
 
+function removeListeners(gui) {
+  dom.unbind(window, 'resize', gui.__resizeHandler);
+
+  if (gui.saveToLocalStorageIfPossible) {
+    dom.unbind(window, 'unload', gui.saveToLocalStorageIfPossible);
+  }
+}
+
 function markPresetModified(gui, modified) {
   const opt = gui.__preset_select[gui.__preset_select.selectedIndex];
 
-  // console.log('mark', modified, opt);
   if (modified) {
     opt.innerHTML = opt.value + '*';
   } else {
@@ -982,7 +1045,11 @@ function augmentController(gui, li, controller) {
   controller.__li = li;
   controller.__gui = gui;
 
-  common.extend(controller, {
+  common.extend(controller, /** @lends Controller.prototype */ {
+    /**
+     * @param  {Array|Object} options
+     * @return {Controller}
+     */
     options: function(options) {
       if (arguments.length > 1) {
         const nextSibling = controller.__li.nextElementSibling;
@@ -1015,16 +1082,29 @@ function augmentController(gui, li, controller) {
       }
     },
 
-    name: function(v) {
-      controller.__li.firstElementChild.firstElementChild.innerHTML = v;
+    /**
+     * Sets the name of the controller.
+     * @param  {string} name
+     * @return {Controller}
+     */
+    name: function(name) {
+      controller.__li.firstElementChild.firstElementChild.innerHTML = name;
       return controller;
     },
 
+    /**
+     * Sets controller to listen for changes on its underlying object.
+     * @return {Controller}
+     */
     listen: function() {
       controller.__gui.listen(controller);
       return controller;
     },
 
+    /**
+     * Removes the controller from its parent GUI.
+     * @return {Controller}
+     */
     remove: function() {
       controller.__gui.remove(controller);
       return controller;
@@ -1036,7 +1116,7 @@ function augmentController(gui, li, controller) {
     const box = new NumberControllerBox(controller.object, controller.property,
       { min: controller.__min, max: controller.__max, step: controller.__step });
 
-    common.each(['updateDisplay', 'onChange', 'onFinishChange', 'step'], function(method) {
+    common.each(['updateDisplay', 'onChange', 'onFinishChange', 'step', 'min', 'max'], function(method) {
       const pc = controller[method];
       const pb = box[method];
       controller[method] = box[method] = function() {

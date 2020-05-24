@@ -29,39 +29,41 @@ import NgColorController from './controllers/NgColorController';
 import GtColorController from './controllers/GtColorController';
 import HSVColorController from './controllers/HSVColorController';
 
-import dom from './dom/dom';
-import GUI from './gui/GUI';
+import domImport from './dom/dom';
+import GUIImport from './gui/GUI';
 
-export default {
-  color: {
-    Color: Color,
-    math: math,
-    interpret: interpret
-  },
+export const color = {
+  Color: Color,
+  math: math,
+  interpret: interpret
+};
 
-  controllers: {
-    Controller: Controller,
-    BooleanController: BooleanController,
-    OptionController: OptionController,
-    StringController: StringController,
-    NumberController: NumberController,
-    NumberControllerBox: NumberControllerBox,
-    NumberControllerSlider: NumberControllerSlider,
-    FunctionController: FunctionController,
+export const controllers = {
+  Controller: Controller,
+  BooleanController: BooleanController,
+  OptionController: OptionController,
+  StringController: StringController,
+  NumberController: NumberController,
+  NumberControllerBox: NumberControllerBox,
+  NumberControllerSlider: NumberControllerSlider,
+  FunctionController: FunctionController,
     ColorController: ColorController,
     BgColorController: BgColorController,
     NgColorController: NgColorController,
     HSVColorController: HSVColorController,
     GtColorController: GtColorController
-  },
+};
 
-  dom: {
-    dom: dom
-  },
+export const dom = { dom: domImport };
 
-  gui: {
-    GUI: GUI
-  },
+export const gui = { GUI: GUIImport };
 
-  GUI: GUI
+export const GUI = GUIImport;
+
+export default {
+  color,
+  controllers,
+  dom,
+  gui,
+  GUI
 };

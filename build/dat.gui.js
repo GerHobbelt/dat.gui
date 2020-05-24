@@ -1617,6 +1617,580 @@
     return null;
   };
 
+  function clipFunc(min, max) {
+    return function (v) {
+      if (v < min) {
+        return min;
+      }
+      if (v > max) {
+        return max;
+      }
+      return v;
+    };
+  }
+  var clip01 = clipFunc(0.0, 1.0);
+  function cubicFunc(a, b, c, d) {
+    return function (t) {
+      var t2 = t * t;
+      var t3 = t2 * t;
+      var mt = 1 - t;
+      var mt2 = mt * mt;
+      var mt3 = mt * mt2;
+      return a * mt3 + 3 * b * mt2 * t + 3 * c * mt * t2 + d * t3;
+    };
+  }
+  function cubicFuncDeriv(a, b, c, d) {
+    return function (t) {
+      var t2 = t * t;
+      var mt = 1 - t;
+      var mt2 = mt * mt;
+      return a * mt2 + 2 * b * mt * t + c * t2;
+    };
+  }
+  function sign(n) {
+    return n >= 0.0 ? 1 : -1;
+  }
+  var EPSILON = 0.0001;
+  var EasingFunctionPoint = function EasingFunctionPoint(coord) {
+    var _this = this;
+    if (Array.isArray(coord) && coord.length == 4) {
+      ["x", "y", "l", "r"].forEach(function (d, i) {
+        _this[d] = coord[i];
+      });
+    } else if (typeof coord === "object") {
+      ["x", "y", "l", "r"].forEach(function (d) {
+        _this[d] = coord[d];
+      });
+    } else {
+      throw new Error("Couldn't parse point arguments");
+    }
+  };
+  var EasingFunction = function EasingFunction(_points) {
+    var rawPoints = _points || [
+      {
+        x: 0,
+        y: 0,
+        l: 0,
+        r: 0.5,
+      },
+      {
+        x: 1,
+        y: 1,
+        l: 0.5,
+        r: 0,
+      },
+    ];
+    var points = [];
+    rawPoints.forEach(function (p) {
+      points.push(new EasingFunctionPoint(p));
+    });
+    this.points = points;
+  };
+  EasingFunction.Point = EasingFunctionPoint;
+  EasingFunction.prototype = {
+    toString: function toString() {
+      return "something";
+    },
+    movePoint: function movePoint(index, type, x, y) {
+      var p = this.points[index];
+      if (type == "LEFT") {
+        p.l = x - p.x;
+      } else if (type == "RIGHT") {
+        p.r = x - p.x;
+      } else {
+        p.x = x;
+        p.y = y;
+      }
+      this.constrainPoints();
+    },
+    constrainPoints: function constrainPoints() {
+      var pl;
+      var p;
+      var pr;
+      var _this = this;
+      var last = function last(i) {
+        return i == _this.points.length - 1;
+      };
+      for (var i = 0; i < this.points.length; i++) {
+        p = this.points[i];
+        pl = i > 0 ? this.points[i - 1] : undefined;
+        pr = !last(i) ? this.points[i + 1] : undefined;
+        p.x = clip01(p.x);
+        p.y = clip01(p.y);
+        if (i == 0) {
+          p.x = 0.0;
+        }
+        if (last(i)) {
+          p.x = 1.0;
+        }
+        if (pr !== undefined && p.x > pr.x) {
+          p.x = pr.x;
+        }
+        if (pl !== undefined) {
+          p.l = clipFunc(pl.x - p.x, 0)(p.l);
+        } else {
+          p.l = 0;
+        }
+        if (pr !== undefined) {
+          p.r = clipFunc(0, pr.x - p.x)(p.r);
+        } else {
+          p.r = 0;
+        }
+      }
+    },
+    findPoint: function findPoint(x, y, r) {
+      r = r || 0.035;
+      var dx;
+      var dy;
+      var h;
+      var minD = Infinity;
+      var minIndex;
+      this.points.forEach(function (p, i) {
+        dx = x - p.x;
+        dy = y - p.y;
+        h = dx * dx + dy * dy;
+        if (h < r * r && minD > h) {
+          minD = h;
+          minIndex = i;
+        }
+      });
+      return {
+        index: minIndex,
+        type: Number.isInteger(minIndex) ? "ANCHOR" : undefined,
+      };
+    },
+    findPointWithHandle: function findPointWithHandle(x, y, r) {
+      r = r || 0.035;
+      var dx;
+      var dy;
+      var h;
+      var minD = Infinity;
+      var minIndex;
+      var minType;
+      var candidates;
+      var d;
+      var type;
+      var _this = this;
+      this.points.forEach(function (p, i) {
+        if (i == 0) {
+          candidates = [
+            [p.r, "RIGHT"],
+            [0.0, "ANCHOR"],
+          ];
+        } else if (i == _this.points.length - 1) {
+          candidates = [
+            [p.l, "LEFT"],
+            [0.0, "ANCHOR"],
+          ];
+        } else {
+          candidates = [
+            [p.r, "RIGHT"],
+            [p.l, "LEFT"],
+            [0.0, "ANCHOR"],
+          ];
+        }
+        candidates.forEach(function (cand) {
+          d = cand[0];
+          type = cand[1];
+          dx = x - p.x - d;
+          dy = y - p.y;
+          h = dx * dx + dy * dy;
+          if (h < r * r && minD > h) {
+            minD = h;
+            minIndex = i;
+            minType = type;
+          }
+        });
+      });
+      return {
+        index: minIndex,
+        type: minType,
+      };
+    },
+    addPoint: function addPoint(x, y) {
+      for (var i = 1; i < this.points.length - 1; i++) {
+        if (x <= this.points[i].x) {
+          break;
+        }
+      }
+      var point = new EasingFunctionPoint({
+        x: x,
+        y: y,
+        l: 0.0,
+        r: 0.0,
+      });
+      this.points.splice(i, 0, point);
+      this.constrainPoints();
+      return point;
+    },
+    deletePoint: function deletePoint(i) {
+      if (i == 0 || i == this.points.length - 1) {
+        return false;
+      }
+      this.points.splice(i, 1);
+      return true;
+    },
+    getSegments: function getSegments() {
+      var segments = [];
+      var p1;
+      var p2;
+      for (var i = 0; i < this.points.length - 1; i++) {
+        p1 = this.points[i];
+        p2 = this.points[i + 1];
+        segments.push([p1.x, p1.y, p1.x + p1.r, p1.y, p2.x + p2.l, p2.y, p2.x, p2.y]);
+      }
+      return segments;
+    },
+    getSegmentByX: function getSegmentByX(x) {
+      var p1;
+      var p2;
+      for (var i = 1; i < this.points.length - 1; i++) {
+        if (x <= this.points[i].x) {
+          break;
+        }
+      }
+      p1 = this.points[i - 1];
+      p2 = this.points[i];
+      return [p1.x, p1.y, p1.x + p1.r, p1.y, p2.x + p2.l, p2.y, p2.x, p2.y];
+    },
+    calculateY: function calculateY(x) {
+      x = clip01(x);
+      if (x < EPSILON) {
+        x = EPSILON;
+      }
+      var segment = this.getSegmentByX(x);
+      var funcX = cubicFunc(segment[0], segment[2], segment[4], segment[6]);
+      var funcY = cubicFunc(segment[1], segment[3], segment[5], segment[7]);
+      var derivX = cubicFuncDeriv(segment[0], segment[2], segment[4], segment[6]);
+      var t = 0.5;
+      var dt;
+      var slope;
+      for (var i = 0; i < 20; i++) {
+        dt = funcX(t) - x;
+        if (Math.abs(dt) < EPSILON) {
+          return funcY(clip01(t));
+        }
+        slope = derivX(t);
+        t -= dt / slope;
+      }
+      var funcXd = function funcXd(t) {
+        return funcX(t) - x;
+      };
+      var t1 = 0.0;
+      var t2 = 1.0;
+      var st1 = sign(funcXd(t1));
+      var st2 = sign(funcXd(t2));
+      var st;
+      var diff;
+      for (var i = 0; i < 30; i++) {
+        t = (t1 + t2) / 2;
+        diff = funcXd(t);
+        if (Math.abs(diff) < EPSILON) {
+          return funcY(t);
+        }
+        st = sign(diff);
+        if (st == st1) {
+          t1 = t;
+        } else if (st == st2) {
+          t2 = t;
+        }
+      }
+      return funcY(t);
+    },
+  };
+
+  var EasingFunctionController = (function (_Controller) {
+    _inheritsLoose(EasingFunctionController, _Controller);
+    function EasingFunctionController(object, property) {
+      var _this2;
+      _this2 = _Controller.call(this, object, property) || this;
+      var _this = _assertThisInitialized(_this2);
+      _this2.domElement = document.createElement("div");
+      dom.makeSelectable(_this2.domElement, false);
+      _this2.__func = new EasingFunction(object[property]);
+      _this2.__cursor = 0.0;
+      _this2.__mouse_over = false;
+      _this2.__point_over = null;
+      _this2.__point_selected = null;
+      _this2.__point_selected_type = null;
+      _this2.__point_moving = false;
+      var width = 146;
+      var height = 80;
+      var rectView = {
+        top: 1,
+        left: 3,
+        width: width - 2,
+        height: height - 16,
+      };
+      var rV = rectView;
+      _this2.__thumbnail = document.createElement("canvas");
+      _this2.__thumbnail.width = width * 2;
+      _this2.__thumbnail.height = height * 2;
+      _this2.__thumbnail.className = "easing-thumbnail";
+      _this2.__ctx = _this2.__thumbnail.getContext("2d");
+      _this2.__ctx.scale(2, 2);
+      dom.bind(_this2.__thumbnail, "contextmenu", function (e) {
+        e.preventDefault();
+      });
+      dom.bind(_this2.__thumbnail, "mouseover", onMouseOver);
+      dom.bind(_this2.__thumbnail, "mouseout", onMouseOut);
+      dom.bind(_this2.__thumbnail, "mousedown", onMouseDown);
+      dom.bind(_this2.__thumbnail, "dblclick", onDoubleClick);
+      dom.bind(_this2.__thumbnail, "mousemove", onMouseMove);
+      dom.bind(_this2.__thumbnail, "mouseup", onMouseUp);
+      dom.bind(_this2.__thumbnail, "mouseup", onMouseUp);
+      function toNorm(elem, e) {
+        var mouseX = e.pageX - elem.offsetLeft;
+        var mouseY = e.pageY - elem.offsetTop;
+        return [0 + (mouseX - rV.left + 1) / (rV.width - 2), 1 - (mouseY - rV.top - 2) / rV.height];
+      }
+      function onMouseDown(e) {
+        e.preventDefault();
+        var coord = toNorm(this, e);
+        var point;
+        var index;
+        var type;
+        if (Number.isInteger(_this.__point_selected)) {
+          point = _this.__func.findPointWithHandle(coord[0], coord[1]);
+        } else {
+          point = _this.__func.findPoint(coord[0], coord[1]);
+        }
+        index = point.index;
+        type = point.type;
+        if (index !== undefined) {
+          if (e.button == 2 && type == "ANCHOR") {
+            var delete_successful = _this.__func.deletePoint(index);
+            if (delete_successful) {
+              index = undefined;
+            }
+          }
+        }
+        if (index !== undefined) {
+          if (_this.__point_selected == index) {
+            _this.__point_selected_type = type;
+          } else {
+            _this.__point_selected = index;
+            _this.__point_selected_type = "ANCHOR";
+          }
+          _this.__point_moving = true;
+        } else {
+          _this.__point_selected = null;
+          _this.__point_selected_type = null;
+          _this.__point_moving = false;
+        }
+        _this.updateDisplay();
+      }
+      function onDoubleClick(e) {
+        e.preventDefault();
+        var coord = toNorm(this, e);
+        var point = _this.__func.addPoint(coord[0], coord[1]);
+        _this.__point_selected = point.index;
+        _this.__point_selected_type = point.type;
+        _this.__point_moving = true;
+        _this.updateDisplay();
+      }
+      function onMouseOver(e) {
+        _this.__mouse_over = true;
+        _this.updateDisplay();
+      }
+      function onMouseOut(e) {
+        _this.__mouse_over = false;
+        _this.__point_moving = false;
+        _this.updateDisplay();
+      }
+      function onMouseMove(e) {
+        e.preventDefault();
+        var coord = toNorm(this, e);
+        if (Number.isInteger(_this.__point_selected) && _this.__point_moving) {
+          _this.__func.movePoint(_this.__point_selected, _this.__point_selected_type, coord[0], coord[1]);
+        } else {
+          var _this$__func$findPoin = _this.__func.findPoint(coord[0], coord[1]),
+            index = _this$__func$findPoin.index;
+          if (index !== undefined) {
+            _this.__point_over = index;
+          } else {
+            _this.__point_over = null;
+          }
+        }
+        _this.updateDisplay();
+      }
+      function onMouseUp(e) {
+        e.preventDefault();
+        _this.__point_moving = false;
+        _this.updateDisplay();
+      }
+      common.extend(_this2.__thumbnail.style, {
+        width: width + "px",
+        height: height + "px",
+        cursor: "crosshair",
+      });
+      _this2.updateDisplay();
+      _this2.domElement.appendChild(_this2.__thumbnail);
+      return _this2;
+    }
+    var _proto = EasingFunctionController.prototype;
+    _proto.clear = function clear() {
+      _this.__ctx.clearRect(0, 0, width, height);
+    };
+    _proto.drawRuler = function drawRuler() {
+      var ctx = _this.__ctx;
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = "#930";
+      beginPath();
+      moveTo(0, 0);
+      lineTo(1, 0);
+      moveTo(0, 1);
+      lineTo(1, 1);
+      stroke();
+      for (var i = 0; i <= 4; i++) {
+        var x = i / 4.01;
+        ctx.strokeStyle = "#c97";
+        beginPath();
+        moveTo(x, 0);
+        lineTo(x, -0.04);
+        stroke();
+        ctx.strokeStyle = "#333";
+        beginPath();
+        moveTo(x, 0.01);
+        lineTo(x, 0.99);
+        stroke();
+      }
+      ctx.font = "10px";
+      ctx.fillStyle = "#977";
+      p = toCoord(0, -0.17);
+      ctx.fillText("0.0", p[0], p[1]);
+      p = toCoord(0.25, -0.17);
+      ctx.fillText(".25", p[0] - 8, p[1]);
+      p = toCoord(0.5, -0.17);
+      ctx.fillText(".50", p[0] - 8, p[1]);
+      p = toCoord(0.75, -0.17);
+      ctx.fillText(".75", p[0] - 8, p[1]);
+      p = toCoord(1, -0.17);
+      ctx.fillText("1.0", p[0] - 14, p[1]);
+    };
+    _proto.drawEasingFunction = function drawEasingFunction(easing_func) {
+      var ctx = _this.__ctx;
+      ctx.strokeStyle = "#fff";
+      ctx.lineWidth = 1;
+      beginPath();
+      easing_func.getSegments().forEach(function (s, i) {
+        moveTo.apply(null, s.slice(0, 2));
+        curveTo.apply(null, s.slice(2));
+      });
+      stroke();
+      if (!_this.__mouse_over) {
+        return;
+      }
+      ctx.fillStyle = "#fff";
+      ctx.strokeStyle = "#f90";
+      ctx.lineWidth = 2;
+      easing_func.points.forEach(function (p, i) {
+        if (_this.__mouseo_over && i === _this.__point_over) {
+          return;
+        }
+        if (i === _this.__point_selected) {
+          return;
+        }
+        beginPath();
+        circle(p.x, p.y, 3);
+        closePath();
+        fill();
+        stroke();
+      });
+      var p;
+      if (Number.isInteger(_this.__point_over)) {
+        p = easing_func.points[_this.__point_over];
+        ctx.strokeStyle = "#f3d";
+        beginPath();
+        circle(p.x, p.y, 3);
+        closePath();
+        fill();
+        stroke();
+      }
+      if (Number.isInteger(_this.__point_selected)) {
+        p = easing_func.points[_this.__point_selected];
+        ctx.strokeStyle = "#f3d";
+        ctx.fillStyle = "#fff";
+        beginPath();
+        moveTo(p.x + p.l + 0.01, p.y);
+        lineTo(p.x + p.r - 0.01, p.y);
+        stroke();
+        ["l", "r"].forEach(function (dir) {
+          beginPath();
+          circle(p.x + p[dir], p.y, 2);
+          fill();
+          stroke();
+        });
+        beginPath();
+        square(p.x, p.y, 3);
+        fill();
+        stroke();
+      }
+    };
+    _proto.setCursor = function setCursor(x) {
+      var y = _this.__func.calculateY(x);
+      _this.__ctx.fillStyle = "#ff0";
+      _this.__ctx.strokeStyle = "#ff0";
+      _this.__ctx.lineWidth = 1;
+      beginPath();
+      circle(x, y, 3);
+      closePath();
+      fill();
+      beginPath();
+      moveTo(x, 0);
+      lineTo(x, 1);
+      closePath();
+      stroke();
+      return y;
+    };
+    _proto.setValue = function setValue(v) {
+      var toReturn = _Controller.prototype.setValue.call(this, v);
+      if (this.__onFinishChange) {
+        this.__onFinishChange.call(this, this.getValue());
+      }
+      return toReturn;
+    };
+    _proto.updateDisplay = function updateDisplay() {
+      this.clear();
+      this.drawRuler();
+      this.drawEasingFunction(this.__func);
+    };
+    return EasingFunctionController;
+  })(Controller);
+
+  var TextAreaController = (function (_Controller) {
+    _inheritsLoose(TextAreaController, _Controller);
+    function TextAreaController(object, property) {
+      var _this2;
+      _this2 = _Controller.call(this, object, property) || this;
+      var _this = _assertThisInitialized(_this2);
+      _this2.__input = document.createElement("textarea");
+      dom.bind(_this2.__input, "keyup", onChange);
+      dom.bind(_this2.__input, "change", onChange);
+      dom.bind(_this2.__input, "blur", onBlur);
+      function onChange() {
+        _this.setValue(_this.__input.value);
+      }
+      function onBlur() {
+        if (_this.__onFinishChange) {
+          _this.__onFinishChange.call(_this, _this.getValue());
+        }
+      }
+      _this2.updateDisplay();
+      _this2.domElement.appendChild(_this2.__input);
+      return _this2;
+    }
+    var _proto = TextAreaController.prototype;
+    _proto.updateDisplay = function updateDisplay() {
+      if (dom.isActive(this.__input)) {
+        return this;
+      }
+      this.__input.value = this.getValue();
+      return _Controller.prototype.updateDisplay.call(this);
+    };
+    return TextAreaController;
+  })(Controller);
+
   function requestAnimationFrame(callback, element) {
     setTimeout(callback, 1000 / 60);
   }
@@ -1800,11 +2374,12 @@
           set: function set(v) {
             params.width = v;
             setWidth(_this, v);
+            return _this;
           },
         },
         name: {
           get: function get() {
-            return params.name;
+            return params.name || "";
           },
           set: function set(v) {
             if (v !== params.name && _this.__folders[v] !== undefined) {
@@ -1814,6 +2389,7 @@
             if (titleRow) {
               titleRow.innerHTML = params.name;
             }
+            return _this;
           },
         },
         closed: {
@@ -1831,6 +2407,7 @@
             if (_this.__closeButton) {
               _this.__closeButton.innerHTML = v ? GUI.TEXT_OPEN : GUI.TEXT_CLOSED;
             }
+            return _this;
           },
         },
         load: {
@@ -1852,6 +2429,7 @@
               }
               localStorage.setItem(getLocalStorageHash(_this, "isLocal"), bool);
             }
+            return _this;
           },
         },
       });
@@ -1916,14 +2494,14 @@
           setWidth(_this, params.width);
         }
       }
-      function __resizeHandler() {
+      function onResizeHandler() {
         _this.onResizeDebounced();
       }
-      dom.bind(window, "resize", __resizeHandler);
-      dom.bind(this.__ul, "webkitTransitionEnd", __resizeHandler);
-      dom.bind(this.__ul, "transitionend", __resizeHandler);
-      dom.bind(this.__ul, "oTransitionEnd", __resizeHandler);
-      this.onResize();
+      dom.bind(window, "resize", onResizeHandler);
+      dom.bind(this.__ul, "webkitTransitionEnd", onResizeHandler);
+      dom.bind(this.__ul, "transitionend", onResizeHandler);
+      dom.bind(this.__ul, "oTransitionEnd", onResizeHandler);
+      onResizeHandler();
       if (params.resizable) {
         addResizeHandle(this);
       }
@@ -1932,7 +2510,10 @@
           localStorage.setItem(getLocalStorageHash(_this, "gui"), JSON.stringify(_this.getSaveObject()));
         }
       };
-      this.saveToLocalStorageIfPossible = saveToLocalStorage;
+      this.saveToLocalStorageIfPossible = function () {
+        saveToLocalStorage();
+        return _this;
+      };
       function resetWidth() {
         var root = _this.getRoot();
         root.width += 1;
@@ -1945,6 +2526,58 @@
       }
     }
     var _proto = GUI.prototype;
+    _proto.getControllerByName = function getControllerByName(name, recurse) {
+      var controllers = this.__controllers;
+      var i = controllers.length;
+      while (--i > -1) {
+        if (controllers[i].property === name) {
+          return controllers[i];
+        }
+      }
+      var folders = this.__folders;
+      var tryFI;
+      if (recurse) {
+        for (i in folders) {
+          tryFI = folders[i].getControllerByName(name, true);
+          if (tryFI != null) return tryFI;
+        }
+      }
+      return null;
+    };
+    _proto.getFolderByName = function getFolderByName(name) {
+      return this.__folders[name];
+    };
+    _proto.getAllControllers = function getAllControllers(recurse, myArray) {
+      if (recurse == undefined) recurse = true;
+      var i;
+      var arr = myArray != null ? myArray : [];
+      var controllers = this.__controllers;
+      for (i in controllers) {
+        arr.push(controllers[i]);
+      }
+      if (recurse) {
+        var folders = this.__folders;
+        for (i in folders) {
+          folders[i].getAllControllers(true, arr);
+        }
+      }
+      return arr;
+    };
+    _proto.getAllGUIs = function getAllGUIs(recurse, myArray) {
+      if (recurse == undefined) recurse = true;
+      var i;
+      var arr = myArray != null ? myArray : [this];
+      var folders = this.__folders;
+      for (i in folders) {
+        arr.push(folders[i]);
+      }
+      if (recurse) {
+        for (i in folders) {
+          folders[i].getAllGUIs(true, arr);
+        }
+      }
+      return arr;
+    };
     _proto.toggleHide = function toggleHide() {
       hide = !hide;
       Common.each(hideableGuis, function (gui) {
@@ -1976,6 +2609,16 @@
     _proto.addColor = function addColor(object, property) {
       return _add(this, object, property, {
         color: true,
+      });
+    };
+    _proto.addTextArea = function addTextArea(object, property) {
+      return _add(this, object, property, {
+        multiline: true,
+      });
+    };
+    _proto.addEasingFunction = function addEasingFunction(object, property) {
+      return _add(this, object, property, {
+        easing: true,
       });
     };
     _proto.remove = function remove(controller) {

@@ -21,6 +21,9 @@ import NumberControllerBox from "../controllers/NumberControllerBox";
 import NumberControllerSlider from "../controllers/NumberControllerSlider";
 import ColorController from "../controllers/ColorController";
 import CustomController from "../controllers/CustomController";
+import EasingFunctionController from "../controllers/EasingFunctionController";
+import TextAreaController from "../controllers/TextAreaController";
+import UndefinedController from "../controllers/UndefinedController";
 import requestAnimationFrame from "../utils/requestAnimationFrame";
 import CenteredDiv from "../dom/CenteredDiv";
 import dom from "../dom/dom";
@@ -66,11 +69,8 @@ let hide = false;
 const hideableGuis = [];
 
 /**
- * @class A lightweight controller library for JavaScript. It allows you to easily
+ * A lightweight controller library for JavaScript. It allows you to easily
  * manipulate variables and fire functions on the fly.
- * @class
- *
- * @member dat.gui
  *
  * @typicalname gui
  *
@@ -85,9 +85,9 @@ const hideableGuis = [];
  *
  * @param {Object} [params]
  * @param {String} [params.name] The name of this GUI.
- * @param {Object} [params.load] JSON object representing the saved state of
- * this GUI.
- * @param {dat.gui.GUI} [params.parent] The GUI I'm nested in.
+ * @param {Object} [params.load] JSON object representing the saved state of this GUI.
+ * @param {Object} [params.object] Providing your object will create a controller for each property automatically
+ * @param {GUI} [params.parent] The GUI I'm nested in.
  * @param {Boolean} [params.autoPlace=true]
  * @param {Boolean} [params.hideable=true] If true, GUI is shown/hidden by <kbd>h</kbd> keypress.
  * @param {Boolean} [params.closed=false] If true, starts closed
@@ -199,7 +199,7 @@ class GUI {
       {
         /**
          * The parent <code>GUI</code>
-         * @type dat.gui.GUI
+         * @type GUI
          */
         parent: {
           get: function () {
@@ -268,6 +268,7 @@ class GUI {
           set: function (v) {
             params.width = v;
             setWidth(_this, v);
+            return _this;
           },
         },
 
@@ -278,7 +279,7 @@ class GUI {
          */
         name: {
           get: function () {
-            return params.name;
+            return params.name || "";
           },
           set: function (v) {
             // Check for collisions among sibling folders:
@@ -291,6 +292,7 @@ class GUI {
             if (titleRow) {
               titleRow.innerHTML = params.name;
             }
+            return _this;
           },
         },
 
@@ -317,6 +319,7 @@ class GUI {
             if (_this.__closeButton) {
               _this.__closeButton.innerHTML = v ? GUI.TEXT_OPEN : GUI.TEXT_CLOSED;
             }
+            return _this;
           },
         },
 
@@ -349,6 +352,7 @@ class GUI {
               }
               localStorage.setItem(getLocalStorageHash(_this, "isLocal"), bool);
             }
+            return _this;
           },
         },
       }
@@ -439,15 +443,15 @@ class GUI {
       }
     }
 
-    function __resizeHandler() {
+    function onResizeHandler() {
       _this.onResizeDebounced();
     }
 
-    dom.bind(window, "resize", __resizeHandler);
-    dom.bind(this.__ul, "webkitTransitionEnd", __resizeHandler);
-    dom.bind(this.__ul, "transitionend", __resizeHandler);
-    dom.bind(this.__ul, "oTransitionEnd", __resizeHandler);
-    this.onResize();
+    dom.bind(window, "resize", onResizeHandler);
+    dom.bind(this.__ul, "webkitTransitionEnd", onResizeHandler);
+    dom.bind(this.__ul, "transitionend", onResizeHandler);
+    dom.bind(this.__ul, "oTransitionEnd", onResizeHandler);
+    onResizeHandler();
 
     if (params.resizable) {
       addResizeHandle(this);
@@ -460,7 +464,10 @@ class GUI {
     };
 
     // expose this method publicly
-    this.saveToLocalStorageIfPossible = saveToLocalStorage;
+    this.saveToLocalStorageIfPossible = function () {
+      saveToLocalStorage();
+      return _this;
+    };
 
     function resetWidth() {
       const root = _this.getRoot();
@@ -473,6 +480,73 @@ class GUI {
     if (!params.parent) {
       resetWidth();
     }
+  }
+
+  getControllerByName(name, recurse) {
+    const controllers = this.__controllers;
+    let i = controllers.length;
+    while (--i > -1) {
+      if (controllers[i].property === name) {
+        return controllers[i];
+      }
+    }
+    const folders = this.__folders;
+    let tryFI;
+    if (recurse) {
+      for (i in folders) {
+        tryFI = folders[i].getControllerByName(name, true);
+        if (tryFI != null) return tryFI;
+      }
+    }
+    return null;
+  }
+
+  getFolderByName(name) {
+    return this.__folders[name];
+  }
+
+  getAllControllers(recurse, myArray) {
+    if (recurse == undefined) recurse = true;
+    let i;
+    const arr = myArray != null ? myArray : [];
+
+    const controllers = this.__controllers;
+    for (i in controllers) {
+      arr.push(controllers[i]);
+    }
+
+    if (recurse) {
+      const folders = this.__folders;
+      for (i in folders) {
+        folders[i].getAllControllers(true, arr);
+      }
+    }
+    return arr;
+  }
+
+  /**
+   * Gets this current GUI (usually) and all sub-folder GUIs under this GUI as an array of {name/gui} pairs. The "this" current gui uses empty string.
+   *
+   * @param  recurse (optional) By default, it will recurse multiple levels deep. Set to false to only scan current level from current GUI.
+   * @param  myArray (optional) Supply an existing array to use instead.  If supplied, will not push current GUI into array, only the subfolder GUIs.
+   * @return   The array of {name/gui} value pairs
+   */
+  getAllGUIs(recurse, myArray) {
+    if (recurse == undefined) recurse = true;
+    let i;
+    const arr = myArray != null ? myArray : [this];
+    const folders = this.__folders;
+
+    for (i in folders) {
+      arr.push(folders[i]);
+    }
+
+    if (recurse) {
+      for (i in folders) {
+        folders[i].getAllGUIs(true, arr);
+      }
+    }
+    return arr;
   }
 
   toggleHide() {
@@ -504,7 +578,6 @@ class GUI {
    * @param {Number} [max] Maximum allowed value
    * @param {Number} [step] Increment by which to change value
    * @returns {Controller} The controller that was added to the GUI.
-   * @instance
    *
    * @example
    * // Add a string controller.
@@ -526,7 +599,6 @@ class GUI {
    * @param object
    * @param property
    * @returns {Controller} The controller that was added to the GUI.
-   * @instance
    *
    * @example
    * var palette = {
@@ -547,9 +619,30 @@ class GUI {
   }
 
   /**
+   * @param object
+   * @param property
+   * @returns {dat.controllers.TextAreaController} The new controller that was added.
+   */
+  addTextArea(object, property) {
+    return add(this, object, property, {
+      multiline: true,
+    });
+  }
+
+  /**
+   * @param object
+   * @param property
+   * @returns {dat.controllers.EasingFunctionController} The new controller that was added.
+   */
+  addEasingFunction(object, property) {
+    return add(this, object, property, {
+      easing: true,
+    });
+  }
+
+  /**
    * Removes the given controller from the GUI.
    * @param {Controller} controller
-   * @instance
    */
   remove(controller) {
     // TODO listening?
@@ -564,7 +657,6 @@ class GUI {
   /**
    * Removes the root GUI from the document and unbinds all event listeners.
    * For subfolders, use `gui.removeFolder(folder)` instead.
-   * @instance
    */
   destroy() {
     if (this.parent) {
@@ -594,7 +686,6 @@ class GUI {
    * @returns {dat.gui.GUI} The new folder.
    * @throws {Error} if this GUI already has a folder by the specified
    * name
-   * @instance
    */
   addFolder(name) {
     // We have to prevent collisions on names in order to have a key
@@ -641,7 +732,6 @@ class GUI {
   /**
    * Removes a subfolder GUI instance.
    * @param {dat.gui.GUI} folder The folder to remove.
-   * @instance
    */
   removeFolder(folder) {
     this.__ul.removeChild(folder.domElement.parentElement);
@@ -740,7 +830,6 @@ class GUI {
    *
    * @param {...Object} objects
    * @throws {Error} if not called on a top level GUI.
-   * @instance
    */
   remember(/* ...args */) {
     if (common.isUndefined(SAVE_DIALOGUE)) {
@@ -771,8 +860,7 @@ class GUI {
   }
 
   /**
-   * @returns {dat.gui.GUI} the topmost parent GUI of a nested GUI.
-   * @instance
+   * @returns {GUI} the topmost parent GUI of a nested GUI.
    */
   getRoot() {
     let gui = this;
@@ -785,7 +873,6 @@ class GUI {
   /**
    * @returns {Object} a JSON object representing the current state of
    * this GUI as well as its remembered properties.
-   * @instance
    */
   getSaveObject() {
     const toReturn = this.load;
@@ -811,6 +898,11 @@ class GUI {
     return toReturn;
   }
 
+  /**
+   * TODO:
+   * [save description]
+   * @return {GUI} [description]
+   */
   save() {
     if (!this.load.remembered) {
       this.load.remembered = {};
@@ -822,6 +914,12 @@ class GUI {
     return this;
   }
 
+  /**
+   * TODO:
+   * [saveAs description]
+   * @param  {String} presetName  [description]
+   * @return {GUI}    [description]
+   */
   saveAs(presetName) {
     if (!this.load.remembered) {
       // Retain default values upon first save
@@ -836,6 +934,12 @@ class GUI {
     return this;
   }
 
+  /**
+   * TODO:
+   * [revert description]
+   * @param  {GUI} gui [description]
+   * @return {GUI}     [description]
+   */
   revert(gui) {
     common.each(
       this.__controllers,
@@ -865,6 +969,12 @@ class GUI {
     return this;
   }
 
+  /**
+   * TODO:
+   * listen description
+   * @param  {Controller} controller [description]
+   * @return {GUI}            [description]
+   */
   listen(controller) {
     const init = this.__listening.length === 0;
     this.__listening.push(controller);

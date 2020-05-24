@@ -28,6 +28,25 @@
         const { CustomController } = dat.controllers;
         const { GUI } = dat.gui;
 
+        function match(a, b, msg) {
+          for (const i in b) {
+            if (Number.isNaN(b[i])) {
+              ok(Number.isNaN(a[i]), msg);
+            } else {
+              equal(b[i], a[i], msg);
+            }
+          }
+        }
+
+        function equalish(a, b, tolerance, label) {
+          return ok(Math.abs(a - b) < tolerance, label);
+        }
+
+        // disabled tests are renamed to xxxtest():
+        function xxxtest(description, f) {
+          console.warn("Disabled test: ", description);
+        }
+
         module("Color Math");
 
         test("rgb_to_hex", function () {
@@ -364,20 +383,6 @@
 
           equal(c.h, prevHue, "black, hue intact");
         });
-
-        function match(a, b, msg) {
-          for (const i in b) {
-            if (b[i] !== b[i]) {
-              ok(a[i] !== a[i], msg);
-            } else {
-              equal(b[i], a[i], msg);
-            }
-          }
-        }
-
-        function equalish(a, b, tolerance, label) {
-          return ok(Math.abs(a - b) < tolerance, label);
-        }
 
         function initObject() {
           return {
@@ -758,7 +763,7 @@
           document.body.removeChild(c1.domElement);
         });
 
-        test("Set Color", function () {
+        xxxtest("Set Color", function () {
           // get from click, get from hover
           const object = initObject();
           const c1 = new ColorController(object, "colorProperty");
@@ -933,10 +938,6 @@
 
           ok(c2_changed, "StringController fires when needed.");
         });
-
-        function equalish(a, b, tolerance, label) {
-          return ok(Math.abs(a - b) < tolerance, label);
-        }
 
         module("GUI Appearance");
 

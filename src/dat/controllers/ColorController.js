@@ -168,6 +168,7 @@ class ColorController extends Controller {
       if (i !== false) {
         _this.__color.__state = i;
         _this.setValue(_this.__color.toOriginal());
+        onFinish();
       } else {
         this.value = _this.__color.toString();
       }

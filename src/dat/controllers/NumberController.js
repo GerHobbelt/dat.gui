@@ -56,7 +56,8 @@ class NumberController extends Controller {
       this.__impliedStep = this.__step;
     }
 
-    this.__precision = numDecimals(this.__impliedStep);
+    // Top out at 9 decimals
+    this.__precision = Math.min(numDecimals(this.__impliedStep), 9);
   }
 
   setValue(v) {

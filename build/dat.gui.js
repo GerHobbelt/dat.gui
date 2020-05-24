@@ -488,8 +488,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	      },
 	
 	      write: _toString2.default
+	    },
+	
+	    RGBA_ARRAY: {
+	      read: function read(original) {
+	        var test = original.match(/^\[\s*(\d+),\s*(\d+),\s*(\d+),\s*(\d*\.{0,1}\d*)/);
+	        if (test === null) {
+	          return false;
+	        }
+	
+	        return {
+	          space: 'RGB',
+	          r: parseFloat(test[1]),
+	          g: parseFloat(test[2]),
+	          b: parseFloat(test[3]),
+	          a: parseFloat(test[4])
+	        };
+	      },
+	
+	      write: _toString2.default
 	    }
 	  }
+	
 	},
 	
 	// Numbers
@@ -1899,7 +1919,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      _this.__impliedStep = _this.__step;
 	    }
 	
-	    _this.__precision = numDecimals(_this.__impliedStep);
+	    // Top out at 9 decimals
+	    _this.__precision = Math.min(numDecimals(_this.__impliedStep), 9);
 	    return _this;
 	  }
 	
@@ -2534,6 +2555,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (i !== false) {
 	        _this.__color.__state = i;
 	        _this.setValue(_this.__color.toOriginal());
+	        onFinish();
 	      } else {
 	        this.value = _this.__color.toString();
 	      }

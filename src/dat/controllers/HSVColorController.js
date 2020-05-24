@@ -17,6 +17,14 @@ import Color from "../color/Color";
 import interpret from "../color/interpret";
 import common from "../utils/common";
 
+/**
+ * @class Represents a given property of an object that is a color.
+ *
+ * @extends Controller
+ *
+ * @param {Object} object
+ * @param {string} property
+ */
 class HSVColorController extends Controller {
   constructor(object, property) {
     super(object, property);

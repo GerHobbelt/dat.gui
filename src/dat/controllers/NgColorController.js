@@ -17,20 +17,15 @@ import Color from "../color/Color";
 import interpret from "../color/interpret";
 import common from "../utils/common";
 
+/**
+ * @class Represents a given property of an object that is a color.
+ *
+ * @extends Controller
+ *
+ * @param {Object} object
+ * @param {string} property
+ */
 class NgColorController extends Controller {
-  setValue(newValue) {
-    this.object[this.property] = newValue;
-    if (this.__onChange) {
-      this.__onChange.call(this, newValue);
-    }
-    this.updateDisplay();
-    return this;
-  }
-
-  getValue() {
-    return this.object[this.property];
-  }
-
   constructor(object, property) {
     super(object, property);
 
@@ -39,7 +34,7 @@ class NgColorController extends Controller {
 
     const _this = this;
 
-    this.domElement = document.createElement("div");
+    // this.domElement = document.createElement('div');
 
     dom.makeSelectable(this.domElement, false);
 
@@ -196,9 +191,7 @@ class NgColorController extends Controller {
     }
 
     function onFinish() {
-      if (_this.__onFinishChange) {
-        _this.__onFinishChange.call(_this, _this.__color.toOriginal());
-      }
+      _this.__propagateFinishChange(_this.__color.toOriginal());
     }
 
     this.__saturation_field.appendChild(valueField);
@@ -260,7 +253,8 @@ class NgColorController extends Controller {
     }
   }
 
-  updateDisplay() {
+  updateDisplay(force) {
+    if (!force && dom.isActive(this.__input)) return this;
     const i = interpret(this.getValue());
 
     if (i !== false) {

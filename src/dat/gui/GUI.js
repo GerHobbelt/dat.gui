@@ -24,6 +24,8 @@ import BgColorController from "../controllers/BgColorController";
 import NgColorController from "../controllers/NgColorController";
 import HSVColorController from "../controllers/HSVColorController";
 import GtColorController from "../controllers/GtColorController";
+import ImageController from "../controllers/ImageController";
+import PlotterController from "../controllers/PlotterController";
 import EasingFunctionController from "../controllers/EasingFunctionController";
 import TextAreaController from "../controllers/TextAreaController";
 import UndefinedController from "../controllers/UndefinedController";
@@ -44,8 +46,8 @@ const CSS_NAMESPACE = "dg";
 
 const HIDE_KEY_CODE = 72;
 
-/** The only value shared between the JS and SCSS. Use caution. */
-const CLOSE_BUTTON_HEIGHT = 20;
+/** Caches the height of the Close Button. */
+let CLOSE_BUTTON_HEIGHT = 0;
 
 const DEFAULT_DEFAULT_PRESET_NAME = "Default";
 
@@ -155,17 +157,27 @@ class GUI {
      */
     this.__rememberedObjectIndecesToControllers = [];
 
-    /*
+    /**
      * Called on change of child elements.
      */
     this.__onChange = undefined;
 
-    /*
+    /**
      * Called on finish change of child elements.
      */
     this.__onFinishChange = undefined;
 
     this.__listening = [];
+
+    const __resizeDebounced = common.debounce(function () {
+      _this.onResize();
+    }, 50);
+
+    /**
+     * Debounced {onResize} handler. Use this instead of {onResize} directly to improve
+     * performance on mobile and other low power platforms.
+     */
+    this.onResizeDebounced = __resizeDebounced;
 
     // Default parameters
     params = common.defaults(params, {
@@ -338,7 +350,7 @@ class GUI {
             // For browsers that aren't going to respect the CSS transition,
             // Let's just check our height against the window height right off
             // the bat.
-            _this.onResize();
+            _this.onResizeDebounced();
 
             if (_this.__closeButton) {
               if (params.name) {
@@ -478,15 +490,13 @@ class GUI {
       }
     }
 
-    function __resizeHandler() {
+    dom.bind(window, "resize", _this.onResizeDebounced);
+    dom.bind(this.__ul, "webkitTransitionEnd", _this.onResizeDebounced);
+    dom.bind(this.__ul, "transitionend", _this.onResizeDebounced);
+    dom.bind(this.__ul, "oTransitionEnd", _this.onResizeDebounced);
+    common.defer(function () {
       _this.onResizeDebounced();
-    }
-
-    dom.bind(window, "resize", __resizeHandler);
-    dom.bind(this.__ul, "webkitTransitionEnd", __resizeHandler);
-    dom.bind(this.__ul, "transitionend", __resizeHandler);
-    dom.bind(this.__ul, "oTransitionEnd", __resizeHandler);
-    this.onResize();
+    });
 
     if (params.resizable) {
       addResizeHandle(this);
@@ -770,7 +780,7 @@ class GUI {
     this.__controllers.splice(this.__controllers.indexOf(controller), 1);
     const _this = this;
     common.defer(function () {
-      _this.onResize();
+      _this.onResizeDebounced();
     });
   }
 
@@ -908,7 +918,7 @@ class GUI {
     });
 
     common.defer(function () {
-      _this.onResize();
+      _this.onResizeDebounced();
     });
   }
 
@@ -952,7 +962,13 @@ class GUI {
           h += dom.getHeight(node);
         }
       });
+      debugger;
+      h = dom.getHeight(root.__ul);
 
+      if (!CLOSE_BUTTON_HEIGHT) {
+        debugger;
+        CLOSE_BUTTON_HEIGHT = dom.getHeight(root.__closeButton);
+      }
       if (window.innerHeight - top - CLOSE_BUTTON_HEIGHT < h) {
         dom.addClass(root.domElement, GUI.CLASS_TOO_TALL);
         root.__ul.style.height = window.innerHeight - top - CLOSE_BUTTON_HEIGHT + "px";
@@ -1184,10 +1200,6 @@ GUI.TEXT_OPEN = '<img src="https://icon.now.sh/settings/FFFFFF/18" />';
 
 dom.bind(window, "keydown", GUI._keydownHandler, false);
 
-GUI.onResizeDebounced = common.debounce(function () {
-  this.onResize();
-}, 50);
-
 function add(gui, object, property, params) {
   let controller;
 
@@ -1209,7 +1221,7 @@ function add(gui, object, property, params) {
     } else if (params.gtcolor) {
       controller = new GtColorController(object, property);
     } else if (params.hsvcolor) {
-      controller = new HsvColorController(object, property);
+      controller = new HSVColorController(object, property);
     } else if (params.easing) {
       controller = new EasingFunctionController(object, property);
     } else if (params.multiline) {
@@ -1298,12 +1310,15 @@ function addRow(gui, dom, liBefore) {
   } else {
     gui.__ul.appendChild(li);
   }
-  gui.onResize();
+  gui.onResizeDebounced();
   return li;
 }
 
 function removeListeners(gui) {
-  dom.unbind(window, "resize", gui.__resizeHandler);
+  dom.unbind(window, "resize", gui.onResizeDebounced);
+  dom.unbind(gui.__ul, "webkitTransitionEnd", gui.onResizeDebounced);
+  dom.unbind(gui.__ul, "transitionend", gui.onResizeDebounced);
+  dom.unbind(gui.__ul, "oTransitionEnd", gui.onResizeDebounced);
 
   if (gui.saveToLocalStorageIfPossible) {
     dom.unbind(window, "unload", gui.saveToLocalStorageIfPossible);
@@ -1452,42 +1467,16 @@ function augmentController(gui, li, controller) {
     dom.bind(li, "mouseout", function () {
       dom.removeClass(controller.__button, "hover");
     });
-  } else if (controller instanceof ColorController) {
+  } else if (
+    controller instanceof ColorController ||
+    controller instanceof BgColorController ||
+    controller instanceof NgColorController ||
+    controller instanceof HSVColorController ||
+    controller instanceof GtColorController
+  ) {
     dom.addClass(li, "color");
     controller.updateDisplay = common.compose(function (val) {
       li.style.borderLeftColor = controller.__color.toHexString();
-      return val;
-    }, controller.updateDisplay);
-
-    controller.updateDisplay();
-  } else if (controller instanceof BgColorController) {
-    dom.addClass(li, "color");
-    controller.updateDisplay = common.compose(function (val) {
-      li.style.borderLeftColor = controller.__color.toString();
-      return val;
-    }, controller.updateDisplay);
-
-    controller.updateDisplay();
-  } else if (controller instanceof NgColorController) {
-    dom.addClass(li, "color");
-    controller.updateDisplay = common.compose(function (val) {
-      li.style.borderLeftColor = controller.__color.toString();
-      return val;
-    }, controller.updateDisplay);
-
-    controller.updateDisplay();
-  } else if (controller instanceof HSVColorController) {
-    dom.addClass(li, "color");
-    controller.updateDisplay = common.compose(function (val) {
-      li.style.borderLeftColor = controller.__color.toString();
-      return val;
-    }, controller.updateDisplay);
-
-    controller.updateDisplay();
-  } else if (controller instanceof GtColorController) {
-    dom.addClass(li, "color");
-    controller.updateDisplay = common.compose(function (val) {
-      li.style.borderLeftColor = controller.__color.toString();
       return val;
     }, controller.updateDisplay);
 
@@ -1734,7 +1723,7 @@ function addResizeHandle(gui) {
     e.preventDefault();
 
     gui.width += pmouseX - e.clientX;
-    gui.onResize();
+    gui.onResizeDebounced();
     pmouseX = e.clientX;
 
     return false;

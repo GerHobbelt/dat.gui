@@ -17,16 +17,15 @@ import Color from "../color/Color";
 import interpret from "../color/interpret";
 import common from "../utils/common";
 
+/**
+ * @class Represents a given property of an object that is a color.
+ *
+ * @extends Controller
+ *
+ * @param {Object} object
+ * @param {string} property
+ */
 class BgColorController extends Controller {
-  setValue(newValue) {
-    this.object[this.property] = newValue;
-    if (this.__onChange) {
-      this.__onChange.call(this, newValue);
-    }
-    this.updateDisplay();
-    return this;
-  }
-
   setValue2(newValue) {
     this.value2 = newValue;
     if (this.object[this.property + "bg"]) {
@@ -37,10 +36,6 @@ class BgColorController extends Controller {
     }
     this.updateDisplay();
     return this;
-  }
-
-  getValue() {
-    return this.object[this.property];
   }
 
   constructor(object, property) {
@@ -58,7 +53,7 @@ class BgColorController extends Controller {
 
     const _this = this;
 
-    this.domElement = document.createElement("div");
+    // this.domElement = document.createElement('div');
 
     dom.makeSelectable(this.domElement, false);
 

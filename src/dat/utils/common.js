@@ -136,7 +136,12 @@ const Common = {
   },
 
   isNaN: function (obj) {
-    return isNaN(obj);
+    //
+    // See for the difference between `isNan()` and `Number.isNaN()`:
+    // - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/isNaN#Description
+    // - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isNaN
+    //
+    return Number.isNaN(obj);
   },
 
   // isArray: Array.isArray || function(obj) {
@@ -158,7 +163,7 @@ const Common = {
   },
 
   isString: function (obj) {
-    return obj === obj + "";
+    return typeof obj === "string";
   },
 
   isBoolean: function (obj) {
@@ -167,6 +172,10 @@ const Common = {
 
   isFunction: function (obj) {
     return obj instanceof Function;
+  },
+
+  isAsyncFunction: function (obj) {
+    return Object.prototype.toString.call(obj) === "[object AsyncFunction]";
   },
 
   supportsPassive: function () {

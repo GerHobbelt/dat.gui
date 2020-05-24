@@ -108,7 +108,7 @@ class NumberControllerBox extends NumberController {
       prevY = e.clientY;
     }
 
-    function onMouseUp() {
+    function onMouseUp(e) {
       dom.unbind(window, "mousemove", onMouseDrag);
       dom.unbind(window, "mouseup", onMouseUp);
       onFinish();
@@ -168,6 +168,8 @@ class NumberControllerBox extends NumberController {
   }
 
   updateDisplay() {
+    // No updating while editing number field.
+    //
     // Use the same solution from StringController.js to enable
     // editing <input>s while "listen()"ing
     if (dom.isActive(this.__input)) {

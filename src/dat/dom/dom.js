@@ -177,7 +177,12 @@ const dom = {
     bool = bool || false;
     passive = passive || false;
     if (elem.addEventListener) {
-      const listenerArg = common.supportsPassive() ? { capture: bool, passive: passive } : bool;
+      const listenerArg = common.supportsPassive()
+        ? {
+            capture: bool,
+            passive: passive,
+          }
+        : bool;
       elem.addEventListener(event, func, listenerArg);
     } else if (elem.attachEvent) {
       elem.attachEvent("on" + event, func);

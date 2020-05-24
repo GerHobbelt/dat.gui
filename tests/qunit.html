@@ -789,7 +789,7 @@
           document.body.removeChild(c1.domElement);
         });
 
-        xxxtest("Set Color", function () {
+        test("Set Color", function () {
           // get from click, get from hover
           const object = initObject();
           const c1 = new ColorController(object, "colorProperty");
@@ -1392,8 +1392,32 @@
         }
       });
     </script>
+    <style>
+      .nav-header {
+        padding: 0.5em 0 0.5em 2.5em;
+        background-color: #2b81af;
+        color: #ffffff;
+        text-shadow: rgba(0, 0, 0, 0.5) 2px 2px 1px;
+
+        font-size: small;
+
+        font-family: "Helvetica Neue Light", "HelveticaNeue-Light", "Helvetica Neue", Calibri, Helvetica, Arial,
+          sans-serif;
+        font-weight: bold;
+      }
+
+      .nav-header a {
+        color: white;
+      }
+
+      .nav-header a:hover {
+        color: #ffb884;
+      }
+    </style>
   </head>
   <body>
+    <h2 class="nav-header"><a href="../index.html">Back to main index page</a> | <a href="?#">Back to full test</a></h2>
+
     <h1 id="qunit-header"></h1>
 
     <h2 id="qunit-banner"></h2>

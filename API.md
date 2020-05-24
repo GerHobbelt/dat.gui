@@ -42,7 +42,7 @@ manipulate variables and fire functions on the fly.</p>
 ## Functions
 
 <dl>
-<dt><a href="#addRow">addRow(gui, [newDom], [liBefore])</a></dt>
+<dt><a href="#addRow">addRow(gui, [dom], [liBefore])</a></dt>
 <dd><p>Add a row to the end of the GUI or before another row.</p>
 </dd>
 </dl>
@@ -70,8 +70,11 @@ manipulate variables and fire functions on the fly.
     * [.closed](#GUI+closed) : <code>Boolean</code>
     * [.load](#GUI+load) : <code>Object</code>
     * [.useLocalStorage](#GUI+useLocalStorage) : <code>Boolean</code>
+    * [.getAllGUIs(recurse, myArray)](#GUI+getAllGUIs) ⇒ <code>name/gui</code>
     * [.add(object, property, label, [min], [max], [step])](#GUI+add) ⇒ <code>Controller</code>
     * [.addColor(object, property)](#GUI+addColor) ⇒ <code>Controller</code>
+    * [.addTextArea(object, property)](#GUI+addTextArea) ⇒ <code>dat.controllers.TextAreaController</code>
+    * [.addEasingFunction(object, property)](#GUI+addEasingFunction) ⇒ <code>dat.controllers.EasingFunctionController</code>
     * [.addPlotter(object, property, max, period, type, fgColor, bgColor)](#GUI+addPlotter) ⇒ <code>Controller</code>
     * [.addFile(object, property)](#GUI+addFile) ⇒ <code>Controller</code>
     * [.addCustomController(object, property)](#GUI+addCustomController) ⇒ <code>Controller</code>
@@ -88,6 +91,12 @@ manipulate variables and fire functions on the fly.
     * [.remember(...objects)](#GUI+remember)
     * [.getRoot()](#GUI+getRoot) ⇒ [<code>GUI</code>](#GUI)
     * [.getSaveObject()](#GUI+getSaveObject) ⇒ <code>Object</code>
+    * [.save()](#GUI+save) ⇒ [<code>GUI</code>](#GUI)
+    * [.saveAs(presetName)](#GUI+saveAs) ⇒ [<code>GUI</code>](#GUI)
+    * [.revert(gui)](#GUI+revert) ⇒ [<code>GUI</code>](#GUI)
+    * [.deleteSave()](#GUI+deleteSave) ⇒ [<code>GUI</code>](#GUI)
+    * [.listen(controller)](#GUI+listen) ⇒ [<code>GUI</code>](#GUI)
+    * [.updateDisplay()](#GUI+updateDisplay) ⇒ [<code>GUI</code>](#GUI)
 
 <a name="new_GUI_new"></a>
 
@@ -161,7 +170,7 @@ The identifier for a set of saved values
 <a name="GUI+width"></a>
 
 ### gui.width : <code>Number</code>
-The width of <code>GUI</code> element
+The width of the <code>GUI</code> element
 
 **Kind**: instance property of [<code>GUI</code>](#GUI)  
 <a name="GUI+name"></a>
@@ -197,6 +206,19 @@ Determines whether or not to use <a href="https://developer.mozilla.org/en/DOM/S
 <code>remember</code>ing
 
 **Kind**: instance property of [<code>GUI</code>](#GUI)  
+<a name="GUI+getAllGUIs"></a>
+
+### gui.getAllGUIs(recurse, myArray) ⇒ <code>name/gui</code>
+Gets this current GUI (usually) and all sub-folder GUIs under this GUI as an array of {name/gui} pairs. The "this" current gui uses empty string.
+
+**Kind**: instance method of [<code>GUI</code>](#GUI)  
+**Returns**: <code>name/gui</code> - The array of  value pairs  
+
+| Param | Description |
+| --- | --- |
+| recurse | (optional) By default, it will recurse multiple levels deep. Set to false to only scan current level from current GUI. |
+| myArray | (optional) Supply an existing array to use instead.  If supplied, will not push current GUI into array, only the subfolder GUIs. |
+
 <a name="GUI+add"></a>
 
 ### gui.add(object, property, label, [min], [max], [step]) ⇒ <code>Controller</code>
@@ -255,6 +277,28 @@ gui.addColor(palette, 'color2');
 gui.addColor(palette, 'color3');
 gui.addColor(palette, 'color4');
 ```
+<a name="GUI+addTextArea"></a>
+
+### gui.addTextArea(object, property) ⇒ <code>dat.controllers.TextAreaController</code>
+**Kind**: instance method of [<code>GUI</code>](#GUI)  
+**Returns**: <code>dat.controllers.TextAreaController</code> - The new controller that was added.  
+
+| Param |
+| --- |
+| object | 
+| property | 
+
+<a name="GUI+addEasingFunction"></a>
+
+### gui.addEasingFunction(object, property) ⇒ <code>dat.controllers.EasingFunctionController</code>
+**Kind**: instance method of [<code>GUI</code>](#GUI)  
+**Returns**: <code>dat.controllers.EasingFunctionController</code> - The new controller that was added.  
+
+| Param |
+| --- |
+| object | 
+| property | 
+
 <a name="GUI+addPlotter"></a>
 
 ### gui.addPlotter(object, property, max, period, type, fgColor, bgColor) ⇒ <code>Controller</code>
@@ -437,6 +481,69 @@ of the list.
 **Kind**: instance method of [<code>GUI</code>](#GUI)  
 **Returns**: <code>Object</code> - a JSON object representing the current state of
 this GUI as well as its remembered properties.  
+<a name="GUI+save"></a>
+
+### gui.save() ⇒ [<code>GUI</code>](#GUI)
+TODO:
+[save description]
+
+**Kind**: instance method of [<code>GUI</code>](#GUI)  
+**Returns**: [<code>GUI</code>](#GUI) - [description]  
+<a name="GUI+saveAs"></a>
+
+### gui.saveAs(presetName) ⇒ [<code>GUI</code>](#GUI)
+TODO:
+[saveAs description]
+
+**Kind**: instance method of [<code>GUI</code>](#GUI)  
+**Returns**: [<code>GUI</code>](#GUI) - [description]  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| presetName | <code>String</code> | [description] |
+
+<a name="GUI+revert"></a>
+
+### gui.revert(gui) ⇒ [<code>GUI</code>](#GUI)
+TODO:
+[revert description]
+
+**Kind**: instance method of [<code>GUI</code>](#GUI)  
+**Returns**: [<code>GUI</code>](#GUI) - [description]  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| gui | [<code>GUI</code>](#GUI) | [description] |
+
+<a name="GUI+deleteSave"></a>
+
+### gui.deleteSave() ⇒ [<code>GUI</code>](#GUI)
+TODO:
+deleteSave description
+
+**Kind**: instance method of [<code>GUI</code>](#GUI)  
+**Returns**: [<code>GUI</code>](#GUI) - description  
+<a name="GUI+listen"></a>
+
+### gui.listen(controller) ⇒ [<code>GUI</code>](#GUI)
+TODO:
+listen description
+
+**Kind**: instance method of [<code>GUI</code>](#GUI)  
+**Returns**: [<code>GUI</code>](#GUI) - [description]  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| controller | <code>Controller</code> | [description] |
+
+<a name="GUI+updateDisplay"></a>
+
+### gui.updateDisplay() ⇒ [<code>GUI</code>](#GUI)
+TODO:
+updateDisplay description
+
+**Kind**: instance method of [<code>GUI</code>](#GUI)  
+**Returns**: [<code>GUI</code>](#GUI) - description  
 <a name="autoPlaceVirgin"></a>
 
 ## autoPlaceVirgin
@@ -469,7 +576,7 @@ The only value shared between the JS and SCSS. Use caution.
 **Kind**: global constant  
 <a name="addRow"></a>
 
-## addRow(gui, [newDom], [liBefore])
+## addRow(gui, [dom], [liBefore])
 Add a row to the end of the GUI or before another row.
 
 **Kind**: global function  
@@ -477,7 +584,7 @@ Add a row to the end of the GUI or before another row.
 | Param | Description |
 | --- | --- |
 | gui |  |
-| [newDom] | If specified, inserts the dom content in the new row |
+| [dom] | If specified, inserts the dom content in the new row |
 | [liBefore] | If specified, places the new row before another row |
 
 <!--- API END --->

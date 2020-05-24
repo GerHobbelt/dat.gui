@@ -17,7 +17,7 @@ import Plotter from "../utils/plotter";
 /**
  * @class Provides a canvas that graphically displays the value of the object property at the specified interval
  *
- * @extends Controller
+ * @extends dat.controllers.Controller
  *
  * @param {Object} object The object to be manipulated
  * @param {string} property The name of the property to be manipulated
@@ -29,11 +29,13 @@ class PlotterController extends Controller {
   constructor(object, property, params) {
     super(object, property);
 
+    params = params || {};
+
     /** The graph will be these many units high */
-    this.max = params.max;
+    this.max = params.max || 3;
 
     /** Refresh rate. Value of 0 disables auto-refresh */
-    this.period = params.period;
+    this.period = params.period || 0;
 
     /** Stores the current value for comparison during animation frame */
     this.prevValue = this.getValue();
@@ -41,7 +43,7 @@ class PlotterController extends Controller {
     /** Allows acurate timing for the period to be checked during animation frame */
     this.lastUpdate = Date.now();
 
-    this.__panel = new Plotter(params.fgColor, params.bgColor, params.type);
+    this.__panel = new Plotter(params.fgColor || "#fff", params.bgColor || "#000", params.type || "line");
     this.domElement.appendChild(this.__panel.dom);
   }
 

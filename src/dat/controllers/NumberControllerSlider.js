@@ -79,7 +79,7 @@ class NumberControllerSlider extends NumberController {
       return false;
     }
 
-    function onMouseUp() {
+    function onMouseUp(e) {
       dom.unbind(window, "mousemove", onMouseDrag);
       dom.unbind(window, "mouseup", onMouseUp);
       if (_this.__onFinishChange) {

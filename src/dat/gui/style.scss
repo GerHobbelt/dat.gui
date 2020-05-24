@@ -61,6 +61,45 @@ $input-color: lighten($background-color, 8.5%);
   width: 8px;
 }
 
+@mixin scrollbars(
+  $size,
+  $foreground-color,
+  $background-color: mix($foreground-color, white, 50%)
+) {
+  // For Google Chrome
+  &::-webkit-scrollbar {
+    width: $size;
+    //height: $size;
+    // background: $background-color;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: $size / 2;
+    background: $foreground-color;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: $background-color;
+  }
+
+  &::-webkit-scrollbar-corner {
+    height: 0;
+    display: none;
+  }
+
+  // For Internet Explorer
+  & {
+    scrollbar-face-color: $foreground-color;
+    scrollbar-track-color: $background-color;
+    scrollbar-width: thin;
+  }
+
+  // Firefox
+  scrollbar-width: $size;
+  // IE, Edge
+  -ms-overflow-style: none;
+}
+
 @import "structure";
 
 /** Main type */
@@ -71,25 +110,16 @@ $input-color: lighten($background-color, 8.5%);
 
   /** Auto place */
   &.main {
-    /** Scrollbar */
-    &::-webkit-scrollbar {
-      width: 5px;
-      background: $background-color;
-    }
+    > ul {
+      @include scrollbars(
+        6px,
+        lighten($background-color, 30%) /*, $background-color */
+      );
 
-    &::-webkit-scrollbar-corner {
-      height: 0;
-      display: none;
+      overflow-y: auto;
+      overflow-x: auto; // keep this for now, SHOULD be 'hidden', but we're debugging some controls...
+      //overflow-x: hidden;
     }
-
-    &::-webkit-scrollbar-thumb {
-      border-radius: 5px;
-      background: lighten($background-color, 30%);
-    }
-    // Firefox
-    scrollbar-width: none;
-    // IE, Edge
-    -ms-overflow-style: none;
   }
 
   li {

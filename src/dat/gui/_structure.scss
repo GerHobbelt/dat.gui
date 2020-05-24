@@ -56,10 +56,11 @@ $shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
   &.main {
     @include transition(opacity, 0.1s, linear);
 
+    box-sizing: border-box;
     box-shadow: $shadow;
 
     &.taller-than-window {
-      overflow-y: auto;
+      //overflow-y: auto;
 
       .close-button {
         opacity: 1;
@@ -204,7 +205,7 @@ $shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
   .c {
     float: left;
     width: 60%;
-    height: 125px; /* JLA */
+    height: 125px;
     position: relative;
   }
 
@@ -243,7 +244,7 @@ $shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
 
   .slider {
     float: left;
-    width: 66%;
+    width: 66%; // should be 70% (input is 30% wide) but we leave a litte room at the right side that way
     margin-left: -5px;
     margin-right: 0;
     height: 19px;

@@ -957,16 +957,19 @@ class GUI {
       const { top } = dom.getOffset(root.__ul);
       let h = 0;
 
-      common.each(root.__ul.childNodes, function (node) {
-        if (!(root.autoPlace && node === root.__save_row)) {
-          h += dom.getHeight(node);
-        }
-      });
-      debugger;
-      h = dom.getHeight(root.__ul);
+      // this code doesn't account for overflowing stylings in controllers (which can be buggy that way)
+      //
+      // common.each(root.__ul.childNodes, function (node) {
+      //  if (!(root.autoPlace && node === root.__save_row)) {
+      //    h += dom.getHeight(node);
+      //  }
+      // });
+      //
+      // instead use `scrollHeight` which will always deliver the true total height
+      // as per https://stackoverflow.com/a/22675563/1635910
+      h = root.__ul.scrollHeight;
 
       if (!CLOSE_BUTTON_HEIGHT) {
-        debugger;
         CLOSE_BUTTON_HEIGHT = dom.getHeight(root.__closeButton);
       }
       if (window.innerHeight - top - CLOSE_BUTTON_HEIGHT < h) {

@@ -1,0 +1,261 @@
+/**
+ * dat.GUI JavaScript Controller Library
+ * http://code.google.com/p/dat-gui
+ *
+ * Copyright 2011-2020 Data Arts Team, Google Creative Lab
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
+* {
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  font: 9.5px/13px "Lucida Grande", sans-serif;
+  padding: 0 20px 20px 20px;
+}
+
+#container {
+  max-width: 530px;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Helvetica Neue", helvetica, arial, sans-serif;
+  color: #222222;
+}
+
+hr {
+  border: 0;
+  height: 0;
+  border-top: 1px dotted #CCCCCC;
+}
+
+h1 {
+  font-size: 80px;
+  font-weight: 800;
+  text-transform: lowercase;
+  line-height: 80px;
+  margin: 39px 0 20px 0;
+}
+
+h1 a:link,
+h1 a:visited,
+h1 a:hover,
+h1 a:active {
+  text-decoration: none;
+  margin-right: 7px;
+}
+
+h1 img {
+  width: 45px;
+  height: 45px;
+  margin-bottom: 8px;
+}
+
+h2 {
+  margin-top: 30px;
+  font-size: 18px;
+  margin-bottom: 24px;
+}
+
+h2.section {
+  margin: 0;
+  padding: 20px 0 20px;
+  cursor: pointer;
+  border-top: 1px dotted #CCCCCC;
+  -webkit-transition: color 0.15s linear;
+}
+
+h2.section:hover {
+  color: #00AEFF;
+}
+
+div.collapsed h2,
+div.expanded h2 {
+  float: left;
+  clear: both;
+  width: 100%;
+  cursor: pointer;
+}
+
+div.expanded h2::before {
+  content: "-";
+}
+
+div.collapsed h2::before {
+  content: "+";
+}
+
+div.expanded h2::before,
+div.collapsed h2::before {
+  font-weight: normal;
+  line-height: 2px;
+  float: left;
+  margin-top: 6px;
+  margin-right: 6px;
+  font-size: 9px;
+  font-family: Monaco, monospace;
+}
+
+div.collapsed .collapsable {
+  overflow: hidden;
+  clear: both;
+  height: 0;
+}
+
+div.expanded .collapsable {
+  overflow: hidden;
+  clear: both;
+  height: auto;
+}
+
+div.expanded {
+  cursor: pointer;
+}
+
+#helvetica-demo {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 800;
+  height: 300;
+  z-index: -1;
+}
+
+#notifier {
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 271px;
+  height: 142px;
+  background: url("assets/itgivesyouthis.jpg") center 0 no-repeat;
+  z-index: -2;
+  margin: 30px 22px 0 0;
+}
+
+pre {
+  margin: 20px 0 20px 0;
+  padding: 15px;
+  background-color: #222222;
+  max-width: 500px;
+  font: 10px Monaco, monospace;
+  clear: both;
+}
+
+p,
+ul,
+ol {
+  font-size: 125%;
+  clear: both;
+  line-height: 18px;
+  margin-bottom: 24px;
+}
+
+li {
+  margin-left: 22px;
+}
+
+ul#desc {
+  list-style: circle;
+  font-size: 100%;
+  max-width: 380px;
+}
+
+a:link {
+  color: #00AEFF;
+}
+
+a:visited {
+  color: #0FA954;
+}
+
+a:hover {
+  color: #E61D5F;
+}
+
+a:active {
+  color: #54396E;
+}
+
+footer {
+  margin-top: 20px;
+  background-color: #EEEEEE;
+  width: 510px;
+  padding: 10px;
+  clear: both;
+  color: #444444;
+}
+
+pre a:link,
+pre a:visited,
+pre a:active,
+pre a:hover {
+  color: #CCCCCC;
+}
+
+code {
+  font: 10px Monaco, monospace;
+}
+
+code strong {
+  font-weight: normal;
+  color: #E61D5F;
+}
+
+/* SPAN elements with the classes below are added by prettyprint. */
+.str {
+  color: #0FA954;
+}
+
+.kwd {
+  color: #E61D5F;
+}
+
+.com {
+  color: #555555;
+}
+
+.typ {
+  color: #CCCCCC;
+}
+
+.lit {
+  color: #00AEFF;
+}
+
+.pun,
+.opn,
+.clo {
+  color: #777777;
+}
+
+.pln {
+  color: #CCCCCC;
+}
+
+.tag {
+  color: #555555;
+}
+
+.atn {
+  color: #555555;
+}
+
+.atv {
+  color: #777777;
+}
+
+.dec {
+  color: #660066;
+}

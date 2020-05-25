@@ -1,0 +1,415 @@
+/**
+ * dat.GUI JavaScript Controller Library
+ * http://code.google.com/p/dat-gui
+ *
+ * Copyright 2011-2020 Data Arts Team, Google Creative Lab
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
+@charset "UTF-8";
+.dg ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  clear: both;
+}
+.dg.ac {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 0;
+  z-index: 0;
+}
+.dg:not(.ac) .main {
+  overflow: hidden;
+}
+.dg.main {
+  transition: opacity 0.1s linear;
+  box-sizing: border-box;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+}
+.dg.main.taller-than-window .close-button {
+  opacity: 1;
+  margin-top: -1px;
+  border-top: 1px solid #454545;
+}
+.dg.main ul.closed .close-button {
+  opacity: 1 !important;
+}
+.dg.main .close-button.drag,
+.dg.main:hover .close-button {
+  opacity: 1;
+}
+.dg.main .close-button {
+  transition: opacity 0.1s linear;
+  border: 0;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+  line-height: 27px;
+  height: 28px;
+  cursor: pointer;
+  text-align: center;
+  background-color: #000;
+}
+.dg.main .close-button.close-top {
+  position: relative;
+}
+.dg.main .close-button.close-bottom {
+  position: absolute;
+}
+.dg.main .close-button:hover {
+  background-color: #111;
+}
+.dg.main .close-button img {
+  display: inline-block;
+  margin: 2px;
+  vertical-align: middle;
+}
+.dg.a {
+  float: right;
+  margin-right: 15px;
+  overflow-y: visible;
+}
+.dg.a.has-save > ul.close-top {
+  margin-top: 0;
+}
+.dg.a.has-save > ul.close-bottom {
+  margin-top: 32px;
+}
+.dg.a.has-save > ul.closed {
+  margin-top: 0;
+}
+.dg.a .save-row {
+  top: 0;
+  z-index: 2;
+}
+.dg.a .save-row.close-top {
+  position: relative;
+}
+.dg.a .save-row.close-bottom {
+  position: fixed;
+}
+.dg li {
+  transition: height 0.1s ease-out;
+  transition: overflow 0.1s linear;
+}
+.dg li:not(.folder) {
+  cursor: auto;
+  height: 32px;
+  line-height: 32px;
+  padding: 0 4px 0 5px;
+}
+.dg li.folder {
+  padding: 0;
+  border-left: 4px solid #000;
+}
+.dg li.title {
+  margin-left: -4px;
+}
+.dg .closed li:not(.title),
+.dg .closed ul li,
+.dg .closed ul li > * {
+  height: 0;
+  overflow: hidden;
+  border: 0;
+}
+.dg .cr {
+  clear: both;
+  padding-left: 3px;
+  height: 32px;
+  overflow: hidden;
+}
+.dg .property-name {
+  cursor: default;
+  float: left;
+  clear: left;
+  width: 40%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-overflow: "…" "…";
+  white-space: nowrap;
+}
+.dg .c {
+  float: left;
+  width: 60%;
+  height: 125px;
+  position: relative;
+}
+.dg .c canvas,
+.dg .c input[type="number"],
+.dg .c input[type="text"] {
+  border: 0;
+  margin-top: 4px;
+  padding: 3px;
+  width: 100%;
+  float: right;
+}
+.dg .has-slider input[type="number"] {
+  width: 30%;
+  margin-left: 0;
+}
+.dg .c canvas {
+  padding: 0;
+  height: 53px;
+}
+.dg .slider {
+  float: left;
+  width: 66%;
+  margin-left: -5px;
+  margin-right: 0;
+  height: 19px;
+  margin-top: 4px;
+}
+.dg .slider-fg {
+  height: 100%;
+}
+.dg .c input[type="checkbox"] {
+  margin-top: 7px;
+}
+.dg .c select {
+  margin-top: 5px;
+}
+.dg .cr.boolean,
+.dg .cr.boolean *,
+.dg .cr.function,
+.dg .cr.function *,
+.dg .cr.function .property-name {
+  cursor: pointer;
+}
+.dg .cr.color {
+  overflow: visible;
+}
+.dg .selector {
+  display: none;
+  position: absolute;
+  margin-left: -9px;
+  margin-top: 23px;
+  z-index: 1;
+}
+.dg .c:hover .selector,
+.dg .selector.drag {
+  display: block;
+}
+.dg li.save-row {
+  padding: 0;
+}
+.dg li.save-row .button {
+  display: inline-block;
+  padding: 0 6px;
+}
+.dg.dialogue {
+  background-color: #222;
+  width: 460px;
+  padding: 15px;
+  font-size: 13px;
+  line-height: 15px;
+}
+#dg-new-constructor {
+  padding: 10px;
+  color: #222;
+  font-family: Monaco, monospace;
+  font-size: 10px;
+  border: 0;
+  resize: none;
+  box-shadow: inset 1px 1px 1px #888;
+  word-wrap: break-word;
+  margin: 12px 0;
+  display: block;
+  width: 440px;
+  overflow-y: scroll;
+  height: 100px;
+  position: relative;
+}
+#dg-local-explain {
+  display: none;
+  font-size: 11px;
+  line-height: 17px;
+  border-radius: 3px;
+  background-color: #333;
+  padding: 8px;
+  margin-top: 10px;
+}
+#dg-local-explain code {
+  font-size: 10px;
+}
+#dat-gui-save-locally {
+  display: none;
+}
+.dg {
+  color: #eee;
+  font: 12px Roboto, Helvetica, sans-serif;
+  text-shadow: 0 -1px 0 #111;
+}
+.dg.main > ul {
+  scrollbar-width: 6px;
+  -ms-overflow-style: none;
+  overflow-y: auto;
+  overflow-x: auto;
+}
+.dg.main > ul::-webkit-scrollbar {
+  width: 6px;
+}
+.dg.main > ul::-webkit-scrollbar-thumb {
+  border-radius: 3px;
+  background: grey;
+}
+.dg.main > ul::-webkit-scrollbar-track {
+  background: silver;
+}
+.dg.main > ul::-webkit-scrollbar-corner {
+  height: 0;
+  display: none;
+}
+.dg.main > ul {
+  scrollbar-face-color: grey;
+  scrollbar-track-color: silver;
+  scrollbar-width: thin;
+}
+.dg li:not(.folder) {
+  background: #333;
+  border-bottom: 1px solid #454545;
+}
+.dg li.save-row {
+  line-height: 30px;
+  background: #666;
+  border: 0;
+}
+.dg li.save-row select {
+  margin-left: 5px;
+  width: 100px;
+}
+.dg li.save-row .button {
+  text-transform: uppercase;
+  margin-left: 5px;
+  margin-top: 1px;
+  border-radius: 2px;
+  font-size: 9px;
+  line-height: 7px;
+  padding: 4px 4px 5px;
+  background: #4d4d4d;
+  color: #fff;
+  text-shadow: 0 1px 0 #333;
+  box-shadow: 0 -1px 0 #333;
+  cursor: pointer;
+}
+.dg li.save-row .button.gears {
+  background: #4d4d4d url(https://icon.now.sh/settings/FFFFFF/12) 50% no-repeat;
+  height: 7px;
+  width: 8px;
+}
+.dg li.save-row .button:hover {
+  background-color: #404040;
+  box-shadow: 0 -1px 0 #333;
+}
+.dg li.folder {
+  border-bottom: 0;
+}
+.dg li.title {
+  cursor: pointer;
+  border-bottom: 1px solid hsla(0, 0%, 100%, 0.2);
+}
+.dg li.title:before {
+  content: "▲︎ ";
+  font-size: 65%;
+  margin: 0 5px 0 2px;
+  display: inline-block;
+  vertical-align: middle;
+}
+.dg .closed li.title:before {
+  content: "▶ ";
+}
+.dg .cr.boolean {
+  border-left: 3px solid #d32f2f;
+}
+.dg .cr.color,
+.dg .cr.image {
+  border-left: 3px solid;
+}
+.dg .cr.image {
+  position: relative;
+  height: auto;
+}
+.dg .cr.plotter {
+  height: 58px;
+}
+.dg .cr.function {
+  border-left: 3px solid #fbc02d;
+}
+.dg .cr.number {
+  border-left: 3px solid #1976d2;
+}
+.dg .cr.number input[type="number"] {
+  color: #1976d2;
+}
+.dg .cr.string {
+  border-left: 3px solid #388e3c;
+}
+.dg .cr.string input[type="text"] {
+  color: #388e3c;
+}
+.dg .cr.boolean:hover,
+.dg .cr.function:hover {
+  background: #111;
+}
+.dg .c input[type="number"],
+.dg .c input[type="text"] {
+  background: #494949;
+  outline: none;
+}
+.dg .c input[type="number"]:hover,
+.dg .c input[type="text"]:hover {
+  background: #555;
+}
+.dg .c input[type="number"]:focus,
+.dg .c input[type="text"]:focus {
+  background: #626262;
+  color: #fff;
+}
+.dg .c .slider {
+  background: #494949;
+  cursor: ew-resize;
+}
+.dg .c .slider-fg {
+  background: #1976d2;
+  max-width: 100%;
+}
+.dg .c .slider:hover {
+  background: #555;
+}
+.dg .c .slider:hover .slider-fg {
+  background: #2083e4;
+}
+.slider {
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15);
+  height: 1em;
+  border-radius: 1em;
+  background-color: #eee;
+  padding: 0 0.5em;
+  overflow: hidden;
+  width: calc(70% - 1vw);
+}
+.slider-fg {
+  background-color: #aaa;
+  height: 1em;
+  margin-left: -0.5em;
+  padding: 1px 0.5em 2px 0;
+  border-radius: 1em 0 0 1em;
+}
+.slider-fg:after {
+  display: inline-block;
+  border-radius: 0.5em;
+  background-color: #fff;
+  border: 1px solid #aaa;
+  content: "";
+  float: right;
+  margin-right: -1em;
+  margin-top: -2px;
+  height: 0.9em;
+  width: 0.9em;
+}

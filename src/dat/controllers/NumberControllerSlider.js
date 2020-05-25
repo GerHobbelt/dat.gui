@@ -1,8 +1,8 @@
 /**
- * dat-gui JavaScript Controller Library
+ * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2020 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -11,8 +11,10 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import NumberController from './NumberController';
-import dom from '../dom/dom';
+import NumberController from "./NumberController";
+import dom from "../dom/dom";
+
+// import "./NumberControllerSlider.css";
 
 function map(v, i1, i2, o1, o2) {
   return o1 + (o2 - o1) * ((v - i1) / (i2 - i1));
@@ -25,14 +27,16 @@ function map(v, i1, i2, o1, o2) {
  * <code>&lt;div&gt;</code> tags, <strong>not</strong> the html5
  * <code>&lt;slider&gt;</code> element.
  *
- * @extends dat.controllers.Controller
- * @extends dat.controllers.NumberController
+ * @extends Controller
+ * @extends NumberController
  *
  * @param {Object} object The object to be manipulated
  * @param {string} property The name of the property to be manipulated
  * @param {Number} minValue Minimum allowed value
  * @param {Number} maxValue Maximum allowed value
  * @param {Number} stepValue Increment by which to change value
+ *
+ * @member dat.controllers
  */
 class NumberControllerSlider extends NumberController {
   constructor(object, property, min, max, step) {
@@ -40,20 +44,21 @@ class NumberControllerSlider extends NumberController {
 
     const _this = this;
 
-    this.__background = document.createElement('div');
-    this.__foreground = document.createElement('div');
+    this.__background = document.createElement("div");
+    this.__foreground = document.createElement("div");
 
-    dom.bind(this.__background, 'mousedown', onMouseDown);
-    dom.bind(this.__background, 'touchstart', onTouchStart);
+    dom.bind(this.__background, "mousedown", onMouseDown);
+    dom.bind(this.__background, "touchstart", onTouchStart, false, true);
+    dom.bind(this.__background, "wheel", onWheel);
 
-    dom.addClass(this.__background, 'slider');
-    dom.addClass(this.__foreground, 'slider-fg');
+    dom.addClass(this.__background, "slider");
+    dom.addClass(this.__foreground, "slider-fg");
 
     function onMouseDown(e) {
       document.activeElement.blur();
 
-      dom.bind(window, 'mousemove', onMouseDrag);
-      dom.bind(window, 'mouseup', onMouseUp);
+      dom.bind(window, "mousemove", onMouseDrag);
+      dom.bind(window, "mouseup", onMouseUp, false, true);
 
       onMouseDrag(e);
     }
@@ -63,43 +68,50 @@ class NumberControllerSlider extends NumberController {
 
       const bgRect = _this.__background.getBoundingClientRect();
 
-      _this.setValue(
-        map(e.clientX, bgRect.left, bgRect.right, _this.__min, _this.__max)
-      );
+      if (!_this._readonly) {
+        _this.setValue(map(e.clientX, bgRect.left, bgRect.right, _this.__min, _this.__max));
+      }
 
       return false;
     }
 
-    function onMouseUp() {
-      dom.unbind(window, 'mousemove', onMouseDrag);
-      dom.unbind(window, 'mouseup', onMouseUp);
-      if (_this.__onFinishChange) {
-        _this.__onFinishChange.call(_this, _this.getValue());
-      }
+    function onMouseUp(e) {
+      dom.unbind(window, "mousemove", onMouseDrag);
+      dom.unbind(window, "mouseup", onMouseUp);
+
+      _this.__propagateFinishChange(_this.getValue());
     }
 
     function onTouchStart(e) {
-      if (e.touches.length !== 1) { return; }
-      dom.bind(window, 'touchmove', onTouchMove);
-      dom.bind(window, 'touchend', onTouchEnd);
+      if (e.touches.length !== 1) {
+        return;
+      }
+      dom.bind(window, "touchmove", onTouchMove, false, true);
+      dom.bind(window, "touchend", onTouchEnd, false, true);
       onTouchMove(e);
     }
 
     function onTouchMove(e) {
-      const clientX = e.touches[0].clientX;
+      const { clientX } = e.touches[0];
       const bgRect = _this.__background.getBoundingClientRect();
 
-      _this.setValue(
-        map(clientX, bgRect.left, bgRect.right, _this.__min, _this.__max)
-      );
+      if (!_this._readonly) {
+        _this.setValue(map(clientX, bgRect.left, bgRect.right, _this.__min, _this.__max));
+      }
     }
 
     function onTouchEnd() {
-      dom.unbind(window, 'touchmove', onTouchMove);
-      dom.unbind(window, 'touchend', onTouchEnd);
+      dom.unbind(window, "touchmove", onTouchMove);
+      dom.unbind(window, "touchend", onTouchEnd);
       if (_this.__onFinishChange) {
         _this.__onFinishChange.call(_this, _this.getValue());
       }
+    }
+
+    function onWheel(e) {
+      e.preventDefault();
+      const direction = -e.deltaY >> 10 || 1;
+      _this.setValue(_this.getValue() + direction * _this.__impliedStep);
     }
 
     this.updateDisplay();
@@ -109,8 +121,10 @@ class NumberControllerSlider extends NumberController {
   }
 
   updateDisplay() {
-    const pct = (this.getValue() - this.__min) / (this.__max - this.__min);
-    this.__foreground.style.width = pct * 100 + '%';
+    const value = this.getValue();
+    const pct = (value - this.__min) / (this.__max - this.__min);
+    this.__foreground.style.width = pct * 100 + "%";
+
     return super.updateDisplay();
   }
 }

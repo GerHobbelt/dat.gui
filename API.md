@@ -12,11 +12,41 @@ hands-on examples, see the dat.GUI [tutorial](http://workshop.chromeexperiments.
 <dd><p>A lightweight controller library for JavaScript. It allows you to easily
 manipulate variables and fire functions on the fly.</p>
 </dd>
-<dt><a href="#Controller">Controller</a></dt>
-<dd><p>An &quot;abstract&quot; class that represents a given property of an object.</p>
+</dl>
+
+## Members
+
+<dl>
+<dt><a href="#CLOSE_BUTTON_HEIGHT">CLOSE_BUTTON_HEIGHT</a></dt>
+<dd><p>Caches the height of the Close Button.</p>
 </dd>
-<dt><a href="#NumberController">NumberController</a> ⇐ <code>dat.controllers.Controller</code></dt>
-<dd><p>Represents a given property of an object that is a number.</p>
+<dt><a href="#autoPlaceVirgin">autoPlaceVirgin</a></dt>
+<dd><p>Have we yet to create an autoPlace GUI?</p>
+</dd>
+<dt><a href="#autoPlaceContainer">autoPlaceContainer</a></dt>
+<dd><p>Fixed position div that auto place GUI&#39;s go inside</p>
+</dd>
+<dt><a href="#hide">hide</a></dt>
+<dd><p>Are we hiding the GUI&#39;s ?</p>
+</dd>
+</dl>
+
+## Constants
+
+<dl>
+<dt><a href="#CSS_NAMESPACE">CSS_NAMESPACE</a></dt>
+<dd><p>Outer-most className for GUI&#39;s</p>
+</dd>
+<dt><a href="#CSS">CSS</a> : <code>String</code></dt>
+<dd><p>class name used to mark auto-placed items.</p>
+</dd>
+</dl>
+
+## Functions
+
+<dl>
+<dt><a href="#addRow">addRow(gui, [dom], [liBefore])</a></dt>
+<dd><p>Add a row to the end of the GUI or before another row.</p>
 </dd>
 </dl>
 
@@ -31,7 +61,10 @@ manipulate variables and fire functions on the fly.
 * [GUI](#GUI)
     * [new GUI([params])](#new_GUI_new)
     * [.domElement](#GUI+domElement) : <code>DOMElement</code>
-    * [.parent](#GUI+parent) : <code>dat.gui.GUI</code>
+    * [.__onChange](#GUI+__onChange)
+    * [.__onFinishChange](#GUI+__onFinishChange)
+    * [.onResizeDebounced](#GUI+onResizeDebounced)
+    * [.parent](#GUI+parent) : [<code>GUI</code>](#GUI)
     * [.autoPlace](#GUI+autoPlace) : <code>Boolean</code>
     * [.closeOnTop](#GUI+closeOnTop) : <code>Boolean</code>
     * [.preset](#GUI+preset) : <code>String</code>
@@ -40,18 +73,31 @@ manipulate variables and fire functions on the fly.
     * [.closed](#GUI+closed) : <code>Boolean</code>
     * [.load](#GUI+load) : <code>Object</code>
     * [.useLocalStorage](#GUI+useLocalStorage) : <code>Boolean</code>
-    * [.add(object, property, [min], [max], [step])](#GUI+add) ⇒ [<code>Controller</code>](#Controller)
-    * [.addColor(object, property)](#GUI+addColor) ⇒ [<code>Controller</code>](#Controller)
+    * [.saveToLocalStorageIfPossible](#GUI+saveToLocalStorageIfPossible) ⇒
+    * [.getAllGUIs(recurse, myArray)](#GUI+getAllGUIs) ⇒ <code>name/gui</code>
+    * [.add(object, property, [min], [max], [step])](#GUI+add) ⇒ <code>Controller</code>
+    * [.addColor(object, property)](#GUI+addColor) ⇒ <code>Controller</code>
+    * [.addTextArea(object, property)](#GUI+addTextArea) ⇒ <code>dat.controllers.TextAreaController</code>
+    * [.addEasingFunction(object, property)](#GUI+addEasingFunction) ⇒ <code>dat.controllers.EasingFunctionController</code>
+    * [.addPlotter(object, property, max, period, type, fgColor, bgColor)](#GUI+addPlotter) ⇒ <code>Controller</code>
+    * [.addImage(object, property)](#GUI+addImage) ⇒ <code>Controller</code>
     * [.remove(controller)](#GUI+remove)
     * [.destroy()](#GUI+destroy)
-    * [.addFolder(name)](#GUI+addFolder) ⇒ <code>dat.gui.GUI</code>
+    * [.addFolder(name)](#GUI+addFolder) ⇒ [<code>GUI</code>](#GUI)
     * [.removeFolder(folder)](#GUI+removeFolder)
     * [.open()](#GUI+open)
     * [.close()](#GUI+close)
     * [.hide()](#GUI+hide)
     * [.show()](#GUI+show)
-    * [.getRoot()](#GUI+getRoot) ⇒ <code>dat.gui.GUI</code>
+    * [.remember(...objects)](#GUI+remember)
+    * [.getRoot()](#GUI+getRoot) ⇒ [<code>GUI</code>](#GUI)
     * [.getSaveObject()](#GUI+getSaveObject) ⇒ <code>Object</code>
+    * [.save()](#GUI+save) ⇒ [<code>GUI</code>](#GUI)
+    * [.saveAs(presetName)](#GUI+saveAs) ⇒ [<code>GUI</code>](#GUI)
+    * [.revert(gui)](#GUI+revert) ⇒ [<code>GUI</code>](#GUI)
+    * [.deleteSave()](#GUI+deleteSave) ⇒ [<code>GUI</code>](#GUI)
+    * [.listen(controller)](#GUI+listen) ⇒ [<code>GUI</code>](#GUI)
+    * [.updateDisplay()](#GUI+updateDisplay) ⇒ [<code>GUI</code>](#GUI)
 
 <a name="new_GUI_new"></a>
 
@@ -62,11 +108,14 @@ manipulate variables and fire functions on the fly.
 | [params] | <code>Object</code> |  |  |
 | [params.name] | <code>String</code> |  | The name of this GUI. |
 | [params.load] | <code>Object</code> |  | JSON object representing the saved state of this GUI. |
-| [params.parent] | <code>dat.gui.GUI</code> |  | The GUI I'm nested in. |
+| [params.object] | <code>Object</code> |  | Providing your object will create a controller for each property automatically |
+| [params.parent] | [<code>GUI</code>](#GUI) |  | The GUI I'm nested in. |
 | [params.autoPlace] | <code>Boolean</code> | <code>true</code> |  |
 | [params.hideable] | <code>Boolean</code> | <code>true</code> | If true, GUI is shown/hidden by <kbd>h</kbd> keypress. |
 | [params.closed] | <code>Boolean</code> | <code>false</code> | If true, starts closed |
 | [params.closeOnTop] | <code>Boolean</code> | <code>false</code> | If true, close/open button shows on top of the GUI |
+| [params.closeStr] | <code>String</code> |  | close string |
+| [params.openStr] | <code>String</code> |  | open string |
 
 **Example**  
 ```js
@@ -85,9 +134,28 @@ var folder1 = gui.addFolder('Flow Field');
 Outermost DOM Element
 
 **Kind**: instance property of [<code>GUI</code>](#GUI)  
+<a name="GUI+__onChange"></a>
+
+### gui.\_\_onChange
+Called on change of child elements.
+
+**Kind**: instance property of [<code>GUI</code>](#GUI)  
+<a name="GUI+__onFinishChange"></a>
+
+### gui.\_\_onFinishChange
+Called on finish change of child elements.
+
+**Kind**: instance property of [<code>GUI</code>](#GUI)  
+<a name="GUI+onResizeDebounced"></a>
+
+### gui.onResizeDebounced
+Debounced {onResize} handler. Use this instead of {onResize} directly to improve
+performance on mobile and other low power platforms.
+
+**Kind**: instance property of [<code>GUI</code>](#GUI)  
 <a name="GUI+parent"></a>
 
-### gui.parent : <code>dat.gui.GUI</code>
+### gui.parent : [<code>GUI</code>](#GUI)
 The parent <code>GUI</code>
 
 **Kind**: instance property of [<code>GUI</code>](#GUI)  
@@ -112,7 +180,7 @@ The identifier for a set of saved values
 <a name="GUI+width"></a>
 
 ### gui.width : <code>Number</code>
-The width of <code>GUI</code> element
+The width of the <code>GUI</code> element
 
 **Kind**: instance property of [<code>GUI</code>](#GUI)  
 <a name="GUI+name"></a>
@@ -141,15 +209,36 @@ Determines whether or not to use <a href="https://developer.mozilla.org/en/DOM/S
 <code>remember</code>ing
 
 **Kind**: instance property of [<code>GUI</code>](#GUI)  
+<a name="GUI+saveToLocalStorageIfPossible"></a>
+
+### gui.saveToLocalStorageIfPossible ⇒
+TODO:
+saveToLocalStorageIfPossible description
+
+**Kind**: instance property of [<code>GUI</code>](#GUI)  
+**Returns**: xxx  
+<a name="GUI+getAllGUIs"></a>
+
+### gui.getAllGUIs(recurse, myArray) ⇒ <code>name/gui</code>
+Gets this current GUI (usually) and all sub-folder GUIs under this GUI as an array of {name/gui} pairs. The "this" current gui uses empty string.
+
+**Kind**: instance method of [<code>GUI</code>](#GUI)  
+**Returns**: <code>name/gui</code> - The array of  value pairs  
+
+| Param | Description |
+| --- | --- |
+| recurse | (optional) By default, it will recurse multiple levels deep. Set to false to only scan current level from current GUI. |
+| myArray | (optional) Supply an existing array to use instead.  If supplied, will not push current GUI into array, only the subfolder GUIs. |
+
 <a name="GUI+add"></a>
 
-### gui.add(object, property, [min], [max], [step]) ⇒ [<code>Controller</code>](#Controller)
-Adds a new [Controller](#Controller) to the GUI. The type of controller created
+### gui.add(object, property, [min], [max], [step]) ⇒ <code>Controller</code>
+Adds a new [Controller](Controller) to the GUI. The type of controller created
 is inferred from the initial value of <code>object[property]</code>. For
 color properties, see [addColor](addColor).
 
 **Kind**: instance method of [<code>GUI</code>](#GUI)  
-**Returns**: [<code>Controller</code>](#Controller) - The controller that was added to the GUI.  
+**Returns**: <code>Controller</code> - The controller that was added to the GUI.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -173,11 +262,11 @@ gui.add(person, 'age', 0, 100);
 ```
 <a name="GUI+addColor"></a>
 
-### gui.addColor(object, property) ⇒ [<code>Controller</code>](#Controller)
+### gui.addColor(object, property) ⇒ <code>Controller</code>
 Adds a new color controller to the GUI.
 
 **Kind**: instance method of [<code>GUI</code>](#GUI)  
-**Returns**: [<code>Controller</code>](#Controller) - The controller that was added to the GUI.  
+**Returns**: <code>Controller</code> - The controller that was added to the GUI.  
 
 | Param |
 | --- |
@@ -197,6 +286,72 @@ gui.addColor(palette, 'color2');
 gui.addColor(palette, 'color3');
 gui.addColor(palette, 'color4');
 ```
+<a name="GUI+addTextArea"></a>
+
+### gui.addTextArea(object, property) ⇒ <code>dat.controllers.TextAreaController</code>
+**Kind**: instance method of [<code>GUI</code>](#GUI)  
+**Returns**: <code>dat.controllers.TextAreaController</code> - The new controller that was added.  
+
+| Param |
+| --- |
+| object | 
+| property | 
+
+<a name="GUI+addEasingFunction"></a>
+
+### gui.addEasingFunction(object, property) ⇒ <code>dat.controllers.EasingFunctionController</code>
+**Kind**: instance method of [<code>GUI</code>](#GUI)  
+**Returns**: <code>dat.controllers.EasingFunctionController</code> - The new controller that was added.  
+
+| Param |
+| --- |
+| object | 
+| property | 
+
+<a name="GUI+addPlotter"></a>
+
+### gui.addPlotter(object, property, max, period, type, fgColor, bgColor) ⇒ <code>Controller</code>
+Adds a new plotter controller to the GUI.
+
+**Kind**: instance method of [<code>GUI</code>](#GUI)  
+**Returns**: <code>Controller</code> - The controller that was added to the GUI.  
+
+| Param | Description |
+| --- | --- |
+| object |  |
+| property |  |
+| max | The maximum value that the plotter will display (default 10) |
+| period | The update interval in ms or use 0 to only update on value change (default 500) |
+| type | Type of graph to render - line or bar (default line) |
+| fgColor | Foreground color of the graph in hex (default #fff) |
+| bgColor | Background color of the graph in hex (default #000) |
+
+**Example**  
+```js
+var obj = {
+  value: 5
+};
+gui.addPlotter(obj, 'value', 10, 100);
+gui.addPlotter(obj, 'value', 10, 0);
+```
+<a name="GUI+addImage"></a>
+
+### gui.addImage(object, property) ⇒ <code>Controller</code>
+Adds an image controller to the GUI.
+
+**Kind**: instance method of [<code>GUI</code>](#GUI)  
+**Returns**: <code>Controller</code> - The controller that was added to the GUI.  
+
+| Param |
+| --- |
+| object | 
+| property | 
+
+**Example**  
+```js
+var images = { path1: 'myImage.png'};
+gui.addImage(images, 'path1');
+```
 <a name="GUI+remove"></a>
 
 ### gui.remove(controller)
@@ -206,7 +361,7 @@ Removes the given controller from the GUI.
 
 | Param | Type |
 | --- | --- |
-| controller | [<code>Controller</code>](#Controller) | 
+| controller | <code>Controller</code> | 
 
 <a name="GUI+destroy"></a>
 
@@ -217,11 +372,11 @@ For subfolders, use `gui.removeFolder(folder)` instead.
 **Kind**: instance method of [<code>GUI</code>](#GUI)  
 <a name="GUI+addFolder"></a>
 
-### gui.addFolder(name) ⇒ <code>dat.gui.GUI</code>
+### gui.addFolder(name) ⇒ [<code>GUI</code>](#GUI)
 Creates a new subfolder GUI instance.
 
 **Kind**: instance method of [<code>GUI</code>](#GUI)  
-**Returns**: <code>dat.gui.GUI</code> - The new folder.  
+**Returns**: [<code>GUI</code>](#GUI) - The new folder.  
 **Throws**:
 
 - <code>Error</code> if this GUI already has a folder by the specified
@@ -241,7 +396,7 @@ Removes a subfolder GUI instance.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| folder | <code>dat.gui.GUI</code> | The folder to remove. |
+| folder | [<code>GUI</code>](#GUI) | The folder to remove. |
 
 <a name="GUI+open"></a>
 
@@ -267,221 +422,144 @@ Hides the GUI.
 Shows the GUI.
 
 **Kind**: instance method of [<code>GUI</code>](#GUI)  
+<a name="GUI+remember"></a>
+
+### gui.remember(...objects)
+Mark objects for saving. The order of these objects cannot change as
+the GUI grows. When remembering new objects, append them to the end
+of the list.
+
+**Kind**: instance method of [<code>GUI</code>](#GUI)  
+**Throws**:
+
+- <code>Error</code> if not called on a top level GUI.
+
+
+| Param | Type |
+| --- | --- |
+| ...objects | <code>Object</code> | 
+
 <a name="GUI+getRoot"></a>
 
-### gui.getRoot() ⇒ <code>dat.gui.GUI</code>
+### gui.getRoot() ⇒ [<code>GUI</code>](#GUI)
 **Kind**: instance method of [<code>GUI</code>](#GUI)  
-**Returns**: <code>dat.gui.GUI</code> - the topmost parent GUI of a nested GUI.  
+**Returns**: [<code>GUI</code>](#GUI) - the topmost parent GUI of a nested GUI.  
 <a name="GUI+getSaveObject"></a>
 
 ### gui.getSaveObject() ⇒ <code>Object</code>
 **Kind**: instance method of [<code>GUI</code>](#GUI)  
 **Returns**: <code>Object</code> - a JSON object representing the current state of
 this GUI as well as its remembered properties.  
-<a name="Controller"></a>
+<a name="GUI+save"></a>
 
-## Controller
-An "abstract" class that represents a given property of an object.
+### gui.save() ⇒ [<code>GUI</code>](#GUI)
+TODO:
+[save description]
 
-**Kind**: global class  
+**Kind**: instance method of [<code>GUI</code>](#GUI)  
+**Returns**: [<code>GUI</code>](#GUI) - [description]  
+<a name="GUI+saveAs"></a>
 
-* [Controller](#Controller)
-    * [new Controller(object, property)](#new_Controller_new)
-    * [.domElement](#Controller+domElement) : <code>DOMElement</code>
-    * [.object](#Controller+object) : <code>Object</code>
-    * [.property](#Controller+property) : <code>String</code>
-    * [.options(options)](#Controller+options) ⇒ [<code>Controller</code>](#Controller)
-    * [.name(name)](#Controller+name) ⇒ [<code>Controller</code>](#Controller)
-    * [.listen()](#Controller+listen) ⇒ [<code>Controller</code>](#Controller)
-    * [.remove()](#Controller+remove) ⇒ [<code>Controller</code>](#Controller)
-    * [.onChange(fnc)](#Controller+onChange) ⇒ [<code>Controller</code>](#Controller)
-    * [.onFinishChange(fnc)](#Controller+onFinishChange) ⇒ [<code>Controller</code>](#Controller)
-    * [.setValue(newValue)](#Controller+setValue)
-    * [.getValue()](#Controller+getValue) ⇒ <code>Object</code>
-    * [.updateDisplay()](#Controller+updateDisplay) ⇒ [<code>Controller</code>](#Controller)
-    * [.isModified()](#Controller+isModified) ⇒ <code>Boolean</code>
+### gui.saveAs(presetName) ⇒ [<code>GUI</code>](#GUI)
+TODO:
+[saveAs description]
 
-<a name="new_Controller_new"></a>
-
-### new Controller(object, property)
+**Kind**: instance method of [<code>GUI</code>](#GUI)  
+**Returns**: [<code>GUI</code>](#GUI) - [description]  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| object | <code>Object</code> | The object to be manipulated |
-| property | <code>string</code> | The name of the property to be manipulated |
+| presetName | <code>String</code> | [description] |
 
-<a name="Controller+domElement"></a>
+<a name="GUI+revert"></a>
 
-### controller.domElement : <code>DOMElement</code>
-Those who extend this class will put their DOM elements in here.
+### gui.revert(gui) ⇒ [<code>GUI</code>](#GUI)
+TODO:
+[revert description]
 
-**Kind**: instance property of [<code>Controller</code>](#Controller)  
-<a name="Controller+object"></a>
+**Kind**: instance method of [<code>GUI</code>](#GUI)  
+**Returns**: [<code>GUI</code>](#GUI) - [description]  
 
-### controller.object : <code>Object</code>
-The object to manipulate
+| Param | Type | Description |
+| --- | --- | --- |
+| gui | [<code>GUI</code>](#GUI) | [description] |
 
-**Kind**: instance property of [<code>Controller</code>](#Controller)  
-<a name="Controller+property"></a>
+<a name="GUI+deleteSave"></a>
 
-### controller.property : <code>String</code>
-The name of the property to manipulate
+### gui.deleteSave() ⇒ [<code>GUI</code>](#GUI)
+TODO:
+deleteSave description
 
-**Kind**: instance property of [<code>Controller</code>](#Controller)  
-<a name="Controller+options"></a>
+**Kind**: instance method of [<code>GUI</code>](#GUI)  
+**Returns**: [<code>GUI</code>](#GUI) - description  
+<a name="GUI+listen"></a>
 
-### controller.options(options) ⇒ [<code>Controller</code>](#Controller)
-**Kind**: instance method of [<code>Controller</code>](#Controller)  
+### gui.listen(controller) ⇒ [<code>GUI</code>](#GUI)
+TODO:
+listen description
 
-| Param | Type |
+**Kind**: instance method of [<code>GUI</code>](#GUI)  
+**Returns**: [<code>GUI</code>](#GUI) - [description]  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| controller | <code>Controller</code> | [description] |
+
+<a name="GUI+updateDisplay"></a>
+
+### gui.updateDisplay() ⇒ [<code>GUI</code>](#GUI)
+TODO:
+updateDisplay description
+
+**Kind**: instance method of [<code>GUI</code>](#GUI)  
+**Returns**: [<code>GUI</code>](#GUI) - description  
+<a name="CLOSE_BUTTON_HEIGHT"></a>
+
+## CLOSE\_BUTTON\_HEIGHT
+Caches the height of the Close Button.
+
+**Kind**: global variable  
+<a name="autoPlaceVirgin"></a>
+
+## autoPlaceVirgin
+Have we yet to create an autoPlace GUI?
+
+**Kind**: global variable  
+<a name="autoPlaceContainer"></a>
+
+## autoPlaceContainer
+Fixed position div that auto place GUI's go inside
+
+**Kind**: global variable  
+<a name="hide"></a>
+
+## hide
+Are we hiding the GUI's ?
+
+**Kind**: global variable  
+<a name="CSS_NAMESPACE"></a>
+
+## CSS\_NAMESPACE
+Outer-most className for GUI's
+
+**Kind**: global constant  
+<a name="CSS"></a>
+
+## CSS : <code>String</code>
+class name used to mark auto-placed items.
+
+**Kind**: global constant  
+<a name="addRow"></a>
+
+## addRow(gui, [dom], [liBefore])
+Add a row to the end of the GUI or before another row.
+
+**Kind**: global function  
+
+| Param | Description |
 | --- | --- |
-| options | <code>Array</code> \| <code>Object</code> | 
-
-<a name="Controller+name"></a>
-
-### controller.name(name) ⇒ [<code>Controller</code>](#Controller)
-Sets the name of the controller.
-
-**Kind**: instance method of [<code>Controller</code>](#Controller)  
-
-| Param | Type |
-| --- | --- |
-| name | <code>string</code> | 
-
-<a name="Controller+listen"></a>
-
-### controller.listen() ⇒ [<code>Controller</code>](#Controller)
-Sets controller to listen for changes on its underlying object.
-
-**Kind**: instance method of [<code>Controller</code>](#Controller)  
-<a name="Controller+remove"></a>
-
-### controller.remove() ⇒ [<code>Controller</code>](#Controller)
-Removes the controller from its parent GUI.
-
-**Kind**: instance method of [<code>Controller</code>](#Controller)  
-<a name="Controller+onChange"></a>
-
-### controller.onChange(fnc) ⇒ [<code>Controller</code>](#Controller)
-Specify that a function fire every time someone changes the value with
-this Controller.
-
-**Kind**: instance method of [<code>Controller</code>](#Controller)  
-**Returns**: [<code>Controller</code>](#Controller) - this  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| fnc | <code>function</code> | This function will be called whenever the value is modified via this Controller. |
-
-<a name="Controller+onFinishChange"></a>
-
-### controller.onFinishChange(fnc) ⇒ [<code>Controller</code>](#Controller)
-Specify that a function fire every time someone "finishes" changing
-the value wih this Controller. Useful for values that change
-incrementally like numbers or strings.
-
-**Kind**: instance method of [<code>Controller</code>](#Controller)  
-**Returns**: [<code>Controller</code>](#Controller) - this  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| fnc | <code>function</code> | This function will be called whenever someone "finishes" changing the value via this Controller. |
-
-<a name="Controller+setValue"></a>
-
-### controller.setValue(newValue)
-Change the value of <code>object[property]</code>
-
-**Kind**: instance method of [<code>Controller</code>](#Controller)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| newValue | <code>Object</code> | The new value of <code>object[property]</code> |
-
-<a name="Controller+getValue"></a>
-
-### controller.getValue() ⇒ <code>Object</code>
-Gets the value of <code>object[property]</code>
-
-**Kind**: instance method of [<code>Controller</code>](#Controller)  
-**Returns**: <code>Object</code> - The current value of <code>object[property]</code>  
-<a name="Controller+updateDisplay"></a>
-
-### controller.updateDisplay() ⇒ [<code>Controller</code>](#Controller)
-Refreshes the visual display of a Controller in order to keep sync
-with the object's current value.
-
-**Kind**: instance method of [<code>Controller</code>](#Controller)  
-**Returns**: [<code>Controller</code>](#Controller) - this  
-<a name="Controller+isModified"></a>
-
-### controller.isModified() ⇒ <code>Boolean</code>
-**Kind**: instance method of [<code>Controller</code>](#Controller)  
-**Returns**: <code>Boolean</code> - true if the value has deviated from initialValue  
-<a name="NumberController"></a>
-
-## NumberController ⇐ <code>dat.controllers.Controller</code>
-Represents a given property of an object that is a number.
-
-**Kind**: global class  
-**Extends**: <code>dat.controllers.Controller</code>  
-
-* [NumberController](#NumberController) ⇐ <code>dat.controllers.Controller</code>
-    * [new NumberController(object, property, [params])](#new_NumberController_new)
-    * [.min(minValue)](#NumberController+min) ⇒ <code>dat.controllers.NumberController</code>
-    * [.max(maxValue)](#NumberController+max) ⇒ <code>dat.controllers.NumberController</code>
-    * [.step(stepValue)](#NumberController+step) ⇒ <code>dat.controllers.NumberController</code>
-
-<a name="new_NumberController_new"></a>
-
-### new NumberController(object, property, [params])
-
-| Param | Type | Description |
-| --- | --- | --- |
-| object | <code>Object</code> | The object to be manipulated |
-| property | <code>string</code> | The name of the property to be manipulated |
-| [params] | <code>Object</code> | Optional parameters |
-| [params.min] | <code>Number</code> | Minimum allowed value |
-| [params.max] | <code>Number</code> | Maximum allowed value |
-| [params.step] | <code>Number</code> | Increment by which to change value |
-
-<a name="NumberController+min"></a>
-
-### numberController.min(minValue) ⇒ <code>dat.controllers.NumberController</code>
-Specify a minimum value for <code>object[property]</code>.
-
-**Kind**: instance method of [<code>NumberController</code>](#NumberController)  
-**Returns**: <code>dat.controllers.NumberController</code> - this  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| minValue | <code>Number</code> | The minimum value for <code>object[property]</code> |
-
-<a name="NumberController+max"></a>
-
-### numberController.max(maxValue) ⇒ <code>dat.controllers.NumberController</code>
-Specify a maximum value for <code>object[property]</code>.
-
-**Kind**: instance method of [<code>NumberController</code>](#NumberController)  
-**Returns**: <code>dat.controllers.NumberController</code> - this  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| maxValue | <code>Number</code> | The maximum value for <code>object[property]</code> |
-
-<a name="NumberController+step"></a>
-
-### numberController.step(stepValue) ⇒ <code>dat.controllers.NumberController</code>
-Specify a step value that dat.controllers.NumberController
-increments by.
-
-**Kind**: instance method of [<code>NumberController</code>](#NumberController)  
-**Default**: <code>if minimum and maximum specified increment is 1% of the
-difference otherwise stepValue is 1</code>  
-**Returns**: <code>dat.controllers.NumberController</code> - this  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| stepValue | <code>Number</code> | The step value for dat.controllers.NumberController |
+| gui |  |
+| [dom] | If specified, inserts the dom content in the new row |
+| [liBefore] | If specified, places the new row before another row |
 
 <!--- API END --->

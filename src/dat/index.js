@@ -1,8 +1,8 @@
 /**
- * dat-gui JavaScript Controller Library
+ * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2020 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -11,51 +11,104 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import Color from './color/Color';
-import math from './color/math';
-import interpret from './color/interpret';
+// ------------------------------------------------------------------
+//
+// extra: help rollup to produce the accompanying CSS file
+//
+import "./index.scss";
+// ------------------------------------------------------------------
 
-import Controller from './controllers/Controller';
-import BooleanController from './controllers/BooleanController';
-import OptionController from './controllers/OptionController';
-import StringController from './controllers/StringController';
-import NumberController from './controllers/NumberController';
-import NumberControllerBox from './controllers/NumberControllerBox';
-import NumberControllerSlider from './controllers/NumberControllerSlider';
-import FunctionController from './controllers/FunctionController';
-import ColorController from './controllers/ColorController';
+import Color from "./color/Color";
+import math from "./color/math";
+import interpret from "./color/interpret";
 
-import domImport from './dom/dom';
-import GUIImport from './gui/GUI';
+import Controller from "./controllers/Controller";
+import ArrayController from "./controllers/ArrayController";
+import BgColorController from "./controllers/BgColorController";
+import BooleanController from "./controllers/BooleanController";
+import ColorController from "./controllers/ColorController";
+import CustomController from "./controllers/CustomController";
+import FileController from "./controllers/FileController";
+import FunctionController from "./controllers/FunctionController";
+import GtColorController from "./controllers/GtColorController";
+import HSVColorController from "./controllers/HSVColorController";
+import ImageController from "./controllers/ImageController";
+import NgColorController from "./controllers/NgColorController";
+import NumberController from "./controllers/NumberController";
+import NumberControllerBox from "./controllers/NumberControllerBox";
+import NumberControllerSlider from "./controllers/NumberControllerSlider";
+import OptionController from "./controllers/OptionController";
+import PlotterController from "./controllers/PlotterController";
+import StringController from "./controllers/StringController";
+import TabbedController from "./controllers/TabbedController";
 
+import domImport from "./dom/dom";
+import GUIImport from "./gui/GUI";
+
+/** @module dat */
+
+/**
+ * [color description]
+ * @type {Object}
+ */
 export const color = {
   Color: Color,
   math: math,
-  interpret: interpret
+  interpret: interpret,
 };
 
+/**
+ * [controllers description]
+ * @type {Object}
+ */
 export const controllers = {
   Controller: Controller,
+  ArrayController: ArrayController,
+  BgColorController: BgColorController,
   BooleanController: BooleanController,
-  OptionController: OptionController,
-  StringController: StringController,
+  ColorController: ColorController,
+  CustomController: CustomController,
+  FileController: FileController,
+  FunctionController: FunctionController,
+  GtColorController: GtColorController,
+  HSVColorController: HSVColorController,
+  ImageController: ImageController,
+  NgColorController: NgColorController,
   NumberController: NumberController,
   NumberControllerBox: NumberControllerBox,
   NumberControllerSlider: NumberControllerSlider,
-  FunctionController: FunctionController,
-  ColorController: ColorController
+  OptionController: OptionController,
+  PlotterController: PlotterController,
+  StringController: StringController,
+  TabbedController: TabbedController,
 };
 
+/**
+ * [dom description]
+ * @type {Object}
+ */
 export const dom = { dom: domImport };
 
+/**
+ * [gui description]
+ * @type {Object}
+ */
 export const gui = { GUI: GUIImport };
 
+/**
+ * [GUI description]
+ * @type {GUI}
+ */
 export const GUI = GUIImport;
 
-export default {
+/**
+ * TBD
+ */
+const datGUI = {
   color,
   controllers,
   dom,
   gui,
-  GUI
+  GUI,
 };
+export default datGUI;

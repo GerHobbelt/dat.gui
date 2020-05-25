@@ -1,8 +1,8 @@
 /**
- * dat-gui JavaScript Controller Library
+ * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2020 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -11,54 +11,56 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import Controller from './Controller';
-import dom from '../dom/dom';
-import common from '../utils/common';
+import Controller from "./Controller";
+import dom from "../dom/dom";
+import common from "../utils/common";
 
 /**
  * @class Provides a select input to alter the property of an object, using a
  * list of accepted values.
  *
- * @extends dat.controllers.Controller
+ * @extends Controller
  *
  * @param {Object} object The object to be manipulated
  * @param {string} property The name of the property to be manipulated
- * @param {Object|string[]} options A map of labels to acceptable values, or
-* a list of acceptable string values.
+ * @param {Object|string[]} params A map of labels to acceptable values, or
+ * a list of acceptable string values.
+ *
+ * @member dat.controllers
  */
 class OptionController extends Controller {
-  constructor(object, property, opts) {
-    super(object, property);
-
-    let options = opts;
+  constructor(object, property, params) {
+    super(object, property, "option");
 
     const _this = this;
 
+    params = params || {};
+
     /**
      * The drop down menu
-     * @ignore
+     * @private
      */
-    this.__select = document.createElement('select');
+    this.__select = document.createElement("select");
 
-    if (common.isArray(options)) {
+    if (common.isArray(params)) {
       const map = {};
-      common.each(options, function(element) {
+      common.each(params, function (element) {
         map[element] = element;
       });
-      options = map;
+      params = map;
     }
 
-    common.each(options, function(value, key) {
-      const opt = document.createElement('option');
+    common.each(params, function (value, key) {
+      const opt = document.createElement("option");
       opt.innerHTML = key;
-      opt.setAttribute('value', value);
+      opt.setAttribute("value", value);
       _this.__select.appendChild(opt);
     });
 
     // Acknowledge original value
     this.updateDisplay();
 
-    dom.bind(this.__select, 'change', function() {
+    dom.bind(this.__select, "change", function () {
       const desiredValue = this.options[this.selectedIndex].value;
       _this.setValue(desiredValue);
     });
@@ -67,16 +69,24 @@ class OptionController extends Controller {
   }
 
   setValue(v) {
+    if (this._readonly) {
+      return this.getValue();
+    }
     const toReturn = super.setValue(v);
 
-    if (this.__onFinishChange) {
-      this.__onFinishChange.call(this, this.getValue());
-    }
+    this.__propagateFinishChange(this.getValue());
+
     return toReturn;
   }
 
   updateDisplay(force) {
-    if (!force && dom.isActive(this.__select)) return this; // prevent number from updating if user is trying to manually update
+    // prevent number from updating if user is trying to manually update
+    //
+    // Use the same solution from StringController.js to enable
+    // editing <input>s while "listen()"ing
+    if (!force && dom.isActive(this.__select) && !this.forceUpdateDisplay) {
+      return this;
+    }
     this.__select.value = this.getValue();
     return super.updateDisplay(force);
   }

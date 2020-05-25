@@ -1,8 +1,8 @@
 /**
- * dat-gui JavaScript Controller Library
+ * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2020 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -11,12 +11,12 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import NumberController from './NumberController';
-import dom from '../dom/dom';
-import common from '../utils/common';
+import NumberController from "./NumberController";
+import dom from "../dom/dom";
+import common from "../utils/common";
 
 function roundToDecimal(value, decimals) {
-  const tenTo = Math.pow(10, decimals);
+  const tenTo = 10 ** decimals;
   return Math.round(value * tenTo) / tenTo;
 }
 
@@ -24,8 +24,8 @@ function roundToDecimal(value, decimals) {
  * @class Represents a given property of an object that is a number and
  * provides an input element with which to manipulate it.
  *
- * @extends dat.controllers.Controller
- * @extends dat.controllers.NumberController
+ * @extends Controller
+ * @extends NumberController
  *
  * @param {Object} object The object to be manipulated
  * @param {string} property The name of the property to be manipulated
@@ -33,14 +33,20 @@ function roundToDecimal(value, decimals) {
  * @param {Number} [params.min] Minimum allowed value
  * @param {Number} [params.max] Maximum allowed value
  * @param {Number} [params.step] Increment by which to change value
+ *
+ * @member dat.controllers
  */
 class NumberControllerBox extends NumberController {
   constructor(object, property, params) {
     super(object, property, params);
 
+    params = params || {};
+
     this.__truncationSuspended = false;
 
     const _this = this;
+
+    this.__suspendUpdate = false;
 
     /**
      * {Number} Previous mouse y position
@@ -48,20 +54,77 @@ class NumberControllerBox extends NumberController {
      */
     let prevY;
 
-    function onChange() {
+    function onKeyDown(e) {
+      // TODO: pick one of the two keyboard switch-case handlers below:
+      if (1) {
+        const step = _this.__step || 1;
+        switch (e.keyCode) {
+          // When pressing ENTER key, you can be as precise as you want.
+          case 13:
+            _this.__truncationSuspended = true;
+            /* jshint validthis: true */
+            this.blur();
+            /* jshint validthis: false */
+            _this.__truncationSuspended = false;
+            onFinish();
+            break;
+
+          // arrow up
+          case 38:
+            var newVal = _this.getValue() + step;
+            _this.setValue(newVal);
+            break;
+
+          // arrow down
+          case 40:
+            var newVal = _this.getValue() - step;
+            _this.setValue(newVal);
+            break;
+        }
+      } else {
+        switch (e.key) {
+          case "Enter": {
+            // When pressing ENTER key, you can be as precise as you want.
+            _this.__truncationSuspended = true;
+            /* jshint validthis: true */
+            this.blur();
+            /* jshint validthis: false */
+            _this.__truncationSuspended = false;
+            onFinish();
+            break;
+          }
+          case "ArrowUp": {
+            _this.setValue(_this.getValue() + _this.__impliedStep);
+            break;
+          }
+          case "ArrowDown": {
+            _this.setValue(_this.getValue() - _this.__impliedStep);
+            break;
+          }
+          default: {
+            break;
+          }
+        }
+      }
+    }
+
+    function onChange(e) {
       const attempted = parseFloat(_this.__input.value);
-      if (!common.isNaN(attempted)) {
+      if (!common.isNaN(attempted) && !_this._readonly) {
         _this.setValue(attempted);
       }
     }
 
     function onFinish() {
-      if (_this.__onFinishChange) {
-        _this.__onFinishChange.call(_this, _this.getValue());
-      }
+      _this.__propagateFinishChange(_this.getValue());
+    }
+
+    function onFocus() {
+      this.__suspendUpdate = true;
     }
 
     function onBlur() {
+      this.__suspendUpdate = false;
       onFinish();
     }
 
@@ -72,46 +135,35 @@ class NumberControllerBox extends NumberController {
       prevY = e.clientY;
     }
 
-    function onMouseUp() {
-      dom.unbind(window, 'mousemove', onMouseDrag);
-      dom.unbind(window, 'mouseup', onMouseUp);
+    function onMouseUp(e) {
+      dom.unbind(window, "mousemove", onMouseDrag);
+      dom.unbind(window, "mouseup", onMouseUp);
       onFinish();
     }
 
     function onMouseDown(e) {
-      dom.bind(window, 'mousemove', onMouseDrag);
-      dom.bind(window, 'mouseup', onMouseUp);
+      dom.bind(window, "mousemove", onMouseDrag, false, true);
+      dom.bind(window, "mouseup", onMouseUp, false, true);
       prevY = e.clientY;
     }
 
-    this.__input = document.createElement('input');
-    this.__input.setAttribute('type', 'text');
+    function onWheel(e) {
+      e.preventDefault();
+      const direction = -e.deltaY >> 10 || 1;
+      _this.setValue(_this.getValue() + direction * _this.__impliedStep);
+    }
+
+    this.__input = document.createElement("input");
+    this.__input.setAttribute("type", "number");
 
     // Makes it so manually specified values are not truncated.
 
-    dom.bind(this.__input, 'change', onChange);
-    dom.bind(this.__input, 'blur', onBlur);
-    dom.bind(this.__input, 'mousedown', onMouseDown);
-    dom.bind(this.__input, 'keydown', function(e) {
-      // When pressing enter, you can be as precise as you want.
-      const step = _this.__step || 1;
-      switch (e.keyCode) {
-        case 13:
-          _this.__truncationSuspended = true;
-          this.blur();
-          _this.__truncationSuspended = false;
-          onFinish();
-          break;
-        case 38:
-          var newVal = _this.getValue() + step;
-          _this.setValue(newVal);
-          break;
-        case 40: // down
-          var newVal = _this.getValue() - step;
-          _this.setValue(newVal);
-          break;
-      }
-    });
+    dom.bind(this.__input, "focus", onFocus, false, true);
+    dom.bind(this.__input, "change", onChange, false, true);
+    dom.bind(this.__input, "blur", onBlur, false, true);
+    dom.bind(this.__input, "mousedown", onMouseDown, false, true);
+    dom.bind(this.__input, "wheel", onWheel);
+    dom.bind(this.__input, "keydown", onKeyDown, false, true);
 
     this.updateDisplay();
 
@@ -119,9 +171,28 @@ class NumberControllerBox extends NumberController {
   }
 
   updateDisplay(force) {
-    if (!force && dom.isActive(this.__input)) return this;
-    this.__input.value = this.__truncationSuspended ? this.getValue() : roundToDecimal(this.getValue(), this.__precision);
+    // TODO: next two statements are from different fixes for the same problem:
+    // no updating while editing number field. See which one works best.
+    //
+    // Use the same solution from StringController.js to enable
+    // editing <input>s while "listen()"ing
+    if (!force && dom.isActive(this.__input)) {
+      return this;
+    }
+    if (this.__suspendUpdate) return;
+
+    this.__input.value = this.__truncationSuspended
+      ? this.getValue()
+      : roundToDecimal(this.getValue(), this.__precision);
     return super.updateDisplay();
+  }
+
+  step(v) {
+    if (this.__input.getAttribute("type") !== "number") {
+      this.__input.setAttribute("type", "number");
+    }
+    this.__input.setAttribute("step", v);
+    return super.step(...arguments);
   }
 }
 

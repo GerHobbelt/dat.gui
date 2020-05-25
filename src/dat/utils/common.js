@@ -1,8 +1,8 @@
 /**
- * dat-gui JavaScript Controller Library
+ * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2020 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,9 @@
 const ARR_EACH = Array.prototype.forEach;
 const ARR_SLICE = Array.prototype.slice;
 
+// cache supportsPassive check result:
+let supportsPassive;
+
 /**
  * Band-aid methods for things that should be a lot easier in JavaScript.
  * Implementation and structure inspired by underscore.js
@@ -23,35 +26,41 @@ const ARR_SLICE = Array.prototype.slice;
 const Common = {
   BREAK: {},
 
-  extend: function(target) {
-    this.each(ARR_SLICE.call(arguments, 1), function(obj) {
-      const keys = this.isObject(obj) ? Object.keys(obj) : [];
-      keys.forEach(function(key) {
-        if (!this.isUndefined(obj[key])) {
-          target[key] = obj[key];
+  extend: function (target) {
+    this.each(
+      ARR_SLICE.call(arguments, 1),
+      function (obj) {
+        for (const key in obj) {
+          if (!this.isUndefined(obj[key])) {
+            target[key] = obj[key];
+          }
         }
-      }.bind(this));
-    }, this);
+      },
+      this
+    );
 
     return target;
   },
 
-  defaults: function(target) {
-    this.each(ARR_SLICE.call(arguments, 1), function(obj) {
-      const keys = this.isObject(obj) ? Object.keys(obj) : [];
-      keys.forEach(function(key) {
-        if (this.isUndefined(target[key])) {
-          target[key] = obj[key];
+  defaults: function (target) {
+    this.each(
+      ARR_SLICE.call(arguments, 1),
+      function (obj) {
+        for (const key in obj) {
+          if (this.isUndefined(target[key])) {
+            target[key] = obj[key];
+          }
         }
-      }.bind(this));
-    }, this);
+      },
+      this
+    );
 
     return target;
   },
 
-  compose: function() {
+  compose: function () {
     const toCall = ARR_SLICE.call(arguments);
-    return function() {
+    return function () {
       let args = ARR_SLICE.call(arguments);
       for (let i = toCall.length - 1; i >= 0; i--) {
         args = [toCall[i].apply(this, args)];
@@ -60,39 +69,42 @@ const Common = {
     };
   },
 
-  each: function(obj, itr, scope) {
+  each: function (obj, itr, scope) {
     if (!obj) {
       return;
     }
 
-    if (ARR_EACH && obj.forEach && obj.forEach === ARR_EACH) {
+    // if (ARR_EACH && obj.forEach && obj.forEach === ARR_EACH) {
+    if (obj.forEach) {
       obj.forEach(itr, scope);
-    } else if (obj.length === obj.length + 0) { // Is number but not NaN
-      let key;
-      let l;
-      for (key = 0, l = obj.length; key < l; key++) {
+    } else if (obj.length === obj.length + 0) {
+      // Is number but not NaN
+      for (let key = 0, l = obj.length; key < l; key++) {
         if (key in obj && itr.call(scope, obj[key], key) === this.BREAK) {
           return;
         }
       }
     } else {
-      for (const key in obj) {
-        if (itr.call(scope, obj[key], key) === this.BREAK) {
+      for (const objkey in obj) {
+        if (itr.call(scope, obj[objkey], objkey) === this.BREAK) {
           return;
         }
       }
     }
   },
 
-  defer: function(fnc) {
+  defer: function (fnc) {
     setTimeout(fnc, 0);
   },
 
-  // if the function is called repeatedly, wait until threshold passes until we execute the function
-  debounce: function(func, threshold, callImmediately) {
+  /**
+   * If the function is called repeatedly, wait until threshold passes
+   * until we execute the function.
+   */
+  debounce: function (func, threshold, callImmediately) {
     let timeout;
 
-    return function() {
+    return function () {
       const obj = this;
       const args = arguments;
       function delayed() {
@@ -111,47 +123,110 @@ const Common = {
     };
   },
 
-  toArray: function(obj) {
-    if (obj.toArray) return obj.toArray();
+  toArray: function (obj) {
+    if (obj.toArray) {
+      return obj.toArray();
+    }
     return ARR_SLICE.call(obj);
   },
 
-  isUndefined: function(obj) {
+  isUndefined: function (obj) {
     return obj === undefined;
   },
 
-  isNull: function(obj) {
+  isNull: function (obj) {
     return obj === null;
   },
 
-  isNaN: function(obj) {
-    return isNaN(obj);
+  isNaN: function (obj) {
+    //
+    // See for the difference between `isNan()` and `Number.isNaN()`:
+    // - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/isNaN#Description
+    // - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isNaN
+    //
+    return Number.isNaN(obj);
+    // return obj !== obj;
   },
 
-  isArray: Array.isArray || function(obj) {
-    return obj.constructor === Array;
+  // isArray: Array.isArray || function(obj) {
+  isArray: function (obj) {
+    // return obj.constructor === Array;
+    return obj != null && obj.length >= 0 && typeof obj === "object";
   },
 
-  isObject: function(obj) {
+  isObject: function (obj) {
     return obj === Object(obj);
   },
 
-  isNumber: function(obj) {
-    return obj === obj + 0;
+  isNumber: function (obj) {
+    return obj === +obj;
+    // return obj === obj + 0;
   },
 
-  isString: function(obj) {
-    return obj === obj + '';
+  isFiniteNumber: function (obj) {
+    return obj === +obj && isFinite(obj);
   },
 
-  isBoolean: function(obj) {
+  isString: function (obj) {
+    return typeof obj === "string";
+  },
+
+  isBoolean: function (obj) {
     return obj === false || obj === true;
   },
 
-  isFunction: function(obj) {
-    return Object.prototype.toString.call(obj) === '[object Function]';
-  }
+  isFunction: function (obj) {
+    return obj instanceof Function;
+  },
 
+  isAsyncFunction: function (obj) {
+    return Object.prototype.toString.call(obj) === "[object AsyncFunction]";
+  },
+
+  supportsPassive: function () {
+    if (supportsPassive !== false && supportsPassive !== true) {
+      try {
+        supportsPassive = false;
+        const opts = Object.defineProperty({}, "passive", {
+          get: function () {
+            supportsPassive = true;
+            return false; // make lint happy: return a value
+          },
+        });
+        window.addEventListener("testPassive", null, opts);
+        window.removeEventListener("testPassive", null, opts);
+      } catch (e) {
+        supportsPassive = false;
+      }
+    }
+    return supportsPassive;
+  },
+
+  isImagePath: function (obj) {
+    return typeof obj === "string" && obj.search(/\.(gif|jpg|jpeg|png)$/) > -1;
+  },
+
+  setupDynamicProperty: function (object, property) {
+    // when the property is not available directly, we may have to get at it via getter/setter functions:
+    if (!(property in object)) {
+      const ucProperty = property.charAt(0).toUpperCase() + property.slice(1);
+      const getter = object["get" + ucProperty];
+      const setter = object["set" + ucProperty];
+      if (typeof getter === "function" && typeof setter === "function") {
+        return {
+          getter: getter,
+          setter: setter,
+        };
+      }
+      // or it's a read-only property?
+      if (typeof getter === "function") {
+        return {
+          getter: getter,
+        };
+      }
+    }
+    return false;
+  },
 };
 
 export default Common;

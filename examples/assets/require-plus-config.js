@@ -1,0 +1,51 @@
+/**
+ * dat.GUI JavaScript Controller Library
+ * http://code.google.com/p/dat-gui
+ *
+ * Copyright 2011-2020 Data Arts Team, Google Creative Lab
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
+/*
+  This configuration is appended to the requireJS library itself to ensure that it is executed before any other chunk of
+  JavaScript gets a chance to run.
+
+  The goal here is to guarantee that the given configuration applies deterministically from the very start of the page load.../
+
+  Tests show that 'must-append action' is required when, for example, you have an HTML page with a <script> chunk in the BODY
+  which calls `require` and [therefore] expects the requireJS library to behave as configured here. When this config chunk
+  is loaded through the requireJS `data-main` SCRIPT tag attribute (as its documentation suggests), then it will execute
+  too late: the BODY SCRIPT will already have executed by the time that the dynamically loaded `data-main`-referenced
+  file loads and executes.
+
+  The above matches the requireJS documentation at http://requirejs.org/docs/api.html#config where it is pointed out
+  that the `data-main` referenced file is 'loaded asynchronously'...
+ */
+
+/*
+requirejs.config({
+  baseUrl: "../src/",
+  paths: {
+    init: "../examples/init",
+
+    domReady: "../examples/assets/requireJS-domReady/domReady",
+    text: "../examples/assets/text/text",
+    "dat.GUI": "./index",
+
+    gui: "../examples/gui",
+    "gui.timer": "../time/timer",
+    "gui.easing": "../time/easing",
+    "gui.scrubber": "../time/scrubber",
+    "gui.scrubberpoint": "../time/scrubberpoint",
+    "gui.utils": "../time/utils",
+
+    demo: "../examples/demo",
+    testbed: "../examples/testbed",
+  },
+});
+*/

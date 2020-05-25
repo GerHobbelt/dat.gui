@@ -1,8 +1,8 @@
 /**
- * dat-gui JavaScript Controller Library
+ * dat.GUI JavaScript Controller Library
  * http://code.google.com/p/dat-gui
  *
- * Copyright 2011 Data Arts Team, Google Creative Lab
+ * Copyright 2011-2020 Data Arts Team, Google Creative Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -11,45 +11,106 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import Controller from './Controller';
-import dom from '../dom/dom';
+import Controller from "./Controller";
+import dom from "../dom/dom";
+import common from "../utils/common";
 
 /**
  * @class Provides a GUI interface to fire a specified method, a property of an object.
  *
- * @extends dat.controllers.Controller
+ * @extends Controller
  *
  * @param {Object} object The object to be manipulated
  * @param {string} property The name of the property to be manipulated
+ * @param {string} text The text displayed in the button which will invoke the specified method.
+ * @param {Array} user_data Optional set of user-specified datums to be passed to the specified method as its parameters (using JavaScript `.apply()`)
+ *
+ * @member dat.controllers
  */
 class FunctionController extends Controller {
-  constructor(object, property, text) {
-    super(object, property);
+  constructor(object, property, text, user_data) {
+    super(object, property, "function");
 
     const _this = this;
 
-    this.__button = document.createElement('div');
-    this.__button.innerHTML = text === undefined ? 'Fire' : text;
+    if (!common.isUndefined(user_data) && !common.isArray(user_data)) {
+      user_data = [user_data];
+    }
 
-    dom.bind(this.__button, 'click', function(e) {
+    this.__button = document.createElement("div");
+    this.__button.innerHTML = text === undefined ? "Fire" : text;
+
+    dom.bind(this.__button, "click", function (e) {
       e.preventDefault();
-      _this.fire();
+      e.stopPropagation();
+      _this.fire(user_data);
+
+      // minimal animation to show action in button:
+      //
+      // TODO: use this.parent {GUI} base element instead of that parentElement chain
+      const liNode = _this.domLiElement;
+      dom.addClass(liNode, "function--active");
+      setTimeout(() => {
+        dom.removeClass(liNode, "function--active");
+      }, 100);
+
       return false;
     });
 
-    dom.addClass(this.__button, 'button');
+    dom.addClass(this.__button, "button");
 
     this.domElement.appendChild(this.__button);
   }
 
-  fire() {
-    if (this.__onChange) {
-      this.__onChange.call(this);
+  /**
+   * Invoke the function (property of the object), passing the `user_data` array as function
+   * arguments.
+   *
+   * Before the function is invoked, the dat.GUI `beforeChange` callback will be invoked
+   *
+   *
+   * @param  {Array} user_data  The array of function arguments; when the `user_data` is not
+   * an array, it will be assumed to be a single argument by itself and will be
+   * passed to the invoked function as is.
+   *
+   * @param  {boolean} silent   When truthy, no onBeforeChange/onChange events will be fired.
+   *
+   * @return {Controller}           This controller.
+   */
+  fire(user_data, silent) {
+    if (!common.isUndefined(user_data) && !common.isArray(user_data)) {
+      user_data = [user_data];
     }
-    this.getValue().call(this.object);
-    if (this.__onFinishChange) {
-      this.__onFinishChange.call(this, this.getValue());
+
+    const msg = {
+      userData: user_data,
+      // isChange: undefined,
+      silent: silent,
+      noGo: false,
+      // eventData: undefined,
+      eventSource: "fire",
+    };
+    if (!silent) {
+      // `userData` will end up in the second argument of the event listener, thus
+      // userland code can look at both existing and new values for this property
+      // and decide what to do accordingly!
+      msg.noGo = this.fireBeforeChange(msg);
+      this.__propagateChange(this.getValue());
     }
+    if (!msg.noGo) {
+      this.getValue().apply(this.object, user_data);
+    }
+    // Always fire the change event; inform the userland code whether the change was 'real'
+    // or aborted:
+    if (!silent) {
+      this.fireChange(msg);
+      this.fireFinishChange(msg);
+      this.__propagateFinishChange(this.getValue());
+    }
+    // Whenever you call `fire`, the display will be updated automatically.
+    // This reduces some clutter in subclasses.
+    this.updateDisplay();
+    return this;
   }
 }
 

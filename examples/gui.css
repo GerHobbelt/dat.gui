@@ -52,7 +52,7 @@
   top: 50%;
   left: 50%;
   background-color: #111111;
-  color: #CCCCCC;
+  color: #cccccc;
   width: 400px;
   height: 228px;
   margin-top: -114px;
@@ -81,7 +81,7 @@
 }
 
 .guidat {
-  color: #FFFFFF;
+  color: #ffffff;
   opacity: 0.97;
   text-align: left;
 
@@ -89,8 +89,8 @@
   float: right;
   margin-right: 20px;
   margin-bottom: 20px;
-*/
-  background-color: #FFFFFF;
+  */
+  background-color: #ffffff;
 }
 
 .guidat,
@@ -113,7 +113,7 @@
 a.guidat-toggle {
   text-decoration: none;
   cursor: pointer;
-  color: #FFFFFF;
+  color: #ffffff;
   background-color: #222222;
   text-align: center;
   display: block;
@@ -167,36 +167,48 @@ a.guidat-toggle:hover {
 .guidat-controller input:focus,
 .guidat-controller.active input {
   background-color: #555555;
-  color: #FFFFFF;
+  color: #ffffff;
 }
 
 .guidat-controller.number {
-  border-left: 5px solid #00AEFF;
+  border-left: 5px solid #00aeff;
 }
 
 .guidat-controller.string {
-  border-left: 5px solid #1ED36F;
+  border-left: 5px solid #1ed36f;
 }
 
 .guidat-controller.string input {
   border: 0;
-  color: #1ED36F;
+  color: #1ed36f;
   margin-right: 2px;
   width: 148px;
 }
 
 .guidat-controller.boolean {
-  border-left: 5px solid #54396E;
+  border-left: 5px solid #54396e;
 }
 
 .guidat-controller.function {
-  border-left: 5px solid #E61D5F;
+  border-left: 5px solid #e61d5f;
+}
+
+.guidat-controller.function button {
+  margin: 3px 0;
+  border: 2px solid #666666;
+  line-height: 18px;
+  background: #333333;
+  border-radius: 3px;
+}
+
+.guidat-controller.object {
+  border-left: 5px solid #ffff00;
 }
 
 .guidat-controller.number input[type="text"] {
   margin-left: 5px;
   margin-right: 2px;
-  color: #00AEFF;
+  color: #00aeff;
   width: 35px;
 }
 
@@ -227,7 +239,7 @@ a.guidat-toggle:hover {
 
 .guidat-slider-bg:hover .guidat-slider-fg,
 .guidat-slider-bg.active .guidat-slider-fg {
-  background-color: #52C8FF;
+  background-color: #52c8ff;
 }
 
 .guidat-slider-bg {
@@ -241,7 +253,7 @@ a.guidat-toggle:hover {
 
 .guidat-slider-fg {
   cursor: ew-resize;
-  background-color: #00AEFF;
+  background-color: #00aeff;
   height: 21px;
 }
 

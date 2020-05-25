@@ -15,14 +15,14 @@
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15);
   height: 1em;
   border-radius: 1em;
-  background-color: #EEEEEE;
+  background-color: #eeeeee;
   padding: 0 0.5em;
   overflow: hidden;
 }
 
 .slider-fg {
   padding: 1px 0 2px 0;
-  background-color: #AAAAAA;
+  background-color: #aaaaaa;
   height: 1em;
   margin-left: -0.5em;
   padding-right: 0.5em;
@@ -32,8 +32,8 @@
 .slider-fg::after {
   display: inline-block;
   border-radius: 1em;
-  background-color: #FFFFFF;
-  border: 1px solid #AAAAAA;
+  background-color: #ffffff;
+  border: 1px solid #aaaaaa;
   content: "";
   float: right;
   margin-right: -1em;

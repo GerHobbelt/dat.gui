@@ -28,21 +28,32 @@ import dom from "../dom/dom";
  * @member dat.controllers
  */
 class UndefinedController extends Controller {
-  constructor(object, property) {
-    super(object, property);
+  constructor(object, property, options) {
+    super(object, property, "undefined", options);
 
     const _this = this;
+    this.__prev = this.getValue();
 
+    this.__elem = document.createElement("em");
+    this.domElement.appendChild(this.__elem);
+
+    // Match original value
+    this.updateDisplay();
+
+    /*
     this.__input = document.createElement("input");
     this.__input.setAttribute("type", "text");
     this.__input.setAttribute("disabled", true);
     this.domElement.appendChild(this.__input);
+    */
   }
 
   updateDisplay() {
+    this.__elem.innerText = "<undefined>";
+
     if (this.__onFinishChange) {
-      if (!common.isUndefined(this.object[this.property])) {
-        this.__onFinishChange.call(this.object[this.property]);
+      if (!common.isUndefined(this.getValue())) {
+        this.__onFinishChange.call(this.getValue());
       }
     }
     return super.updateDisplay();

@@ -92,6 +92,8 @@ class Controller {
     this.object[this.property] = newValue;
     if (this.__onChange) {
       this.__onChange.call(this, newValue);
+    } else if (this.__onFinishChange) {
+      this.__onFinishChange.call(this, newValue);
     }
     this.updateDisplay();
     return this;
@@ -104,6 +106,23 @@ class Controller {
    */
   getValue() {
     return this.object[this.property];
+  }
+
+  /**
+   * Set the drop handler
+   *
+   * @param {function} handler
+   */
+  setDropHandler(handler) {
+    this.domElement.ondragover = function (event) {
+      event.preventDefault();
+    };
+    this.domElement.ondrop = function (event) {
+      event.preventDefault();
+      handler.call(this, event.dataTransfer.getData("text"));
+    };
+
+    return this;
   }
 
   /**

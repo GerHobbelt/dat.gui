@@ -12,20 +12,19 @@
  */
 
 const css = {
-  load: function (url, indoc) {
-    const doc = indoc || document;
+  load: function (url, doc) {
+    doc = doc || document;
     const link = doc.createElement("link");
     link.type = "text/css";
     link.rel = "stylesheet";
     link.href = url;
     doc.getElementsByTagName("head")[0].appendChild(link);
   },
-
-  inject: function (cssContent, indoc) {
-    const doc = indoc || document;
+  inject: function (css, doc) {
+    doc = doc || document;
     const injected = document.createElement("style");
     injected.type = "text/css";
-    injected.innerHTML = cssContent;
+    injected.innerHTML = css;
     const head = doc.getElementsByTagName("head")[0];
     try {
       head.appendChild(injected);

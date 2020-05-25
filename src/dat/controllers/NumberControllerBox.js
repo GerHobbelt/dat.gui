@@ -43,6 +43,7 @@ class NumberControllerBox extends NumberController {
     params = params || {};
 
     this.__truncationSuspended = false;
+    this.__mouseIsDown = false;
 
     const _this = this;
 
@@ -50,7 +51,7 @@ class NumberControllerBox extends NumberController {
      * {Number} Previous mouse y position
      * @ignore
      */
-    let prev_y;
+    let prevY;
 
     function onKeyDown(e) {
       // When pressing ENTER key, you can be as precise as you want.
@@ -60,14 +61,36 @@ class NumberControllerBox extends NumberController {
         this.blur();
         /* jshint validthis: false */
         _this.__truncationSuspended = false;
+      } else if ((e.keyCode === 38 || e.keyCode === 40) && _this.__step) {
+        onChange();
       }
+    }
+
+    function onMouseDownDetect() {
+      _this.__mouseIsDown = true;
+      dom.bind(window, "mouseup", onMouseUpDetect);
+    }
+
+    function onMouseUpDetect() {
+      _this.__mouseIsDown = false;
+      dom.unbind(window, "mouseup", onMouseUpDetect);
     }
 
     function onChange(e) {
       const attempted = parseFloat(_this.__input.value);
       if (!common.isNaN(attempted)) {
-        _this.setValue(attempted);
+        _this.setValue(attempted); // this includes an *implied* `_this.updateDisplay();`
+      } else {
+        _this.updateDisplay();
       }
+    }
+
+    function onInput() {
+      if (!_this.__mouseIsDown) {
+        return;
+      }
+      const attempted = parseFloat(_this.__input.value);
+      if (!common.isNaN(attempted)) _this.setValue(attempted);
     }
 
     function onBlur(e) {
@@ -80,15 +103,14 @@ class NumberControllerBox extends NumberController {
     function onMouseDown(e) {
       dom.bind(window, "mousemove", onMouseDrag);
       dom.bind(window, "mouseup", onMouseUp);
-
-      prev_y = e.clientY;
+      prevY = e.clientY;
     }
 
     function onMouseDrag(e) {
-      const diff = prev_y - e.clientY;
+      const diff = prevY - e.clientY;
       _this.setValue(_this.getValue() + diff * _this.__impliedStep);
 
-      prev_y = e.clientY;
+      prevY = e.clientY;
     }
 
     function onMouseUp(e) {
@@ -97,13 +119,19 @@ class NumberControllerBox extends NumberController {
     }
 
     this.__input = document.createElement("input");
-    this.__input.setAttribute("type", "text");
+
+    if (this.__step != null) {
+      this.__input.setAttribute("step", this.__step);
+      this.__input.setAttribute("type", "number");
+    } else this.__input.setAttribute("type", "text");
 
     // Makes it so manually specified values are not truncated.
 
+    dom.bind(this.__input, "input", onInput);
     dom.bind(this.__input, "change", onChange);
     dom.bind(this.__input, "blur", onBlur);
-    dom.bind(this.__input, "mousedown", onMouseDown);
+    dom.bind(this.__input, "mousedown", onMouseDownDetect);
+    // dom.bind(this.__input, 'mousedown', onMouseDown);
     dom.bind(this.__input, "keydown", onKeyDown);
 
     this.updateDisplay();
@@ -121,6 +149,14 @@ class NumberControllerBox extends NumberController {
       ? this.getValue()
       : roundToDecimal(this.getValue(), this.__precision);
     return super.updateDisplay();
+  }
+
+  step(v) {
+    if (this.__input.getAttribute("type") !== "number") {
+      this.__input.setAttribute("type", "number");
+    }
+    this.__input.setAttribute("step", v);
+    return super.step(...arguments);
   }
 }
 

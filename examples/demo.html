@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <link rel="stylesheet" href="../build/dat.gui.css" />
+    <script src="../tests/jquery.js"></script>
   </head>
   <body>
     <center>
@@ -14,25 +15,118 @@
     <script type="text/javascript">
       /* eslint-disable no-console, camelcase */
 
-      const obj = {
-        x: undefined,
-        y: undefined,
-        timer: 2.0,
+      let myFizzyText;
+
+      const FizzyText = function () {
+        this.message = "dat.gui";
+        this.speed = 0.8;
+        this.displayOutline = false;
+        this["Trace object!"] = function () {
+          console.log(myFizzyText);
+        };
+        this["Trace folder find!"] = function () {
+          console.log("folder find test", gui.getFolderByName("folder"));
+        };
+        this["Trace cont find!"] = function () {
+          console.log("controller find test", gui.getControllerByName("testbool4", true));
+        };
+
+        // Define render logic ...
+        this.number1 = 0;
+        this.number2 = 0;
+        this.number3 = 0.3;
+        this.testbool = false;
+        this.testbool2 = false;
+        this.testbool3 = false;
+        this.testbool4 = false;
+        this.enumerated = 2;
+        this.description = "";
       };
-      const gui = new dat.GUI();
-      gui.add(obj, "timer").min(0).max(obj.timer).listen();
-      gui.add(obj, "x").listen();
-      const y = gui.add(obj, "y");
-      var interval = setInterval(function () {
-        obj.timer -= 0.1;
-        if (obj.timer <= 0) {
-          clearInterval(interval);
-          obj.x = "Not Undefined!";
-          obj.y = 1;
-          obj.timer = 0;
-          y.updateDisplay();
+
+      let gui;
+
+      window.onload = function () {
+        function displayOutput(value) {
+          $("#output").html(value);
         }
-      }, 100);
+
+        const text = (myFizzyText = new FizzyText());
+        gui = new dat.GUI();
+        let g;
+        gui.add(text, "message").onChange(displayOutput);
+        gui.addTextArea(text, "description").onChange(function (value) {
+          value = value.replace(/\r?\n/g, "<br />");
+          $("#output").html(value);
+        });
+        gui.add(text, "speed", -5, 8).onChange(displayOutput);
+        gui
+          .add(text, "enumerated", 0, 8, 1, {
+            None: 0,
+            Low: 1,
+            Medium: 2,
+            High: 3,
+            "Very High": 6,
+            Extreme: 8,
+          })
+          .onChange(displayOutput);
+        gui.add(text, "displayOutline").onChange(displayOutput);
+        gui.add(text, "Trace object!");
+        g = gui.add(text, "testbool").onChange(displayOutput);
+
+        $(g.domElement).addClass("testClass");
+        gui.add(text, "testbool2").onChange(displayOutput);
+
+        gui.add(text, "number1").onChange(displayOutput);
+        gui.add(text, "number2").step(0.5).onChange(displayOutput);
+        gui.add(text, "number3").min(0).step(0.01).onChange(displayOutput);
+
+        g = gui.addFolder("folder");
+        $(g.domElement).addClass("testClass");
+        g.open();
+        g.add(text, "testbool3").onChange(displayOutput);
+        g = g.addFolder("folder2");
+        g.add(text, "testbool4").onChange(displayOutput);
+
+        gui.add(text, "Trace folder find!");
+        gui.add(text, "Trace cont find!");
+
+        const allComponents = gui.getAllControllers();
+        const allGUIs = gui.getAllGUIs();
+        let p;
+
+        for (p in allGUIs) {
+          g = allGUIs[p];
+          g.onClosedChange(function (val) {
+            displayOutput("" + this.name + " is closed? " + val);
+          });
+        }
+      };
     </script>
+
+    <h1>
+      Output:
+    </h1>
+    <div id="output"></div>
+    <div id="info" style="width: 65%;">
+      <h1>Changelog:</h1>
+      <ul>
+        <li>Misc improvements for CSS and controllers</li>
+        <li>Multiline TextArea support <i>(description)</i></li>
+        <li>Enumerated value >= threshold labeling for slider <i>(enumerated)</i></li>
+        <li>
+          Removed implicit horizontal mouseDown+mouseDrag step handlers on NumberControllerBox to prevent conflict with
+          text highlighting.
+        </li>
+        <li>
+          If you define explicit "step" value for your controller component, the input now uses the HTML5 input
+          type="number", with a "step" attribute, which should provide native stepper UI functionality if available.
+        </li>
+        <li>
+          Added GUI instance utility methods: getFolderByName(name), getControllerByName(name,?recurse),
+          getAllGUIs(?recurse, ?myArray), getAllControllers(?recurse, ?myArray)
+        </li>
+        <li>Added 'onClosedChange' handler to detect opened/closed states</li>
+      </ul>
+    </div>
   </body>
 </html>

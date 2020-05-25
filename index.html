@@ -1,9 +1,12 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
+    <meta charset="utf-8" />
     <title>dat.GUI</title>
-
     <link rel="icon" type="image/png" href="examples/assets/favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+    <link rel="stylesheet" href="build/dat.gui.css" />
 
     <!--Minified build-->
     <!--<script type='text/javascript' src='build/dat.GUI.min.js'></script>-->
@@ -17,7 +20,6 @@
   <script type='text/javascript' src='examples/RequestAnimationFrame.js'></script>
   <script type='text/javascript' src='examples/improvedNoise.js'></script>
   <script type='text/javascript' src='examples/assets/prettify.js'></script>
-  <script type="text/javascript" src="examples/improvedNoise.js"></script>
   <script type='text/javascript' src='examples/demo.js'></script>
   -->
 
@@ -66,8 +68,8 @@
         gui.add(fizzyText, "explode").name("Explode!"); // Specify a custom name.
 
         // Colors
-        gui.addAs(fizzyText, "fgcolor", "color");
-        gui.addAs(fizzyText, "bgcolor", gui.findController("color"));
+        gui.addColor(fizzyText, "fgcolor");
+        gui.addColor(fizzyText, "bgcolor");
 
         // Numbers without range
         gui.add(fizzyText, "regular_number").name("just a number...");
@@ -213,7 +215,7 @@
           </ul>
         </li>
 
-        <li><a href="tests/index.html">qUnit tests</a></li>
+        <li><a href="tests/qunit.html">qUnit tests</a></li>
       </ul>
 
       <h2>Basic Usage</h2>
@@ -222,7 +224,6 @@
 &lt;script type='text/javascript'&gt;
 
 window.onload = function() {
-
    var fizzyText = new <a href='examples/demo.js'>FizzyText</a>('dat.GUI');
 
    var gui = new DAT.GUI();
@@ -242,7 +243,6 @@ window.onload = function() {
 
    // Fires a function called 'explode'
    gui.add(fizzyText, 'explode').name('Explode!'); // Specify a custom name.
-
 };
 
 &lt;/script&gt;

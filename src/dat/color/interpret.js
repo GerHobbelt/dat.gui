@@ -30,13 +30,13 @@ const INTERPRETATIONS = [
           return {
             space: "HEX",
             hex: parseInt(
-              "0x" +
-                test[1].toString() +
-                test[1].toString() +
-                test[2].toString() +
-                test[2].toString() +
-                test[3].toString() +
-                test[3].toString(),
+              "0x"
+                + test[1].toString()
+                + test[1].toString()
+                + test[2].toString()
+                + test[2].toString()
+                + test[3].toString()
+                + test[3].toString(),
               16
             ),
           };
@@ -172,10 +172,10 @@ const INTERPRETATIONS = [
       RGBA_OBJ: {
         read: function (original) {
           if (
-            common.isNumber(original.r) &&
-            common.isNumber(original.g) &&
-            common.isNumber(original.b) &&
-            common.isNumber(original.a)
+            common.isNumber(original.r)
+            && common.isNumber(original.g)
+            && common.isNumber(original.b)
+            && common.isNumber(original.a)
           ) {
             return {
               space: "RGB",
@@ -223,10 +223,10 @@ const INTERPRETATIONS = [
       HSVA_OBJ: {
         read: function (original) {
           if (
-            common.isNumber(original.h) &&
-            common.isNumber(original.s) &&
-            common.isNumber(original.v) &&
-            common.isNumber(original.a)
+            common.isNumber(original.h)
+            && common.isNumber(original.s)
+            && common.isNumber(original.v)
+            && common.isNumber(original.a)
           ) {
             return {
               space: "HSV",

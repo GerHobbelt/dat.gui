@@ -19,13 +19,10 @@ import common from "../utils/common";
 
 /**
  * @class Represents a given property of an object that is a color.
- *
- * @extends Controller
- *
  * @param {Object} object
  * @param {string} property
  */
-class ColorController extends Controller {
+class HifiColorController extends Controller {
   constructor(object, property) {
     super(object, property);
 
@@ -34,7 +31,7 @@ class ColorController extends Controller {
 
     const _this = this;
 
-    // this.domElement = document.createElement('div');
+    this.domElement = document.createElement("div");
 
     dom.makeSelectable(this.domElement, false);
 
@@ -56,10 +53,7 @@ class ColorController extends Controller {
 
     this.__input = document.createElement("input");
     this.__input.type = "text";
-
-    this.__input_textShadow = ["1px 0px 0px ", "-1px 0px 0px ", "0px 1px 0px ", "0px -1px 0px "];
-
-    /* jshint unused: false */
+    this.__input_textShadow = "0 1px 1px ";
 
     dom.bind(this.__input, "keydown", function (e) {
       if (e.keyCode === 13) {
@@ -71,17 +65,15 @@ class ColorController extends Controller {
     dom.bind(this.__input, "blur", onBlur);
 
     dom.bind(this.__selector, "mousedown", function (e) {
-      dom.addClass(this, "drag").bind(window, "mouseup", function (e) {
+      dom.addClass(this, "drag").bind(window, "mouseup", function (evt) {
         dom.removeClass(_this.__selector, "drag");
       });
     });
 
-    /* jshint unused: true */
-
     const valueField = document.createElement("div");
 
     common.extend(this.__selector.style, {
-      width: "122px", // 124px
+      width: "122px",
       height: "102px",
       padding: "3px",
       backgroundColor: "#222",
@@ -142,11 +134,7 @@ class ColorController extends Controller {
       color: "#fff",
       border: 0,
       fontWeight: "bold",
-      textShadow: this.__input_textShadow
-        .map(function (d) {
-          return d + " rgba(0,0,0,0.7)";
-        })
-        .join(", "),
+      textShadow: this.__input_textShadow + "rgba(0,0,0,0.7)",
     });
 
     dom.bind(this.__saturation_field, "mousedown", fieldDown);
@@ -172,7 +160,6 @@ class ColorController extends Controller {
     }
 
     function onBlur() {
-      /* jshint validthis: true */
       const i = interpret(this.value);
       if (i !== false) {
         _this.__color.__state = i;
@@ -180,7 +167,6 @@ class ColorController extends Controller {
       } else {
         this.value = _this.__color.toString();
       }
-      /* jshint validthis: false */
     }
 
     function unbindH() {
@@ -203,22 +189,15 @@ class ColorController extends Controller {
       e.preventDefault();
 
       const w = dom.getWidth(_this.__saturation_field);
-      const h = dom.getHeight(_this.__saturation_field);
       const o = dom.getOffset(_this.__saturation_field);
       let s = (e.clientX - o.left + document.body.scrollLeft) / w;
-      let v = 1 - (e.clientY - o.top + document.body.scrollTop) / h;
+      let v = 1 - (e.clientY - o.top + document.body.scrollTop) / w;
 
-      if (v > 1) {
-        v = 1;
-      } else if (v < 0) {
-        v = 0;
-      }
+      if (v > 1) v = 1;
+      else if (v < 0) v = 0;
 
-      if (s > 1) {
-        s = 1;
-      } else if (s < 0) {
-        s = 0;
-      }
+      if (s > 1) s = 1;
+      else if (s < 0) s = 0;
 
       _this.__color.v = v;
       _this.__color.s = s;
@@ -235,11 +214,8 @@ class ColorController extends Controller {
       const o = dom.getOffset(_this.__hue_field);
       let h = 1 - (e.clientY - o.top + document.body.scrollTop) / s;
 
-      if (h > 1) {
-        h = 1;
-      } else if (h < 0) {
-        h = 0;
-      }
+      if (h > 1) h = 1;
+      else if (h < 0) h = 0;
 
       _this.__color.h = h * 360;
 
@@ -266,7 +242,7 @@ class ColorController extends Controller {
             && i[component] !== this.__color.__state[component]
           ) {
             mismatch = true;
-            return common.BREAK; // break
+            return {}; // break
           }
         },
         this
@@ -289,7 +265,7 @@ class ColorController extends Controller {
     common.extend(this.__field_knob.style, {
       marginLeft: 100 * this.__color.s - 7 + "px",
       marginTop: 100 * (1 - this.__color.v) - 7 + "px",
-      backgroundColor: this.__temp.toHexString(),
+      backgroundColor: this.__temp.toString(),
       border: this.__field_knob_border + "rgb(" + flip + "," + flip + "," + flip + ")",
     });
 
@@ -298,18 +274,12 @@ class ColorController extends Controller {
     this.__temp.s = 1;
     this.__temp.v = 1;
 
-    linearGradient(this.__saturation_field, "left", "#fff", this.__temp.toHexString());
-
-    this.__input.value = this.__color.toString();
+    linearGradient(this.__saturation_field, "left", "#fff", this.__temp.toString());
 
     common.extend(this.__input.style, {
-      backgroundColor: this.__color.toHexString(),
+      backgroundColor: (this.__input.value = this.__color.toString()),
       color: "rgb(" + flip + "," + flip + "," + flip + ")",
-      textShadow: this.__input_textShadow
-        .map(function (d) {
-          return d + " rgba(" + _flip + "," + _flip + "," + _flip + ",0.7)";
-        })
-        .join(", "),
+      textShadow: this.__input_textShadow + "rgba(" + _flip + "," + _flip + "," + _flip + ",.7)",
     });
   }
 }
@@ -337,4 +307,4 @@ function hueGradient(elem) {
     += "background: linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
 }
 
-export default ColorController;
+export default HifiColorController;

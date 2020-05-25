@@ -38,7 +38,7 @@ h6 {
 hr {
   border: 0;
   height: 0;
-  border-top: 1px dotted #CCCCCC;
+  border-top: 1px dotted #cccccc;
 }
 
 h1 {
@@ -73,12 +73,12 @@ h2.section {
   margin: 0;
   padding: 20px 0 20px;
   cursor: pointer;
-  border-top: 1px dotted #CCCCCC;
+  border-top: 1px dotted #cccccc;
   -webkit-transition: color 0.15s linear;
 }
 
 h2.section:hover {
-  color: #00AEFF;
+  color: #00aeff;
 }
 
 div.collapsed h2,
@@ -173,24 +173,24 @@ ul#desc {
 }
 
 a:link {
-  color: #00AEFF;
+  color: #00aeff;
 }
 
 a:visited {
-  color: #0FA954;
+  color: #0fa954;
 }
 
 a:hover {
-  color: #E61D5F;
+  color: #e61d5f;
 }
 
 a:active {
-  color: #54396E;
+  color: #54396e;
 }
 
 footer {
   margin-top: 20px;
-  background-color: #EEEEEE;
+  background-color: #eeeeee;
   width: 510px;
   padding: 10px;
   clear: both;
@@ -201,7 +201,7 @@ pre a:link,
 pre a:visited,
 pre a:active,
 pre a:hover {
-  color: #CCCCCC;
+  color: #cccccc;
 }
 
 code {
@@ -210,16 +210,16 @@ code {
 
 code strong {
   font-weight: normal;
-  color: #E61D5F;
+  color: #e61d5f;
 }
 
 /* SPAN elements with the classes below are added by prettyprint. */
 .str {
-  color: #0FA954;
+  color: #0fa954;
 }
 
 .kwd {
-  color: #E61D5F;
+  color: #e61d5f;
 }
 
 .com {
@@ -227,11 +227,11 @@ code strong {
 }
 
 .typ {
-  color: #CCCCCC;
+  color: #cccccc;
 }
 
 .lit {
-  color: #00AEFF;
+  color: #00aeff;
 }
 
 .pun,
@@ -241,7 +241,7 @@ code strong {
 }
 
 .pln {
-  color: #CCCCCC;
+  color: #cccccc;
 }
 
 .tag {

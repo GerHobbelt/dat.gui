@@ -38,7 +38,7 @@ class PlotterController extends Controller {
     this.liClass = params.liClass || "plotter";
 
     /** Refresh rate. Value of 0 disables auto-refresh */
-    this.period = typeof period === "number" ? period : period ? 500 : 0;
+    this.period = typeof params.period === "number" ? params.period : params.period ? 500 : 0;
 
     /** Stores the current value for comparison during animation frame */
     this.prevValue = this.getValue();

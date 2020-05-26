@@ -24,6 +24,7 @@ import BgColorController from "../controllers/BgColorController";
 import NgColorController from "../controllers/NgColorController";
 import HSVColorController from "../controllers/HSVColorController";
 import GtColorController from "../controllers/GtColorController";
+import CustomController from "../controllers/CustomController";
 import ImageController from "../controllers/ImageController";
 import OptionController from "../controllers/OptionController";
 import PlotterController from "../controllers/PlotterController";

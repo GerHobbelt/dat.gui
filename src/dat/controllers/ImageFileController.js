@@ -18,7 +18,7 @@
 import Controller from "./Controller";
 import dom from "../dom/dom";
 
-// import "./ImageController.css";
+// import "./ImageFileController.css";
 
 /**
  * @class Provides a image/file input to alter the url property on an object
@@ -30,7 +30,7 @@ import dom from "../dom/dom";
  *
  * @member dat.controllers
  */
-class ImageController extends Controller {
+class ImageFileController extends Controller {
   constructor(object, property) {
     super(object, property);
 
@@ -70,4 +70,4 @@ class ImageController extends Controller {
   }
 }
 
-export default ImageController;
+export default ImageFileController;

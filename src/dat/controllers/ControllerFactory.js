@@ -11,6 +11,8 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
+import ArrayController from "./ArrayController";
+import VectorController from "./VectorController";
 import OptionController from "./OptionController";
 import NumberControllerBox from "./NumberControllerBox";
 import NumberControllerSlider from "./NumberControllerSlider";
@@ -18,6 +20,7 @@ import StringController from "./StringController";
 import TextAreaController from "./TextAreaController";
 import ArrayController from "./ArrayController";
 import FunctionController from "./FunctionController";
+import TabbedController from "./TabbedController";
 import BooleanController from "./BooleanController";
 import ImageController from "./ImageController";
 import ColorController from "./ColorController";
@@ -68,7 +71,7 @@ const controllerFactory = function (object, property, ...optionalArgs) {
         min,
         max,
         step,
-        minimumSaneStepSize,
+        minimumSaneStepSize,            // enumeration
         maximumSaneStepSize,
         mode
       );

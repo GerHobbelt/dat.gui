@@ -16,25 +16,35 @@ import saveDialogueContents from "./saveDialogue.html";
 import controllerFactory from "../controllers/ControllerFactory";
 import Controller from "../controllers/Controller";
 import BooleanController from "../controllers/BooleanController";
+import VectorController from "../controllers/VectorController";
 import FunctionController from "../controllers/FunctionController";
+import TabbedController from "../controllers/TabbedController";
 import NumberControllerBox from "../controllers/NumberControllerBox";
 import NumberControllerSlider from "../controllers/NumberControllerSlider";
+import NumberControllerAnimator from "../controllers/NumberControllerAnimator";
 import ColorController from "../controllers/ColorController";
 import BgColorController from "../controllers/BgColorController";
 import NgColorController from "../controllers/NgColorController";
 import HSVColorController from "../controllers/HSVColorController";
 import GtColorController from "../controllers/GtColorController";
+import FileController from "../controllers/FileController";
 import CustomController from "../controllers/CustomController";
 import ImageController from "../controllers/ImageController";
 import OptionController from "../controllers/OptionController";
 import PlotterController from "../controllers/PlotterController";
 import EasingFunctionController from "../controllers/EasingFunctionController";
 import TextAreaController from "../controllers/TextAreaController";
+import CustomController from "../controllers/CustomController";
+import GradientController from "../controllers/GradientController";
+import ArrayController from "../controllers/ArrayController";
+import ImageController from "../controllers/ImageController";
+import ImageFileController from "../controllers/ImageFileController";
 import UndefinedController from "../controllers/UndefinedController";
 import requestAnimationFrame from "../utils/requestAnimationFrame";
 import CenteredDiv from "../dom/CenteredDiv";
 import dom from "../dom/dom";
 import common from "../utils/common";
+import autocomplete from "../dom/autocomplete";
 
 // import styleSheet from "./style.scss"; // CSS to embed in build
 
@@ -203,6 +213,7 @@ class GUI {
       closeOnTop: false,
       autoPlace: true,
       width: GUI.DEFAULT_WIDTH,
+      showCloseButton: true,
     });
 
     params = common.defaults(params, {
@@ -242,7 +253,7 @@ class GUI {
     // Not part of params because I don't want people passing this in via
     // constructor. Should be a 'remembered' value.
     let useLocalStorage =
-      SUPPORTS_LOCAL_STORAGE && localStorage.getItem(getLocalStorageHash(this, "isLocal")) === "true";
+      SUPPORTS_LOCAL_STORAGE && window.localStorage.getItem(getLocalStorageHash(this, "isLocal")) === "true";
 
     let saveToLocalStorage;
     let titleRow;
@@ -251,6 +262,38 @@ class GUI {
       this,
       /** @lends GUI.prototype */
       {
+        /**
+         * Toggles light theme
+         * @type Boolean
+         */
+        lightTheme: {
+          set: function (v) {
+            params.lightTheme = v;
+            if (v) dom.addClass(_this.domElement, GUI.CLASS_LIGHT_THEME);
+            else dom.removeClass(_this.domElement, GUI.CLASS_LIGHT_THEME);
+          },
+
+          get: function () {
+            return params.lightTheme;
+          },
+        },
+
+        /**
+         * Toggles open/close button
+         * @type Boolean
+         */
+        showCloseButton: {
+          set: function (v) {
+            params.showCloseButton = v;
+            if (v) dom.removeClass(_this.__closeButton, GUI.CLASS_DISPLAY_NONE);
+            else dom.addClass(_this.__closeButton, GUI.CLASS_DISPLAY_NONE);
+          },
+
+          get: function () {
+            return params.showCloseButton;
+          },
+        },
+
         /**
          * The parent <code>GUI</code>
          * @type GUI
@@ -354,6 +397,27 @@ class GUI {
         },
 
         /**
+         * The name of <code>GUI</code>. Used for folders. i.e
+         * a folder's title
+         * @type String
+         */
+        title: {
+          get: function () {
+            return params.title;
+          },
+          set: function (v) {
+            params.title = v;
+            if (titleRow) {
+              if (common.isString(params.title)) {
+                titleRow.setAttribute("title", params.title);
+              } else {
+                titleRow.removeAttribute("title");
+              }
+            }
+          },
+        },
+
+        /**
          * Whether the <code>GUI</code> is collapsed or not
          * @type Boolean
          */
@@ -426,7 +490,7 @@ class GUI {
               } else {
                 dom.unbind(window, "unload", saveToLocalStorage);
               }
-              localStorage.setItem(getLocalStorageHash(_this, "isLocal"), bool);
+              window.localStorage.setItem(getLocalStorageHash(_this, "isLocal"), bool);
             }
             return _this;
           },
@@ -436,17 +500,19 @@ class GUI {
 
     // Are we a root level GUI?
     if (common.isUndefined(params.parent)) {
-      params.closed = false;                  // TODO: check what this does
-
       dom.addClass(this.domElement, GUI.CLASS_MAIN);
       dom.makeSelectable(this.domElement, false);
+
+      if (params.lightTheme) {
+        dom.addClass(this.domElement, GUI.CLASS_LIGHT_THEME);
+      }
 
       // Are we supposed to be loading locally?
       if (SUPPORTS_LOCAL_STORAGE) {
         if (useLocalStorage) {
           _this.useLocalStorage = true;
 
-          const savedGui = localStorage.getItem(getLocalStorageHash(this, "gui"));
+          const savedGui = window.localStorage.getItem(getLocalStorageHash(this, "gui"));
 
           // Mix the localStorage data with the optional user-provided load data:
           // user-provided load data prevails over localStorage data.
@@ -471,6 +537,9 @@ class GUI {
         dom.addClass(this.__closeButton, GUI.CLASS_CLOSE_BOTTOM);
         this.domElement.appendChild(this.__closeButton);
       }
+      if (!params.showCloseButton) {
+        dom.addClass(this.__closeButton, GUI.CLASS_DISPLAY_NONE);
+      }
 
       dom.bind(this.__closeButton, "click", function () {
         _this.closed = !_this.closed;
@@ -489,6 +558,10 @@ class GUI {
       dom.addClass(titleRowName, "controller-name");
 
       titleRow = addRow(_this, titleRowName);
+
+      if (common.isString(params.title)) {
+        titleRow.setAttribute("title", params.title);
+      }
 
       const onClickTitle = function (e) {
         e.preventDefault();
@@ -545,8 +618,8 @@ class GUI {
     }
 
     saveToLocalStorage = function () {
-      if (SUPPORTS_LOCAL_STORAGE && localStorage.getItem(getLocalStorageHash(_this, "isLocal")) === "true") {
-        localStorage.setItem(getLocalStorageHash(_this, "gui"), JSON.stringify(_this.getSaveObject()));
+      if (SUPPORTS_LOCAL_STORAGE && window.localStorage.getItem(getLocalStorageHash(_this, "isLocal")) === "true") {
+        window.localStorage.setItem(getLocalStorageHash(_this, "gui"), JSON.stringify(_this.getSaveObject()));
       }
     };
 
@@ -694,6 +767,7 @@ if (1) {
    * Adds a new {@link Controller} to the GUI. The type of controller created
    * is inferred from the initial value of <code>object[property]</code>. For
    * color properties, see {@link addColor}.
+   * For file properties, see {@link addFile}.
    *
    * @param {Object} object The object to be manipulated
    * @param {String} property The name of the property to be manipulated
@@ -818,6 +892,54 @@ if (1) {
   }
 
   /**
+   * Adds a new file controller to the GUI.
+   *
+   * @param object
+   * @param property
+   * @returns {Controller} The controller that was added to the GUI.
+   *
+   * @example
+   * var instance = {
+   *  onLoad: function(dataURL) {
+   *    document.getElementById('img').src = dataURL
+   *  }
+   * };
+   * gui.addFile(instance, 'onLoad');
+   */
+  addFile(object, property) {
+    return add(this, object, property, {
+      file: true,
+    });
+  }
+
+  /**
+   * Adds a new custom controller to the GUI.
+   *
+   * @param object
+   * @param property
+   * @returns {Controller} The controller that was added to the GUI.
+   *
+   */
+  addCustomController(object, property) {
+    return add(this, object, property, {
+      custom: true,
+      factoryArgs: Array.prototype.slice.call(arguments, 2),
+    });
+  }
+
+  /**
+   * @param object
+   * @param property
+   * @returns {dat.controllers.ColorController} The new controller that was added.
+   */
+  addGradient(object, property, label) {
+    return add(this, object, property, label, {
+      gradient: true,
+      factoryArgs: Array.prototype.slice.call(arguments, 3),
+    });
+  }
+
+  /**
    * Adds an image controller to the GUI.
    *
    * @param object
@@ -872,10 +994,15 @@ if (1) {
    * @param {Controller} controller
    */
   remove(controller) {
-    // TODO listening?
     this.__ul.removeChild(controller.__li);
-    const ixl = this.__listening.indexOf(controller);
-    if (ixl >= 0) this.__listening.splice(ixl, 1);
+    const lIndex = this.__listening.indexOf(controller);
+    if (lIndex !== -1) {
+      this.__listening.splice(lIndex, 1);
+    }
+    // Hacky remove check, should be in events
+    if (controller.destruct) {
+      controller.destruct();
+    }
     this.__controllers.splice(this.__controllers.indexOf(controller), 1);
     const _this = this;
     common.defer(function () {
@@ -901,13 +1028,14 @@ if (1) {
     }
 
     const _this = this;
-    common.each(this.__folders, function (subfolder) {
-      _this.removeFolder(subfolder);
+    common.each(this.__folders, function (folder, name) {
+      _this.removeFolder(name);
     });
 
     dom.unbind(window, "keydown", GUI._keydownHandler, false);
 
     removeListeners(this);
+    assert(this.__listening.length === 0);
   }
 
   onChange(f) {
@@ -957,6 +1085,7 @@ if (1) {
     const newGuiParams = {
       name: name,
       parent: this,
+      //title: title,
     };
 
     // We need to pass down the autoPlace trait so that we can
@@ -997,7 +1126,14 @@ if (1) {
    * Removes a subfolder GUI instance.
    * @param {GUI} folder The folder to remove.
    */
-  removeFolder(folder) {
+  removeFolder(name) {
+    const folder = this.__folders[name];
+    if (!folder) {
+      console.error('There is no folder in this GUI by the name "' + name + '"'); // eslint-disable-line no-console
+      return;
+    }
+    folder.close();
+
     this.__ul.removeChild(folder.domElement.parentElement);
 
     delete this.__folders[folder.name];
@@ -1054,6 +1190,11 @@ if (1) {
    */
   show() {
     this.domElement.style.display = "";
+  }
+
+  onFinishRevert(fn) {
+    this.__onFinishRevert = fn;
+    return this;
   }
 
   onResize() {
@@ -1239,6 +1380,10 @@ if (1) {
     if (!gui) {
       markPresetModified(this.getRoot(), false);
     }
+
+    if (_this === this && _this.__onFinishRevert) {
+      _this.__onFinishRevert.call(_this);
+    }
     return this;
   }
 
@@ -1290,6 +1435,10 @@ if (1) {
   }
 }
 
+GUI.plugins = {
+  autocomplete: autocomplete,
+};
+
 /** @const {String} CSS class name used to mark auto-placed items. */
 GUI.CLASS_AUTO_PLACE = "a";
 GUI.CLASS_AUTO_PLACE_CONTAINER = "ac";
@@ -1336,15 +1485,25 @@ function add(gui, object, property, params) {
       controller = new EasingFunctionController(object, property);
     } else if (params.multiline) {
       controller = new TextAreaController(object, property);
+  } else if (params.gradient) {
+    controller = new GradientController(object, property, params.factoryArgs[0]);
     } else if (params.image) {
       controller = new ImageController(object, property);
     } else if (params.plotter) {
       controller = new PlotterController(object, property, params);
       gui.listen(controller);
-    } else {
-      const factoryArgs = [object, property].concat(params.factoryArgs);
-      controller = controllerFactory.apply(gui, factoryArgs);
-    }
+  } else if (params.file) {
+    controller = new FileController(object, property);
+  } else if (object instanceof CustomController && property === undefined) {
+    controller = object;
+  } else if (!(object instanceof CustomController) && params.custom && object[property] === undefined) {
+    controller = new CustomController(object, property);
+  } else {
+    const factoryArgs =
+      object instanceof CustomController
+        ? [property].concat(params.factoryArgs)
+        : [object, property].concat(params.factoryArgs);
+    controller = controllerFactory.apply(gui, factoryArgs);
   }
 
   if (!controller) {
@@ -1482,6 +1641,15 @@ function augmentController(gui, li, controller) {
         return controller;
       },
 
+      title: function (v) {
+        if (common.isString(v)) {
+          controller.__li.setAttribute("title", v);
+        } else {
+          controller.__li.removeAttribute("title");
+        }
+        return controller;
+      },
+
       /**
        * Sets controller to listen for changes on its underlying object.
        * @param {boolean} forceUpdateDisplay Whether to force update a display, even when input is active (default: false).
@@ -1525,6 +1693,26 @@ function augmentController(gui, li, controller) {
 
     dom.addClass(li, "has-slider");
     controller.domElement.insertBefore(box.domElement, controller.domElement.firstElementChild);
+
+    // Add animation buttons to slider.
+    const animateButtons = new NumberControllerAnimator(controller.object, controller.property, {
+      min: controller.__min,
+      max: controller.__max,
+      step: controller.__step,
+    });
+
+    common.each([
+    "updateDisplay", "onChange", "onFinishChange", "step"], function (method) {
+      const pc = controller[method];
+      const pb = animateButtons[method];
+      controller[method] = animateButtons[method] = function () {
+        const args = Array.prototype.slice.call(arguments);
+        pb.apply(animateButtons, args);
+        return pc.apply(controller, args);
+      };
+    });
+    dom.addClass(li, "has-animate-buttons");
+    controller.domElement.insertBefore(animateButtons.domElement, controller.domElement.firstElementChild);
   } else if (controller instanceof NumberControllerBox) {
     const r = function (returned) {
       // Have we defined both boundaries?
@@ -1560,7 +1748,7 @@ function augmentController(gui, li, controller) {
     dom.bind(controller.__checkbox, "click", function (e) {
       e.stopPropagation(); // Prevents double-toggle
     });
-  } else if (controller instanceof FunctionController) {
+  } else if (controller instanceof FunctionController || controller instanceof TabbedController) {
     dom.bind(li, "click", function () {
       dom.fakeEvent(controller.__button, "click");
     });
@@ -1586,6 +1774,16 @@ function augmentController(gui, li, controller) {
     }, controller.updateDisplay);
 
     controller.updateDisplay();
+  } else if (controller instanceof ArrayController) {
+    dom.addClass(li, "array");
+
+    controller.updateDisplay = common.compose(function (val) {
+      li.style.height = `${(controller.__inputs.length + 1) * 26}px`;
+    }, controller.updateDisplay);
+
+    controller.updateDisplay();
+  } else if (controller instanceof GradientController) {
+    li.style.borderLeft = "3px solid #2FA1D6";
   } else if (controller instanceof EasingFunctionController) {
     dom.addClass(li, "easing");
 
@@ -1674,6 +1872,7 @@ function recallSavedValue(gui, controller) {
 
 const _generatedUIDs = new Map();
 
+// TODO: use function
 function generateUIDWithCollisionChecking() {
   while (true) {
     const uid = ("0000" + ((Math.random() * Math.pow(36, 4)) | 0).toString(36)).slice(-4);
@@ -1688,8 +1887,9 @@ function generateUIDWithCollisionChecking() {
 }
 
 function getLocalStorageHash(gui, key) {
-  // TODO how does this deal with multiple GUI's?
-  return document.location.href + "." + key;
+  // This deals with multiple GUI's IFF every GUI has its own namespace:
+  const namespace = window.localStorage.getItem("dat.gui.namespace") || document.location.href;
+  return "dat.gui." + namespace + "." + key;
 }
 
 function addPresetOption(gui, name, setSelected) {
@@ -1779,7 +1979,7 @@ function addSaveMenu(gui) {
 
     saveLocally.style.display = "block";
 
-    if (localStorage.getItem(getLocalStorageHash(gui, "isLocal")) === "true") {
+    if (window.localStorage.getItem(getLocalStorageHash(gui, "isLocal")) === "true") {
       localStorageCheckBox.setAttribute("checked", "checked");
     }
 
@@ -1823,6 +2023,14 @@ function addSaveMenu(gui) {
   });
 
   dom.bind(button4, "click", function () {
+    if (gui.preset === DEFAULT_DEFAULT_PRESET_NAME) {
+      alert("Default preset can't be deleted.");
+      return;
+    }
+    if (!confirm(`Are you sure you want to delete preset "${gui.preset}"?`)) {
+      return;
+    }
+
     gui.deleteSave();
   });
 

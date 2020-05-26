@@ -12,7 +12,12 @@
  */
 
 //$background-color: #1a1a1a;
+//$background-color: #fafafa;
 $background-color: #333333;
+
+$hover-darken: 5%;
+$border-darken: 7%;
+$active-darken: 10%;
 
 $hover-lighten: 5%;
 $border-lighten: 7%;
@@ -27,11 +32,14 @@ $number-color: #1976D2;
 $boolean-color: #D32F2F;
 $string-color: #388E3C;
 $function-color: #FBC02D;
+//$save-row-color: #DAD5CB;
+//$save-row-border-color: #806787;
 $save-row-color: #666666;
 $easing-color: #ff8710;
 $button-color: darken($save-row-color, 10%);
 $border-color: lighten($background-color, $border-lighten);
 $input-color: lighten($background-color, 8.5%);
+$array-color: #1ED36F;
 
 $row-easing-height: 80px;
 
@@ -114,9 +122,9 @@ $row-easing-height: 80px;
 
 /** Main type */
 .dg {
-  color: #EEEEEE;
-  font: 12px Roboto, Helvetica, sans-serif;
-  text-shadow: 0 -1px 0 #111111;
+  color: #EEEEEE;                         // #555555
+  font: 12px Roboto, "Lucida Grande", Helvetica, sans-serif;
+  text-shadow: 0 -1px 0 #111111;          // #eeeeee
 
   /** Auto place */
   &.main {
@@ -150,6 +158,7 @@ $row-easing-height: 80px;
 
       .button {
         text-transform: uppercase;
+        text-shadow: none;
 
         &.gears {
           @include gears;
@@ -170,6 +179,12 @@ $row-easing-height: 80px;
 
     &.title {
       //padding-left: 16px;
+      //background: #E8E8E8;
+      //background:
+      //  #000000
+      //  // assets/title-background.png
+      //  url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlI+hKgFxoCgAOw==)
+      //  6px 10px no-repeat;
       cursor: pointer;
       border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 
@@ -184,6 +199,8 @@ $row-easing-height: 80px;
   }
 
   .closed li.title {
+    //  // assets/closed-title-background.png
+    //   background-image: url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlGIWqMCbWAEAOw==);
     &::before {
       content: "▶ ";
     }
@@ -271,7 +288,7 @@ $row-easing-height: 80px;
 
     &.function:hover,
     &.boolean:hover {
-      background: #111111;
+      background: #111111;             // #eeeeee
     }
   }
 
@@ -282,6 +299,7 @@ $row-easing-height: 80px;
     input[type="number"] {
       background: $input-color;
       outline: none;
+      border: none;
 
       &:hover {
         background: lighten($input-color, $hover-lighten);
@@ -289,7 +307,7 @@ $row-easing-height: 80px;
 
       &:focus {
         background: lighten($input-color, $active-lighten);
-        color: #FFFFFF;
+        color: #FFFFFF;                   // #555555
       }
     }
 
@@ -312,4 +330,265 @@ $row-easing-height: 80px;
       }
     }
   }
+}
+
+// Some extra styles.
+
+.autocomplete {
+  background: white;
+  z-index: 1000;
+  font: 11px "Lucida Grande", sans-seriff;
+  overflow: auto;
+  box-sizing: border-box;
+  border: 1px solid rgba(50, 50, 50, 0.6);
+}
+
+.autocomplete * {
+  font: inherit;
+}
+
+.autocomplete > div {
+  padding: 0 4px;
+}
+
+.autocomplete .group {
+  background: #EEEEEE;
+}
+
+.autocomplete > div:hover:not(.group),
+.autocomplete > div.selected {
+  background: #81CA91;
+  cursor: pointer;
+}
+
+/* Light theme styles */
+
+.dg {
+  &.light-theme.main {
+    &.taller-than-window .close-button {
+      border-top: 1px solid #DDDDDD;
+    }
+
+    .close-button {
+      background-color: #E8E8E8;
+    }
+
+    .close-button:hover {
+      background-color: #DDDDDD;
+    }
+
+    &::-webkit-scrollbar {
+      background: #FAFAFA;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #BBBBBB;
+    }
+  }
+
+  &.light-theme,
+  &.light-theme .dg {
+    color: #555555;
+    text-shadow: none !important;
+
+    li:not(.folder) {
+      background: #FAFAFA;
+      border-bottom: 1px solid #DDDDDD;
+    }
+
+    li.save-row .button {
+      text-shadow: none !important;
+    }
+
+    li.title {
+      background: #E8E8E8 url(assets/light-title.png) 6px 10px no-repeat;
+    }
+
+    .closed li.title {
+      background-image: url(assets/light-closed-title.png);
+    }
+
+    .cr.function:hover,
+    .cr.boolean:hover {
+      background: #FFFFFF;
+    }
+
+    .c input[type="text"] {
+      background: #E9E9E9;
+    }
+
+    .c input[type="text"]:hover {
+      background: #EEEEEE;
+    }
+
+    .c input[type="text"]:focus {
+      background: #EEEEEE;
+      color: #555555;
+    }
+
+    .c .slider {
+      background: #E9E9E9;
+    }
+
+    .c .slider:hover {
+      background: #EEEEEE;
+    }
+
+    li.save-row .button,
+    li.save-row .button.gears {
+      background-color: #BBBBBB;
+
+      /* box-shadow: none; */
+    }
+
+    li.save-row {
+      padding-top: 4px;
+    }
+  }
+}
+
+.remove-icon {
+  background: url(assets/light-remove.png) no-repeat;
+  width: 8px;
+  height: 8px;
+  display: inline-block;
+  padding: 4px;
+  float: right;
+  cursor: pointer;
+  position: absolute;
+  right: 4px;
+  top: 7px;
+}
+
+.array-input {
+  height: 25px;
+  position: relative;
+}
+
+/** Image Controller */
+.image-picker {
+  position: relative;
+
+  .content {
+    height: 100%;
+    cursor: pointer;
+    transition: opacity 0.2s;
+
+    &.dragover {
+      opacity: 0.8;
+    }
+  }
+
+  input {
+    display: none;
+  }
+
+  &:hover .image-swatches {
+    opacity: 1;
+    visibility: visible;
+    transition-delay: 0s;
+  }
+
+  .image-swatches {
+    z-index: 2;
+    height: 100%;
+    transition: visibility 0s linear 0.2s, opacity 0.2s linear;
+    width: 100%;
+    text-align: left;
+
+    .swatch {
+      display: inline-block;
+      cursor: pointer;
+      flex: 0 1 33%;
+      width: 32%;
+      margin-right: 1%;
+    }
+  }
+
+  .camera-icon {
+    width: 20px;
+    height: 20px;
+    background-image: url("assets/light-camera.png");
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: 11px 6px;
+  }
+
+  .camera-button,
+  .new-image-button {
+    display: flex;
+    align-items: center;
+    padding: 5px 10px;
+    background: black;
+    cursor: pointer;
+  }
+
+  .new-image-button {
+    margin-left: 20px;
+  }
+
+  .new-image-icon {
+    width: 20px;
+    height: 20px;
+    background-image: url("assets/light-new-image.png");
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: 11px 11px;
+  }
+
+  .swatch-buttons {
+    display: flex;
+    margin-bottom: 10px;
+  }
+
+  .swatch-images {
+    display: flex;
+    align-items: center;
+  }
+
+  .selected-image {
+    height: 70px;
+
+    & .jsgif {
+      height: 100%;
+    }
+
+    & .jsgif canvas {
+      height: 100%;
+    }
+
+    margin-bottom: 10px;
+    border: 2px solid white;
+    display: inline-flex;
+  }
+
+  .gif-img {
+    visibility: hidden;
+  }
+}
+
+.dg .button-container {
+  float: right;
+  background-color: black;
+  height: 19px;
+  margin-top: 4px;
+  margin-left: 4px;
+}
+
+.dg .saw-button {
+  height: 19px;
+  width: 19px;
+  background-image: url("assets/saw.png");
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 19px 10px;
+}
+
+.dg .sine-button {
+  height: 19px;
+  width: 19px;
+  background-image: url("assets/sine.png");
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 19px 15px;
 }

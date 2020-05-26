@@ -310,7 +310,7 @@ class Controller {
     if (!msg.silent) {
       this.fireChange(msg);
     if (this.__onChange) {
-      this.__onChange.call(this, newValue);
+      this.__onChange.call(this, newValue, oldValue);
     }
       this.__propagateChange(__newValue, oldValue);
     }

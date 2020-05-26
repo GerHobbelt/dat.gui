@@ -33,6 +33,7 @@ function roundToDecimal(value, decimals) {
  * @param {Number} [params.min] Minimum allowed value
  * @param {Number} [params.max] Maximum allowed value
  * @param {Number} [params.step] Increment by which to change value
+ * @param {string} [params.suffix] Suffix for the value
  *
  * @member dat.controllers
  */
@@ -42,6 +43,7 @@ class NumberControllerBox extends NumberController {
 
     params = params || {};
 
+    this.__suffix = params.suffix || "";
     this.__truncationSuspended = false;
     this.__mouseIsDown = false;  // TODO: check use
 
@@ -201,7 +203,7 @@ class NumberControllerBox extends NumberController {
 
     this.__input.value = this.__truncationSuspended
       ? this.getValue()
-      : roundToDecimal(this.getValue(), this.__precision);
+      : roundToDecimal(this.getValue(), this.__precision) + this.__suffix;
     return super.updateDisplay();
   }
 

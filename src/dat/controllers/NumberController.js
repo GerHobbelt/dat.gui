@@ -122,7 +122,7 @@ class NumberController extends Controller {
    * @returns {NumberController} this
    */
   min(minValue) {
-    this.__min = common.isFiniteNumber(v) ? v : undefined;
+    this.__min = common.isFiniteNumber(minValue) ? minValue : undefined;
     return this;
   }
 
@@ -135,7 +135,7 @@ class NumberController extends Controller {
    * @returns {NumberController} this
    */
   max(maxValue) {
-    this.__max = common.isFiniteNumber(v) ? v : undefined;
+    this.__max = common.isFiniteNumber(maxValue) ? maxValue : undefined;
     return this;
   }
 
@@ -161,6 +161,10 @@ class NumberController extends Controller {
     );
 
     this.__precision = numDecimals(this.__impliedStep);
+
+    if (this.__input) {
+      this.__input.setAttribute("step", stepValue);
+    }
     return this;
   }
 

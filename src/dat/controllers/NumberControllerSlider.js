@@ -151,6 +151,9 @@ if (1) {
   }
 
   updateDisplay() {
+    if (this.__input === document.activeElement) {
+      return this;
+    }
     const value = this.getValue();
     const pct = (value - this.__min) / (this.__max - this.__min);
     this.__foreground.style.width = pct * 100 + "%";

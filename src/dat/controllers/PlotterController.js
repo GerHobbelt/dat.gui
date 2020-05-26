@@ -21,7 +21,7 @@ import Plotter from "../utils/plotter";
  *
  * @param {Object} object The object to be manipulated
  * @param {string} property The name of the property to be manipulated
- * @param {Object} params Contains the max and period and liClass properties
+ * @param {Object} params Contains the max and period properties
  *
  * @member dat.controllers
  */
@@ -33,9 +33,6 @@ class PlotterController extends Controller {
 
     /** The graph will be these many units high */
     this.max = params.max || 3; // 10 was the other default (GUI.addPlotter)
-
-    /** The containing li will have this class added */
-    this.liClass = params.liClass || "plotter";
 
     /** Refresh rate. Value of 0 disables auto-refresh */
     this.period = typeof params.period === "number" ? params.period : params.period ? 500 : 0;

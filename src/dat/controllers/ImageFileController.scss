@@ -1,0 +1,32 @@
+/**
+ * dat.GUI JavaScript Controller Library
+ * http://code.google.com/p/dat-gui
+ *
+ * Copyright 2011-2020 Data Arts Team, Google Creative Lab
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
+.GUI-preview-image {
+  float: left;
+  padding: 0.4em;
+  max-width: 2em;
+  max-height: 2em;
+}
+
+.GUI-label-image {
+  color: rgb(214, 214, 245);
+  text-decoration: underline;
+  display: block;
+  background-color: #3C3C3C;
+  width: 100%;
+  cursor: pointer;
+}
+
+.GUI-label-image:hover {
+  background: #3C3C3C;
+}

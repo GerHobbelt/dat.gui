@@ -11,24 +11,24 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import ArrayController from "./ArrayController";
-import VectorController from "./VectorController";
-import OptionController from "./OptionController";
+import Array1Controller from "./Array1Controller";
+import ArrayNController from "./ArrayNController";
+import BooleanController from "./BooleanController";
+import ColorController from "./ColorController";
+import common from "../utils/common";
+import FunctionController from "./FunctionController";
+import ImageController from "./ImageController";
+import NullController from "./NullController";
 import NumberControllerBox from "./NumberControllerBox";
 import NumberControllerSlider from "./NumberControllerSlider";
-import StringController from "./StringController";
-import TextAreaController from "./TextAreaController";
-import ArrayController from "./ArrayController";
-import FunctionController from "./FunctionController";
-import TabbedController from "./TabbedController";
-import BooleanController from "./BooleanController";
-import ImageController from "./ImageController";
-import ColorController from "./ColorController";
 import ObjectController from "./ObjectController";
-import NullController from "./NullController";
-import Vec3Controller from "./Vec3Controller";
+import OptionController from "./OptionController";
+import StringController from "./StringController";
+import TabbedController from "./TabbedController";
+import TextAreaController from "./TextAreaController";
 import UndefinedController from "./UndefinedController";
-import common from "../utils/common";
+import Vec3Controller from "./Vec3Controller";
+import VectorController from "./VectorController";
 
 const ARR_SLICE = Array.prototype.slice;
 
@@ -71,7 +71,7 @@ const controllerFactory = function (object, property, ...optionalArgs) {
         min,
         max,
         step,
-        minimumSaneStepSize,            // enumeration
+        minimumSaneStepSize, // enumeration
         maximumSaneStepSize,
         mode
       );
@@ -126,7 +126,7 @@ const controllerFactory = function (object, property, ...optionalArgs) {
   }
 
   if (common.isArray(initialValue)) {
-    return new ArrayController(object, property);
+    return new ArrayNController(object, property);
   }
 
   if (common.isObject(initialValue)) {

@@ -35,11 +35,12 @@ $function-color: #FBC02D;
 //$save-row-color: #DAD5CB;
 //$save-row-border-color: #806787;
 $save-row-color: #666666;
-$easing-color: #ff8710;
+$easing-color: #FF8710;
 $button-color: darken($save-row-color, 10%);
 $border-color: lighten($background-color, $border-lighten);
 $input-color: lighten($background-color, 8.5%);
 $array-color: #1ED36F;
+$file-color: #1ED36F;
 
 $row-easing-height: 80px;
 
@@ -73,11 +74,14 @@ $row-easing-height: 80px;
 @mixin gears() {
   // url(assets/gears.png)
   background:
-    //$button-color
-    //  url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAANCAYAAAB/9ZQ7AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAQJJREFUeNpiYKAU/P//PwGIC/ApCABiBSAW+I8AClAcgKxQ4T9hoMAEUrxx2QSGN6+egDX+/vWT4e7N82AMYoPAx/evwWoYoSYbACX2s7KxCxzcsezDh3evFoDEBYTEEqycggWAzA9AuUSQQgeYPa9fPv6/YWm/Acx5IPb7ty/fw+QZblw67vDs8R0YHyQhgObx+yAJkBqmG5dPPDh1aPOGR/eugW0G4vlIoTIfyFcA+QekhhHJhPdQxbiAIguMBTQZrPD7108M6roWYDFQiIAAv6Aow/1bFwXgis+f2LUAynwoIaNcz8XNx3Dl7MEJUDGQpx9gtQ8YCueB+D26OECAAQDadt7e46D42QAAAABJRU5ErkJggg==)
-    //  2px 1px no-repeat;
-    $button-color url("https://icon.now.sh/settings/FFFFFF/12") center
-    center no-repeat;
+    /*
+    $button-color
+      url(data:
+image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAANCAYAAAB/9ZQ7AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAQJJREFUeNpiYKAU/P//PwGIC/ApCABiBSAW+I8AClAcgKxQ4T9hoMAEUrxx2QSGN6+egDX+/vWT4e7N82AMYoPAx/evwWoYoSYbACX2s7KxCxzcsezDh3evFoDEBYTEEqycggWAzA9AuUSQQgeYPa9fPv6/YWm/Acx5IPb7ty/fw+QZblw67vDs8R0YHyQhgObx+yAJkBqmG5dPPDh1aPOGR/eugW0G4vlIoTIfyFcA+QekhhHJhPdQxbiAIguMBTQZrPD7108M6roWYDFQiIAAv6Aow/1bFwXgis+f2LUAynwoIaNcz8XNx3Dl7MEJUDGQpx9gtQ8YCueB+D26OECAAQDadt7e46D42QAAAABJRU5ErkJggg==)
+      2px 1px no-repeat;
+	*/
+    $button-color
+    url("https://icon.now.sh/settings/FFFFFF/12") center center no-repeat;
   height: 7px;
   width: 8px;
 }
@@ -125,9 +129,9 @@ $row-easing-height: 80px;
 
 /** Main type */
 .dg {
-  color: #EEEEEE;                         // #555555
+  color: #EEEEEE; // #555555
   font: 12px Roboto, "Lucida Grande", Helvetica, sans-serif;
-  text-shadow: 0 -1px 0 #111111;          // #eeeeee
+  text-shadow: 0 -1px 0 #111111; // #eeeeee
 
   /** Auto place */
   &.main {
@@ -151,19 +155,19 @@ $row-easing-height: 80px;
     }
 
     &.save-row {
-      line-height: 30px; 		// 25px
+      line-height: 30px; // 25px
       background: $save-row-color;
       border: 0;
       //border-bottom: 1px solid "white";
 
       select {
         margin-left: 5px;
-        width: 100px; 			// 108px // 70px
+        width: 100px; // 108px // 70px
       }
 
       .button {
         //text-transform: uppercase;
- 
+
         text-shadow: none;
 
         &.gears {
@@ -294,7 +298,7 @@ $row-easing-height: 80px;
 
     &.function:hover,
     &.boolean:hover {
-      background: #111111;             // #eeeeee
+      background: #111111; // #eeeeee
     }
   }
 
@@ -313,7 +317,7 @@ $row-easing-height: 80px;
 
       &:focus {
         background: lighten($input-color, $active-lighten);
-        color: #FFFFFF;                   // #555555
+        color: #FFFFFF; // #555555
       }
     }
 

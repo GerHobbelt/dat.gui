@@ -23,7 +23,8 @@ import math from "./color/math";
 import interpret from "./color/interpret";
 
 import Controller from "./controllers/Controller";
-import ArrayController from "./controllers/ArrayController";
+import Array1Controller from "./controllers/Array1Controller";
+import ArrayNController from "./controllers/ArrayNController";
 import BgColorController from "./controllers/BgColorController";
 import BooleanController from "./controllers/BooleanController";
 import ColorController from "./controllers/ColorController";
@@ -63,7 +64,8 @@ export const color = {
  */
 export const controllers = {
   Controller: Controller,
-  ArrayController: ArrayController,
+  Array1Controller: Array1Controller,
+  ArrayController: ArrayNController,
   BgColorController: BgColorController,
   BooleanController: BooleanController,
   ColorController: ColorController,

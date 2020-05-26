@@ -15,20 +15,21 @@ import css from "../utils/css";
 import saveDialogueContents from "./saveDialogue.html";
 import controllerFactory from "../controllers/ControllerFactory";
 import Controller from "../controllers/Controller";
-import ArrayController from "../controllers/ArrayController";
+import Array1Controller from "../controllers/Array1Controller";
+import ArrayNController from "../controllers/ArrayNController";
+import BgColorController from "../controllers/BgColorController";
 import BooleanController from "../controllers/BooleanController";
 import ColorController from "../controllers/ColorController";
-import BgColorController from "../controllers/BgColorController";
-import NgColorController from "../controllers/NgColorController";
-import GtColorController from "../controllers/GtColorController";
-import HSVColorController from "../controllers/HSVColorController";
 import CustomController from "../controllers/CustomController";
 import EasingFunctionController from "../controllers/EasingFunctionController";
 import FileController from "../controllers/FileController";
 import FunctionController from "../controllers/FunctionController";
+import GradientController from "../controllers/GradientController";
+import GtColorController from "../controllers/GtColorController";
+import HSVColorController from "../controllers/HSVColorController";
 import ImageController from "../controllers/ImageController";
 import ImageFileController from "../controllers/ImageFileController";
-import GradientController from "../controllers/GradientController";
+import NgColorController from "../controllers/NgColorController";
 import NumberController from "../controllers/NumberController";
 import NumberControllerAnimator from "../controllers/NumberControllerAnimator";
 import NumberControllerBox from "../controllers/NumberControllerBox";
@@ -36,13 +37,13 @@ import NumberControllerSlider from "../controllers/NumberControllerSlider";
 import ObjectController from "../controllers/ObjectController";
 import OptionController from "../controllers/OptionController";
 import PlotterController from "../controllers/PlotterController";
+import requestAnimationFrame from "../utils/requestAnimationFrame";
 import StringController from "../controllers/StringController";
 import TabbedController from "../controllers/TabbedController";
 import TextAreaController from "../controllers/TextAreaController";
 import UndefinedController from "../controllers/UndefinedController";
 import UserMediaController from "../controllers/UserMediaController";
 import VectorController from "../controllers/VectorController";
-import requestAnimationFrame from "../utils/requestAnimationFrame";
 import CenteredDiv from "../dom/CenteredDiv";
 import dom from "../dom/dom";
 import common from "../utils/common";
@@ -760,12 +761,12 @@ class GUI {
   toggleHide() {
     hide = !hide;
     common.each(hideableGuis, function (gui) {
-if (1) {
-      gui.domElement.style.display = hide ? "none" : "";
-} else {
-      gui.domElement.style.zIndex = hide ? -999 : 999;
-      gui.domElement.style.opacity = hide ? 0 : 1;
-}      
+      if (1) {
+        gui.domElement.style.display = hide ? "none" : "";
+      } else {
+        gui.domElement.style.zIndex = hide ? -999 : 999;
+        gui.domElement.style.opacity = hide ? 0 : 1;
+      }
     });
   }
 
@@ -1269,11 +1270,12 @@ if (1) {
 
       // this code doesn't account for overflowing stylings in controllers (which can be buggy that way)
       if (0) {
-       common.each(root.__ul.childNodes, function (node) {
-        if (!(root.autoPlace && node === root.__save_row) && node.nodeType === 1) {
-          h += dom.getHeight(node);
-        }
-      });
+        common.each(root.__ul.childNodes, function (node) {
+          if (!(root.autoPlace && node === root.__save_row) && node.nodeType === 1) {
+            h += dom.getHeight(node);
+          }
+        });
+      }
       // instead use `scrollHeight` which will always deliver the true total height
       // as per https://stackoverflow.com/a/22675563/1635910
       h = root.__ul.scrollHeight;
@@ -1422,20 +1424,17 @@ if (1) {
   revert(gui) {
     const _this = gui || this.getRoot();
 
-    common.each(
-      this.__controllers,
-      function (controller) {
-        // Make revert work on Default.
-        if (!_this.load.remembered) {
-          controller.setValue(controller.initialValue);
-        } else {
-          recallSavedValue(_this, controller);
-        }
-
-        // fire onFinishChange callback
-        controller.__propagateFinishChange(controller.getValue());
+    common.each(this.__controllers, function (controller) {
+      // Make revert work on Default.
+      if (!_this.load.remembered) {
+        controller.setValue(controller.initialValue);
+      } else {
+        recallSavedValue(_this, controller);
       }
-    );
+
+      // fire onFinishChange callback
+      controller.__propagateFinishChange(controller.getValue());
+    });
 
     common.each(_this.__folders, function (folder) {
       folder.revert(folder);
@@ -1518,8 +1517,8 @@ GUI.CLASS_DISPLAY_NONE = "display-none";
 GUI.CLASS_LIGHT_THEME = "light-theme";
 
 GUI.DEFAULT_WIDTH = 245;
-//GUI.TEXT_CLOSED = "Close Controls";
-//GUI.TEXT_OPEN = "Open Controls";
+// GUI.TEXT_CLOSED = "Close Controls";
+// GUI.TEXT_OPEN = "Open Controls";
 GUI.TEXT_CLOSED = '<img src="https://icon.now.sh/x/FFFFFF/10" />';
 GUI.TEXT_OPEN = '<img src="https://icon.now.sh/settings/FFFFFF/18" />';
 
@@ -1777,8 +1776,7 @@ function augmentController(gui, li, controller) {
     });
 
     common.each(
-      [
-      "updateDisplay", "onChange", "onFinishChange", "setValue", "min", "max", "step", "mode", "setReadonly"],
+      ["updateDisplay", "onChange", "onFinishChange", "setValue", "min", "max", "step", "mode", "setReadonly"],
       function (method) {
         const pc = controller[method];
         const pb = box[method];
@@ -1882,9 +1880,7 @@ function augmentController(gui, li, controller) {
     }, controller.updateDisplay);
 
     controller.updateDisplay();
-  } else if (controller instanceof ArrayController) {
-    dom.addClass(li, "array");
-
+  } else if (controller instanceof ArrayNController) {
     controller.updateDisplay = common.compose(function (val) {
       li.style.height = `${(controller.__inputs.length + 1) * 26}px`;
     }, controller.updateDisplay);

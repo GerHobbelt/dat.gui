@@ -33,6 +33,7 @@ class OptionController extends Controller {
     super(object, property, "option");
 
     const _this = this;
+    this.CUSTOM_FLAG = "";
 
     params = params || {};
 
@@ -41,6 +42,9 @@ class OptionController extends Controller {
      * @private
      */
     this.__select = document.createElement("select");
+
+    this.__arrow = document.createElement("label");
+    this.__arrow.className = "caret-down";
 
     if (common.isArray(params)) {
       const map = {};
@@ -57,15 +61,38 @@ class OptionController extends Controller {
       _this.__select.appendChild(opt);
     });
 
+    if (params.custom) {
+      const opt = document.createElement("option");
+      opt.innerHTML = params.custom.display || "Custom";
+      opt.setAttribute("value", _this.CUSTOM_FLAG);
+      _this.__select.appendChild(opt);
+
+      this.__custom_controller = params.custom.controller;
+    }
+
     // Acknowledge original value
     this.updateDisplay();
 
     dom.bind(this.__select, "change", function () {
-      const desiredValue = this.options[this.selectedIndex].value;
+      let desiredValue = this.options[this.selectedIndex].value;
+      if (desiredValue === _this.CUSTOM_FLAG) {
+        desiredValue = _this.__custom_controller.getValue();
+      }
       _this.setValue(desiredValue);
     });
 
+    if (this.__custom_controller) {
+      this.__custom_controller.onChange(function () {
+        const value = this.getValue();
+        _this.setValue(value);
+      });
+    }
+
     this.domElement.appendChild(this.__select);
+    this.domElement.appendChild(this.__arrow);
+    if (this.__custom_controller) {
+      this.domElement.appendChild(this.__custom_controller.el);
+    }
   }
 
   setValue(v) {
@@ -87,7 +114,25 @@ class OptionController extends Controller {
     if (!force && dom.isActive(this.__select) && !this.forceUpdateDisplay) {
       return this;
     }
-    this.__select.value = this.getValue();
+
+    const value = this.getValue();
+    let custom = true;
+    if (value !== this.CUSTOM_FLAG) {
+      common.each(this.__select.options, function (option) {
+        if (value == option.value) {
+          custom = false;
+        }
+      });
+    }
+
+    this.__select.value = custom ? this.CUSTOM_FLAG : value;
+    this.__select.disabled = this.getReadonly();
+
+    if (this.__custom_controller) {
+      this.__custom_controller.el.style.display = custom ? "block" : "none";
+      this.__custom_controller.setReadonly(this.getReadonly());
+    }
+
     return super.updateDisplay(force);
   }
 }

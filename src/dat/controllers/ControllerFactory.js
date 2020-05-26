@@ -19,6 +19,7 @@ import TextAreaController from "./TextAreaController";
 import ArrayController from "./ArrayController";
 import FunctionController from "./FunctionController";
 import BooleanController from "./BooleanController";
+import ImageController from "./ImageController";
 import ColorController from "./ColorController";
 import ObjectController from "./ObjectController";
 import NullController from "./NullController";
@@ -27,6 +28,20 @@ import UndefinedController from "./UndefinedController";
 import common from "../utils/common";
 
 const ARR_SLICE = Array.prototype.slice;
+
+// TODO: add to accessible API, use internally
+function isControllerTemplate(f) {
+  return (
+    typeof f === "function" &&
+    f.prototype &&
+    typeof f.prototype.onBeforeChange === "function" &&
+    typeof f.prototype.onChange === "function" &&
+    typeof f.prototype.onFinishChange === "function" &&
+    typeof f.prototype.setValue === "function" &&
+    typeof f.prototype.getValue === "function" &&
+    typeof f.prototype.updateDisplay === "function"
+  );
+}
 
 const controllerFactory = function (object, property, ...optionalArgs) {
   const dyninfo = common.setupDynamicProperty(object, property);

@@ -305,8 +305,9 @@ class GUI {
             } else {
               params.load.preset = v;
             }
-            setPresetSelectIndex(this);
+            setPresetSelectIndex(_this);
             _this.revert();
+            return _this;
           },
         },
 
@@ -399,9 +400,24 @@ class GUI {
          * @type Boolean
          */
         useLocalStorage: {
+          // Return:
+          // - FALSE when localStorage has been *explicitly disabled* (by executing `this.useLocalStorage = false;` some time before)
+          // - NULL when localStorage is not available
+          // - TRUE when localStorage is available and has been enabled (localStorage is enabled by default)
           get: function () {
             return useLocalStorage;
           },
+          // @param {bool}:
+          // - truthy value: explicitly enables localStorage (when the browser supports it)
+          //
+          // - falsey value (except `null` or `undefined`): explicitly *disables* localStorage automatic data
+          //   storage for `dat.GUI`.
+          //
+          // - `null` or `undefined`: *clear* the explicit configuration: localStorage use is determined
+          //   solely by the available browser support from this point forward.
+          //
+          //   (You can use this `bool` value to clear previous explicit dat.GUI configuration
+          //   and data storage and revert to using the coded default(s) once again.)
           set: function (bool) {
             if (SUPPORTS_LOCAL_STORAGE) {
               useLocalStorage = bool;
@@ -432,6 +448,8 @@ class GUI {
 
           const savedGui = localStorage.getItem(getLocalStorageHash(this, "gui"));
 
+          // Mix the localStorage data with the optional user-provided load data:
+          // user-provided load data prevails over localStorage data.
           if (savedGui) {
             params.load = JSON.parse(savedGui);
           }
@@ -653,6 +671,23 @@ if (1) {
     ) {
       GUI.toggleHide();
     }
+  }
+
+  /**
+   * @param controllerName
+   * @param controllerTemplate the template controller object which will be used for
+   */
+  defineController(controllerName, controllerTemplate) {
+    this.__typeControllers[controllerName] = controllerTemplate;
+  }
+
+  /**
+   * @param controllerName
+   * @returns {dat.controllers.Controller} The controller registered for the given `controllerName`.
+   * Return boolean FALSE when no controller has been registered for the given name.
+   */
+  findController(controllerName) {
+    return this.__typeControllers[controllerName] || false;
   }
 
   /**
@@ -1347,18 +1382,11 @@ function add(gui, object, property, params) {
     dom.addClass(li, object.className);
   }
 
-  if (controller instanceof ColorController) {
-    dom.addClass(li, "color");
-  } else if (controller instanceof ImageController) {
-    dom.addClass(li, "image");
-  } else if (controller instanceof PlotterController) {
-    dom.addClass(li, "plotter");
-  } else if (params.liClass) {
+  dom.addClass(li, controller.name);
+  if (params.liClass) {
     dom.addClass(li, params.liClass);
   } else if (controller.liClass) {
     dom.addClass(li, controller.liClass);
-  } else {
-    dom.addClass(li, typeof controller.getValue());
   }
 
   augmentController(gui, li, controller);
@@ -1484,7 +1512,8 @@ function augmentController(gui, li, controller) {
       step: controller.__step,
     });
 
-    common.each(["updateDisplay", "onChange", "onFinishChange", "step", "min", "max"], function (method) {
+    common.each([
+    "updateDisplay", "onChange", "onFinishChange", "step", "min", "max"], function (method) {
       const pc = controller[method];
       const pb = box[method];
       controller[method] = box[method] = function () {

@@ -54,6 +54,12 @@ class ColorController extends Controller {
     this.__hue_field = document.createElement("div");
     this.__hue_field.className = "hue-field";
 
+    this.__alpha_knob = document.createElement("div");
+    this.__alpha_knob.className = "alpha-knob";
+
+    this.__alpha_field = document.createElement("div");
+    this.__alpha_field.className = "alpha-field";
+
     this.__input = document.createElement("input");
     this.__input.type = "text";
 
@@ -87,7 +93,7 @@ class ColorController extends Controller {
     const valueField = document.createElement("div");
 
     common.extend(this.__selector.style, {
-      width: "122px", // 124px
+      width: "122px", // 124px  // 140px
       height: "102px",
       padding: "3px",
       backgroundColor: "#222",
@@ -158,11 +164,57 @@ class ColorController extends Controller {
         .join(", "),
     });
 
+    common.extend(this.__alpha_field.style, {
+      width: "15px",
+      height: "100px",
+      marginLeft: "3px",
+      display: "inline-block",
+      border: "1px solid #555",
+      cursor: "ns-resize",
+    });
+
+    alphaGradient(this.__alpha_field, _this.__color);
+
+    common.extend(this.__alpha_knob.style, {
+      position: "absolute",
+      width: "15px",
+      height: "2px",
+      borderRight: "4px solid #fff",
+      zIndex: 1,
+    });
+
     dom.bind(this.__saturation_field, "mousedown", fieldDown, false, false);
     dom.bind(this.__saturation_field, "touchstart", fieldDown, false, false);
 
     dom.bind(this.__field_knob, "mousedown", fieldDown, false, false);
     dom.bind(this.__field_knob, "touchstart", fieldDown, false, false);
+    dom.bind(this.__alpha_field, "mousedown", function (e) {
+      setA(e);
+      dom.bind(window, "mousemove", setA);
+      dom.bind(window, "mouseup", unbindA);
+      dom.bind(window, "touchmove", setAonTouch);
+      dom.bind(window, "touchend", unbindA);
+    });
+    dom.bind(this.__alpha_field, "touchstart", function (e) {
+      setAonTouch(e);
+      dom.bind(window, "mousemove", setA);
+      dom.bind(window, "mouseup", unbindA);
+      dom.bind(window, "touchmove", setAonTouch);
+      dom.bind(window, "touchend", unbindA);
+    });
+
+    // TODO: make setValue always call alphaGradient like the two functions do below:
+    /*
+    var setHValues = function (e) {
+      setH(e);
+      alphaGradient(_this.__alpha_field, _this.__color);
+    };
+
+    var setSVValues = function (e) {
+      setSV(e);
+      alphaGradient(_this.__alpha_field, _this.__color);
+    };
+    */
 
     dom.bind(this.__hue_field, "mousedown", fieldDownH, false, false);
     dom.bind(this.__hue_field, "touchstart", fieldDownH, false, false);
@@ -222,8 +274,9 @@ class ColorController extends Controller {
     this.__selector.appendChild(this.__field_knob);
     this.__selector.appendChild(this.__saturation_field);
     this.__selector.appendChild(this.__hue_field);
+    this.__selector.appendChild(this.__alpha_field);
     this.__hue_field.appendChild(this.__hue_knob);
-
+    this.__alpha_field.appendChild(this.__alpha_knob);
     this.domElement.appendChild(this.__input);
     this.domElement.appendChild(this.__selector);
 

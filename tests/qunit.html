@@ -1336,6 +1336,9 @@
           };
 
           let gui = new GUI();
+
+          gui.resetLocalStorage();
+
           gui.remember(object);
 
           for (const i in object) {
@@ -1402,6 +1405,197 @@
           }
 
           gui.destroy();
+        });
+
+        module("Dynamic properties NumberController");
+
+        function initObject2() {
+          const MyObject = function () {
+            let _numberProperty = 0;
+            this.setNumberProperty = function (value) {
+              _numberProperty = value;
+            };
+            this.getNumberProperty = function () {
+              return _numberProperty;
+            };
+          };
+          /*
+    MyObject.prototype.setNumberProperty = function(value) {
+        this._numberProperty = value;
+      };
+      MyObject.prototype.getNumberProperty = function() {
+        return this._numberProperty;
+      };
+    */
+          const object = new MyObject();
+
+          dat.utils.common.setupDynamicProperty(object, "numberProperty");
+          return object;
+        }
+
+        test("Constraints", function () {
+          const object = initObject2();
+          // console.log("dat object", object);
+          const params = {
+            min: 0,
+            max: 10,
+            step: 2,
+          };
+
+          const c1 = new NumberController(object, "numberProperty", params);
+
+          c1.setValue(12);
+          equal(object.getNumberProperty(), params.max, "Maximum values");
+
+          c1.setValue(-20);
+          equal(object.getNumberProperty(), params.min, "Minimum values");
+
+          c1.setValue(1);
+          equal(object.getNumberProperty(), 2, "Steps");
+        });
+
+        module("Dynamic properties  NumberControllerBox");
+
+        test("Acknowledges original value", function () {
+          const object = initObject2();
+          const c1 = new NumberControllerBox(object, "numberProperty");
+
+          //        var newVal = Date.now();
+          //
+          //        $(c1.__input).val(newVal).trigger('change');
+          //
+          equal($(c1.__input).val(), object.getNumberProperty().toString());
+        });
+
+        test("Modifies value", function () {
+          const object = initObject2();
+          const c1 = new NumberControllerBox(object, "numberProperty");
+
+          const newVal = Date.now();
+
+          const elem = $(c1.__input).val(newVal)[0];
+          dom.fakeEvent(elem, "change");
+
+          equal(typeof object.getNumberProperty(), "number");
+          equal(object.getNumberProperty(), newVal);
+        });
+
+        test("Handles invalid input", function () {
+          const object = initObject2();
+          const c1 = new NumberControllerBox(object, "numberProperty");
+
+          const newVal = "~! I98* omg this is not a N&^&*^umber.e-083.9";
+          const prevVal = object.getNumberProperty();
+
+          const elem = $(c1.__input).val(newVal)[0];
+          dom.fakeEvent(elem, "change");
+
+          equal(typeof object.getNumberProperty(), "number");
+          equal(object.getNumberProperty(), prevVal);
+        });
+
+        test("Handles drag", function () {
+          const object = initObject2();
+          const params = {
+            step: Math.random() * 21,
+          };
+
+          const c1 = new NumberControllerBox(object, "numberProperty", params);
+
+          const prevVal = object.getNumberProperty();
+          const disp = Math.round(Math.random() * 100);
+
+          const elem = c1.__input;
+
+          dom.fakeEvent(elem, "mousedown", {
+            x: 0,
+            y: 0,
+          });
+          dom.fakeEvent(window, "mousemove", {
+            x: 0,
+            y: disp,
+          });
+          dom.fakeEvent(window, "mouseup");
+
+          equal(object.getNumberProperty(), prevVal + params.step * -disp);
+        });
+
+        module("Dynamic properties NumberControllerSlider");
+
+        test("Acknowledges original value", function () {
+          const object = initObject2();
+
+          const min = 0;
+          const max = 50;
+
+          const c1 = new NumberControllerSlider(object, "numberProperty", min, max);
+
+          document.body.appendChild(c1.domElement);
+
+          const bw = dom.getWidth(c1.__background);
+          const fw = dom.getWidth(c1.__foreground);
+
+          document.body.removeChild(c1.domElement);
+
+          equalish(
+            fw / bw,
+            (object.getNumberProperty() - min) / (max - min),
+            0.01,
+            "Slider width indicative of value."
+          );
+        });
+
+        test("Modifies values", function () {
+          const object = initObject2();
+
+          const min = 0;
+          const max = 50;
+
+          const c1 = new NumberControllerSlider(object, "numberProperty", min, max, 1);
+
+          document.body.appendChild(c1.domElement);
+
+          const o = dom.getOffset(c1.domElement);
+          const w = dom.getWidth(c1.domElement);
+
+          dom.fakeEvent(c1.__background, "mousedown", {
+            x: o.left + w / 2,
+            y: o.top,
+          });
+
+          const bw = dom.getWidth(c1.__background);
+          let fw = dom.getWidth(c1.__foreground);
+
+          equal(object.getNumberProperty(), (min + max) / 2, "Mouse down");
+
+          equalish(
+            fw / bw,
+            (object.getNumberProperty() - min) / (max - min),
+            0.01,
+            "Slider width still indicative of value."
+          );
+
+          dom.fakeEvent(window, "mousemove", {
+            x: o.left,
+            y: o.top,
+          });
+
+          fw = dom.getWidth(c1.__foreground);
+
+          equal(object.getNumberProperty(), min, "Mouse move");
+
+          equal(fw / bw, (object.getNumberProperty() - min) / (max - min), "Slider width still indicative of value.");
+
+          dom.fakeEvent(window, "mouseup");
+
+          dom.fakeEvent(window, "mousemove", {
+            x: o.left + w,
+            y: o.top,
+          });
+
+          equal(object.getNumberProperty(), min, "Mouse releases drag");
+
+          document.body.removeChild(c1.domElement);
         });
 
         function ensurePresetSelectDisplay(gui) {

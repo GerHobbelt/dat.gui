@@ -17,9 +17,31 @@ import common from "../utils/common";
 function numDecimals(x) {
   const _x = x.toString();
   if (_x.indexOf(".") > -1) {
-    return _x.length - _x.indexOf(".") - 1;
+    let prec = _x.length - _x.indexOf(".") - 1;
+    // Top out at 9 decimals
+    return Math.min(prec, 9);
   }
   return 0;
+}
+
+/**
+ * When the user didn't specify a sane step size, infer a suitable stepsize from the initialValue.
+ */
+function guestimateImpliedStep(initialValue, userSpecifiedStep, minimumSaneStepSize, maximumSaneStepSize) {
+  if (common.isFiniteNumber(userSpecifiedStep)) {
+    return userSpecifiedStep;
+  }
+
+  let v;
+  if (!initialValue) {
+    v = 1; // What are we, psychics?
+  } else {
+    // make the step a rounded 10th of the initial value.
+    // (the floor(log) minus 1 ensures that the result still is as accurate as possible for very small numbers;
+    // while the old code performed pow(floor(log)) / 10 which would already cause trouble at values near 1E-6)
+    v = 10 ** (Math.floor(Math.log(Math.abs(initialValue)) / Math.LN10) - 1);
+  }
+  return Math.max(minimumSaneStepSize, Math.min(maximumSaneStepSize, v));
 }
 
 /**
@@ -40,25 +62,27 @@ class NumberController extends Controller {
   constructor(object, property, params) {
     super(object, property);
 
-    params = params || {};
-
-    this.__min = params.min;
-    this.__max = params.max;
-    this.__step = params.step;
-
-    if (common.isUndefined(this.__step)) {
-      if (this.initialValue === 0) {
-        this.__impliedStep = 1; // What are we, psychics?
-      } else {
-        // Hey Doug, check this out.
-        this.__impliedStep = 10 ** Math.floor(Math.log(Math.abs(this.initialValue)) / Math.LN10) / 10;
-      }
-    } else {
-      this.__impliedStep = this.__step;
+    if (typeof this.getValue() !== "number") {
+      throw new Error("Provided value is not a number");
     }
 
-    // Top out at 9 decimals
-    this.__precision = Math.min(numDecimals(this.__impliedStep), 9);
+    params = params || {};
+
+    this.__min = common.isFiniteNumber(params.min) ? params.min : undefined;
+    this.__max = common.isFiniteNumber(params.max) ? params.max : undefined;
+    this.__step = common.isFiniteNumber(params.step) ? params.step : undefined;
+    this.__minimumSaneStepSize = params.minimumSaneStepSize || 1e-9;
+    this.__maximumSaneStepSize = params.maximumSaneStepSize || 1e12;
+    this.__mode = params.mode || "linear";
+
+    this.__impliedStep = guestimateImpliedStep(
+      this.initialValue,
+      this.__step,
+      this.__minimumSaneStepSize,
+      this.__maximumSaneStepSize
+    );
+
+    this.__precision = numDecimals(this.__impliedStep);
   }
 
   setValue(v) {
@@ -70,6 +94,20 @@ class NumberController extends Controller {
 
     if (this.__step != null && v % this.__step !== 0) {
       v = Math.round(v / this.__step) * this.__step;
+    }
+
+    if (this.__mode !== "linear") {
+      const old_step = this.__impliedStep;
+      this.__impliedStep = guestimateImpliedStep(
+        v,
+        this.__step,
+        this.__minimumSaneStepSize,
+        this.__maximumSaneStepSize
+      );
+      if (old_step !== this.__impliedStep) {
+        this.__precision = numDecimals(this.__impliedStep);
+        console.log("number controller: new step = ", this.__impliedStep, ", precision: ", this.__precision);
+      }
     }
 
     return super.setValue(v);
@@ -84,7 +122,7 @@ class NumberController extends Controller {
    * @returns {NumberController} this
    */
   min(minValue) {
-    this.__min = minValue;
+    this.__min = common.isFiniteNumber(v) ? v : undefined;
     return this;
   }
 
@@ -97,7 +135,7 @@ class NumberController extends Controller {
    * @returns {NumberController} this
    */
   max(maxValue) {
-    this.__max = maxValue;
+    this.__max = common.isFiniteNumber(v) ? v : undefined;
     return this;
   }
 
@@ -108,15 +146,42 @@ class NumberController extends Controller {
    * @param {Number} stepValue The step value for {NumberController}
    *
    * @default if minimum and maximum specified increment is 1% of the
-   * difference otherwise stepValue is 1
+   * difference otherwise stepValue is 1  (TODO: INCORRECT; stepsize is ~10% of the current value)
    *
    * @returns {NumberController} this
    */
   step(stepValue) {
-    this.__step = stepValue;
-    this.__impliedStep = stepValue;
-    this.__precision = numDecimals(stepValue);
+    this.__step = common.isFiniteNumber(stepValue) ? stepValue : undefined;
+
+    this.__impliedStep = guestimateImpliedStep(
+      this.getValue(),
+      this.__step,
+      this.__minimumSaneStepSize,
+      this.__maximumSaneStepSize
+    );
+
+    this.__precision = numDecimals(this.__impliedStep);
     return this;
+  }
+
+  mode(m) {
+    this.__mode = m || "linear";
+
+    return this;
+  }
+
+  getMetaInfo() {
+    return {
+      min: this.__min,
+      max: this.__max,
+      step: this.__step,
+      minimumSaneStepSize: this.__minimumSaneStepSize,
+      maximumSaneStepSize: this.__maximumSaneStepSize,
+      mode: this.__mode,
+
+      impliedStep: this.__impliedStep,
+      precision: this.__precision,
+    };
   }
 }
 

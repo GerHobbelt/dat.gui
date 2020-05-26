@@ -43,10 +43,11 @@ class NumberControllerBox extends NumberController {
     params = params || {};
 
     this.__truncationSuspended = false;
+    this.__mouseIsDown = false;  // TODO: check use
 
     const _this = this;
 
-    this.__suspendUpdate = false;
+    this.__suspendUpdate = false;  // TODO: check use
 
     /**
      * {Number} Previous mouse y position
@@ -111,8 +112,18 @@ class NumberControllerBox extends NumberController {
     function onChange(e) {
       const attempted = parseFloat(_this.__input.value);
       if (!common.isNaN(attempted) && !_this._readonly) {
-        _this.setValue(attempted);
+        _this.setValue(attempted); // this includes an *implied* `_this.updateDisplay();`
+      } else {
+        _this.updateDisplay();
       }
+    }
+
+    function onInput() {
+      if (!_this.__mouseIsDown) {
+        return;
+      }
+      const attempted = parseFloat(_this.__input.value);
+      if (!common.isNaN(attempted)) _this.setValue(attempted);
     }
 
     function onFinish() {
@@ -136,12 +147,14 @@ class NumberControllerBox extends NumberController {
     }
 
     function onMouseUp(e) {
+      _this.__mouseIsDown = false;
       dom.unbind(window, "mousemove", onMouseDrag);
       dom.unbind(window, "mouseup", onMouseUp);
       onFinish();
     }
 
     function onMouseDown(e) {
+      _this.__mouseIsDown = true;
       dom.bind(window, "mousemove", onMouseDrag, false, true);
       dom.bind(window, "mouseup", onMouseUp, false, true);
       prevY = e.clientY;
@@ -154,16 +167,21 @@ class NumberControllerBox extends NumberController {
     }
 
     this.__input = document.createElement("input");
-    this.__input.setAttribute("type", "number");
+
+    if (this.__step != null) {
+      this.__input.setAttribute("step", this.__step);
+      this.__input.setAttribute("type", "number");
+    } else { this.__input.setAttribute("type", "text"); }
 
     // Makes it so manually specified values are not truncated.
 
-    dom.bind(this.__input, "focus", onFocus, false, true);
-    dom.bind(this.__input, "change", onChange, false, true);
-    dom.bind(this.__input, "blur", onBlur, false, true);
-    dom.bind(this.__input, "mousedown", onMouseDown, false, true);
-    dom.bind(this.__input, "wheel", onWheel);
-    dom.bind(this.__input, "keydown", onKeyDown, false, true);
+    dom.bind(this.__input, "input", onInput);
+    dom.bind(this.__input, "focus", onFocus);
+    dom.bind(this.__input, "change", onChange);
+    dom.bind(this.__input, "blur", onBlur);
+    dom.bind(this.__input, "mousedown", onMouseDown);
+    dom.bind(this.__input, "wheel", onWheel, false, false);
+    dom.bind(this.__input, "keydown", onKeyDown);
 
     this.updateDisplay();
 

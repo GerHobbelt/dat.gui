@@ -25,6 +25,7 @@ import NgColorController from "../controllers/NgColorController";
 import HSVColorController from "../controllers/HSVColorController";
 import GtColorController from "../controllers/GtColorController";
 import ImageController from "../controllers/ImageController";
+import OptionController from "../controllers/OptionController";
 import PlotterController from "../controllers/PlotterController";
 import EasingFunctionController from "../controllers/EasingFunctionController";
 import TextAreaController from "../controllers/TextAreaController";
@@ -105,6 +106,23 @@ class GUI {
     const _this = this;
 
     params = params || {};
+
+    this.__typeControllers = {
+      color: ColorController,
+      option: OptionController,
+      numberSlider: NumberControllerSlider,
+      numberBox: NumberControllerBox,
+      number: NumberController,
+      string: StringController,
+      image: ImageController,
+      function: FunctionController,
+      boolean: BooleanController,
+      object: ObjectController,
+      // WARNING: never add the Null and Undefined controllers to the standard lookup list as this will break the ControllerFactory internals:
+      //
+      // 'null': NullController,
+      // 'undefined': UndefinedController
+    };
 
     /**
      * Outermost DOM Element
@@ -277,7 +295,6 @@ class GUI {
             if (_this.parent) {
               return _this.getRoot().preset;
             }
-
             return params.load.preset;
           },
 
@@ -303,6 +320,7 @@ class GUI {
           set: function (v) {
             params.width = v;
             setWidth(_this, v);
+            return _this;
           },
         },
 
@@ -329,6 +347,7 @@ class GUI {
             if (titleRow) {
               titleRow.innerHTML = params.name;
             }
+            return _this;
           },
         },
 
@@ -359,6 +378,7 @@ class GUI {
                 _this.__closeButton.innerHTML = v ? params.openStr : params.closeStr;
               }
             }
+            return _this;
           },
         },
 
@@ -391,6 +411,7 @@ class GUI {
               }
               localStorage.setItem(getLocalStorageHash(_this, "isLocal"), bool);
             }
+            return _this;
           },
         },
       }
@@ -398,6 +419,8 @@ class GUI {
 
     // Are we a root level GUI?
     if (common.isUndefined(params.parent)) {
+      params.closed = false;                  // TODO: check what this does
+
       dom.addClass(this.domElement, GUI.CLASS_MAIN);
       dom.makeSelectable(this.domElement, false);
 
@@ -611,7 +634,12 @@ class GUI {
   toggleHide() {
     hide = !hide;
     common.each(hideableGuis, function (gui) {
+if (1) {
       gui.domElement.style.display = hide ? "none" : "";
+} else {
+      gui.domElement.style.zIndex = hide ? -999 : 999;
+      gui.domElement.style.opacity = hide ? 0 : 1;
+}      
     });
   }
 
@@ -771,17 +799,53 @@ class GUI {
   }
 
   /**
+   * @param object
+   * @param property
+   * @returns {dat.controllers.HifiColorController} The new controller that was added.
+   */
+  addHifiColor(object, property) {
+    return add(this, object, property, {
+      hifiColor: true,
+    });
+  }
+
+  /**
+   * @param object
+   * @param property
+   * @returns {dat.controllers.Vec3Controller} The new controller that was added.
+   */
+  addVec3(object, property) {
+    return add(this, object, property, {
+      vec3: true,
+    });
+  }
+
+  /**
+   * @param object
+   * @param property
+   * @returns {dat.controllers.QuatController} The new controller that was added.
+   */
+  addQuat(object, property) {
+    return add(this, object, property, {
+      quat: true,
+    });
+  }
+
+  /**
    * Removes the given controller from the GUI.
    * @param {Controller} controller
    */
   remove(controller) {
     // TODO listening?
     this.__ul.removeChild(controller.__li);
+    const ixl = this.__listening.indexOf(controller);
+    if (ixl >= 0) this.__listening.splice(ixl, 1);
     this.__controllers.splice(this.__controllers.indexOf(controller), 1);
     const _this = this;
     common.defer(function () {
       _this.onResizeDebounced();
     });
+    return this;
   }
 
   /**
@@ -885,6 +949,10 @@ class GUI {
     this.__folders[name] = gui;
 
     const li = addRow(this, gui.domElement);
+    li.setAttribute("draggable", "true");
+    li.ondragstart = function (event) {
+      event.dataTransfer.setData("text", name);
+    };
     dom.addClass(li, "folder");
     return gui;
   }
@@ -927,6 +995,7 @@ class GUI {
    */
   open() {
     this.closed = false;
+    return this;
   }
 
   /**
@@ -934,6 +1003,7 @@ class GUI {
    */
   close() {
     this.closed = true;
+    return this;
   }
 
   /**
@@ -958,13 +1028,12 @@ class GUI {
       let h = 0;
 
       // this code doesn't account for overflowing stylings in controllers (which can be buggy that way)
-      //
-      // common.each(root.__ul.childNodes, function (node) {
-      //  if (!(root.autoPlace && node === root.__save_row)) {
-      //    h += dom.getHeight(node);
-      //  }
-      // });
-      //
+      if (0) {
+       common.each(root.__ul.childNodes, function (node) {
+        if (!(root.autoPlace && node === root.__save_row) && node.nodeType === 1) {
+          h += dom.getHeight(node);
+        }
+      });
       // instead use `scrollHeight` which will always deliver the true total height
       // as per https://stackoverflow.com/a/22675563/1635910
       h = root.__ul.scrollHeight;
@@ -1175,12 +1244,12 @@ class GUI {
    * @return {GUI}  description
    */
   updateDisplay() {
-    common.each(this.__controllers, function (controller) {
-      controller.updateDisplay();
-    });
-    common.each(this.__folders, function (folder) {
-      folder.updateDisplay();
-    });
+    for (const c in this.__controllers) {
+      this.__controllers[c].updateDisplay();
+    }
+    for (const f in this.__folders) {
+      this.__folders[f].updateDisplay();
+    }
     return this;
   }
 }
@@ -1198,6 +1267,8 @@ GUI.CLASS_CLOSE_BOTTOM = "close-bottom";
 GUI.CLASS_DRAG = "drag";
 
 GUI.DEFAULT_WIDTH = 245;
+//GUI.TEXT_CLOSED = "Close Controls";
+//GUI.TEXT_OPEN = "Open Controls";
 GUI.TEXT_CLOSED = '<img src="https://icon.now.sh/x/FFFFFF/10" />';
 GUI.TEXT_OPEN = '<img src="https://icon.now.sh/settings/FFFFFF/18" />';
 
@@ -1260,6 +1331,7 @@ function add(gui, object, property, params) {
 
   const name = document.createElement("span");
   dom.addClass(name, "property-name");
+  // name.innerHTML = controller.label;      // TODO
   name.innerHTML = controller.property;
 
   const container = document.createElement("div");
@@ -1484,6 +1556,23 @@ function augmentController(gui, li, controller) {
     }, controller.updateDisplay);
 
     controller.updateDisplay();
+  } else if (controller instanceof EasingFunctionController) {
+    dom.addClass(li, "easing");
+
+    controller.updateDisplay = common.compose(function (r) {
+      // [TODO]
+      // Let's adapt style!
+      return r;
+    }, controller.updateDisplay);
+
+    controller.updateDisplay();
+  } else if (controller instanceof UndefinedController) {
+    controller.__onFinishChange = function (val) {
+      controller.remove();
+      return add(gui, controller.object, controller.property, {
+        before: controller.__li.nextElementSibling,
+      });
+    };
   }
 
   controller.setValue = common.compose(function (val) {
@@ -1589,7 +1678,9 @@ function removeCurrentPresetOption(gui) {
 }
 
 function showHideExplain(gui, explain) {
-  explain.style.display = gui.useLocalStorage ? "block" : "none";
+  if (explain) {
+    explain.style.display = gui.useLocalStorage ? "block" : "none";
+  }
 }
 
 function addSaveMenu(gui) {
@@ -1736,6 +1827,13 @@ function addResizeHandle(gui) {
     // dom.removeClass(gui.__closeButton, GUI.CLASS_DRAG);
     dom.unbind(window, "mousemove", drag);
     dom.unbind(window, "mouseup", dragStop);
+
+    gui.domElement.dispatchEvent(
+      new CustomEvent("dragstop", {
+        bubbles: true,
+        cancelable: true,
+      })
+    );
   }
 
   function dragStart(e) {
@@ -1746,6 +1844,13 @@ function addResizeHandle(gui) {
     // dom.addClass(gui.__closeButton, GUI.CLASS_DRAG);
     dom.bind(window, "mousemove", drag);
     dom.bind(window, "mouseup", dragStop);
+
+    gui.domElement.dispatchEvent(
+      new CustomEvent("dragstart", {
+        bubbles: true,
+        cancelable: true,
+      })
+    );
 
     return false;
   }

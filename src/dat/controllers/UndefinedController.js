@@ -39,10 +39,23 @@ class UndefinedController extends Controller {
 
     // Match original value
     this.updateDisplay();
+
+    /*
+    this.__input = document.createElement("input");
+    this.__input.setAttribute("type", "text");
+    this.__input.setAttribute("disabled", true);
+    this.domElement.appendChild(this.__input);
+    */
   }
 
   updateDisplay() {
     this.__elem.innerText = "<undefined>";
+
+    if (this.__onFinishChange) {
+      if (!common.isUndefined(this.getValue())) {
+        this.__onFinishChange.call(this.getValue());
+      }
+    }
     return super.updateDisplay();
   }
 }

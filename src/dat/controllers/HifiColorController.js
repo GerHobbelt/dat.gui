@@ -25,9 +25,9 @@ import common from "../utils/common";
  * @param {Object} object
  * @param {string} property
  */
-class ColorController extends Controller {
+class HifiColorController extends Controller {
   constructor(object, property) {
-    super(object, property, "color");
+    super(object, property, "hificolor");
 
     this.__color = new Color(this.getValue());
     this.__temp = new Color(0);
@@ -39,7 +39,7 @@ class ColorController extends Controller {
     dom.makeSelectable(this.domElement, false);
 
     this.__selector = document.createElement("div");
-    this.__selector.className = "selector";
+    /* this.__selector.className = 'selector'; */
 
     this.__saturation_field = document.createElement("div");
     this.__saturation_field.className = "saturation-field";
@@ -56,10 +56,7 @@ class ColorController extends Controller {
 
     this.__input = document.createElement("input");
     this.__input.type = "text";
-
-    this.__input_textShadow = ["1px 0px 0px ", "-1px 0px 0px ", "0px 1px 0px ", "0px -1px 0px "];
-
-    /* jshint unused: false */
+    this.__input_textShadow = "0 1px 1px ";
 
     dom.bind(this.__input, "keydown", function (e) {
       if (e.keyCode === 13) {
@@ -70,24 +67,16 @@ class ColorController extends Controller {
 
     dom.bind(this.__input, "blur", onBlur);
 
-    dom.bind(this.__selector, "mousedown", function (e) {
-      dom.addClass(this, "drag").bind(window, "mouseup", function (e) {
+    dom.bind(this.__selector, "mousedown", function (/* e */) {
+      dom.addClass(this, "drag").bind(window, "mouseup", function (/* e */) {
         dom.removeClass(_this.__selector, "drag");
       });
     });
-
-    dom.bind(this.__selector, "touchstart", function (e) {
-      dom.addClass(this, "drag").bind(window, "touchend", function (e) {
-        dom.removeClass(_this.__selector, "drag");
-      });
-    });
-
-    /* jshint unused: true */
 
     const valueField = document.createElement("div");
 
     common.extend(this.__selector.style, {
-      width: "122px", // 124px
+      width: "122px",
       height: "102px",
       padding: "3px",
       backgroundColor: "#222",
@@ -132,12 +121,9 @@ class ColorController extends Controller {
     common.extend(this.__hue_field.style, {
       width: "15px",
       height: "100px",
-      //display: "inline-block",
+      display: "inline-block",
       border: "1px solid #555",
       cursor: "ns-resize",
-      position: "absolute",
-      top: "3px",
-      right: "3px",
     });
 
     hueGradient(this.__hue_field);
@@ -151,71 +137,44 @@ class ColorController extends Controller {
       color: "#fff",
       border: 0,
       fontWeight: "bold",
-      textShadow: this.__input_textShadow
-        .map(function (d) {
-          return d + " rgba(0,0,0,0.7)";
-        })
-        .join(", "),
+      textShadow: this.__input_textShadow + "rgba(0,0,0,0.7)",
     });
 
-    dom.bind(this.__saturation_field, "mousedown", fieldDown, false, false);
-    dom.bind(this.__saturation_field, "touchstart", fieldDown, false, false);
+    dom.bind(this.__saturation_field, "mousedown", fieldDown);
+    dom.bind(this.__field_knob, "mousedown", fieldDown);
 
-    dom.bind(this.__field_knob, "mousedown", fieldDown, false, false);
-    dom.bind(this.__field_knob, "touchstart", fieldDown, false, false);
-
-    dom.bind(this.__hue_field, "mousedown", fieldDownH, false, false);
-    dom.bind(this.__hue_field, "touchstart", fieldDownH, false, false);
+    dom.bind(this.__hue_field, "mousedown", function (e) {
+      setH(e);
+      dom.bind(window, "mousemove", setH);
+      dom.bind(window, "mouseup", fieldUpH);
+    });
 
     function fieldDown(e) {
       setSV(e);
       // document.body.style.cursor = 'none';
-      dom.bind(window, "mousemove", setSV, false, false);
-      dom.bind(window, "touchmove", setSV, false, false);
+      dom.bind(window, "mousemove", setSV);
       dom.bind(window, "mouseup", fieldUpSV);
-      dom.bind(window, "touchend", fieldUpSV);
-    }
-
-    function fieldDownH(e) {
-      setH(e);
-      dom.bind(window, "mousemove", setH, false, false);
-      dom.bind(window, "touchmove", setH, false, false);
-      dom.bind(window, "mouseup", fieldUpH);
-      dom.bind(window, "touchend", fieldUpH);
     }
 
     function fieldUpSV() {
       dom.unbind(window, "mousemove", setSV);
-      dom.unbind(window, "touchmove", setSV);
       dom.unbind(window, "mouseup", fieldUpSV);
-      dom.unbind(window, "touchend", fieldUpSV);
       // document.body.style.cursor = 'default';
-      onFinish();
-    }
-
-    function fieldUpH() {
-      dom.unbind(window, "mousemove", setH);
-      dom.unbind(window, "touchmove", setH);
-      dom.unbind(window, "mouseup", fieldUpH);
-      dom.unbind(window, "touchend", fieldUpH);
-      onFinish();
     }
 
     function onBlur() {
-      /* jshint validthis: true */
       const i = interpret(this.value);
       if (i !== false) {
         _this.__color.__state = i;
         _this.setValue(_this.__color.toOriginal());
-        onFinish();
       } else {
         this.value = _this.__color.toString();
       }
-      /* jshint validthis: false */
     }
 
-    function onFinish() {
-      _this.__propagateFinishChange(_this.__color.toOriginal());
+    function fieldUpH() {
+      dom.unbind(window, "mousemove", setH);
+      dom.unbind(window, "mouseup", fieldUpH);
     }
 
     this.__saturation_field.appendChild(valueField);
@@ -225,27 +184,18 @@ class ColorController extends Controller {
     this.__hue_field.appendChild(this.__hue_knob);
 
     this.domElement.appendChild(this.__input);
+
     this.domElement.appendChild(this.__selector);
 
     this.updateDisplay();
 
     function setSV(e) {
-      if (e.type.indexOf("touch") === -1) {
-        e.preventDefault();
-      }
+      e.preventDefault();
 
-if (1) {
-      const fieldRect = _this.__saturation_field.getBoundingClientRect();
-      const { clientX, clientY } = (e.touches && e.touches[0]) || e;
-      let s = (clientX - fieldRect.left) / (fieldRect.right - fieldRect.left);
-      let v = 1 - (clientY - fieldRect.top) / (fieldRect.bottom - fieldRect.top);
-} else {
       const w = dom.getWidth(_this.__saturation_field);
-      const h = dom.getHeight(_this.__saturation_field);
       const o = dom.getOffset(_this.__saturation_field);
       let s = (e.clientX - o.left + document.body.scrollLeft) / w;
-      let v = 1 - (e.clientY - o.top + document.body.scrollTop) / h;
-}
+      let v = 1 - (e.clientY - o.top + document.body.scrollTop) / w;
 
       if (v > 1) {
         v = 1;
@@ -268,19 +218,12 @@ if (1) {
     }
 
     function setH(e) {
-      if (e.type.indexOf("touch") === -1) {
-        e.preventDefault();
-      }
+      e.preventDefault();
 
-if (1) {
-      const fieldRect = _this.__hue_field.getBoundingClientRect();
-      const { clientY } = (e.touches && e.touches[0]) || e;
-      let h = 1 - (clientY - fieldRect.top) / (fieldRect.bottom - fieldRect.top);
-} else {
       const s = dom.getHeight(_this.__hue_field);
       const o = dom.getOffset(_this.__hue_field);
       let h = 1 - (e.clientY - o.top + document.body.scrollTop) / s;
-}
+
       if (h > 1) {
         h = 1;
       } else if (h < 0) {
@@ -352,11 +295,7 @@ if (1) {
     common.extend(this.__input.style, {
       backgroundColor: this.__color.toHexString(),
       color: "rgb(" + flip + "," + flip + "," + flip + ")",
-      textShadow: this.__input_textShadow
-        .map(function (d) {
-          return d + " rgba(" + _flip + "," + _flip + "," + _flip + ",0.7)";
-        })
-        .join(", "),
+      textShadow: this.__input_textShadow + "rgba(" + _flip + "," + _flip + "," + _flip + ",.7)",
     });
   }
 }
@@ -384,4 +323,4 @@ function hueGradient(elem) {
     "background: linear-gradient(top,  #ff0000 0%,#ff00ff 17%,#0000ff 34%,#00ffff 50%,#00ff00 67%,#ffff00 84%,#ff0000 100%);";
 }
 
-export default ColorController;
+export default HifiColorController;

@@ -11,20 +11,29 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
+//$background-color: #1a1a1a;
 $background-color: #333333;
 
 $hover-lighten: 5%;
 $border-lighten: 7%;
 $active-lighten: 10%;
 
+//$number-color: #2fa1d6;
+//$boolean-color: #806787;
+//$string-color: #1ed36f;
+//$function-color: #e61d5f;
+//$save-row-color: #dad5cb;
 $number-color: #1976D2;
 $boolean-color: #D32F2F;
 $string-color: #388E3C;
 $function-color: #FBC02D;
 $save-row-color: #666666;
+$easing-color: #ff8710;
 $button-color: darken($save-row-color, 10%);
 $border-color: lighten($background-color, $border-lighten);
 $input-color: lighten($background-color, 8.5%);
+
+$row-easing-height: 80px;
 
 @mixin transition($prop, $time, $curve) {
   -webkit-transition: $prop $time $curve;
@@ -130,13 +139,13 @@ $input-color: lighten($background-color, 8.5%);
     }
 
     &.save-row {
-      line-height: 30px;
+      line-height: 30px;      /* 25px */
       background: $save-row-color;
       border: 0;
 
       select {
         margin-left: 5px;
-        width: 100px;
+        width: 100px;          /* 108px */
       }
 
       .button {
@@ -160,6 +169,7 @@ $input-color: lighten($background-color, 8.5%);
     }
 
     &.title {
+      //padding-left: 16px;
       cursor: pointer;
       border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 
@@ -222,7 +232,12 @@ $input-color: lighten($background-color, 8.5%);
     &.number {
       border-left: 3px solid $number-color;
 
+      input[type="text"],
       input[type="number"] {
+        color: $number-color;
+      }
+
+      textarea {
         color: $number-color;
       }
     }
@@ -230,7 +245,12 @@ $input-color: lighten($background-color, 8.5%);
     &.string {
       border-left: 3px solid $string-color;
 
-      input[type="text"] {
+      input[type="text"],
+      input[type="number"] {
+        color: $string-color;
+      }
+
+      textarea {
         color: $string-color;
       }
     }
@@ -243,6 +263,12 @@ $input-color: lighten($background-color, 8.5%);
       }
     }
 
+    &.easing {
+      border-left: 3px solid $easing-color;
+      height: $row-easing-height;
+      line-height: $row-easing-height;
+    }
+
     &.function:hover,
     &.boolean:hover {
       background: #111111;
@@ -251,6 +277,7 @@ $input-color: lighten($background-color, 8.5%);
 
   /** Controllers */
   .c {
+    textarea,
     input[type="text"],
     input[type="number"] {
       background: $input-color;
@@ -269,6 +296,7 @@ $input-color: lighten($background-color, 8.5%);
     .slider {
       background: $input-color;
       cursor: ew-resize;
+      overflow: hidden;
     }
 
     .slider-fg {

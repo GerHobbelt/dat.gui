@@ -39,26 +39,48 @@ function map(v, i1, i2, o1, o2) {
  * @member dat.controllers
  */
 class NumberControllerSlider extends NumberController {
-  constructor(object, property, min, max, step) {
+  constructor(object, property, min, max, step, enumeration) {
     super(object, property, { min: min, max: max, step: step });
 
     const _this = this;
 
     this.__background = document.createElement("div");
+    this.__label = document.createElement("div");
     this.__foreground = document.createElement("div");
+
+    function getEnumArr(hash) {
+      let arr = [];
+      let k;
+      for (k in hash) {
+        arr.push({ key: k, value: hash[k] });
+      }
+      arr = arr.sort(function (a, b) {
+        const result = true ? a.value < b.value : a.value > b.value;
+        return result ? 1 : -1;
+      });
+
+      return arr.length > 0 ? arr : null;
+    }
+
+    if (enumeration) {
+      this.enumeration = getEnumArr(enumeration);
+    }
+
+    this.__label.style.visibility = enumeration ? "visible" : "hidden";
 
     dom.bind(this.__background, "mousedown", onMouseDown);
     dom.bind(this.__background, "touchstart", onTouchStart, false, true);
     dom.bind(this.__background, "wheel", onWheel);
 
     dom.addClass(this.__background, "slider");
+    dom.addClass(this.__label, "label");
     dom.addClass(this.__foreground, "slider-fg");
 
     function onMouseDown(e) {
       document.activeElement.blur();
 
       dom.bind(window, "mousemove", onMouseDrag);
-      dom.bind(window, "mouseup", onMouseUp, false, true);
+      dom.bind(window, "mouseup", onMouseUp);
 
       onMouseDrag(e);
     }
@@ -66,11 +88,18 @@ class NumberControllerSlider extends NumberController {
     function onMouseDrag(e) {
       e.preventDefault();
 
+if (1) {
       const bgRect = _this.__background.getBoundingClientRect();
 
       if (!_this._readonly) {
         _this.setValue(map(e.clientX, bgRect.left, bgRect.right, _this.__min, _this.__max));
       }
+} else {
+      const offset = dom.getOffset(_this.__background);
+      const width = dom.getWidth(_this.__background);
+
+      _this.setValue(map(e.clientX, offset.left, offset.left + width, _this.__min, _this.__max));
+}
 
       return false;
     }
@@ -117,6 +146,7 @@ class NumberControllerSlider extends NumberController {
     this.updateDisplay();
 
     this.__background.appendChild(this.__foreground);
+    this.__background.appendChild(this.__label);
     this.domElement.appendChild(this.__background);
   }
 
@@ -124,6 +154,27 @@ class NumberControllerSlider extends NumberController {
     const value = this.getValue();
     const pct = (value - this.__min) / (this.__max - this.__min);
     this.__foreground.style.width = pct * 100 + "%";
+
+    this.__label.innerHTML = value;
+
+    if (this.enumeration) {
+      let chosenValue = null;
+      let chosenIndex = null;
+      let i = this.enumeration.length;
+      while (--i > -1) {
+        chosenValue = this.enumeration[i].value;
+        if (value < chosenValue) {
+          break;
+        }
+        chosenIndex = i;
+      }
+
+      if (chosenIndex == null) {
+        chosenValue = "";
+      } else chosenValue = this.enumeration[chosenIndex].key;
+
+      this.__label.innerHTML = chosenValue;
+    }
 
     return super.updateDisplay();
   }

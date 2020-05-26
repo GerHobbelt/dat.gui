@@ -22,6 +22,7 @@ import BooleanController from "./BooleanController";
 import ColorController from "./ColorController";
 import ObjectController from "./ObjectController";
 import NullController from "./NullController";
+import Vec3Controller from "./Vec3Controller";
 import UndefinedController from "./UndefinedController";
 import common from "../utils/common";
 
@@ -44,6 +45,7 @@ const controllerFactory = function (object, property, ...optionalArgs) {
     const [min, max, step, minimumSaneStepSize, maximumSaneStepSize, mode] = optionalArgs;
     // Has min and max? (slider)
     // Don't care about step (may be undefined) or enumeration value (that one's optional too)
+    // The NumberControllers will take care of that difference in invocation/usage.
     if (common.isNumber(min) && common.isNumber(max)) {
       return new NumberControllerSlider(
         object,

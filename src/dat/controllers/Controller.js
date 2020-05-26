@@ -309,6 +309,9 @@ class Controller {
     // or aborted:
     if (!msg.silent) {
       this.fireChange(msg);
+    if (this.__onChange) {
+      this.__onChange.call(this, newValue);
+    }
       this.__propagateChange(__newValue, oldValue);
     }
     // Whenever you call `setValue`, the display will be updated automatically.
@@ -326,6 +329,23 @@ class Controller {
     return this.__transformInput(
       !this.__dyninfo ? this.object[this.property] : this.__dyninfo.getter.call(this.object)
     );
+  }
+
+  /**
+   * Set the drop handler
+   *
+   * @param {function} handler
+   */
+  setDropHandler(handler) {
+    this.domElement.ondragover = function (event) {
+      event.preventDefault();
+    };
+    this.domElement.ondrop = function (event) {
+      event.preventDefault();
+      handler.call(this, event.dataTransfer.getData("text"));
+    };
+
+    return this;
   }
 
   /**

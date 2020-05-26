@@ -88,18 +88,18 @@ class NumberControllerSlider extends NumberController {
     function onMouseDrag(e) {
       e.preventDefault();
 
-if (1) {
-      const bgRect = _this.__background.getBoundingClientRect();
+      if (1) {
+        const bgRect = _this.__background.getBoundingClientRect();
 
-      if (!_this._readonly) {
-        _this.setValue(map(e.clientX, bgRect.left, bgRect.right, _this.__min, _this.__max));
+        if (!_this._readonly) {
+          _this.setValue(map(e.clientX, bgRect.left, bgRect.right, _this.__min, _this.__max));
+        }
+      } else {
+        const offset = dom.getOffset(_this.__background);
+        const width = dom.getWidth(_this.__background);
+
+        _this.setValue(map(e.clientX, offset.left, offset.left + width, _this.__min, _this.__max));
       }
-} else {
-      const offset = dom.getOffset(_this.__background);
-      const width = dom.getWidth(_this.__background);
-
-      _this.setValue(map(e.clientX, offset.left, offset.left + width, _this.__min, _this.__max));
-}
 
       return false;
     }

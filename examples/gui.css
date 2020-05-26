@@ -90,7 +90,7 @@
   margin-right: 20px;
   margin-bottom: 20px;
   */
-  background-color: #ffffff;
+  background-color: #FFFFFF;
 }
 
 .guidat,
@@ -202,7 +202,7 @@ a.guidat-toggle:hover {
 }
 
 .guidat-controller.object {
-  border-left: 5px solid #ffff00;
+  border-left: 5px solid #FFFF00;
 }
 
 .guidat-controller.number input[type="text"] {
@@ -254,7 +254,7 @@ a.guidat-toggle:hover {
 .guidat-slider-fg {
   cursor: ew-resize;
   background-color: #00AEFF;
-  height: 20px;                /* 21px */
+  height: 20px; /* 21px */
 }
 
 /* Styles for timed GUI */

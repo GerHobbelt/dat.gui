@@ -95,9 +95,9 @@ class FunctionController extends Controller {
       // userland code can look at both existing and new values for this property
       // and decide what to do accordingly!
       msg.noGo = this.fireBeforeChange(msg);
-    if (this.__onChange) {
-      this.__onChange.call(this);
-    }
+      if (this.__onChange) {
+        this.__onChange.call(this);
+      }
       this.__propagateChange(this.getValue());
     }
     if (!msg.noGo) {

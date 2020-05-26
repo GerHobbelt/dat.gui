@@ -138,7 +138,7 @@ class ColorController extends Controller {
     common.extend(this.__hue_field.style, {
       width: "15px",
       height: "100px",
-      //display: "inline-block",
+      // display: "inline-block",
       border: "1px solid #555",
       cursor: "ns-resize",
       position: "absolute",
@@ -287,18 +287,18 @@ class ColorController extends Controller {
         e.preventDefault();
       }
 
-if (1) {
-      const fieldRect = _this.__saturation_field.getBoundingClientRect();
-      const { clientX, clientY } = (e.touches && e.touches[0]) || e;
-      let s = (clientX - fieldRect.left) / (fieldRect.right - fieldRect.left);
-      let v = 1 - (clientY - fieldRect.top) / (fieldRect.bottom - fieldRect.top);
-} else {
-      const w = dom.getWidth(_this.__saturation_field);
-      const h = dom.getHeight(_this.__saturation_field);
-      const o = dom.getOffset(_this.__saturation_field);
-      let s = (e.clientX - o.left + document.body.scrollLeft) / w;
-      let v = 1 - (e.clientY - o.top + document.body.scrollTop) / h;
-}
+      if (1) {
+        const fieldRect = _this.__saturation_field.getBoundingClientRect();
+        const { clientX, clientY } = (e.touches && e.touches[0]) || e;
+        const s = (clientX - fieldRect.left) / (fieldRect.right - fieldRect.left);
+        const v = 1 - (clientY - fieldRect.top) / (fieldRect.bottom - fieldRect.top);
+      } else {
+        const w = dom.getWidth(_this.__saturation_field);
+        const h = dom.getHeight(_this.__saturation_field);
+        const o = dom.getOffset(_this.__saturation_field);
+        const s = (e.clientX - o.left + document.body.scrollLeft) / w;
+        const v = 1 - (e.clientY - o.top + document.body.scrollTop) / h;
+      }
 
       if (v > 1) {
         v = 1;
@@ -325,15 +325,15 @@ if (1) {
         e.preventDefault();
       }
 
-if (1) {
-      const fieldRect = _this.__hue_field.getBoundingClientRect();
-      const { clientY } = (e.touches && e.touches[0]) || e;
-      let h = 1 - (clientY - fieldRect.top) / (fieldRect.bottom - fieldRect.top);
-} else {
-      const s = dom.getHeight(_this.__hue_field);
-      const o = dom.getOffset(_this.__hue_field);
-      let h = 1 - (e.clientY - o.top + document.body.scrollTop) / s;
-}
+      if (1) {
+        const fieldRect = _this.__hue_field.getBoundingClientRect();
+        const { clientY } = (e.touches && e.touches[0]) || e;
+        const h = 1 - (clientY - fieldRect.top) / (fieldRect.bottom - fieldRect.top);
+      } else {
+        const s = dom.getHeight(_this.__hue_field);
+        const o = dom.getOffset(_this.__hue_field);
+        const h = 1 - (e.clientY - o.top + document.body.scrollTop) / s;
+      }
       if (h > 1) {
         h = 1;
       } else if (h < 0) {

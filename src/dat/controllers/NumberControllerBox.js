@@ -45,12 +45,12 @@ class NumberControllerBox extends NumberController {
 
     this.__suffix = params.suffix || "";
     this.__truncationSuspended = false;
-    this.__mouseIsDown = false;  // TODO: check use
+    this.__mouseIsDown = false; // TODO: check use
 
     const _this = this;
 
     // TODO: see if this works better than the Active DOM node check
-    this.__suspendUpdate = false;  // TODO: check use
+    this.__suspendUpdate = false; // TODO: check use
 
     /**
      * {Number} Previous mouse y position
@@ -104,7 +104,7 @@ class NumberControllerBox extends NumberController {
             _this.setValue(_this.getValue() - _this.__impliedStep);
             break;
           }
-        // make ESLINT happy:
+          // make ESLINT happy:
           default: {
             break;
           }
@@ -179,7 +179,9 @@ class NumberControllerBox extends NumberController {
     if (this.__step != null) {
       this.__input.setAttribute("step", this.__step);
       this.__input.setAttribute("type", "number");
-    } else { this.__input.setAttribute("type", "text"); }
+    } else {
+      this.__input.setAttribute("type", "text");
+    }
 
     // Makes it so manually specified values are not truncated.
 

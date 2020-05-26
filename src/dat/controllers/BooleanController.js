@@ -61,10 +61,10 @@ class BooleanController extends Controller {
     if (this.getValue() === true) {
       this.__checkbox.setAttribute("checked", "checked");
       this.__checkbox.checked = true;
-      this.__prev = true;               // TODO: see what this does
+      this.__prev = true; // TODO: see what this does
     } else {
       this.__checkbox.checked = false;
-      this.__prev = false;               // TODO: see what this does
+      this.__prev = false; // TODO: see what this does
     }
 
     this.__checkbox.disabled = this.getReadonly();

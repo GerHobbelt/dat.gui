@@ -43,7 +43,7 @@ class TabbedController extends Controller {
 
     const tabSize = tabs * 2; // 2em = 1 tab
     this.__button.style.paddingLeft = tabSize.toString() + "em";
-    this.property = displayName;               // TODO: check what this does; remove? Probably.
+    this.property = displayName; // TODO: check what this does; remove? Probably.
     this.domElement.appendChild(this.__button);
   }
 

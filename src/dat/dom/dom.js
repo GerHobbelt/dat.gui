@@ -175,7 +175,7 @@ const dom = {
    */
   bind: function (elem, event, func, bool, passive) {
     bool = bool || false;
-    passive = passive || false;
+    passive = passive || true;
     if (elem.addEventListener) {
       const listenerArg = common.supportsPassive()
         ? {

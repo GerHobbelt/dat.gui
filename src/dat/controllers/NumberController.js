@@ -17,7 +17,7 @@ import common from "../utils/common";
 function numDecimals(x) {
   const _x = x.toString();
   if (_x.indexOf(".") > -1) {
-    let prec = _x.length - _x.indexOf(".") - 1;
+    const prec = _x.length - _x.indexOf(".") - 1;
     // Top out at 9 decimals
     return Math.min(prec, 9);
   }
@@ -60,7 +60,7 @@ function guestimateImpliedStep(initialValue, userSpecifiedStep, minimumSaneStepS
  */
 class NumberController extends Controller {
   constructor(object, property, params) {
-    super(object, property);
+    super(object, property, "number");
 
     if (typeof this.getValue() !== "number") {
       throw new Error("Provided value is not a number");
@@ -146,7 +146,9 @@ class NumberController extends Controller {
    * @param {Number} stepValue The step value for {NumberController}
    *
    * @default if minimum and maximum specified increment is 1% of the
-   * difference otherwise stepValue is 1  (TODO: INCORRECT; stepsize is ~10% of the current value)
+   * difference otherwise stepValue is 1
+   *
+   * TODO: INCORRECT; stepsize is ~10% of the current value
    *
    * @returns {NumberController} this
    */

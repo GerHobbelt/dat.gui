@@ -49,6 +49,7 @@ class NumberControllerBox extends NumberController {
 
     const _this = this;
 
+    // TODO: see if this works better than the Active DOM node check
     this.__suspendUpdate = false;  // TODO: check use
 
     /**
@@ -60,7 +61,6 @@ class NumberControllerBox extends NumberController {
     function onKeyDown(e) {
       // TODO: pick one of the two keyboard switch-case handlers below:
       if (1) {
-        const step = _this.__step || 1;
         switch (e.keyCode) {
           // When pressing ENTER key, you can be as precise as you want.
           case 13:
@@ -74,13 +74,13 @@ class NumberControllerBox extends NumberController {
 
           // arrow up
           case 38:
-            var newVal = _this.getValue() + step;
+            var newVal = _this.getValue() + _this.__impliedStep;
             _this.setValue(newVal);
             break;
 
           // arrow down
           case 40:
-            var newVal = _this.getValue() - step;
+            var newVal = _this.getValue() - _this.__impliedStep;
             _this.setValue(newVal);
             break;
         }
@@ -104,6 +104,7 @@ class NumberControllerBox extends NumberController {
             _this.setValue(_this.getValue() - _this.__impliedStep);
             break;
           }
+        // make ESLINT happy:
           default: {
             break;
           }
@@ -112,6 +113,11 @@ class NumberControllerBox extends NumberController {
     }
 
     function onChange(e) {
+      let { value } = _this.__input;
+      if (params && _this.__suffix) {
+        // TODO: stricter check: suffix must sit at the end, after trimming
+        value = value.replace(_this.__suffix, "");
+      }
       const attempted = parseFloat(_this.__input.value);
       if (!common.isNaN(attempted) && !_this._readonly) {
         _this.setValue(attempted); // this includes an *implied* `_this.updateDisplay();`

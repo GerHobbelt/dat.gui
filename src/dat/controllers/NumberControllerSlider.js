@@ -69,7 +69,7 @@ class NumberControllerSlider extends NumberController {
     this.__label.style.visibility = enumeration ? "visible" : "hidden";
 
     dom.bind(this.__background, "mousedown", onMouseDown);
-    dom.bind(this.__background, "touchstart", onTouchStart, false, true);
+    dom.bind(this.__background, "touchstart", onTouchStart);
     dom.bind(this.__background, "wheel", onWheel);
 
     dom.addClass(this.__background, "slider");

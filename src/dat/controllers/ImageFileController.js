@@ -11,10 +11,6 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-/**
- * Created by pery on 16/08/14.
- */
-
 import Controller from "./Controller";
 import dom from "../dom/dom";
 
@@ -32,7 +28,7 @@ import dom from "../dom/dom";
  */
 class ImageFileController extends Controller {
   constructor(object, property) {
-    super(object, property);
+    super(object, property, "image");
 
     const _this = this;
 

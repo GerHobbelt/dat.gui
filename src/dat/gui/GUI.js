@@ -15,31 +15,33 @@ import css from "../utils/css";
 import saveDialogueContents from "./saveDialogue.html";
 import controllerFactory from "../controllers/ControllerFactory";
 import Controller from "../controllers/Controller";
+import ArrayController from "../controllers/ArrayController";
 import BooleanController from "../controllers/BooleanController";
-import VectorController from "../controllers/VectorController";
-import FunctionController from "../controllers/FunctionController";
-import TabbedController from "../controllers/TabbedController";
-import NumberControllerBox from "../controllers/NumberControllerBox";
-import NumberControllerSlider from "../controllers/NumberControllerSlider";
-import NumberControllerAnimator from "../controllers/NumberControllerAnimator";
 import ColorController from "../controllers/ColorController";
 import BgColorController from "../controllers/BgColorController";
 import NgColorController from "../controllers/NgColorController";
-import HSVColorController from "../controllers/HSVColorController";
 import GtColorController from "../controllers/GtColorController";
-import FileController from "../controllers/FileController";
+import HSVColorController from "../controllers/HSVColorController";
 import CustomController from "../controllers/CustomController";
-import ImageController from "../controllers/ImageController";
-import OptionController from "../controllers/OptionController";
-import PlotterController from "../controllers/PlotterController";
 import EasingFunctionController from "../controllers/EasingFunctionController";
-import TextAreaController from "../controllers/TextAreaController";
-import CustomController from "../controllers/CustomController";
-import GradientController from "../controllers/GradientController";
-import ArrayController from "../controllers/ArrayController";
+import FileController from "../controllers/FileController";
+import FunctionController from "../controllers/FunctionController";
 import ImageController from "../controllers/ImageController";
 import ImageFileController from "../controllers/ImageFileController";
+import GradientController from "../controllers/GradientController";
+import NumberController from "../controllers/NumberController";
+import NumberControllerAnimator from "../controllers/NumberControllerAnimator";
+import NumberControllerBox from "../controllers/NumberControllerBox";
+import NumberControllerSlider from "../controllers/NumberControllerSlider";
+import ObjectController from "../controllers/ObjectController";
+import OptionController from "../controllers/OptionController";
+import PlotterController from "../controllers/PlotterController";
+import StringController from "../controllers/StringController";
+import TabbedController from "../controllers/TabbedController";
+import TextAreaController from "../controllers/TextAreaController";
 import UndefinedController from "../controllers/UndefinedController";
+import UserMediaController from "../controllers/UserMediaController";
+import VectorController from "../controllers/VectorController";
 import requestAnimationFrame from "../utils/requestAnimationFrame";
 import CenteredDiv from "../dom/CenteredDiv";
 import dom from "../dom/dom";
@@ -119,16 +121,27 @@ class GUI {
     params = params || {};
 
     this.__typeControllers = {
-      color: ColorController,
-      option: OptionController,
-      numberSlider: NumberControllerSlider,
-      numberBox: NumberControllerBox,
-      number: NumberController,
-      string: StringController,
-      image: ImageController,
-      function: FunctionController,
+      bgcolor: BgColorController,
       boolean: BooleanController,
+      color: ColorController,
+      easing: EasingFunctionController,
+      file: FileController,
+      function: FunctionController,
+      gradient: GradientController,
+      gtcolor: GtColorController,
+      hsvcolor: HSVColorController,
+      image: ImageController,
+      imagefile: ImageFileController,
+      multiline: TextAreaController,
+      ngcolor: NgColorController,
+      number: NumberController,
+      numberBox: NumberControllerBox,
+      numberSlider: NumberControllerSlider,
       object: ObjectController,
+      option: OptionController,
+      plotter: PlotterController,
+      string: StringController,
+      usermedia: UserMediaController,
       // WARNING: never add the Null and Undefined controllers to the standard lookup list as this will break the ControllerFactory internals:
       //
       // 'null': NullController,
@@ -227,7 +240,9 @@ class GUI {
         params.load.preset = params.preset;
       }
     } else {
-      params.load = { preset: DEFAULT_DEFAULT_PRESET_NAME };
+      params.load = {
+        preset: DEFAULT_DEFAULT_PRESET_NAME,
+      };
     }
 
     if (common.isUndefined(params.closeStr)) {
@@ -630,7 +645,10 @@ class GUI {
      * @type xxx
      * @returns xxx
      */
-    this.saveToLocalStorageIfPossible = saveToLocalStorage;
+    this.saveToLocalStorageIfPossible = function () {
+      saveToLocalStorage();
+      return _this;
+    };
 
     function resetWidth() {
       const root = _this.getRoot();
@@ -646,6 +664,7 @@ class GUI {
 
     if (common.isObject(params.object)) {
       common.each(params.object, function (property, propertyName) {
+        debugger;
         _this.add(params.object, propertyName);
       });
     }
@@ -656,29 +675,44 @@ class GUI {
     return this;
   }
 
+  /**
+   * TODO: getControllerByName description
+   * @param  {String} name         description
+   * @param  {boolean} [recurse]   description
+   * @return {Controller}          description
+   */
   getControllerByName(name, recurse) {
     const controllers = this.__controllers;
-    let i = controllers.length;
-    while (--i > -1) {
+    for (const i in controllers) {
       if (controllers[i].property === name) {
         return controllers[i];
       }
     }
     const folders = this.__folders;
-    let tryFI;
     if (recurse) {
-      for (i in folders) {
-        tryFI = folders[i].getControllerByName(name, true);
+      for (const i in folders) {
+        const tryFI = folders[i].getControllerByName(name, true);
         if (tryFI != null) return tryFI;
       }
     }
     return null;
   }
 
+  /**
+   * TODO: [getFolderByName description]
+   * @param  {String} name [description]
+   * @return {GUI}      [description]
+   */
   getFolderByName(name) {
     return this.__folders[name];
   }
 
+  /**
+   * TODO: [getAllControllers description]
+   * @param  {Any} [recurse]    description
+   * @param  {Array} [myArray]  description
+   * @return {Array}         description
+   */
   getAllControllers(recurse, myArray) {
     if (recurse == undefined) recurse = true;
     let i;
@@ -765,8 +799,8 @@ if (1) {
 
   /**
    * Adds a new {@link Controller} to the GUI. The type of controller created
-   * is inferred from the initial value of <code>object[property]</code>. For
-   * color properties, see {@link addColor}.
+   * is inferred from the initial value of <code>object[property]</code>.
+   * For color properties, see {@link addColor}.
    * For file properties, see {@link addFile}.
    *
    * @param {Object} object The object to be manipulated
@@ -809,33 +843,45 @@ if (1) {
    * gui.addColor(palette, 'color3');
    * gui.addColor(palette, 'color4');
    */
-  addColor(object, property) {
+  addColor(object, property, params) {
     return add(this, object, property, {
       color: true,
+      factoryArgs: [params],
     });
   }
 
-  addBgColor(object, property) {
+  addBgColor(object, property, params) {
     return add(this, object, property, {
       bgcolor: true,
+      factoryArgs: [params],
     });
   }
 
-  addNgColor(object, property) {
+  addNgColor(object, property, params) {
     return add(this, object, property, {
       ngcolor: true,
+      factoryArgs: [params],
     });
   }
 
-  addGtColor(object, property) {
+  addGtColor(object, property, params) {
     return add(this, object, property, {
       gtcolor: true,
+      factoryArgs: [params],
     });
   }
 
-  addHSVColor(object, property) {
+  addHSVColor(object, property, params) {
     return add(this, object, property, {
       hsvcolor: true,
+      factoryArgs: [params],
+    });
+  }
+
+  addVector(object, property, min, max) {
+    return add(this, object, property, {
+      vector: true,
+      factoryArgs: [min, max],
     });
   }
 
@@ -844,9 +890,10 @@ if (1) {
    * @param property
    * @returns {dat.controllers.TextAreaController} The new controller that was added.
    */
-  addTextArea(object, property) {
+  addTextArea(object, property, params) {
     return add(this, object, property, {
       multiline: true,
+      factoryArgs: [params],
     });
   }
 
@@ -883,11 +930,12 @@ if (1) {
   addPlotter(object, property, max, period, type, fgColor, bgColor) {
     return add(this, object, property, {
       plotter: true,
-      max: max || 10,
-      period: typeof period === "number" ? period : 500,
-      type: type || "line",
-      fgColor: fgColor || "#fff",
-      bgColor: bgColor || "#000",
+      // NOTE: do NOT provide defaults for the next few items as the Controller should be the only one assigning defaults:
+      max,
+      period,
+      type,
+      fgColor,
+      bgColor,
     });
   }
 
@@ -909,33 +957,6 @@ if (1) {
   addFile(object, property) {
     return add(this, object, property, {
       file: true,
-    });
-  }
-
-  /**
-   * Adds a new custom controller to the GUI.
-   *
-   * @param object
-   * @param property
-   * @returns {Controller} The controller that was added to the GUI.
-   *
-   */
-  addCustomController(object, property) {
-    return add(this, object, property, {
-      custom: true,
-      factoryArgs: Array.prototype.slice.call(arguments, 2),
-    });
-  }
-
-  /**
-   * @param object
-   * @param property
-   * @returns {dat.controllers.ColorController} The new controller that was added.
-   */
-  addGradient(object, property, label) {
-    return add(this, object, property, label, {
-      gradient: true,
-      factoryArgs: Array.prototype.slice.call(arguments, 3),
     });
   }
 
@@ -990,11 +1011,50 @@ if (1) {
   }
 
   /**
+   * Adds a new custom controller to the GUI.
+   *
+   * @param object
+   * @param property
+   * @returns {Controller} The controller that was added to the GUI.
+   *
+   */
+  addCustomController(object, property, ...factoryArgs) {
+    return add(this, object, property, {
+      custom: true,
+      factoryArgs,
+    });
+  }
+
+  /**
+   * @param object
+   * @param property
+   * @returns {dat.controllers.ColorController} The new controller that was added.
+   */
+  addGradient(object, property, ...factoryArgs) {
+    return add(this, object, property, {
+      gradient: true,
+      factoryArgs,
+    });
+  }
+
+  /**
+   * @param object
+   * @param property
+   * @returns {dat.controllers.Controller} The new controller that was added.
+   * @instance
+   */
+  addAs(object, property, controller, ...factoryArgs) {
+    return add(this, object, property, {
+      controller: controller,
+      factoryArgs,
+    });
+  }
+
+  /**
    * Removes the given controller from the GUI.
    * @param {Controller} controller
    */
   remove(controller) {
-    this.__ul.removeChild(controller.__li);
     const lIndex = this.__listening.indexOf(controller);
     if (lIndex !== -1) {
       this.__listening.splice(lIndex, 1);
@@ -1003,6 +1063,8 @@ if (1) {
     if (controller.destruct) {
       controller.destruct();
     }
+
+    this.__ul.removeChild(controller.__li);
     this.__controllers.splice(this.__controllers.indexOf(controller), 1);
     const _this = this;
     common.defer(function () {
@@ -1071,9 +1133,9 @@ if (1) {
   /**
    * Creates a new subfolder GUI instance.
    * @param name
+   * @param [title]
    * @returns {GUI} The new folder.
-   * @throws {Error} if this GUI already has a folder by the specified
-   * name
+   * @throws {Error} if this GUI already has a folder by the specified name
    */
   addFolder(name) {
     // We have to prevent collisions on names in order to have a key
@@ -1085,7 +1147,7 @@ if (1) {
     const newGuiParams = {
       name: name,
       parent: this,
-      //title: title,
+      title: title,
     };
 
     // We need to pass down the autoPlace trait so that we can
@@ -1183,6 +1245,7 @@ if (1) {
    */
   hide() {
     this.domElement.style.display = "none";
+    return this;
   }
 
   /**
@@ -1215,7 +1278,7 @@ if (1) {
       // as per https://stackoverflow.com/a/22675563/1635910
       h = root.__ul.scrollHeight;
 
-      if (!CLOSE_BUTTON_HEIGHT) {
+      if (!CLOSE_BUTTON_HEIGHT && root.__closeButton) {
         CLOSE_BUTTON_HEIGHT = dom.getHeight(root.__closeButton);
       }
       if (window.innerHeight - top - CLOSE_BUTTON_HEIGHT < h) {
@@ -1351,29 +1414,30 @@ if (1) {
   }
 
   /**
-   * TODO:
+   * TODO: fix this API. It's a mess.
    * [revert description]
    * @param  {GUI} gui [description]
    * @return {GUI}     [description]
    */
   revert(gui) {
+    const _this = gui || this.getRoot();
+
     common.each(
       this.__controllers,
       function (controller) {
         // Make revert work on Default.
-        if (!this.getRoot().load.remembered) {
+        if (!_this.load.remembered) {
           controller.setValue(controller.initialValue);
         } else {
-          recallSavedValue(gui || this.getRoot(), controller);
+          recallSavedValue(_this, controller);
         }
 
         // fire onFinishChange callback
         controller.__propagateFinishChange(controller.getValue());
-      },
-      this
+      }
     );
 
-    common.each(this.__folders, function (folder) {
+    common.each(_this.__folders, function (folder) {
       folder.revert(folder);
     });
 
@@ -1450,6 +1514,8 @@ GUI.CLASS_CLOSE_BUTTON = "close-button";
 GUI.CLASS_CLOSE_TOP = "close-top";
 GUI.CLASS_CLOSE_BOTTOM = "close-bottom";
 GUI.CLASS_DRAG = "drag";
+GUI.CLASS_DISPLAY_NONE = "display-none";
+GUI.CLASS_LIGHT_THEME = "light-theme";
 
 GUI.DEFAULT_WIDTH = 245;
 //GUI.TEXT_CLOSED = "Close Controls";
@@ -1461,49 +1527,72 @@ dom.bind(window, "keydown", GUI._keydownHandler, false);
 
 function add(gui, object, property, params) {
   let controller;
+  let customObject;
 
   // add( new SomeCustomerController(a,b,c), params)
   if (object instanceof Controller) {
     controller = object;
     params = property || {};
+    property = undefined;
   } else {
+    // TODO: used anywhere? Otherwise this will be taken out.
+    if (object.arguments) {
+      // custom controller
+      //
+      // TODO: fix this mess. Ugly!
+      customObject = object;
+      object = customObject.arguments.object;
+      property = customObject.arguments.property;
+      params = {
+        factoryArgs: customObject.arguments.opts,
+      };
+    }
+
     if (!(property in object)) {
       throw new Error(`Object "${object}" has no property "${property}"`);
     }
 
-    if (params.color) {
-      controller = new ColorController(object, property);
+    const FoundController = gui.findController(params.controller);
+    if (FoundController) {
+      controller = new FoundController(object, property, ...params.factoryArgs);
+    } else if (params.color) {
+      controller = new ColorController(object, property, ...params.factoryArgs);
+    } else if (customObject !== undefined && typeof customObject.property === "string") {
+      // TODO: used anywhere? Otherwise this will be taken out.
+      controller = customObject;
     } else if (params.bgcolor) {
-      controller = new BgColorController(object, property);
+      controller = new BgColorController(object, property, ...params.factoryArgs);
     } else if (params.ngcolor) {
-      controller = new NgColorController(object, property);
+      controller = new NgColorController(object, property, ...params.factoryArgs);
     } else if (params.gtcolor) {
-      controller = new GtColorController(object, property);
+      controller = new GtColorController(object, property, ...params.factoryArgs);
     } else if (params.hsvcolor) {
-      controller = new HSVColorController(object, property);
+      controller = new HSVColorController(object, property, ...params.factoryArgs);
     } else if (params.easing) {
-      controller = new EasingFunctionController(object, property);
+      controller = new EasingFunctionController(object, property, ...params.factoryArgs);
     } else if (params.multiline) {
-      controller = new TextAreaController(object, property);
-  } else if (params.gradient) {
-    controller = new GradientController(object, property, params.factoryArgs[0]);
+      controller = new TextAreaController(object, property, ...params.factoryArgs);
+    } else if (params.gradient) {
+      controller = new GradientController(object, property, ...params.factoryArgs);
     } else if (params.image) {
-      controller = new ImageController(object, property);
+      controller = new ImageController(object, property, ...params.factoryArgs);
     } else if (params.plotter) {
-      controller = new PlotterController(object, property, params);
+      controller = new PlotterController(object, property, ...params.factoryArgs);
       gui.listen(controller);
-  } else if (params.file) {
-    controller = new FileController(object, property);
-  } else if (object instanceof CustomController && property === undefined) {
-    controller = object;
-  } else if (!(object instanceof CustomController) && params.custom && object[property] === undefined) {
-    controller = new CustomController(object, property);
-  } else {
-    const factoryArgs =
-      object instanceof CustomController
-        ? [property].concat(params.factoryArgs)
-        : [object, property].concat(params.factoryArgs);
-    controller = controllerFactory.apply(gui, factoryArgs);
+    } else if (params.file) {
+      controller = new FileController(object, property, ...params.factoryArgs);
+    } else if (params.vector) {
+      controller = new VectorController(object, property, ...params.factoryArgs);
+    } else if (params.custom) {
+      controller = new CustomController(object, property, ...params.factoryArgs);
+    } else {
+      controller = controllerFactory(object, property, ...params.factoryArgs);
+    }
+    if (controller === null) {
+      controller = customObject;
+    } else if (customObject != null) {
+      customObject.controller = controller;
+    }
   }
 
   if (!controller) {
@@ -1527,7 +1616,13 @@ function add(gui, object, property, params) {
   const name = document.createElement("span");
   dom.addClass(name, "property-name");
   // name.innerHTML = controller.label;      // TODO
-  name.innerHTML = controller.property;
+  if (customObject !== undefined && typeof customObject.property === "object") {
+    for (const propertyName in customObject.property) {
+      name.appendChild(customObject.property[propertyName]);
+    }
+  } else {
+    name.innerHTML = controller.property;
+  }
 
   const container = document.createElement("div");
   container.appendChild(name);
@@ -1616,7 +1711,7 @@ function augmentController(gui, li, controller) {
 
           return add(gui, controller.object, controller.property, {
             before: nextSibling,
-            factoryArgs: [common.toArray(arguments)],
+            factoryArgs: common.toArray(arguments),
           });
         }
 
@@ -1629,6 +1724,7 @@ function augmentController(gui, li, controller) {
             factoryArgs: [options],
           });
         }
+        return null;
       },
 
       /**
@@ -1680,39 +1776,44 @@ function augmentController(gui, li, controller) {
       step: controller.__step,
     });
 
-    common.each([
-    "updateDisplay", "onChange", "onFinishChange", "step", "min", "max"], function (method) {
-      const pc = controller[method];
-      const pb = box[method];
-      controller[method] = box[method] = function () {
-        const args = ARR_SLICE.call(arguments);
-        pc.apply(controller, args);
-        return pb.apply(box, args);
-      };
-    });
+    common.each(
+      [
+      "updateDisplay", "onChange", "onFinishChange", "setValue", "min", "max", "step", "mode", "setReadonly"],
+      function (method) {
+        const pc = controller[method];
+        const pb = box[method];
+        controller[method] = box[method] = function () {
+          const args = ARR_SLICE.call(arguments);
+          pc.apply(controller, args);
+          return pb.apply(box, args);
+        };
+      }
+    );
 
     dom.addClass(li, "has-slider");
     controller.domElement.insertBefore(box.domElement, controller.domElement.firstElementChild);
 
-    // Add animation buttons to slider.
-    const animateButtons = new NumberControllerAnimator(controller.object, controller.property, {
-      min: controller.__min,
-      max: controller.__max,
-      step: controller.__step,
-    });
+    // TODO: test & see what this does exactly
+    if (0) {
+      // Add animation buttons to slider.
+      const animateButtons = new NumberControllerAnimator(controller.object, controller.property, {
+        min: controller.__min,
+        max: controller.__max,
+        step: controller.__step,
+      });
 
-    common.each([
-    "updateDisplay", "onChange", "onFinishChange", "step"], function (method) {
-      const pc = controller[method];
-      const pb = animateButtons[method];
-      controller[method] = animateButtons[method] = function () {
-        const args = Array.prototype.slice.call(arguments);
-        pb.apply(animateButtons, args);
-        return pc.apply(controller, args);
-      };
-    });
-    dom.addClass(li, "has-animate-buttons");
-    controller.domElement.insertBefore(animateButtons.domElement, controller.domElement.firstElementChild);
+      common.each(["updateDisplay", "onChange", "onFinishChange", "step"], function (method) {
+        const pc = controller[method];
+        const pb = animateButtons[method];
+        controller[method] = animateButtons[method] = function () {
+          const args = Array.prototype.slice.call(arguments);
+          pb.apply(animateButtons, args);
+          return pc.apply(controller, args);
+        };
+      });
+      dom.addClass(li, "has-animate-buttons");
+      controller.domElement.insertBefore(animateButtons.domElement, controller.domElement.firstElementChild);
+    }
   } else if (controller instanceof NumberControllerBox) {
     const r = function (returned) {
       // Have we defined both boundaries?
@@ -1726,7 +1827,14 @@ function augmentController(gui, li, controller) {
         controller.remove();
         const newController = add(gui, controller.object, controller.property, {
           before: controller.__li.nextElementSibling,
-          factoryArgs: [controller.__min, controller.__max, controller.__step],
+          factoryArgs: [
+            controller.__min,
+            controller.__max,
+            controller.__step,
+            controller.__minimumSaneStepSize,
+            controller.__maximumSaneStepSize,
+            controller.__mode,
+          ],
         });
 
         newController.name(oldName);
@@ -2040,6 +2148,11 @@ function addSaveMenu(gui) {
 function addResizeHandle(gui) {
   let pmouseX;
 
+  if (gui.parent) {
+    debugger;
+    return;
+  }
+
   gui.__resize_handle = document.createElement("div");
 
   common.extend(gui.__resize_handle.style, {
@@ -2062,7 +2175,7 @@ function addResizeHandle(gui) {
   }
 
   function dragStop() {
-    // dom.removeClass(gui.__closeButton, GUI.CLASS_DRAG);
+    dom.removeClass(gui.__closeButton, GUI.CLASS_DRAG);
     dom.unbind(window, "mousemove", drag);
     dom.unbind(window, "mouseup", dragStop);
 
@@ -2079,7 +2192,7 @@ function addResizeHandle(gui) {
 
     pmouseX = e.clientX;
 
-    // dom.addClass(gui.__closeButton, GUI.CLASS_DRAG);
+    dom.addClass(gui.__closeButton, GUI.CLASS_DRAG);
     dom.bind(window, "mousemove", drag);
     dom.bind(window, "mouseup", dragStop);
 
@@ -2094,7 +2207,9 @@ function addResizeHandle(gui) {
   }
 
   dom.bind(gui.__resize_handle, "mousedown", dragStart);
-  // dom.bind(gui.__closeButton, 'mousedown', dragStart);
+  if (gui.__closeButton) {
+    dom.bind(gui.__closeButton, "mousedown", dragStart);
+  }
 
   gui.domElement.insertBefore(gui.__resize_handle, gui.domElement.firstElementChild);
 }

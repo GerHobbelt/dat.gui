@@ -316,7 +316,7 @@ class Controller {
     }
     // Whenever you call `setValue`, the display will be updated automatically.
     // This reduces some clutter in subclasses.
-    this.updateDisplay(true);
+    this.updateDisplay(/* true */);
     return this;
   }
 
